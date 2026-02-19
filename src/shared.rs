@@ -10,11 +10,25 @@ pub struct ClientRequestType {
     pub data: ClientRequestDataType,
 }
 
+impl std::fmt::Display for ClientRequestType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "ClientRequstType
+    app: {}
+    client: {}
+    data: {}",
+            self.app, self.client, self.data
+        )
+    }
+}
+
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub enum ActionType {
     AddPlayer,
     RemovePlayer,
     TestConnection,
+    IsStart,
 }
 
 impl std::fmt::Display for ActionType {
@@ -26,6 +40,7 @@ impl std::fmt::Display for ActionType {
                 Self::AddPlayer => "新增玩家 (AddPlayer)",
                 Self::RemovePlayer => "刪除玩家 (RemovePlayer)",
                 Self::TestConnection => "測試連線 (TestConnection)",
+                Self::IsStart => "是否開始 (IsStart)",
             }
         )
     }
@@ -67,6 +82,7 @@ pub struct ClientRequestDataRemovePlayerType {
 pub struct ServerResponseDataType {
     pub data_add_player: Option<ServerResponseDataAddPlayerType>,
     pub data_test_connection: Option<ServerResponseDataTestConnectionType>,
+    pub data_is_start: Option<ServerResponseDataIsStartType>,
     pub data_type: ActionType,
 }
 
@@ -75,6 +91,7 @@ impl std::default::Default for ServerResponseDataType {
         Self {
             data_add_player: None,
             data_test_connection: None,
+            data_is_start: None,
             data_type: ActionType::TestConnection,
         }
     }
@@ -83,6 +100,11 @@ impl std::default::Default for ServerResponseDataType {
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 pub struct ServerResponseDataAddPlayerType {
     pub number: u8,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug)]
+pub struct ServerResponseDataIsStartType {
+    pub is_start: bool,
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
