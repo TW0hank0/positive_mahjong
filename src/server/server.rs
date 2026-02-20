@@ -5,21 +5,57 @@ use std::sync;
 use tiny_http;
 
 use positive_mahjong::shared;
+use positive_mahjong::shared::PMJCard;
 
 fn main() {
-    let server = tiny_http::Server::http(std::net::SocketAddrV4::new(
-        std::net::Ipv4Addr::UNSPECIFIED,
-        10066,
-    ))
-    .unwrap();
+    println!("ipv4: {}", local_ip_address::local_ip().unwrap());
+    println!("ipv6: {}", local_ip_address::local_ipv6().unwrap());
+    //
     let backend = sync::Arc::new(sync::RwLock::new(PositiveMahjong::new()));
-    println!("ip: {}", local_ip_address::local_ip().unwrap());
-    for request in server.incoming_requests() {
-        let arc_backend = sync::Arc::clone(&backend);
-        std::thread::spawn(move || {
-            handle_requset(request, arc_backend);
-        });
+    let server_addr_ipv4 = std::net::SocketAddr::V4(std::net::SocketAddrV4::new(
+        std::net::Ipv4Addr::LOCALHOST,
+        10066,
+    ));
+    /* let server_addr_ipv6 = std::net::SocketAddr::V6(std::net::SocketAddrV6::new(
+        std::net::Ipv6Addr::LOCALHOST,
+        10066,
+        0,
+        0,
+    )); */
+    let mut servers = Vec::new();
+    servers.push(handle_server(server_addr_ipv4, sync::Arc::clone(&backend)));
+    // FIXME: ipv6 server
+    //servers.push(handle_server(server_addr_ipv6, sync::Arc::clone(&backend)));
+    let duration_2sec = std::time::Duration::from_secs(2);
+    for server in servers {
+        loop {
+            if server.is_finished() {
+                break;
+            } else {
+                std::thread::sleep(duration_2sec);
+            }
+        }
     }
+}
+
+fn handle_server(
+    addr: std::net::SocketAddr,
+    backend: sync::Arc<sync::RwLock<PositiveMahjong>>,
+) -> std::thread::JoinHandle<()> {
+    std::thread::spawn(move || {
+        /* let server = tiny_http::Server::new(tiny_http::ServerConfig {
+            addr: tiny_http::ConfigListenAddr::IP(vec![addr]),
+            ssl: None,
+        })
+        .unwrap(); */
+        let server = tiny_http::Server::http(addr).unwrap();
+        for request in server.incoming_requests() {
+            let arc_backend = sync::Arc::clone(&backend);
+            std::thread::spawn(move || {
+                handle_requset(request, arc_backend);
+            });
+        }
+    })
 }
 
 fn handle_requset(
@@ -189,6 +225,7 @@ struct PositiveMahjong {
     player_count: u8,
     max_player_count: u8,
     is_start: bool,
+    unuse_cards: Vec<PMJCard>,
 }
 
 impl std::fmt::Display for PositiveMahjong {
@@ -206,11 +243,20 @@ impl std::fmt::Display for PositiveMahjong {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+#[derive(Debug, PartialOrd, Ord, Clone)]
 struct PMJPlayer {
-    ip: std::net::SocketAddr,
-    number: u8,
+    pub ip: std::net::SocketAddr,
+    pub number: u8,
+    pub cards: Vec<PMJCard>,
 }
+
+impl std::cmp::PartialEq for PMJPlayer {
+    fn eq(&self, other: &Self) -> bool {
+        self.ip == other.ip && self.number == other.number
+    }
+}
+
+impl std::cmp::Eq for PMJPlayer {}
 
 impl std::fmt::Display for PMJPlayer {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -219,15 +265,19 @@ impl std::fmt::Display for PMJPlayer {
             "PMJPlayer:
     ip: {}
     number: {}
+    cards: {:?}
 ",
             self.ip.to_string(),
-            self.number.to_string()
+            self.number.to_string(),
+            self.cards
         )
     }
 }
 
 impl PositiveMahjong {
     pub fn new() -> Self {
+        let mut unuse_cards = Vec::new();
+        unuse_cards.push(PMJCard {});
         Self {
             players: Vec::new(),
             player_count: 0,
@@ -244,6 +294,7 @@ impl PositiveMahjong {
             self.players.push(PMJPlayer {
                 ip: ip,
                 number: self.player_count,
+                cards: Vec::new(),
             });
             return Either::Right(self.player_count.clone());
         }
@@ -253,12 +304,15 @@ impl PositiveMahjong {
         if self.players.contains(&PMJPlayer {
             ip: ip,
             number: number,
+            cards: Vec::new(),
         }) {
-            self.players.retain(|&x| {
-                x != PMJPlayer {
-                    ip: ip,
-                    number: number,
-                }
+            self.players.retain(|x: &PMJPlayer| {
+                x.clone()
+                    != PMJPlayer {
+                        ip: ip,
+                        number: number,
+                        cards: Vec::new(),
+                    }
             });
             self.player_count -= 1;
             return Either::Right(());
@@ -270,4 +324,6 @@ impl PositiveMahjong {
     pub fn is_start(&self) -> bool {
         return self.is_start.clone();
     }
+
+    pub fn start_game(&mut self) {}
 }

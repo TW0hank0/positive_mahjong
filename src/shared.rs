@@ -50,6 +50,7 @@ impl std::fmt::Display for ActionType {
 pub struct ClientRequestDataType {
     pub req_type: ActionType,
     pub data_remove_player: Option<ClientRequestDataRemovePlayerType>,
+    pub data_test_connection: Option<ClientRequestDataTestConnectionType>,
 }
 
 impl std::fmt::Display for ClientRequestDataType {
@@ -58,8 +59,9 @@ impl std::fmt::Display for ClientRequestDataType {
             f,
             "ClientRequestDataType
     req_type: {}
-    data_remove_player: {:?}",
-            self.req_type, self.data_remove_player
+    data_remove_player: {:?}
+    data_test_connection: {:?}",
+            self.req_type, self.data_remove_player, self.data_test_connection
         )
     }
 }
@@ -69,6 +71,7 @@ impl std::default::Default for ClientRequestDataType {
         Self {
             req_type: ActionType::TestConnection,
             data_remove_player: None,
+            data_test_connection: None,
         }
     }
 }
@@ -76,6 +79,31 @@ impl std::default::Default for ClientRequestDataType {
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 pub struct ClientRequestDataRemovePlayerType {
     pub number: u8,
+}
+
+impl std::fmt::Display for ClientRequestDataRemovePlayerType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "ClientRequestDataRemovePlayerType {{ number: {} }}",
+            self.number
+        )
+    }
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug)]
+pub struct ClientRequestDataTestConnectionType {
+    pub number: u8,
+}
+
+impl std::fmt::Display for ClientRequestDataTestConnectionType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "ClientRequestDataTestConnectionType {{ number: {} }}",
+            self.number
+        )
+    }
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
@@ -118,4 +146,102 @@ pub struct ServerResponseType {
     pub data: ServerResponseDataType,
     pub msg: String,
     pub is_error: bool,
+}
+
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+pub struct PMJCard {
+    pub card_type: PMJCardTypes,
+    pub card_number: u8,
+    pub card_id: u8,
+}
+
+impl std::fmt::Display for PMJCard {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}{}", self.card_number, self.card_type)
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+pub enum PMJCardTypes {
+    TenThousand,            //萬
+    Line,                   //條
+    Dots,                   //筒
+    Flower(PMJCardFlowers), //花
+    Words(PMJCardWords),    //字
+}
+
+impl std::fmt::Display for PMJCardTypes {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::TenThousand => String::from("萬"),
+                Self::Line => String::from("條"),
+                Self::Dots => String::from("筒"),
+                Self::Flower(flower) => format!("{}", flower),
+                Self::Words(word) => format!("{}", word),
+            }
+        )
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+pub enum PMJCardFlowers {
+    Spring,        //春
+    Summer,        //夏
+    Fall,          //秋
+    Winter,        //冬
+    Plum,          //梅
+    Orchid,        //蘭
+    Bamboo,        //竹
+    Chrysanthemum, //菊
+}
+
+impl std::fmt::Display for PMJCardFlowers {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::Spring => "春",
+                Self::Summer => "夏",
+                Self::Fall => "秋",
+                Self::Winter => "冬",
+                Self::Plum => "梅",
+                Self::Orchid => "蘭",
+                Self::Bamboo => "竹",
+                Self::Chrysanthemum => "菊",
+            }
+        )
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+pub enum PMJCardWords {
+    East,        //東
+    South,       //南
+    West,        //西
+    North,       //北
+    RedDragon,   //中 (紅中)
+    GreenDragon, //青發
+    WhiteDragon, //白板
+}
+
+impl std::fmt::Display for PMJCardWords {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::East => "東",
+                Self::South => "南",
+                Self::West => "西",
+                Self::North => "北",
+                Self::RedDragon => "中",
+                Self::GreenDragon => "青發",
+                Self::WhiteDragon => "白板",
+            }
+        )
+    }
 }
