@@ -1,5 +1,5 @@
 use serde;
-use std;
+use std::{self, vec};
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 pub struct ClientRequestType {
@@ -151,7 +151,15 @@ pub struct ServerResponseType {
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub struct PMJCard {
     pub card_type: PMJCardTypes,
+    /// - 萬、條、筒：
+    ///
+    /// 1~4 (1, 2, 3, 4)
+    ///
+    /// - 花、字：
+    ///
+    /// 0
     pub card_number: u8,
+    /// 代表第`card_id`張牌
     pub card_id: u8,
 }
 
@@ -198,6 +206,21 @@ pub enum PMJCardFlowers {
     Chrysanthemum, //菊
 }
 
+impl PMJCardFlowers {
+    pub fn get_all() -> Vec<Self> {
+        vec![
+            Self::Spring,
+            Self::Summer,
+            Self::Fall,
+            Self::Winter,
+            Self::Plum,
+            Self::Orchid,
+            Self::Bamboo,
+            Self::Chrysanthemum,
+        ]
+    }
+}
+
 impl std::fmt::Display for PMJCardFlowers {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
@@ -226,6 +249,20 @@ pub enum PMJCardWords {
     RedDragon,   //中 (紅中)
     GreenDragon, //青發
     WhiteDragon, //白板
+}
+
+impl PMJCardWords {
+    pub fn get_all() -> Vec<Self> {
+        vec![
+            Self::East,
+            Self::South,
+            Self::West,
+            Self::North,
+            Self::RedDragon,
+            Self::GreenDragon,
+            Self::WhiteDragon,
+        ]
+    }
 }
 
 impl std::fmt::Display for PMJCardWords {

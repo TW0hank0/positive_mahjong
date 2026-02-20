@@ -8,7 +8,8 @@ fn main() {
     let mut server_ip = String::new();
     println!("input ipv4:");
     std::io::stdin().read_line(&mut server_ip).ok();
-    println!("get ip: {}", server_ip);
+    let server_url = format!("http://{}:10066/", server_ip.clone());
+    //println!("get ip: {}", server_ip);
     //let server_ip = "localhost";
     let client = reqwest::blocking::Client::new();
     //
@@ -23,7 +24,7 @@ fn main() {
     })
     .unwrap();
     let response = client
-        .post(format!("http://{}:10066/", server_ip.clone()))
+        .post(server_url)
         .body(request)
         .timeout(std::time::Duration::from_mins(1))
         .send()

@@ -4,8 +4,8 @@ use std;
 use std::sync;
 use tiny_http;
 
-use positive_mahjong::shared;
-use positive_mahjong::shared::PMJCard;
+use positive_mahjong::shared::{self, PMJCardFlowers, PMJCardTypes};
+use positive_mahjong::shared::{PMJCard, PMJCardWords};
 
 fn main() {
     println!("ipv4: {}", local_ip_address::local_ip().unwrap());
@@ -277,12 +277,44 @@ impl std::fmt::Display for PMJPlayer {
 impl PositiveMahjong {
     pub fn new() -> Self {
         let mut unuse_cards = Vec::new();
-        unuse_cards.push(PMJCard {});
+        for card_type in vec![
+            PMJCardTypes::TenThousand,
+            PMJCardTypes::Line,
+            PMJCardTypes::Dots,
+        ] {
+            for number in 1..10 {
+                for card_id in 1..5 {
+                    unuse_cards.push(PMJCard {
+                        card_type: card_type,
+                        card_number: number,
+                        card_id: card_id,
+                    });
+                }
+            }
+        }
+        for word in PMJCardWords::get_all() {
+            for card_id in 1..5 {
+                unuse_cards.push(PMJCard {
+                    card_type: PMJCardTypes::Words(word),
+                    card_number: 0,
+                    card_id: card_id,
+                });
+            }
+        }
+        for flower in PMJCardFlowers::get_all() {
+            unuse_cards.push(PMJCard {
+                card_type: PMJCardTypes::Flower(flower),
+                card_number: 0,
+                card_id: 1,
+            });
+        }
+        //
         Self {
             players: Vec::new(),
             player_count: 0,
             max_player_count: 4,
             is_start: false,
+            unuse_cards: unuse_cards,
         }
     }
 
