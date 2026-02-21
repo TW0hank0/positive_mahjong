@@ -1,0 +1,74 @@
+name: commit-check
+
+on:
+  push:
+    paths-ignore:
+      - "README.md"
+      - "READMEs/**"
+      - ".vscode/**"
+
+jobs:
+  check:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        #python: [cpython-3.13, pypy-3.11]
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: install rustup (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
+          ls
+          .\rustup-init.exe -y --profile minimal
+
+      - name: install rustup (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          curl https://sh.rustup.rs -o rust-init.sh
+          sh rust-init.sh -y
+
+      - name: check Install
+        run: |
+          rustc --version
+          cargo --version
+
+      - name: install cargo-about
+        run: |
+          cargo install cargo-about
+
+      - name: check cargo-about install
+        run: |
+          cargo-about --version
+
+      - name: debug check
+        run: cargo check
+
+      - name: release check
+        run: cargo check --release
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: check uv install
+        run: |
+          uv self version
+
+      - name: Install Go (Required for addlicense)
+        uses: actions/setup-go@v5
+        with:
+          go-version: "stable"
+
+      - name: Install addlicense
+        run: go install github.com/google/addlicense@latest
+
+      - name: Run License Check
+        run: |
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+          uv run license_check.py

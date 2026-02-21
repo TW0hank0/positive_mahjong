@@ -8,7 +8,7 @@ fn main() {
     let mut server_ip = String::new();
     println!("輸入ip:");
     std::io::stdin().read_line(&mut server_ip).ok();
-    let server_url = format!("http://{}:6666/", server_ip.clone());
+    let server_url = format!("http://{}:{}/", server_ip.clone(), shared::SERVER_PORT);
     //println!("get ip: {}", server_ip);
     //let server_ip = "localhost";
     let client = reqwest::blocking::Client::new();

@@ -1,6 +1,8 @@
 use serde;
 use std::{self, vec};
 
+pub const SERVER_PORT: u16 = 6060;
+
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 pub struct ClientRequestType {
     /// 需為 `positive_mahjong`

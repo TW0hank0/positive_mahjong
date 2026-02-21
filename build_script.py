@@ -1,0 +1,115 @@
+import subprocess
+import sys
+import json
+import os
+import time
+
+
+def main():
+    start_time = time.time()
+    print("-" * 10, "cargo-about", "-" * 10)
+    subprocess.run(
+        [
+            "cargo-about",
+            "generate",
+            "--output-file",
+            "ThirdPartyLicense.html",
+            "about.hbs",
+            "--threshold",
+            "1.0",
+        ],
+        check=True,
+        stdout=sys.stdout,
+        stdin=sys.stdin,
+        stderr=sys.stderr,
+    )
+    #     print("-" * 10, "pip-licenses", "-" * 10)
+    #     subprocess.run(
+    #         [
+    #             "uv",
+    #             "run",
+    #             "pip-licenses",
+    #             "--format=html",
+    #             "--output-file",
+    #             "ThirdPartyLicense-Python.html",
+    #             "--from=mixed",
+    #             "--with-urls",
+    #         ],
+    #         check=True,
+    #         stdout=sys.stdout,
+    #         stdin=sys.stdin,
+    #         stderr=sys.stderr,
+    #     )
+    #     print("-" * 10, "licenses_python.rs", "-" * 10)
+    #     piplicense_output = subprocess.run(
+    #         [
+    #             "uv",
+    #             "run",
+    #             "pip-licenses",
+    #             "--format=json",
+    #             "--from=mixed",
+    #             "--with-urls",
+    #         ],
+    #         check=True,
+    #         capture_output=True,
+    #     )
+    #     piplicense_data = json.loads(piplicense_output.stdout)
+    #     license_file_path = os.path.join(
+    #         os.path.dirname(__file__), "src", "licenses_python.rs"
+    #     )
+    #     piplicense_conversioned_data = """
+    # #[derive(Debug)]
+    # pub struct LicenseInfo {
+    #     pub name: &'static str,
+    #     pub version: &'static str,
+    #     pub license: &'static str,
+    #     pub authors: Vec<&'static str>,
+    # }
+
+    # pub fn get_licenses() -> Vec<LicenseInfo> { \nreturn vec!["""
+    #     for license_data in piplicense_data:
+    #         tmp_str = f"""
+    # LicenseInfo {{
+    #     name: \"{license_data["Name"]}\",
+    #     version: \"{license_data["Version"]}\",
+    #     license: \"{license_data["License"]}\",
+    #     authors: vec![],
+    # }},"""
+    #         piplicense_conversioned_data = (
+    #             piplicense_conversioned_data + "\n" + tmp_str
+    #         )
+    #     piplicense_conversioned_data = (
+    #         piplicense_conversioned_data + "];}"
+    #     )
+    #     with open(license_file_path, "w", encoding="utf-8") as f:
+    #         f.write(piplicense_conversioned_data)
+    #     print("-" * 10, "ptb_launcher", "-" * 10)
+    #     subprocess.run(
+    #         ["uv", "run", "pyinstaller", "ptb_launcher.spec"],
+    #         check=True,
+    #         stdout=sys.stdout,
+    #         stdin=sys.stdin,
+    #         stderr=sys.stderr,
+    #     )
+    print("-" * 10, "cargo build", "-" * 10)
+    subprocess.run(
+        ["cargo", "build", "--release"],
+        check=True,
+        stdout=sys.stdout,
+        stdin=sys.stdin,
+        stderr=sys.stderr,
+    )
+    print("-" * 10, "zip file", "-" * 10)
+    subprocess.run(
+        ["uv", "run", os.path.join("ci", "zip_files.py")],
+        check=True,
+        stdout=sys.stdout,
+        stdin=sys.stdin,
+        stderr=sys.stderr,
+    )
+    print("-" * 20)
+    print("finish in", time.time() - start_time)
+
+
+if __name__ == "__main__":
+    main()

@@ -16,13 +16,13 @@ fn main() {
     //
     let backend = sync::Arc::new(sync::RwLock::new(PositiveMahjong::new()));
     let server_addr_ipv4 = std::net::SocketAddr::V4(std::net::SocketAddrV4::new(
-        std::net::Ipv4Addr::LOCALHOST,
-        6666,
+        std::net::Ipv4Addr::UNSPECIFIED,
+        shared::SERVER_PORT,
     ));
     //let server_addr_ipv4 = "http://localhost:10066";
     let server_addr_ipv6 = std::net::SocketAddr::V6(std::net::SocketAddrV6::new(
         std::net::Ipv6Addr::LOCALHOST,
-        6667,
+        shared::SERVER_PORT,
         0,
         0,
     ));

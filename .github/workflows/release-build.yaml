@@ -1,0 +1,118 @@
+name: release-build
+
+permissions:
+  contents: write
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: install rustup (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
+          ls
+          .\rustup-init.exe -y --profile minimal
+
+      - name: install rustup (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          curl https://sh.rustup.rs -o rust-init.sh
+          sh rust-init.sh -y
+
+      - name: check rust Install
+        run: |
+          rustc --version
+          cargo --version
+
+      - name: install cargo-about
+        run: |
+          cargo install cargo-about
+
+      - name: check cargo-about install
+        run: |
+          cargo-about --version
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: check uv install
+        run: |
+          uv self version
+
+      - name: sync dep
+        run: uv sync --all-extras
+
+      - name: use build script
+        run: uv run build_script.py
+
+      - name: zip files (Linux)
+        id: zip_files_linux
+        if: runner.os == 'Linux'
+        run: |
+          file=$(uv run ci/zip_files.py)
+          echo "zip_path=$file" >> $GITHUB_OUTPUT
+
+      - name: zip files (Windows)
+        if: runner.os == 'Windows'
+        id: zip_files_windows
+        run: |
+          $file = (uv run ci/zip_files.py)
+          echo "zip_path=$file" >> $env:GITHUB_OUTPUT
+
+      - name: Upload exe artifact (Linux)
+        uses: actions/upload-artifact@v4
+        if: runner.os == 'Linux'
+        with:
+          name: ${{ steps.zip_files_linux.outputs.zip_path }}
+          path: ${{ steps.zip_files_linux.outputs.zip_path }}
+
+      - name: Upload exe artifact (Windows)
+        uses: actions/upload-artifact@v4
+        if: runner.os == 'Windows'
+        with:
+          name: ${{ steps.zip_files_windows.outputs.zip_path }}
+          path: ${{ steps.zip_files_windows.outputs.zip_path }}
+
+  upload:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Upload artifacts to release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UPLOAD_URL: ${{ github.event.release.upload_url }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          upload_url="${UPLOAD_URL%\{*}"
+          echo "Uploading artifacts to $upload_url"
+          shopt -s globstar || true
+          for f in artifacts/**; do
+            if [ -f "$f" ]; then
+              echo "Uploading $f"
+              curl -sS -X POST \
+                -H "Authorization: token $GITHUB_TOKEN" \
+                -H "Content-Type: application/octet-stream" \
+                --data-binary @"$f" \
+                "$upload_url?name=$(basename "$f")"
+            fi
+          done
