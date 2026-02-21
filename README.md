@@ -1,6 +1,6 @@
 # positive_mahjong
 
-用Rust編寫
+Server使用Rust編寫
 
 ### 授權
 
