@@ -1,4 +1,3 @@
-use iced;
 use positive_mahjong::shared::{self, ClientRequestDataIsStartType};
 use reqwest;
 use serde_json;
@@ -78,18 +77,4 @@ fn main() {
         let body = response.text().unwrap(); //.await?;
         println!("回應: {}", body);
     }
-}
-
-pub enum PMJClientMsg {}
-
-struct PMJClient {}
-
-impl PMJClient {
-    pub fn new() -> Self {
-        Self {}
-    }
-
-    pub fn update(&self, message: PMJClientMsg) {}
-
-    pub fn view(&self) {}
 }

@@ -7,7 +7,7 @@ use tiny_http;
 use rand;
 use rand::{prelude::SliceRandom, seq::IndexedRandom};
 
-use positive_mahjong::shared;
+use positive_mahjong::shared::{self, GameActionAfter, GameActionPlayerRound, GameActionWaitRound};
 use positive_mahjong::shared::{PMJCard, PMJCardFlowers, PMJCardTypes, PMJCardWords};
 
 fn main() {
@@ -241,7 +241,55 @@ struct PositiveMahjong {
     is_start: bool,
     unuse_cards: Vec<PMJCard>,
     game_status: GameStatus,
+    msg_queue_wait: sync::Arc<sync::RwLock<Vec<PlayerWaitRoundAction>>>,
+    msg_queue_player: sync::Arc<sync::RwLock<Vec<PlayerPlayerRoundAction>>>,
+    msg_queue_after: sync::Arc<sync::RwLock<Vec<AfterAction>>>,
 }
+
+#[derive(Debug)]
+pub struct PlayerWaitRoundAction {
+    pub player_ip: std::net::SocketAddr,
+    pub player_number: u8,
+    pub action: GameActionWaitRound,
+}
+
+impl std::cmp::PartialEq for PlayerWaitRoundAction {
+    fn eq(&self, other: &Self) -> bool {
+        self.player_number == other.player_number && self.action == other.action
+    }
+}
+
+impl std::cmp::Eq for PlayerWaitRoundAction {}
+
+#[derive(Debug)]
+pub struct AfterAction {
+    pub player_ip: std::net::SocketAddr,
+    pub player_number: u8,
+    pub action: GameActionAfter,
+}
+
+impl std::cmp::PartialEq for AfterAction {
+    fn eq(&self, other: &Self) -> bool {
+        self.player_number == other.player_number && self.action == other.action
+    }
+}
+
+impl std::cmp::Eq for AfterAction {}
+
+#[derive(Debug)]
+pub struct PlayerPlayerRoundAction {
+    pub player_ip: std::net::SocketAddr,
+    pub player_number: u8,
+    pub action: GameActionPlayerRound,
+}
+
+impl std::cmp::PartialEq for PlayerPlayerRoundAction {
+    fn eq(&self, other: &Self) -> bool {
+        self.player_number == other.player_number && self.action == other.action
+    }
+}
+
+impl std::cmp::Eq for PlayerPlayerRoundAction {}
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct GameStatus {
@@ -366,6 +414,9 @@ impl PositiveMahjong {
                 is_round_finish: false,
                 is_game_finish: false,
             },
+            msg_queue_player: sync::Arc::new(sync::RwLock::new(Vec::new())),
+            msg_queue_wait: sync::Arc::new(sync::RwLock::new(Vec::new())),
+            msg_queue_after: sync::Arc::new(sync::RwLock::new(Vec::new())),
         }
     }
 
@@ -439,6 +490,7 @@ impl PositiveMahjong {
         self.get_one_unuse_card(0);
         //
         //TODO:等待過補
+        self.game_loop();
     }
 
     pub fn replacing_a_flower(
@@ -480,6 +532,7 @@ impl PositiveMahjong {
         }
     }
 
+    /// for client
     pub fn get_cards(
         &self,
         player_ip: std::net::SocketAddr,
@@ -499,21 +552,43 @@ impl PositiveMahjong {
         }
     }
 
+    /// for client
     pub fn get_game_status(&self) -> GameStatus {
         return self.game_status.clone();
     }
 
-    pub fn game_loop(&self) {
+    pub fn game_loop(&mut self) {
         loop {
             for round_player_number in 0..self.players.len() {
                 for _round_type in vec![GameRoundType::PlayerRoound, GameRoundType::WaitRound] {
-                    if !self.game_status.is_game_finish {}
+                    if !self.game_status.is_game_finish {
+                        match self.game_status.round_type {
+                            GameRoundType::PlayerRoound => {
+                                self.handle_game_round_player(round_player_number as u8);
+                            }
+                            GameRoundType::WaitRound => {
+                                self.handle_game_round_wait(round_player_number as u8);
+                            }
+                        }
+                        self.change_game_round_type();
+                    } else {
+                        break;
+                    }
                 }
+                if self.game_status.is_game_finish {
+                    break;
+                }
+            }
+            if self.game_status.is_game_finish {
+                println!("遊戲已結束！");
+                break;
+            } else {
+                self.game_status.rounds_count += 1;
             }
         }
     }
 
-    fn change_game_round(&mut self) {
+    fn change_game_round_type(&mut self) {
         match self.game_status.round_type {
             GameRoundType::PlayerRoound => {
                 self.game_status.round_type = GameRoundType::WaitRound;
@@ -524,9 +599,137 @@ impl PositiveMahjong {
         }
     }
 
-    fn handle_game_round_player(&mut self) {}
+    /// for client
+    pub fn player_round_action(
+        &self,
+        player_ip: std::net::SocketAddr,
+        player_number: u8,
+        action: GameActionPlayerRound,
+    ) -> Either<String, ()> {
+        if !self.is_start {
+            return Either::Left(String::from("遊戲未開始！"));
+        } else if self.players.contains(&PMJPlayer {
+            ip: player_ip,
+            number: player_number,
+            cards: Vec::new(),
+        }) {
+            let queue_arc = sync::Arc::clone(&self.msg_queue_player);
+            let mut guard = queue_arc.write().unwrap();
+            guard.push(PlayerPlayerRoundAction {
+                player_ip: player_ip,
+                player_number: player_number,
+                action: action,
+            });
+            return Either::Right(());
+        } else {
+            return Either::Left(String::from("無此玩家或非此玩家回合！"));
+        }
+    }
 
-    fn handle_game_round_wait(&mut self) {}
+    /// for client
+    pub fn player_round_after_action(
+        &self,
+        player_ip: std::net::SocketAddr,
+        player_number: u8,
+        action: GameActionAfter,
+    ) -> Either<String, ()> {
+        if !self.is_start {
+            return Either::Left(String::from("遊戲未開始！"));
+        } else if self.players.contains(&PMJPlayer {
+            ip: player_ip,
+            number: player_number,
+            cards: Vec::new(),
+        }) {
+            let queue_arc = sync::Arc::clone(&self.msg_queue_after);
+            let mut guard = queue_arc.write().unwrap();
+            guard.push(AfterAction {
+                player_ip: player_ip,
+                player_number: player_number,
+                action: action,
+            });
+            return Either::Right(());
+        } else {
+            return Either::Left(String::from("無此玩家或非此玩家回合！"));
+        }
+    }
+
+    fn handle_game_round_player(&mut self, player_number: u8) {
+        let duration = std::time::Duration::from_secs(1);
+        {
+            let queue_arc_player = sync::Arc::clone(&self.msg_queue_player);
+            let mut exit_loop: bool = false;
+            loop {
+                std::thread::sleep(duration);
+                let guard = queue_arc_player.read().unwrap();
+                if !guard.is_empty() {
+                    for action in guard.iter() {
+                        if action.player_number == player_number {
+                            match action.action {
+                                GameActionPlayerRound::DrawATile => {
+                                    self.get_one_unuse_card(player_number as usize);
+                                    exit_loop = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                if exit_loop {
+                    break;
+                }
+            }
+            {
+                let mut guard = queue_arc_player.write().unwrap();
+                guard.clear();
+            }
+        }
+        //
+        {
+            let mut exit_loop: bool = false;
+            let queue_arc_after = sync::Arc::clone(&self.msg_queue_after);
+            loop {
+                std::thread::sleep(duration);
+                let guard = queue_arc_after.read().unwrap();
+                if !guard.is_empty() {
+                    for action in guard.iter() {
+                        if action.player_number == player_number {
+                            match action.action {
+                                GameActionAfter::Throw(card) => {
+                                    if self
+                                        .players
+                                        .get(player_number as usize)
+                                        .unwrap()
+                                        .cards
+                                        .contains(&card)
+                                    {
+                                        let player =
+                                            self.players.get_mut(player_number as usize).unwrap();
+                                        let mut index: usize = 0;
+                                        //FIXME:不太可能出現的邏輯問題
+                                        for i in player.cards.iter() {
+                                            if i == &card {
+                                                break;
+                                            } else {
+                                                index += 1;
+                                            }
+                                        }
+                                        player.cards.remove(index);
+                                        exit_loop = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if exit_loop {
+                    break;
+                }
+            }
+        }
+    }
+
+    fn handle_game_round_wait(&self, player_number: u8) {}
 
     fn get_one_unuse_card(&mut self, player_number: usize) {
         let mut rng = rand::rng();

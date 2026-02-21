@@ -156,7 +156,9 @@ pub struct ServerResponseType {
     pub is_error: bool,
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+#[derive(
+    Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, serde::Deserialize, serde::Serialize,
+)]
 pub struct PMJCard {
     pub card_type: PMJCardTypes,
     /// - 萬、條、筒：
@@ -177,7 +179,9 @@ impl std::fmt::Display for PMJCard {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+#[derive(
+    Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, serde::Deserialize, serde::Serialize,
+)]
 pub enum PMJCardTypes {
     TenThousand,            //萬
     Line,                   //條
@@ -202,7 +206,9 @@ impl std::fmt::Display for PMJCardTypes {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+#[derive(
+    Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, serde::Deserialize, serde::Serialize,
+)]
 pub enum PMJCardFlowers {
     Spring,        //春
     Summer,        //夏
@@ -248,7 +254,9 @@ impl std::fmt::Display for PMJCardFlowers {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+#[derive(
+    Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, serde::Deserialize, serde::Serialize,
+)]
 pub enum PMJCardWords {
     East,        //東
     South,       //南
@@ -286,6 +294,78 @@ impl std::fmt::Display for PMJCardWords {
                 Self::RedDragon => "中",
                 Self::GreenDragon => "青發",
                 Self::WhiteDragon => "白板",
+            }
+        )
+    }
+}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub enum GameActions {
+    WaitRound(GameActionWaitRound),
+    PlayerRound(GameActionPlayerRound),
+}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize, PartialEq, Eq)]
+pub enum GameActionWaitRound {
+    ///補花
+    ReplacingAFlower,
+    ///吃
+    Eat,
+    ///碰
+    Triplet,
+    ///明槓
+    ExposedKong,
+    ///暗槓
+    ConcealedKong,
+}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize, PartialEq, Eq)]
+pub enum GameActionAfter {
+    ///丟牌
+    Throw(PMJCard),
+}
+
+impl std::fmt::Display for GameActionAfter {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::Throw(_) => "丟牌",
+            }
+        )
+    }
+}
+
+impl std::fmt::Display for GameActionWaitRound {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::ReplacingAFlower => "補花",
+                Self::Eat => "吃",
+                Self::Triplet => "碰",
+                Self::ExposedKong => "明槓",
+                Self::ConcealedKong => "暗槓",
+            }
+        )
+    }
+}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize, PartialEq, Eq)]
+pub enum GameActionPlayerRound {
+    ///摸牌
+    DrawATile,
+}
+
+impl std::fmt::Display for GameActionPlayerRound {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::DrawATile => "摸牌",
             }
         )
     }
