@@ -3,10 +3,11 @@ name = "positive_mahjong"
 version = "0.1.0"
 edition = "2024"
 repository = "https://github.com/TW0hank0/positive_mahjong"
+default-run = "pmj_server"
 
 [[bin]]
-name = "pmj_client"
-path = "src/client/client.rs"
+name = "pmj_client_test_connection"
+path = "src/client_test_connection/client.rs"
 
 [[bin]]
 name = "pmj_server"

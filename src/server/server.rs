@@ -66,13 +66,13 @@ fn handle_server(
         for request in server.incoming_requests() {
             let arc_backend = sync::Arc::clone(&backend);
             std::thread::spawn(move || {
-                handle_requset(request, arc_backend);
+                handle_request(request, arc_backend);
             });
         }
     })
 }
 
-fn handle_requset(
+fn handle_request(
     mut request: tiny_http::Request,
     backend: sync::Arc<sync::RwLock<PositiveMahjong>>,
 ) {
@@ -240,6 +240,36 @@ struct PositiveMahjong {
     max_player_count: u8,
     is_start: bool,
     unuse_cards: Vec<PMJCard>,
+    game_status: GameStatus,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+pub struct GameStatus {
+    pub rounds_count: u16,
+    pub round_type: GameRoundType,
+    /// 當 `round_type` 是 `GameRoundType::WaitRound` 時，
+    /// `current_player_number` 是最後一個動作的玩家的 `player_number`
+    pub current_player_number: u8,
+    /// 回合是否結束
+    pub is_round_finish: bool,
+    /// 遊戲是否結束
+    pub is_game_finish: bool,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+pub enum GameRoundType {
+    /// 玩家時間
+    ///
+    /// 可以：抽牌
+    ///
+    /// 不可：碰、吃、槓、暗槓、明槓、補花
+    PlayerRoound,
+    /// 等待時間
+    ///
+    /// 可以：碰、吃、槓、暗槓、明槓、補花
+    ///
+    /// 不可：抽牌
+    WaitRound,
 }
 
 impl std::fmt::Display for PositiveMahjong {
@@ -329,6 +359,13 @@ impl PositiveMahjong {
             max_player_count: 4,
             is_start: false,
             unuse_cards: unuse_cards,
+            game_status: GameStatus {
+                rounds_count: 0,
+                round_type: GameRoundType::WaitRound,
+                current_player_number: 0,
+                is_round_finish: false,
+                is_game_finish: false,
+            },
         }
     }
 
@@ -401,6 +438,7 @@ impl PositiveMahjong {
         //莊家多一張
         self.get_one_unuse_card(0);
         //
+        //TODO:等待過補
     }
 
     pub fn replacing_a_flower(
@@ -426,13 +464,69 @@ impl PositiveMahjong {
                     _ => {} //其他忽略
                 }
             }
-            return Either::Right(());
+            if !flower_card_indexes.is_empty() {
+                return Either::Left(String::from("無花可補！"));
+            } else {
+                for index in flower_card_indexes.iter() {
+                    player.cards.remove(index.clone());
+                }
+                for _ in 0..flower_card_indexes.len() {
+                    self.get_one_unuse_card(player_number as usize);
+                }
+                return Either::Right(());
+            }
         } else {
             return Either::Left(String::from("無此玩家！"));
         }
     }
 
-    pub fn game_loop() {}
+    pub fn get_cards(
+        &self,
+        player_ip: std::net::SocketAddr,
+        player_number: u8,
+    ) -> Either<String, Vec<PMJCard>> {
+        if !self.is_start {
+            return Either::Left(String::from("遊戲未開始！"));
+        } else if self.players.contains(&PMJPlayer {
+            ip: player_ip,
+            number: player_number,
+            cards: Vec::new(),
+        }) {
+            let player = self.players.get(player_number as usize).unwrap();
+            return Either::Right(player.cards.clone());
+        } else {
+            return Either::Left(String::from("無此玩家！"));
+        }
+    }
+
+    pub fn get_game_status(&self) -> GameStatus {
+        return self.game_status.clone();
+    }
+
+    pub fn game_loop(&self) {
+        loop {
+            for round_player_number in 0..self.players.len() {
+                for _round_type in vec![GameRoundType::PlayerRoound, GameRoundType::WaitRound] {
+                    if !self.game_status.is_game_finish {}
+                }
+            }
+        }
+    }
+
+    fn change_game_round(&mut self) {
+        match self.game_status.round_type {
+            GameRoundType::PlayerRoound => {
+                self.game_status.round_type = GameRoundType::WaitRound;
+            }
+            GameRoundType::WaitRound => {
+                self.game_status.round_type = GameRoundType::PlayerRoound;
+            }
+        }
+    }
+
+    fn handle_game_round_player(&mut self) {}
+
+    fn handle_game_round_wait(&mut self) {}
 
     fn get_one_unuse_card(&mut self, player_number: usize) {
         let mut rng = rand::rng();
