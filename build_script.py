@@ -1,6 +1,7 @@
 import subprocess
 import sys
-import json
+
+# import json
 import os
 import time
 
@@ -13,7 +14,7 @@ def main():
             "cargo-about",
             "generate",
             "--output-file",
-            "ThirdPartyLicense.html",
+            "ThirdPartyLicense-Rust.html",
             "about.hbs",
             "--threshold",
             "1.0",

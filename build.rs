@@ -13,7 +13,7 @@ fn main() {
         .unwrap()
         .join("src");
     //let out_dir = std::env::var("OUT_DIR").unwrap();
-    let dest_path = Path::new(&out_dir).join("licenses.rs");
+    let dest_path = Path::new(&out_dir).join("licenses_rust.rs");
 
     let metadata = MetadataCommand::new()
         .exec()
@@ -51,7 +51,7 @@ fn main() {
         .args(vec![
             "generate",
             "--output-file",
-            "ThirdPartyLicense.html",
+            "ThirdPartyLicense-Rust.html",
             "about.hbs",
             "--threshold",
             "1.0",

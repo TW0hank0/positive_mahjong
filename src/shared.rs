@@ -1,5 +1,4 @@
 use serde;
-use std::{self, vec};
 
 pub const SERVER_PORT: u16 = 6060;
 

@@ -19,7 +19,6 @@ fn main() {
         std::net::Ipv4Addr::UNSPECIFIED,
         shared::SERVER_PORT,
     ));
-    //let server_addr_ipv4 = "http://localhost:10066";
     let server_addr_ipv6 = std::net::SocketAddr::V6(std::net::SocketAddrV6::new(
         std::net::Ipv6Addr::UNSPECIFIED,
         shared::SERVER_PORT,
@@ -381,7 +380,8 @@ impl PositiveMahjong {
         self.unuse_cards.shuffle(&mut rng);
         //
         for _ in 0..4 {
-            for player in self.players.iter_mut() {
+            for player_number in 0..self.players.len() {
+                /* let player = self.players.get_mut(player_number).unwrap();
                 for _ in 0..4 {
                     let card = self.unuse_cards.choose(&mut rng).unwrap().clone();
                     let mut index = 0;
@@ -394,8 +394,61 @@ impl PositiveMahjong {
                     }
                     self.unuse_cards.remove(index);
                     player.cards.push(card);
+                } */
+                self.get_one_unuse_card(player_number);
+            }
+        }
+        //莊家多一張
+        self.get_one_unuse_card(0);
+        //
+    }
+
+    pub fn replacing_a_flower(
+        &mut self,
+        player_ip: std::net::SocketAddr,
+        player_number: u8,
+    ) -> Either<String, ()> {
+        if !self.is_start {
+            return Either::Left(String::from("遊戲未開始！"));
+        } else if self.players.contains(&PMJPlayer {
+            ip: player_ip,
+            number: player_number,
+            cards: Vec::new(),
+        }) {
+            let player = self.players.get_mut(player_number as usize).unwrap();
+            let mut flower_card_indexes: Vec<usize> = Vec::new();
+            let card_index: usize = 0;
+            for card in player.cards.iter() {
+                match card.card_type {
+                    PMJCardTypes::Flower(_) => {
+                        flower_card_indexes.push(card_index.clone());
+                    }
+                    _ => {} //其他忽略
                 }
             }
+            return Either::Right(());
+        } else {
+            return Either::Left(String::from("無此玩家！"));
+        }
+    }
+
+    pub fn game_loop() {}
+
+    fn get_one_unuse_card(&mut self, player_number: usize) {
+        let mut rng = rand::rng();
+        let player = self.players.get_mut(player_number).unwrap();
+        for _ in 0..4 {
+            let card = self.unuse_cards.choose(&mut rng).unwrap().clone();
+            let mut index = 0;
+            for unuse_card in self.unuse_cards.iter() {
+                if unuse_card.clone() == card.clone() {
+                    break;
+                } else {
+                    index += 1;
+                }
+            }
+            self.unuse_cards.remove(index);
+            player.cards.push(card);
         }
     }
 }

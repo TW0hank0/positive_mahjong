@@ -2,6 +2,7 @@
 name = "positive_mahjong"
 version = "0.1.0"
 edition = "2024"
+repository = "https://github.com/TW0hank0/positive_mahjong"
 
 [[bin]]
 name = "pmj_client"
@@ -12,13 +13,13 @@ name = "pmj_server"
 path = "src/server/server.rs"
 
 [dependencies]
+iced = { version = "0.14.0" }
 local-ip-address = "0.6.10"
 rand = "0.10.0"
 reqwest = { version = "0.13.2", features = ["blocking", "native-tls"] }
 serde = { version = "1.0.228", features = ["serde_derive"] }
 serde_json = "1.0.149"
 tiny_http = { version = "0.12.0", features = [] }
-#tokio = { version = "1.49.0", features = ["full"] }
 
 [build-dependencies]
 cargo_metadata = "0.19"
