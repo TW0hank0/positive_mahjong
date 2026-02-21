@@ -786,6 +786,7 @@ impl PositiveMahjong {
                                             }
                                         }
                                         player.cards.remove(index);
+                                        self.game_status.last_throw_card = Some(card);
                                         exit_loop = true;
                                         break;
                                     }
@@ -803,12 +804,27 @@ impl PositiveMahjong {
         }
     }
 
-    fn have_card(&self, player_number: u8, card: &PMJCard) -> bool {
-        self.players
-            .get(player_number as usize)
-            .unwrap()
-            .cards
-            .contains(card)
+    fn have_card(&self, player_number: u8, card: &PMJCard, do_not_care_id: bool) -> bool {
+        if do_not_care_id {
+            for i in self
+                .players
+                .get(player_number as usize)
+                .unwrap()
+                .cards
+                .iter()
+            {
+                if i.card_number == card.card_number && i.card_type == card.card_type {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            self.players
+                .get(player_number as usize)
+                .unwrap()
+                .cards
+                .contains(card)
+        }
     }
 
     fn handle_game_round_wait(&self, player_number: u8) {
@@ -822,11 +838,76 @@ impl PositiveMahjong {
                 let guard = queue_arc_wait.read().unwrap();
                 if !guard.is_empty() {
                     for action in guard.iter() {
-                        if action.player_number == player_number {
+                        if !(action.player_number == player_number) {
                             is_need_after_throw = true;
                             match action.action {
                                 //FIXME
-                                GameActionWaitRound::Eat(card) => a,
+                                GameActionWaitRound::Eat(card) => {
+                                    if self.game_status.last_throw_card.is_some()
+                                        && card == self.game_status.last_throw_card.unwrap()
+                                        && card.card_number > 0
+                                        && ((card.card_number > 1
+                                            && card.card_number < 9
+                                            && self.have_card(
+                                                action.player_number,
+                                                &PMJCard {
+                                                    card_type: card.card_type,
+                                                    card_number: card.card_number - 1,
+                                                    card_id: 0,
+                                                },
+                                                true,
+                                            )
+                                            && self.have_card(
+                                                action.player_number,
+                                                &PMJCard {
+                                                    card_type: card.card_type,
+                                                    card_number: card.card_number + 1,
+                                                    card_id: 0,
+                                                },
+                                                true,
+                                            ))
+                                            || (card.card_number == 1
+                                                && self.have_card(
+                                                    action.player_number,
+                                                    &PMJCard {
+                                                        card_type: card.card_type,
+                                                        card_number: card.card_number + 1,
+                                                        card_id: 0,
+                                                    },
+                                                    true,
+                                                )
+                                                && self.have_card(
+                                                    action.player_number,
+                                                    &PMJCard {
+                                                        card_type: card.card_type,
+                                                        card_number: card.card_number + 1,
+                                                        card_id: 0,
+                                                    },
+                                                    true,
+                                                ))
+                                            || (card.card_number == 9
+                                                && self.have_card(
+                                                    action.player_number,
+                                                    &PMJCard {
+                                                        card_type: card.card_type,
+                                                        card_number: card.card_number - 1,
+                                                        card_id: 0,
+                                                    },
+                                                    true,
+                                                )
+                                                && self.have_card(
+                                                    action.player_number,
+                                                    &PMJCard {
+                                                        card_type: card.card_type,
+                                                        card_number: card.card_number - 2,
+                                                        card_id: 0,
+                                                    },
+                                                    true,
+                                                )))
+                                    {
+                                        todo!("Not Finish") //TODO
+                                    }
+                                }
                             }
                         }
                     }
