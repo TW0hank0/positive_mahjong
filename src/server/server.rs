@@ -21,7 +21,7 @@ fn main() {
     ));
     //let server_addr_ipv4 = "http://localhost:10066";
     let server_addr_ipv6 = std::net::SocketAddr::V6(std::net::SocketAddrV6::new(
-        std::net::Ipv6Addr::LOCALHOST,
+        std::net::Ipv6Addr::UNSPECIFIED,
         shared::SERVER_PORT,
         0,
         0,
