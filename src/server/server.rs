@@ -317,6 +317,8 @@ pub struct GameStatus {
     pub is_round_finish: bool,
     /// 遊戲是否結束
     pub is_game_finish: bool,
+    /// 最後一個丟的牌
+    pub last_throw_card: Option<PMJCard>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -428,6 +430,7 @@ impl PositiveMahjong {
                 current_player_number: 0,
                 is_round_finish: false,
                 is_game_finish: false,
+                last_throw_card: None,
             },
             msg_queue_player: sync::Arc::new(sync::RwLock::new(Vec::new())),
             msg_queue_wait: sync::Arc::new(sync::RwLock::new(Vec::new())),
@@ -642,7 +645,61 @@ impl PositiveMahjong {
     }
 
     /// for client
+    pub fn wait_round_action(
+        &self,
+        player_ip: std::net::SocketAddr,
+        player_number: u8,
+        action: GameActionWaitRound,
+    ) -> Either<String, ()> {
+        if !self.is_start {
+            return Either::Left(String::from("遊戲未開始！"));
+        } else if self.players.contains(&PMJPlayer {
+            ip: player_ip,
+            number: player_number,
+            cards: Vec::new(),
+        }) {
+            let queue_arc = sync::Arc::clone(&self.msg_queue_wait);
+            let mut guard = queue_arc.write().unwrap();
+            guard.push(PlayerWaitRoundAction {
+                player_ip: player_ip,
+                player_number: player_number,
+                action: action,
+            });
+            return Either::Right(());
+        } else {
+            return Either::Left(String::from("無此玩家或非此玩家回合！"));
+        }
+    }
+
+    /// for client
     pub fn player_round_after_action(
+        &self,
+        player_ip: std::net::SocketAddr,
+        player_number: u8,
+        action: GameActionAfter,
+    ) -> Either<String, ()> {
+        if !self.is_start {
+            return Either::Left(String::from("遊戲未開始！"));
+        } else if self.players.contains(&PMJPlayer {
+            ip: player_ip,
+            number: player_number,
+            cards: Vec::new(),
+        }) {
+            let queue_arc = sync::Arc::clone(&self.msg_queue_after);
+            let mut guard = queue_arc.write().unwrap();
+            guard.push(AfterAction {
+                player_ip: player_ip,
+                player_number: player_number,
+                action: action,
+            });
+            return Either::Right(());
+        } else {
+            return Either::Left(String::from("無此玩家或非此玩家回合！"));
+        }
+    }
+
+    /// for client
+    pub fn wait_round_after_action(
         &self,
         player_ip: std::net::SocketAddr,
         player_number: u8,
@@ -741,10 +798,95 @@ impl PositiveMahjong {
                     break;
                 }
             }
+            let mut guard = queue_arc_after.write().unwrap();
+            guard.clear();
         }
     }
 
-    fn handle_game_round_wait(&self, player_number: u8) {}
+    fn have_card(&self, player_number: u8, card: &PMJCard) -> bool {
+        self.players
+            .get(player_number as usize)
+            .unwrap()
+            .cards
+            .contains(card)
+    }
+
+    fn handle_game_round_wait(&self, player_number: u8) {
+        let duration = std::time::Duration::from_secs(1);
+        let mut is_need_after_throw: bool = false;
+        {
+            let queue_arc_wait = sync::Arc::clone(&self.msg_queue_wait);
+            let mut exit_loop: bool = false;
+            loop {
+                std::thread::sleep(duration);
+                let guard = queue_arc_wait.read().unwrap();
+                if !guard.is_empty() {
+                    for action in guard.iter() {
+                        if action.player_number == player_number {
+                            is_need_after_throw = true;
+                            match action.action {
+                                //FIXME
+                                GameActionWaitRound::Eat(card) => a,
+                            }
+                        }
+                    }
+                }
+                if exit_loop {
+                    break;
+                }
+            }
+            {
+                let mut guard = queue_arc_wait.write().unwrap();
+                guard.clear();
+            }
+        }
+        //
+        if is_need_after_throw {
+            let mut exit_loop: bool = false;
+            let queue_arc_after = sync::Arc::clone(&self.msg_queue_after);
+            loop {
+                std::thread::sleep(duration);
+                let guard = queue_arc_after.read().unwrap();
+                if !guard.is_empty() {
+                    for action in guard.iter() {
+                        if action.player_number == player_number {
+                            match action.action {
+                                GameActionAfter::Throw(card) => {
+                                    if self
+                                        .players
+                                        .get(player_number as usize)
+                                        .unwrap()
+                                        .cards
+                                        .contains(&card)
+                                    {
+                                        let player =
+                                            self.players.get_mut(player_number as usize).unwrap();
+                                        let mut index: usize = 0;
+                                        //FIXME:不太可能出現的邏輯問題
+                                        for i in player.cards.iter() {
+                                            if i == &card {
+                                                break;
+                                            } else {
+                                                index += 1;
+                                            }
+                                        }
+                                        player.cards.remove(index);
+                                        exit_loop = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if exit_loop {
+                    break;
+                }
+            }
+            let mut guard = queue_arc_after.write().unwrap();
+            guard.clear();
+        }
+    }
 
     fn get_one_unuse_card(&mut self, player_number: usize) {
         let mut rng = rand::rng();

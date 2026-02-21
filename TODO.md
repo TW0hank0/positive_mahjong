@@ -5,3 +5,5 @@
 - [ ] 客戶端GUI (kotlin)
 - [ ] 啟動器 (py + pyinstaller)
 - [ ] ICON
+- [ ] 伺服器：設定
+- [ ] 伺服器：WaitAction順序

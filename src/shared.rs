@@ -323,15 +323,15 @@ pub enum GameActions {
 #[derive(Debug, serde::Serialize, serde::Deserialize, PartialEq, Eq)]
 pub enum GameActionWaitRound {
     ///補花
-    ReplacingAFlower,
+    ReplacingAFlower(PMJCard),
     ///吃
-    Eat,
+    Eat(PMJCard),
     ///碰
-    Triplet,
+    Triplet(PMJCard),
     ///明槓
-    ExposedKong,
+    ExposedKong(PMJCard),
     ///暗槓
-    ConcealedKong,
+    ConcealedKong(PMJCard),
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize, PartialEq, Eq)]
@@ -358,11 +358,11 @@ impl std::fmt::Display for GameActionWaitRound {
             f,
             "{}",
             match self {
-                Self::ReplacingAFlower => "補花",
-                Self::Eat => "吃",
-                Self::Triplet => "碰",
-                Self::ExposedKong => "明槓",
-                Self::ConcealedKong => "暗槓",
+                Self::ReplacingAFlower(_) => "補花",
+                Self::Eat(_) => "吃",
+                Self::Triplet(_) => "碰",
+                Self::ExposedKong(_) => "明槓",
+                Self::ConcealedKong(_) => "暗槓",
             }
         )
     }

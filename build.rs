@@ -20,6 +20,9 @@ use cargo_metadata::MetadataCommand;
 
 use positive_tool_rs;
 
+use serde;
+use serde_json;
+
 fn main() {
     // 告訴 Cargo 重新執行 build.rs 當 Cargo.lock 變動
     println!("cargo:rerun-if-changed=Cargo.lock");
@@ -28,7 +31,8 @@ fn main() {
         .unwrap()
         .join("src");
     //let out_dir = std::env::var("OUT_DIR").unwrap();
-    let dest_path = Path::new(&out_dir).join("licenses_rust.rs");
+    let dest_path_rust = Path::new(&out_dir).join("licenses_rust.rs");
+    let dest_path_json = Path::new(&out_dir).join("licenses_rust.json");
 
     let metadata = MetadataCommand::new()
         .exec()
@@ -59,8 +63,10 @@ fn main() {
     // 排序以確保輸出穩定
     licenses.sort_by(|a, b| a.name.cmp(&b.name));
 
-    let content = generate_rust_code(&licenses);
-    fs::write(dest_path, content).expect("Failed to write licenses.rs");
+    let content_rust = generate_rust_code(&licenses);
+    fs::write(dest_path_rust, content_rust).expect("Failed to write licenses_rust.rs");
+    let content_json = generate_json_code(&licenses);
+    fs::write(dest_path_json, content_json).expect("Failed to write licenses.json");
     //
     let status = std::process::Command::new("cargo-about")
         .args(vec![
@@ -78,12 +84,16 @@ fn main() {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 struct LicenseEntry {
     name: String,
     version: String,
     license: String,
     authors: Vec<String>,
+}
+
+fn generate_json_code(entries: &[LicenseEntry]) -> String {
+    serde_json::to_string_pretty(entries).unwrap()
 }
 
 fn generate_rust_code(entries: &[LicenseEntry]) -> String {
