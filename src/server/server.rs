@@ -4,8 +4,11 @@ use std;
 use std::sync;
 use tiny_http;
 
-use positive_mahjong::shared::{self, PMJCardFlowers, PMJCardTypes};
-use positive_mahjong::shared::{PMJCard, PMJCardWords};
+use rand;
+use rand::{prelude::SliceRandom, seq::IndexedRandom};
+
+use positive_mahjong::shared;
+use positive_mahjong::shared::{PMJCard, PMJCardFlowers, PMJCardTypes, PMJCardWords};
 
 fn main() {
     println!("ipv4: {}", local_ip_address::local_ip().unwrap());
@@ -14,18 +17,30 @@ fn main() {
     let backend = sync::Arc::new(sync::RwLock::new(PositiveMahjong::new()));
     let server_addr_ipv4 = std::net::SocketAddr::V4(std::net::SocketAddrV4::new(
         std::net::Ipv4Addr::LOCALHOST,
-        10066,
+        6666,
     ));
-    /* let server_addr_ipv6 = std::net::SocketAddr::V6(std::net::SocketAddrV6::new(
+    //let server_addr_ipv4 = "http://localhost:10066";
+    let server_addr_ipv6 = std::net::SocketAddr::V6(std::net::SocketAddrV6::new(
         std::net::Ipv6Addr::LOCALHOST,
-        10066,
+        6667,
         0,
         0,
-    )); */
+    ));
     let mut servers = Vec::new();
     servers.push(handle_server(server_addr_ipv4, sync::Arc::clone(&backend)));
-    // FIXME: ipv6 server
-    //servers.push(handle_server(server_addr_ipv6, sync::Arc::clone(&backend)));
+    servers.push(handle_server(server_addr_ipv6, sync::Arc::clone(&backend)));
+    println!("start? (press <enter>)");
+    let mut bind = String::new();
+    std::io::stdin().read_line(&mut bind).ok();
+    let backend_arc = sync::Arc::clone(&backend);
+    {
+        let mut guard = backend_arc.write().unwrap();
+        guard.start_game();
+    }
+    {
+        let guard = backend_arc.read().unwrap();
+        println!("{}", guard);
+    }
     let duration_2sec = std::time::Duration::from_secs(2);
     for server in servers {
         loop {
@@ -321,6 +336,8 @@ impl PositiveMahjong {
     pub fn add_player(&mut self, ip: std::net::SocketAddr) -> Either<String, u8> {
         if self.player_count >= self.max_player_count {
             return Either::Left(String::from("人數已達上限！"));
+        } else if self.is_start {
+            return Either::Left(String::from("遊戲已開始！"));
         } else {
             self.player_count += 1;
             self.players.push(PMJPlayer {
@@ -333,7 +350,9 @@ impl PositiveMahjong {
     }
 
     pub fn remove_player(&mut self, ip: std::net::SocketAddr, number: u8) -> Either<String, ()> {
-        if self.players.contains(&PMJPlayer {
+        if self.is_start {
+            return Either::Left(String::from("遊戲已開始！"));
+        } else if self.players.contains(&PMJPlayer {
             ip: ip,
             number: number,
             cards: Vec::new(),
@@ -357,5 +376,26 @@ impl PositiveMahjong {
         return self.is_start.clone();
     }
 
-    pub fn start_game(&mut self) {}
+    pub fn start_game(&mut self) {
+        let mut rng = rand::rng();
+        self.unuse_cards.shuffle(&mut rng);
+        //
+        for _ in 0..4 {
+            for player in self.players.iter_mut() {
+                for _ in 0..4 {
+                    let card = self.unuse_cards.choose(&mut rng).unwrap().clone();
+                    let mut index = 0;
+                    for unuse_card in self.unuse_cards.iter() {
+                        if unuse_card.clone() == card.clone() {
+                            break;
+                        } else {
+                            index += 1;
+                        }
+                    }
+                    self.unuse_cards.remove(index);
+                    player.cards.push(card);
+                }
+            }
+        }
+    }
 }

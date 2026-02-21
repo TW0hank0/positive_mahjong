@@ -1,4 +1,4 @@
-use positive_mahjong::shared;
+use positive_mahjong::shared::{self, ClientRequestDataIsStartType};
 use reqwest;
 use serde_json;
 use std;
@@ -6,9 +6,9 @@ use std;
 //#[tokio::main]
 fn main() {
     let mut server_ip = String::new();
-    println!("input ipv4:");
+    println!("輸入ip:");
     std::io::stdin().read_line(&mut server_ip).ok();
-    let server_url = format!("http://{}:10066/", server_ip.clone());
+    let server_url = format!("http://{}:6666/", server_ip.clone());
     //println!("get ip: {}", server_ip);
     //let server_ip = "localhost";
     let client = reqwest::blocking::Client::new();
@@ -24,7 +24,7 @@ fn main() {
     })
     .unwrap();
     let response = client
-        .post(server_url)
+        .post(server_url.clone())
         .body(request)
         .timeout(std::time::Duration::from_mins(1))
         .send()
@@ -88,7 +88,7 @@ fn main() {
     })
     .unwrap();
     let response = client
-        .post(format!("http://{}:10066/", server_ip.clone()))
+        .post(server_url.clone())
         .body(request)
         .timeout(std::time::Duration::from_mins(1))
         .send()
@@ -102,6 +102,9 @@ fn main() {
         std::thread::sleep(std::time::Duration::from_secs(2));
         let request_data = shared::ClientRequestDataType {
             req_type: shared::ActionType::IsStart,
+            data_is_start: Some(ClientRequestDataIsStartType {
+                number: number.clone(),
+            }),
             ..Default::default()
         };
         let request = serde_json::to_string(&shared::ClientRequestType {
@@ -111,7 +114,7 @@ fn main() {
         })
         .unwrap();
         let response = client
-            .post(format!("http://{}:10066/", server_ip.clone()))
+            .post(server_url.clone())
             .body(request)
             .timeout(std::time::Duration::from_mins(1))
             .send()

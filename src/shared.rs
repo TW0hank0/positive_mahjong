@@ -51,6 +51,7 @@ pub struct ClientRequestDataType {
     pub req_type: ActionType,
     pub data_remove_player: Option<ClientRequestDataRemovePlayerType>,
     pub data_test_connection: Option<ClientRequestDataTestConnectionType>,
+    pub data_is_start: Option<ClientRequestDataIsStartType>,
 }
 
 impl std::fmt::Display for ClientRequestDataType {
@@ -72,6 +73,7 @@ impl std::default::Default for ClientRequestDataType {
             req_type: ActionType::TestConnection,
             data_remove_player: None,
             data_test_connection: None,
+            data_is_start: None,
         }
     }
 }
@@ -93,6 +95,11 @@ impl std::fmt::Display for ClientRequestDataRemovePlayerType {
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 pub struct ClientRequestDataTestConnectionType {
+    pub number: u8,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug)]
+pub struct ClientRequestDataIsStartType {
     pub number: u8,
 }
 
@@ -159,7 +166,7 @@ pub struct PMJCard {
     ///
     /// 0
     pub card_number: u8,
-    /// 代表第`card_id`張牌
+    /// 代表第 `card_id` 張牌
     pub card_id: u8,
 }
 
