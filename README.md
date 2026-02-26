@@ -1,6 +1,10 @@
 # positive_mahjong
 
-Server使用Rust編寫
+[Github Repo](https://github.com/TW0hank0/positive_mahjong)
+
+[Codeberg Repo](https://codeberg.org/TW0hank0/positive_mahjong)
+
+伺服器使用Rust編寫
 
 ### 授權
 
