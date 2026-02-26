@@ -319,6 +319,7 @@ pub struct GameStatus {
     pub is_game_finish: bool,
     /// 最後一個丟的牌
     pub last_throw_card: Option<PMJCard>,
+    pub game_winner: Option<PMJPlayer>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -602,6 +603,30 @@ impl PositiveMahjong {
                 break;
             } else {
                 self.game_status.rounds_count += 1;
+            }
+        }
+    }
+
+    fn check_win(&mut self) {
+        'player: for player in self.players.iter() {
+            let mut finish_check_cards = Vec::new();
+            for card in player.cards {
+                if finish_check_cards.contains(&card) {
+                    continue;
+                } else {
+                    if card.card_type == PMJCardTypes::Dots
+                        || card.card_type == PMJCardTypes::Line
+                        || card.card_type == PMJCardTypes::TenThousand
+                    {
+                        todo!()
+                        for i in player.cards.iter() {
+                            if i.card_number == card.card_number && i.card_type == card.card_type {
+                                break;
+                            }
+                        }
+                        return false;
+                    }
+                }
             }
         }
     }
@@ -905,6 +930,8 @@ impl PositiveMahjong {
                                                     true,
                                                 )))
                                     {
+                                        exit_loop = true;
+                                        self.game_status.last_throw_card = None;
                                         todo!("Not Finish") //TODO
                                     }
                                 }
