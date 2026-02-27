@@ -23,6 +23,7 @@ use tiny_http;
 //use rand::{prelude::SliceRandom, seq::IndexedRandom};
 
 use positive_mahjong::shared;
+use positive_mahjong::shared::Either;
 //use positive_mahjong::shared::{self, GameActionAfter, GameActionPlayerRound, GameActionWaitRound};
 //use positive_mahjong::shared::{PMJCard, PMJCardFlowers, PMJCardTypes, PMJCardWords};
 
@@ -76,11 +77,6 @@ fn main() {
             }
         }
     }
-}
-
-pub enum Either<A, B> {
-    Left(A),
-    Right(B),
 }
 
 fn handle_server_v1_simple(

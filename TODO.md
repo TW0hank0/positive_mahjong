@@ -7,7 +7,7 @@
 - [ ] ICON
 - [ ] 伺服器：設定
 - [ ] 伺服器：更好的錯誤訊息
-- [ ] GameMode重寫
+- [ ] GameMode v1重寫
 - [ ] 接入positive_license_tool
 - [ ] 更好的客戶端API
 - [ ] 修復 Github workflow

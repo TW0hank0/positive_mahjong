@@ -386,7 +386,7 @@ impl std::fmt::Display for GameActionPlayerRound {
     }
 }
 
-#[derive(Debug, PartialOrd, Ord, Clone)]
+#[derive(Debug, PartialOrd, Ord, Clone, serde::Deserialize, serde::Serialize)]
 pub struct PMJPlayer {
     pub ip: std::net::SocketAddr,
     pub number: u8,
@@ -415,4 +415,9 @@ impl std::fmt::Display for PMJPlayer {
             self.cards
         )
     }
+}
+
+pub enum Either<A, B> {
+    Left(A),
+    Right(B),
 }

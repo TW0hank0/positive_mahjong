@@ -1,15 +1,14 @@
 //! 玩法v1 - `simple`
 
+use std::sync;
+
 use rand;
 use rand::{prelude::SliceRandom, seq::IndexedRandom};
 
-use positive_mahjong::shared::{self, GameActionAfter, GameActionPlayerRound, GameActionWaitRound};
-use positive_mahjong::shared::{PMJCard, PMJCardFlowers, PMJCardTypes, PMJCardWords};
-
-pub enum Either<A, B> {
-    Left(A),
-    Right(B),
-}
+use positive_mahjong::shared::{
+    Either, GameActionAfter, GameActionPlayerRound, GameActionWaitRound, PMJCard, PMJCardFlowers,
+    PMJCardTypes, PMJCardWords, PMJPlayer,
+};
 
 pub struct PositiveMahjong {
     players: Vec<PMJPlayer>,
@@ -148,6 +147,7 @@ impl PositiveMahjong {
                 is_round_finish: false,
                 is_game_finish: false,
                 last_throw_card: None,
+                game_winner: None,
             },
             msg_queue_player: sync::Arc::new(sync::RwLock::new(Vec::new())),
             msg_queue_wait: sync::Arc::new(sync::RwLock::new(Vec::new())),
@@ -323,10 +323,12 @@ impl PositiveMahjong {
         }
     }
 
-    fn check_win(&mut self) {
+    /// Bool代表使否結束
+    /// 未完
+    fn check_win(&mut self) -> bool {
+        let mut finish_check_cards = Vec::new();
         'player: for player in self.players.iter() {
-            let mut finish_check_cards = Vec::new();
-            for card in player.cards {
+            for card in player.cards.iter() {
                 if finish_check_cards.contains(&card) {
                     continue;
                 } else {
@@ -334,12 +336,129 @@ impl PositiveMahjong {
                         || card.card_type == PMJCardTypes::Line
                         || card.card_type == PMJCardTypes::TenThousand
                     {
-                        todo!();
-                        return false;
+                        if card.card_number > 2 && card.card_number < 8 {
+                            let player_checked_card = Vec::new();
+                            let mut i_card = None;
+                            let mut i2_card = None;
+                            'i_loop: for i in player.cards.iter() {
+                                if finish_check_cards.contains(&i)
+                                    || player_checked_card.contains(&i)
+                                    || card == i
+                                {
+                                    continue;
+                                } else {
+                                    //FIXME
+                                    //碰
+                                    if i.card_number == card.card_number {
+                                        i_card = Some(i);
+                                        for i2 in player.cards.iter() {
+                                            if finish_check_cards.contains(&i)
+                                                || player_checked_card.contains(&i)
+                                                || card == i
+                                                || card == i2
+                                                || i == i2
+                                            {
+                                                continue;
+                                            } else if i2.card_type == card.card_type
+                                                && i2.card_number == card.card_number
+                                            {
+                                                i2_card = Some(i2);
+                                                break 'i_loop;
+                                            }
+                                        }
+                                    } else if i.card_number == (card.card_number + 1) {
+                                        for i2 in player.cards.iter() {
+                                            if finish_check_cards.contains(&i)
+                                                || player_checked_card.contains(&i)
+                                                || card == i
+                                                || card == i2
+                                                || i == i2
+                                            {
+                                                continue;
+                                            } else if i2.card_type == card.card_type
+                                                && i2.card_number == (card.card_number - 1)
+                                            {
+                                                //FIXME:?
+                                                i2_card = Some(i2);
+                                                break 'i_loop;
+                                            }
+                                        }
+                                    } else if i.card_number == (card.card_number - 1) {
+                                        i_card = Some(i);
+                                        for i2 in player.cards.iter() {
+                                            if finish_check_cards.contains(&i)
+                                                || player_checked_card.contains(&i)
+                                                || card == i
+                                                || card == i2
+                                                || i == i2
+                                            {
+                                                continue;
+                                            } else if i2.card_type == card.card_type
+                                                && i2.card_number == (card.card_number + 1)
+                                            {
+                                                //FIXME:?
+                                                i2_card = Some(i2);
+                                                break 'i_loop;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            if i_card.is_none() || i2_card.is_none() {
+                                continue 'player;
+                            } else {
+                                finish_check_cards.push(card);
+                                finish_check_cards.push(i_card.unwrap());
+                                finish_check_cards.push(i2_card.unwrap());
+                            }
+                        }
+                    } else {
+                        match card.card_type {
+                            PMJCardTypes::Flower(_) => {
+                                continue 'player;
+                            }
+                            PMJCardTypes::Dots => {}
+                            PMJCardTypes::Line => {}
+                            PMJCardTypes::TenThousand => {}
+                            PMJCardTypes::Words(word) => {
+                                let mut card_i = None;
+                                let mut card_i2 = None;
+                                'loop_i: for i in player.cards.iter() {
+                                    match i.card_type {
+                                        PMJCardTypes::Words(word_i) => {
+                                            if word_i == word {
+                                                for i2 in player.cards.iter() {
+                                                    match i2.card_type {
+                                                        PMJCardTypes::Words(word_i2) => {
+                                                            if word_i2 == word {
+                                                                card_i = Some(i);
+                                                                card_i2 = Some(i2);
+                                                                break 'loop_i;
+                                                            }
+                                                        }
+                                                        _ => {}
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        _ => {}
+                                    }
+                                }
+                                if card_i.is_none() || card_i2.is_none() {
+                                    continue 'player;
+                                } else {
+                                    finish_check_cards.push(card);
+                                    finish_check_cards.push(card_i.unwrap());
+                                    finish_check_cards.push(card_i2.unwrap());
+                                }
+                            }
+                        }
                     }
                 }
             }
+            finish_check_cards.clear();
         }
+        return false;
     }
 
     fn check_win_have_card(
@@ -586,7 +705,7 @@ impl PositiveMahjong {
         {
             let queue_arc_wait = sync::Arc::clone(&self.msg_queue_wait);
             let mut exit_loop: bool = false;
-            loop {
+            'out_loop: loop {
                 std::thread::sleep(duration);
                 let guard = queue_arc_wait.read().unwrap();
                 if !guard.is_empty() {
@@ -660,7 +779,8 @@ impl PositiveMahjong {
                                     {
                                         exit_loop = true;
                                         self.game_status.last_throw_card = None;
-                                        todo!("Not Finish") //TODO
+                                        todo!("Not Finish"); //TODO
+                                        break 'out_loop;
                                     }
                                 }
                             }
