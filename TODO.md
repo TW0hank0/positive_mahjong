@@ -6,11 +6,12 @@
 - [ ] 啟動器 (py + pyinstaller)
 - [ ] ICON
 - [ ] 伺服器：設定
-- [ ] 伺服器：WaitAction順序
 - [ ] 伺服器：更好的錯誤訊息
 - [ ] GameMode重寫
 - [ ] 接入positive_license_tool
 - [ ] 更好的客戶端API
-- [ ] Github workflow
+- [ ] 修復 Github workflow
 - [ ] rename gamemode v1 to `simple`
-- [ ] Gamemode v2
+- [ ] Gamemode v2 (name: `better`)
+- [ ] mode -> better: 玩家數量（3~4）
+- [ ] 伺服器：玩家數量限制
