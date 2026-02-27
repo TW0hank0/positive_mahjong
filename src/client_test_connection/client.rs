@@ -88,8 +88,14 @@ fn main() {
             .body(request)
             .timeout(timeout_duration.clone())
             .send()
-            .unwrap(); //.await?;
-        let body = response.text().unwrap(); //.await?;
+            .unwrap();
+        let body = response.text().unwrap();
         println!("回應: {}", body);
+        let resp_data: shared::ServerResponseType = serde_json::from_str(&body).unwrap();
+        if resp_data.data.data_is_start.is_some() && resp_data.data.data_is_start.unwrap().is_start
+        {
+            println!("這是測試連線的客戶端，無法遊玩！");
+            break;
+        };
     }
 }
