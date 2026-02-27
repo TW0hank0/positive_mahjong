@@ -11,3 +11,6 @@
 - [ ] GameMode重寫
 - [ ] 接入positive_license_tool
 - [ ] 更好的客戶端API
+- [ ] Github workflow
+- [ ] rename gamemode v1 to `simple`
+- [ ] Gamemode v2

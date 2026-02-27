@@ -385,3 +385,34 @@ impl std::fmt::Display for GameActionPlayerRound {
         )
     }
 }
+
+#[derive(Debug, PartialOrd, Ord, Clone)]
+pub struct PMJPlayer {
+    pub ip: std::net::SocketAddr,
+    pub number: u8,
+    pub cards: Vec<PMJCard>,
+}
+
+impl std::cmp::PartialEq for PMJPlayer {
+    fn eq(&self, other: &Self) -> bool {
+        self.ip == other.ip && self.number == other.number
+    }
+}
+
+impl std::cmp::Eq for PMJPlayer {}
+
+impl std::fmt::Display for PMJPlayer {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "PMJPlayer:
+    ip: {}
+    number: {}
+    cards: {:?}
+",
+            self.ip.to_string(),
+            self.number.to_string(),
+            self.cards
+        )
+    }
+}
