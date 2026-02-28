@@ -1,0 +1,47 @@
+// ui/main.slint
+
+import { Button } from "std-widgets.slint";
+
+export component MainWindow inherits Window {
+    width: 400px;
+    height: 300px;
+    title: "Slint Rust Demo";
+
+    VerticalLayout {
+        spacing: 20px;
+        padding: 20px;
+
+        Text {
+            text: "歡迎來到 Slint 世界";
+            font-size: 24px;
+            horizontal-alignment: center;
+            color: #2c3e50;
+        }
+
+        TextInput {
+            //placeholder-text: "輸入資料...";
+            text <=> root.user_input;
+        }
+
+        Button {
+            text: "執行背景任務 (模擬 POST)";
+            clicked => {
+                root.start_background_task();
+            }
+        }
+
+        Text {
+            text: root.status_text;
+            horizontal-alignment: center;
+            color: root.has_error ? red : green;
+            wrap: TextWrap.word-wrap;
+        }
+    }
+
+    // 屬性與回調定義
+    in-out property<string> user_input: "";
+    in-out property<string> status_text: "就緒狀態";
+    in-out property<bool> has_error: false;
+    
+    callback start_background_task();
+}

@@ -29,6 +29,7 @@ accepted = [
     "Unicode-3.0",
     "OpenSSL",
     "CDLA-Permissive-2.0",
+    "GPL-3.0-only",
 ]
 
 #threshold = 1.0

@@ -780,7 +780,7 @@ impl PositiveMahjong {
                                         exit_loop = true;
                                         self.game_status.last_throw_card = None;
                                         todo!("Not Finish"); //TODO
-                                        break 'out_loop;
+                                        //break 'out_loop;
                                     }
                                 }
                             }

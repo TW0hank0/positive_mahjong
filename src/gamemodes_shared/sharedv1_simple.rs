@@ -13,11 +13,9 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-//! 通用資料
+//! 資料v1 - `simple`
 
 use serde;
-
-pub const SERVER_PORT: u16 = 6060;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 pub struct ClientRequestType {
@@ -419,12 +417,8 @@ impl std::fmt::Display for PMJPlayer {
     }
 }
 
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub enum Either<A, B> {
     Left(A),
     Right(B),
-}
-
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
-pub enum GameModes {
-    V1Simple,
 }

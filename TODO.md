@@ -2,8 +2,8 @@
 
 - [ ] 保護伺服器端 (避免client錯誤導致伺服器崩潰)
 - [ ] 伺服器GUI (rs + iced)
-- [ ] 客戶端+GUI (kotlin)
-- [ ] 啟動器 (py + pyinstaller)
+- [ ] 客戶端+GUI (rust + slint)
+- [ ] 啟動器+Server-Crash-Handler (python + pyinstaller)
 - [ ] ICON
 - [ ] 伺服器：設定
 - [ ] 伺服器：更好的錯誤訊息
