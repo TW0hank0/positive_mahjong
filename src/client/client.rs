@@ -18,7 +18,6 @@ fn main() -> Result<(), slint::PlatformError> {
     let weak_window: Weak<MainWindow> = main_window.as_weak();
     //
     let timeout_duration = std::time::Duration::from_secs(15);
-    let client = reqwest::blocking::Client::new();
     // 設定Callback
     let window_for_callback = main_window.clone_strong();
     main_window.on_test_connection(move || {
@@ -26,36 +25,41 @@ fn main() -> Result<(), slint::PlatformError> {
         let thread_weak: Weak<MainWindow> = weak_window.clone();
         //
         let input_server_ip: String = window_for_callback.get_server_ip().into();
+        let mut resp_body_text = String::new();
         // 線程
         thread::spawn(move || {
             //
-            let server_url = format!(
-                "http://{}:{}/",
-                input_server_ip.clone(),
-                shared::SERVER_PORT
-            );
-            let client = reqwest::blocking::Client::new();
-            //
-            let request_data = shared::ClientRequestDataType {
-                req_action_type: shared::ActionType::TestConnection,
-                ..Default::default()
-            };
-            let request = serde_json::to_string(&shared::ClientRequestType {
-                app: String::from("positive_mahjong"),
-                client: String::from("pmj-client"),
-                data: request_data,
-                game_data_v1: None,
-                is_test_connection: true,
-            })
-            .unwrap();
-            let response = client
-                .post(server_url.clone())
-                .body(request)
-                .timeout(timeout_duration.clone())
-                .send()
+            if input_server_ip.is_empty() {
+                resp_body_text.push_str("錯誤！未輸入正確伺服器Ip！");
+            } else {
+                let server_url = format!(
+                    "http://{}:{}/",
+                    input_server_ip.clone(),
+                    shared::SERVER_PORT
+                );
+                let client = reqwest::blocking::Client::new();
+                //
+                let request_data = shared::ClientRequestDataType {
+                    req_action_type: shared::ActionType::TestConnection,
+                    ..Default::default()
+                };
+                let request = serde_json::to_string(&shared::ClientRequestType {
+                    app: String::from("positive_mahjong"),
+                    client: String::from("pmj-client"),
+                    data: request_data,
+                    game_data_v1: None,
+                    is_test_connection: true,
+                })
                 .unwrap();
-            //
-            let resp_body_text = response.text().unwrap();
+                let response = client
+                    .post(server_url.clone())
+                    .body(request)
+                    .timeout(timeout_duration.clone())
+                    .send()
+                    .unwrap();
+                //
+                resp_body_text.push_str(&response.text().unwrap());
+            }
             // 安全地回到主執行緒更新 UI
             thread_weak
                 .upgrade_in_event_loop(move |upgraded_window| {

@@ -8,7 +8,7 @@ export component MainWindow inherits Window {
     min-height: 360px;
     max-width: 10800px;
     max-height: 72000px;
-    background: #000000;
+    //background: darkgray;
     default-font-size: 30px;
     VerticalLayout {
         spacing: 20px;
@@ -17,13 +17,14 @@ export component MainWindow inherits Window {
             text: "PMJ Client";
             font-size: 35px;
             horizontal-alignment: TextHorizontalAlignment.left;
-            color: lightgray;
+            //color: lightgray;
         }
 
         TextInput {
             //placeholder-text: "輸入資料...";
             text <=> root.server_ip;
             single-line: true;
+            //color: lightgray;
         }
 
         Button {
@@ -37,7 +38,7 @@ export component MainWindow inherits Window {
             Text {
                 text: root.server_response_text;
                 horizontal-alignment: TextHorizontalAlignment.left;
-                color: lightgray;
+                //color: white;
                 wrap: TextWrap.word-wrap;
             }
 
@@ -48,6 +49,6 @@ export component MainWindow inherits Window {
 
     // 屬性與回調定義
     in-out property <string> server_response_text: "";
-    in-out property <string> server_ip: "";
+    in-out property <string> server_ip: "請輸入伺服器Ip";
     callback test_connection();
 }
