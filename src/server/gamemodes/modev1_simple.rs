@@ -5,7 +5,9 @@ use std::sync;
 use rand;
 use rand::{prelude::SliceRandom, seq::IndexedRandom};
 
-use positive_mahjong::shared::{
+use positive_mahjong::shared;
+
+use positive_mahjong::gamemodes_shared::sharedv1_simple::{
     Either, GameActionAfter, GameActionPlayerRound, GameActionWaitRound, PMJCard, PMJCardFlowers,
     PMJCardTypes, PMJCardWords, PMJPlayer,
 };
@@ -699,7 +701,7 @@ impl PositiveMahjong {
         }
     }
 
-    fn handle_game_round_wait(&self, player_number: u8) {
+    fn handle_game_round_wait(&mut self, player_number: u8) {
         let duration = std::time::Duration::from_secs(1);
         let mut is_need_after_throw: bool = false;
         {
@@ -783,6 +785,7 @@ impl PositiveMahjong {
                                         //break 'out_loop;
                                     }
                                 }
+                                _ => todo!(),
                             }
                         }
                     }

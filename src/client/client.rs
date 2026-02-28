@@ -1,3 +1,4 @@
+use slint;
 use slint::{ComponentHandle, SharedString, Weak};
 use std::thread;
 use std::time::Duration;
@@ -8,7 +9,6 @@ slint::include_modules!();
 fn main() -> Result<(), slint::PlatformError> {
     // 1. 初始化視窗
     let main_window: MainWindow = MainWindow::new()?;
-
     // 2. 建立弱參考，用於子執行緒安全更新 UI
     let weak_window: Weak<MainWindow> = main_window.as_weak();
 
@@ -38,14 +38,38 @@ fn main() -> Result<(), slint::PlatformError> {
             let is_err: bool = input_data.is_empty();
 
             // 5. 安全地回到主執行緒更新 UI
-            if let Some(upgraded_window) = thread_weak.upgrade() {
+            thread_weak
+                .upgrade_in_event_loop(move |upgraded_window| {
+                    upgraded_window.set_status_text(SharedString::from(result_message));
+                    upgraded_window.set_has_error(is_err);
+                })
+                .ok();
+            /* match thread_weak.upgrade_in_event_loop(func) {
+                Some(upgraded_window) => {
+                    slint::invoke_from_event_loop(move || {
+                        upgraded_window.set_status_text(SharedString::from(result_message));
+                        upgraded_window.set_has_error(is_err);
+                    })
+                    .ok();
+                }
+                None => {}
+            } */
+            /* {
+                let upgraded_window = thread_weak.clone();
+                slint::invoke_from_event_loop(move || {
+                    upgraded_window.set_status_text(SharedString::from(result_message));
+                    upgraded_window.set_has_error(is_err);
+                })
+                .ok();
+            } */
+            /* if let Some(upgraded_window) = thread_weak.upgrade() {
                 upgraded_window
                     .invoke_from_event_loop(move |w| {
                         w.set_status_text(SharedString::from(result_message));
                         w.set_has_error(is_err);
                     })
                     .ok();
-            }
+            } */
         });
     });
 
