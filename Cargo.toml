@@ -20,6 +20,7 @@ edition = "2024"
 repository = "https://github.com/TW0hank0/positive_mahjong"
 default-run = "pmj_server"
 license = "AGPL-3.0-only"
+authors = ["TW0hank0"]
 
 [[bin]]
 name = "pmj_test_connection"
