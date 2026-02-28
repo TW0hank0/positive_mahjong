@@ -74,6 +74,18 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
         authors: vec!["Andrew Gallant <jamslam@gmail.com>"] 
     },
     LicenseInfo {
+        name: "aligned",
+        version: "0.4.3",
+        license: "MIT OR Apache-2.0",
+        authors: vec![] 
+    },
+    LicenseInfo {
+        name: "aligned-vec",
+        version: "0.6.4",
+        license: "MIT",
+        authors: vec!["sarah <>"] 
+    },
+    LicenseInfo {
         name: "allocator-api2",
         version: "0.2.21",
         license: "MIT OR Apache-2.0",
@@ -122,10 +134,22 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
         authors: vec!["David Tolnay <dtolnay@gmail.com>"] 
     },
     LicenseInfo {
+        name: "arbitrary",
+        version: "1.4.2",
+        license: "MIT OR Apache-2.0",
+        authors: vec!["The Rust-Fuzz Project Developers", "Nick Fitzgerald <fitzgen@gmail.com>", "Manish Goregaokar <manishsmail@gmail.com>", "Simonas Kazlauskas <arbitrary@kazlauskas.me>", "Brian L. Troutwine <brian@troutwine.us>", "Corey Farwell <coreyf@rwell.org>"] 
+    },
+    LicenseInfo {
         name: "arc-swap",
         version: "1.8.2",
         license: "MIT OR Apache-2.0",
         authors: vec!["Michal 'vorner' Vaner <vorner@vorner.cz>"] 
+    },
+    LicenseInfo {
+        name: "arg_enum_proc_macro",
+        version: "0.3.4",
+        license: "MIT",
+        authors: vec!["Luca Barbato <lu_zero@gentoo.org>"] 
     },
     LicenseInfo {
         name: "arrayref",
@@ -144,6 +168,12 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
         version: "1.0.1",
         license: "MIT OR Apache-2.0",
         authors: vec![] 
+    },
+    LicenseInfo {
+        name: "as-slice",
+        version: "0.2.1",
+        license: "MIT OR Apache-2.0",
+        authors: vec!["Jorge Aparicio <jorge@japaric.io>", "Emil Fresk <emil.fresk@gmail.com>"] 
     },
     LicenseInfo {
         name: "ascii",
@@ -254,6 +284,24 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
         authors: vec!["Josh Stone <cuviper@gmail.com>"] 
     },
     LicenseInfo {
+        name: "av-scenechange",
+        version: "0.14.1",
+        license: "MIT",
+        authors: vec!["Josh Holmer <jholmer.in@gmail.com>"] 
+    },
+    LicenseInfo {
+        name: "av1-grain",
+        version: "0.2.5",
+        license: "BSD-2-Clause",
+        authors: vec![] 
+    },
+    LicenseInfo {
+        name: "avif-serialize",
+        version: "0.8.8",
+        license: "BSD-3-Clause",
+        authors: vec!["Kornel Lesiński <kornel@geekhood.net>"] 
+    },
+    LicenseInfo {
         name: "aws-lc-rs",
         version: "1.15.4",
         license: "ISC AND (Apache-2.0 OR ISC)",
@@ -296,6 +344,12 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
         authors: vec!["Alexis Beingessner <a.beingessner@gmail.com>"] 
     },
     LicenseInfo {
+        name: "bit_field",
+        version: "0.10.3",
+        license: "Apache-2.0/MIT",
+        authors: vec!["Philipp Oppermann <dev@phil-opp.com>"] 
+    },
+    LicenseInfo {
         name: "bitflags",
         version: "1.3.2",
         license: "MIT/Apache-2.0",
@@ -306,6 +360,12 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
         version: "2.11.0",
         license: "MIT OR Apache-2.0",
         authors: vec!["The Rust Project Developers"] 
+    },
+    LicenseInfo {
+        name: "bitstream-io",
+        version: "4.9.0",
+        license: "MIT/Apache-2.0",
+        authors: vec!["Brian Langenberger <bjl@usa.net>"] 
     },
     LicenseInfo {
         name: "block",
@@ -336,6 +396,12 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
         version: "1.6.0",
         license: "MIT OR Apache-2.0",
         authors: vec!["Near Inc <hello@near.org>"] 
+    },
+    LicenseInfo {
+        name: "built",
+        version: "0.8.0",
+        license: "MIT",
+        authors: vec!["Lukas Lueg <lukas.lueg@gmail.com>"] 
     },
     LicenseInfo {
         name: "bumpalo",
@@ -608,6 +674,12 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
         authors: vec!["The Servo Project Developers"] 
     },
     LicenseInfo {
+        name: "core2",
+        version: "0.4.0",
+        license: "Apache-2.0 OR MIT",
+        authors: vec!["Brendan Molloy <brendan@bbqsrc.net>"] 
+    },
+    LicenseInfo {
         name: "core_maths",
         version: "0.1.1",
         license: "MIT",
@@ -670,6 +742,18 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
     LicenseInfo {
         name: "crossbeam-channel",
         version: "0.5.15",
+        license: "MIT OR Apache-2.0",
+        authors: vec![] 
+    },
+    LicenseInfo {
+        name: "crossbeam-deque",
+        version: "0.8.6",
+        license: "MIT OR Apache-2.0",
+        authors: vec![] 
+    },
+    LicenseInfo {
+        name: "crossbeam-epoch",
+        version: "0.9.18",
         license: "MIT OR Apache-2.0",
         authors: vec![] 
     },
@@ -872,6 +956,18 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
         authors: vec!["maik klein <maikklein@googlemail.com>", "Maja Kądziołka <maya@compilercrim.es>"] 
     },
     LicenseInfo {
+        name: "equator",
+        version: "0.4.2",
+        license: "MIT",
+        authors: vec!["sarah <>"] 
+    },
+    LicenseInfo {
+        name: "equator-macro",
+        version: "0.4.2",
+        license: "MIT",
+        authors: vec!["sarah <>"] 
+    },
+    LicenseInfo {
         name: "equivalent",
         version: "1.0.2",
         license: "Apache-2.0 OR MIT",
@@ -914,10 +1010,28 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
         authors: vec!["John Nunley <dev@notgull.net>"] 
     },
     LicenseInfo {
+        name: "exr",
+        version: "1.74.0",
+        license: "BSD-3-Clause",
+        authors: vec!["johannesvollmer <contact@johannesvollmer.com>"] 
+    },
+    LicenseInfo {
         name: "fastrand",
         version: "2.3.0",
         license: "Apache-2.0 OR MIT",
         authors: vec!["Stjepan Glavina <stjepang@gmail.com>"] 
+    },
+    LicenseInfo {
+        name: "fax",
+        version: "0.2.6",
+        license: "MIT",
+        authors: vec!["Sebastian K <s3bk@protonmail.com>"] 
+    },
+    LicenseInfo {
+        name: "fax_derive",
+        version: "0.2.0",
+        license: "MIT",
+        authors: vec!["Sebastian K <s3bk@protonmail.com>"] 
     },
     LicenseInfo {
         name: "fdeflate",
@@ -1652,6 +1766,12 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
         authors: vec!["Richard Dodd <richard.o.dodd@gmail.com>", "Joseph Richey", "Sergei Shulepov"] 
     },
     LicenseInfo {
+        name: "interpolate_name",
+        version: "0.2.4",
+        license: "MIT",
+        authors: vec!["Luca Barbato <lu_zero@gentoo.org>"] 
+    },
+    LicenseInfo {
         name: "io-lifetimes",
         version: "1.0.11",
         license: "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
@@ -1760,10 +1880,22 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
         authors: vec!["Bryant Luk <code@bryantluk.com>"] 
     },
     LicenseInfo {
+        name: "lebe",
+        version: "0.5.3",
+        license: "BSD-3-Clause",
+        authors: vec!["johannesvollmer <contact@johannesvollmer.com>"] 
+    },
+    LicenseInfo {
         name: "libc",
         version: "0.2.182",
         license: "MIT OR Apache-2.0",
         authors: vec!["The Rust Project Developers"] 
+    },
+    LicenseInfo {
+        name: "libfuzzer-sys",
+        version: "0.4.12",
+        license: "(MIT OR Apache-2.0) AND NCSA",
+        authors: vec!["The rust-fuzz Project Developers"] 
     },
     LicenseInfo {
         name: "libloading",
@@ -1874,6 +2006,12 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
         authors: vec!["Steven Fackler <sfackler@gmail.com>", "Evan Simmons <esims89@gmail.com>"] 
     },
     LicenseInfo {
+        name: "loop9",
+        version: "0.1.5",
+        license: "MIT",
+        authors: vec!["Kornel <kornel@geekhood.net>"] 
+    },
+    LicenseInfo {
         name: "lru",
         version: "0.16.3",
         license: "MIT",
@@ -1914,6 +2052,12 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
         version: "0.0.6",
         license: "MIT",
         authors: vec!["Steven Sheldon"] 
+    },
+    LicenseInfo {
+        name: "maybe-rayon",
+        version: "0.1.1",
+        license: "MIT",
+        authors: vec![] 
     },
     LicenseInfo {
         name: "memchr",
@@ -2000,6 +2144,12 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
         authors: vec!["Steven Fackler <sfackler@gmail.com>"] 
     },
     LicenseInfo {
+        name: "natord",
+        version: "1.0.9",
+        license: "MIT",
+        authors: vec!["Kang Seonghoon <public+rust@mearie.org>"] 
+    },
+    LicenseInfo {
         name: "ndk",
         version: "0.9.0",
         license: "MIT OR Apache-2.0",
@@ -2030,6 +2180,12 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
         authors: vec!["John Baublitz <john.m.baublitz@gmail.com>"] 
     },
     LicenseInfo {
+        name: "new_debug_unreachable",
+        version: "1.0.6",
+        license: "MIT",
+        authors: vec!["Matt Brubeck <mbrubeck@limpet.net>", "Jonathan Reem <jonathan.reem@gmail.com>"] 
+    },
+    LicenseInfo {
         name: "nix",
         version: "0.30.1",
         license: "MIT",
@@ -2040,6 +2196,42 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
         version: "7.1.3",
         license: "MIT",
         authors: vec!["contact@geoffroycouprie.com"] 
+    },
+    LicenseInfo {
+        name: "nom",
+        version: "8.0.0",
+        license: "MIT",
+        authors: vec!["contact@geoffroycouprie.com"] 
+    },
+    LicenseInfo {
+        name: "noop_proc_macro",
+        version: "0.3.0",
+        license: "MIT",
+        authors: vec!["Luca Barbato <lu_zero@gentoo.org>"] 
+    },
+    LicenseInfo {
+        name: "num-bigint",
+        version: "0.4.6",
+        license: "MIT OR Apache-2.0",
+        authors: vec!["The Rust Project Developers"] 
+    },
+    LicenseInfo {
+        name: "num-derive",
+        version: "0.4.2",
+        license: "MIT OR Apache-2.0",
+        authors: vec!["The Rust Project Developers"] 
+    },
+    LicenseInfo {
+        name: "num-integer",
+        version: "0.1.46",
+        license: "MIT OR Apache-2.0",
+        authors: vec!["The Rust Project Developers"] 
+    },
+    LicenseInfo {
+        name: "num-rational",
+        version: "0.4.2",
+        license: "MIT OR Apache-2.0",
+        authors: vec!["The Rust Project Developers"] 
     },
     LicenseInfo {
         name: "num-traits",
@@ -2342,6 +2534,12 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
         authors: vec!["David Tolnay <dtolnay@gmail.com>"] 
     },
     LicenseInfo {
+        name: "pastey",
+        version: "0.1.1",
+        license: "MIT OR Apache-2.0",
+        authors: vec!["Aditya Kumar <git@adityais.dev>", "David Tolnay <dtolnay@gmail.com>"] 
+    },
+    LicenseInfo {
         name: "percent-encoding",
         version: "2.3.2",
         license: "MIT OR Apache-2.0",
@@ -2486,6 +2684,12 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
         authors: vec!["Philip Degarmo <aclysma@gmail.com>"] 
     },
     LicenseInfo {
+        name: "profiling-procmacros",
+        version: "1.0.17",
+        license: "MIT OR Apache-2.0",
+        authors: vec!["Philip Degarmo <aclysma@gmail.com>"] 
+    },
+    LicenseInfo {
         name: "pulldown-cmark",
         version: "0.13.1",
         license: "MIT",
@@ -2502,6 +2706,12 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
         version: "0.1.27",
         license: "BSD-3-Clause OR Apache-2.0",
         authors: vec!["Radzivon Bartoshyk"] 
+    },
+    LicenseInfo {
+        name: "qoi",
+        version: "0.4.1",
+        license: "MIT/Apache-2.0",
+        authors: vec!["Ivan Smirnov <rust@ivan.smirnov.ie>"] 
     },
     LicenseInfo {
         name: "qttypes",
@@ -2594,6 +2804,18 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
         authors: vec!["Jeff Parsons <jeff@parsons.io>"] 
     },
     LicenseInfo {
+        name: "rav1e",
+        version: "0.8.1",
+        license: "BSD-2-Clause",
+        authors: vec!["Thomas Daede <tdaede@xiph.org>"] 
+    },
+    LicenseInfo {
+        name: "ravif",
+        version: "0.12.0",
+        license: "BSD-3-Clause",
+        authors: vec!["Kornel Lesiński <kornel@geekhood.net>"] 
+    },
+    LicenseInfo {
         name: "raw-window-handle",
         version: "0.6.2",
         license: "MIT OR Apache-2.0 OR Zlib",
@@ -2602,6 +2824,18 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
     LicenseInfo {
         name: "raw-window-metal",
         version: "1.1.0",
+        license: "MIT OR Apache-2.0",
+        authors: vec![] 
+    },
+    LicenseInfo {
+        name: "rayon",
+        version: "1.11.0",
+        license: "MIT OR Apache-2.0",
+        authors: vec![] 
+    },
+    LicenseInfo {
+        name: "rayon-core",
+        version: "1.13.0",
         license: "MIT OR Apache-2.0",
         authors: vec![] 
     },
@@ -2694,6 +2928,12 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
         version: "0.21.1",
         license: "MIT OR Apache-2.0",
         authors: vec!["Yevhenii Reizner <razrfalcon@gmail.com>"] 
+    },
+    LicenseInfo {
+        name: "rspolib",
+        version: "0.1.2",
+        license: "MIT",
+        authors: vec![] 
     },
     LicenseInfo {
         name: "rustc-hash",
@@ -2906,6 +3146,12 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
         authors: vec!["Marvin Countryman <me@maar.vin>"] 
     },
     LicenseInfo {
+        name: "simd_helpers",
+        version: "0.1.0",
+        license: "MIT",
+        authors: vec!["Luca Barbato <lu_zero@gentoo.org>"] 
+    },
+    LicenseInfo {
         name: "simplecss",
         version: "0.2.2",
         license: "Apache-2.0 OR MIT",
@@ -2943,6 +3189,12 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
     },
     LicenseInfo {
         name: "slint",
+        version: "1.15.1",
+        license: "GPL-3.0-only OR LicenseRef-Slint-Royalty-free-2.0 OR LicenseRef-Slint-Software-3.0",
+        authors: vec!["Slint Developers <info@slint.dev>"] 
+    },
+    LicenseInfo {
+        name: "slint-build",
         version: "1.15.1",
         license: "GPL-3.0-only OR LicenseRef-Slint-Royalty-free-2.0 OR LicenseRef-Slint-Software-3.0",
         authors: vec!["Slint Developers <info@slint.dev>"] 
@@ -2994,6 +3246,18 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
         version: "0.3.5",
         license: "MIT OR Apache-2.0",
         authors: vec!["Aleksey Kladov <aleksey.kladov@gmail.com>", "Lukas Wirth <lukastw97@gmail.com>"] 
+    },
+    LicenseInfo {
+        name: "snafu",
+        version: "0.8.9",
+        license: "MIT OR Apache-2.0",
+        authors: vec!["Jake Goulding <jake.goulding@gmail.com>"] 
+    },
+    LicenseInfo {
+        name: "snafu-derive",
+        version: "0.8.9",
+        license: "MIT OR Apache-2.0",
+        authors: vec!["Jake Goulding <jake.goulding@gmail.com>"] 
     },
     LicenseInfo {
         name: "socket2",
@@ -3170,6 +3434,12 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
         authors: vec!["Ruud van Asseldonk <dev@veniogames.com>"] 
     },
     LicenseInfo {
+        name: "tiff",
+        version: "0.10.3",
+        license: "MIT",
+        authors: vec!["The image-rs Developers"] 
+    },
+    LicenseInfo {
         name: "tiny-skia",
         version: "0.11.4",
         license: "BSD-3-Clause",
@@ -3250,6 +3520,12 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
     LicenseInfo {
         name: "toml_edit",
         version: "0.23.10+spec-1.0.0",
+        license: "MIT OR Apache-2.0",
+        authors: vec![] 
+    },
+    LicenseInfo {
+        name: "toml_edit",
+        version: "0.24.1+spec-1.1.0",
         license: "MIT OR Apache-2.0",
         authors: vec![] 
     },
@@ -3468,6 +3744,12 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
         version: "1.21.0",
         license: "Apache-2.0 OR MIT",
         authors: vec!["Ashley Mannix<ashleymannix@live.com.au>", "Dylan DPC<dylan.dpc@gmail.com>", "Hunar Roop Kahlon<hunar.roop@gmail.com>"] 
+    },
+    LicenseInfo {
+        name: "v_frame",
+        version: "0.3.9",
+        license: "BSD-2-Clause",
+        authors: vec!["Luca Barbato <lu_zero@gentoo.org>"] 
     },
     LicenseInfo {
         name: "vcpkg",
@@ -4262,6 +4544,12 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
         authors: vec!["Evgeniy Reizner <razrfalcon@gmail.com>"] 
     },
     LicenseInfo {
+        name: "y4m",
+        version: "0.8.0",
+        license: "MIT",
+        authors: vec!["Kagami Hiiragi <kagami@genshiken.org>"] 
+    },
+    LicenseInfo {
         name: "yazi",
         version: "0.2.1",
         license: "Apache-2.0 OR MIT",
@@ -4383,9 +4671,27 @@ pub fn get_licenses() -> Vec<LicenseInfo> {
     },
     LicenseInfo {
         name: "zune-core",
+        version: "0.4.12",
+        license: "MIT OR Apache-2.0 OR Zlib",
+        authors: vec![] 
+    },
+    LicenseInfo {
+        name: "zune-core",
         version: "0.5.1",
         license: "MIT OR Apache-2.0 OR Zlib",
         authors: vec![] 
+    },
+    LicenseInfo {
+        name: "zune-inflate",
+        version: "0.2.54",
+        license: "MIT OR Apache-2.0 OR Zlib",
+        authors: vec![] 
+    },
+    LicenseInfo {
+        name: "zune-jpeg",
+        version: "0.4.21",
+        license: "MIT OR Apache-2.0 OR Zlib",
+        authors: vec!["caleb <etemesicaleb@gmail.com>"] 
     },
     LicenseInfo {
         name: "zune-jpeg",
