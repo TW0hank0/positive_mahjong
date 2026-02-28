@@ -17,115 +17,6 @@
 
 use serde;
 
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
-pub struct ClientRequestDataType {
-    pub req_type: ActionType,
-    pub data_remove_player: Option<ClientRequestDataRemovePlayerType>,
-    pub data_test_connection: Option<ClientRequestDataTestConnectionType>,
-    pub data_is_start: Option<ClientRequestDataIsStartType>,
-}
-
-impl std::fmt::Display for ClientRequestDataType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "ClientRequestDataType
-    req_type: {}
-    data_remove_player: {:?}
-    data_test_connection: {:?}",
-            self.req_type, self.data_remove_player, self.data_test_connection
-        )
-    }
-}
-
-impl std::default::Default for ClientRequestDataType {
-    fn default() -> Self {
-        Self {
-            req_type: ActionType::TestConnection,
-            data_remove_player: None,
-            data_test_connection: None,
-            data_is_start: None,
-        }
-    }
-}
-
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
-pub struct ClientRequestDataRemovePlayerType {
-    pub number: u8,
-}
-
-impl std::fmt::Display for ClientRequestDataRemovePlayerType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "ClientRequestDataRemovePlayerType {{ number: {} }}",
-            self.number
-        )
-    }
-}
-
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
-pub struct ClientRequestDataTestConnectionType {
-    pub number: u8,
-}
-
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
-pub struct ClientRequestDataIsStartType {
-    pub number: u8,
-}
-
-impl std::fmt::Display for ClientRequestDataTestConnectionType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "ClientRequestDataTestConnectionType {{ number: {} }}",
-            self.number
-        )
-    }
-}
-
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
-pub struct ServerResponseDataType {
-    pub data_add_player: Option<ServerResponseDataAddPlayerType>,
-    pub data_test_connection: Option<ServerResponseDataTestConnectionType>,
-    pub data_is_start: Option<ServerResponseDataIsStartType>,
-    pub data_type: ActionType,
-}
-
-impl std::default::Default for ServerResponseDataType {
-    fn default() -> Self {
-        Self {
-            data_add_player: None,
-            data_test_connection: None,
-            data_is_start: None,
-            data_type: ActionType::TestConnection,
-        }
-    }
-}
-
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
-pub struct ServerResponseDataAddPlayerType {
-    pub number: u8,
-}
-
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
-pub struct ServerResponseDataIsStartType {
-    pub is_start: bool,
-}
-
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
-pub struct ServerResponseDataTestConnectionType {
-    pub msg: String,
-}
-
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
-pub struct ServerResponseType {
-    pub app: String,
-    pub data: ServerResponseDataType,
-    pub msg: String,
-    pub is_error: bool,
-}
-
 #[derive(
     Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, serde::Deserialize, serde::Serialize,
 )]
@@ -378,21 +269,7 @@ pub enum Either<A, B> {
     Right(B),
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
-pub struct ServerResponseDataTypeV1 {
-    pub data_add_player: Option<ServerResponseDataAddPlayerType>,
-    pub data_test_connection: Option<ServerResponseDataTestConnectionType>,
-    pub data_is_start: Option<ServerResponseDataIsStartType>,
-    pub data_type: ActionType,
-}
-
-impl std::default::Default for ServerResponseDataTypeV1 {
-    fn default() -> Self {
-        Self {
-            data_add_player: None,
-            data_test_connection: None,
-            data_is_start: None,
-            data_type: ActionType::TestConnection,
-        }
-    }
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
+pub struct GameDataV1 {
+    pub game_action: GameActions,
 }

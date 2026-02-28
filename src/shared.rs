@@ -24,11 +24,13 @@ pub const SERVER_PORT: u16 = 6060;
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 pub struct ClientRequestType {
     /// 需為 `positive_mahjong`
+    /// 否則會拒絕
     pub app: String,
-    /// 客戶端程式名
+    /// 客戶端程式名，無限制
     pub client: String,
-    pub datav1: Option<ClientRequestDataType>,
-    pub game_action_v1: Option<gamemodes_shared::sharedv1_simple::GameActions>,
+    pub data: ClientRequestDataType,
+    pub game_data_v1: Option<gamemodes_shared::sharedv1_simple::GameDataV1>,
+    //pub game_action_v1: Option<gamemodes_shared::sharedv1_simple::GameActions>,
     pub is_test_connection: bool,
 }
 
@@ -37,8 +39,8 @@ impl std::default::Default for ClientRequestType {
         Self {
             app: String::from("positive_mahjong"),
             client: String::from("pmj_client"),
-            datav1: None,
-            game_action_v1: None,
+            data: ClientRequestDataType::default(),
+            game_data_v1: None,
             is_test_connection: true,
         }
     }
@@ -52,7 +54,7 @@ impl std::fmt::Display for ClientRequestType {
     app: {}
     client: {}
     data: {:?}",
-            self.app, self.client, self.datav1
+            self.app, self.client, self.data
         )
     }
 }
@@ -63,6 +65,8 @@ pub enum ActionType {
     RemovePlayer,
     TestConnection,
     IsStart,
+    SendGameAction,
+    SyncGameStatus,
 }
 
 impl std::fmt::Display for ActionType {
@@ -75,6 +79,8 @@ impl std::fmt::Display for ActionType {
                 Self::RemovePlayer => "刪除玩家 (RemovePlayer)",
                 Self::TestConnection => "測試連線 (TestConnection)",
                 Self::IsStart => "是否開始 (IsStart)",
+                Self::SendGameAction => "遊戲動作 (SendGameAction)",
+                Self::SyncGameStatus => "同步遊戲資料 (SyncGameStatus)",
             }
         )
     }
@@ -168,7 +174,7 @@ pub struct ServerResponseType {
     /// 客戶端名稱
     pub app: String,
     /// 資料
-    pub datav1: Option<gamemodes_shared::sharedv1_simple::ServerResponseDataTypeV1>,
+    pub data: ServerResponseDataType,
     /// 訊息 (通常錯誤時才有)
     pub msg: String,
     /// 是否錯誤
@@ -185,4 +191,23 @@ pub struct ServerResponseType {
 pub enum GameModes {
     V1Simple,
     V2Better,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug)]
+pub struct ServerResponseDataType {
+    pub data_add_player: Option<ServerResponseDataAddPlayerType>,
+    pub data_test_connection: Option<ServerResponseDataTestConnectionType>,
+    pub data_is_start: Option<ServerResponseDataIsStartType>,
+    pub data_type: ActionType,
+}
+
+impl std::default::Default for ServerResponseDataType {
+    fn default() -> Self {
+        Self {
+            data_add_player: None,
+            data_test_connection: None,
+            data_is_start: None,
+            data_type: ActionType::TestConnection,
+        }
+    }
 }

@@ -117,39 +117,41 @@ fn handle_request(
             println!("{}", content_data);
             if content_data.app == "positive_mahjong" {
                 if content_data.is_test_connection {
-                    let _response_data =
-                        gamemodes_shared::sharedv1_simple::ServerResponseDataTypeV1 {
-                            data_test_connection: Some(
-                                gamemodes_shared::sharedv1_simple::ServerResponseDataTestConnectionType { msg: String::new() },
-                            ),
-                            ..Default::default()
-                        };
+                    let response_data = shared::ServerResponseDataType {
+                        data_test_connection: Some(shared::ServerResponseDataTestConnectionType {
+                            msg: String::new(),
+                        }),
+                        ..Default::default()
+                    };
                     let response = tiny_http::Response::from_string(
                         serde_json::to_string(&shared::ServerResponseType {
                             app: content_data.app,
-                            datav1: None, //response_data,
+                            data: response_data, //response_data,
                             msg: String::new(),
                             is_error: false,
                             gamemode: Some(CURRENT_GAMEMODE),
                         })
                         .unwrap(),
                     );
-                    request.respond(response).ok();
+                    match request.respond(response) {
+                        Ok(_) => {}
+                        Err(_) => {}
+                    }
                 } else {
-                    match content_data.datav1.req_type {
+                    match content_data.data.req_action_type {
                         shared::ActionType::AddPlayer => {
                             let mut guard = backend.write().unwrap();
                             match guard.add_player(request.remote_addr().unwrap().clone()) {
                                 gamemodes_shared::sharedv1_simple::Either::Left(e) => {
-                                    let response_data = shared::ServerResponseDataTypeV1 {
+                                    let response_data = shared::ServerResponseDataType {
                                         data_add_player: None,
-                                        data_type: content_data.datav1.req_type,
+                                        data_type: content_data.data.req_action_type,
                                         ..Default::default()
                                     };
                                     let response = tiny_http::Response::from_string(
                                         serde_json::to_string(&shared::ServerResponseType {
                                             app: content_data.app,
-                                            datav1: response_data,
+                                            data: response_data,
                                             msg: e,
                                             is_error: true,
                                             gamemode: Some(CURRENT_GAMEMODE),
@@ -159,19 +161,19 @@ fn handle_request(
                                     request.respond(response).ok();
                                 }
                                 gamemodes_shared::sharedv1_simple::Either::Right(number) => {
-                                    let response_data = shared::ServerResponseDataTypeV1 {
+                                    let response_data = shared::ServerResponseDataType {
                                         data_add_player: Some(
                                             shared::ServerResponseDataAddPlayerType {
                                                 number: number,
                                             },
                                         ),
-                                        data_type: content_data.datav1.req_type,
+                                        data_type: content_data.data.req_action_type,
                                         ..Default::default()
                                     };
                                     let response = tiny_http::Response::from_string(
                                         serde_json::to_string(&shared::ServerResponseType {
                                             app: content_data.app,
-                                            datav1: response_data,
+                                            data: response_data,
                                             msg: String::new(),
                                             is_error: false,
                                             gamemode: Some(CURRENT_GAMEMODE),
@@ -183,7 +185,7 @@ fn handle_request(
                             }
                         }
                         shared::ActionType::TestConnection => {
-                            let response_data = shared::ServerResponseDataTypeV1 {
+                            let response_data = shared::ServerResponseDataType {
                                 data_test_connection: Some(
                                     shared::ServerResponseDataTestConnectionType {
                                         msg: String::from(format!(
@@ -197,7 +199,7 @@ fn handle_request(
                             let response = tiny_http::Response::from_string(
                                 serde_json::to_string(&shared::ServerResponseType {
                                     app: content_data.app,
-                                    datav1: response_data,
+                                    data: response_data,
                                     msg: String::new(),
                                     is_error: false,
                                     gamemode: Some(CURRENT_GAMEMODE),
@@ -210,18 +212,18 @@ fn handle_request(
                             let mut guard = backend.write().unwrap();
                             match guard.remove_player(
                                 request.remote_addr().unwrap().clone(),
-                                content_data.datav1.data_remove_player.unwrap().number,
+                                content_data.data.data_remove_player.unwrap().number,
                             ) {
                                 gamemodes_shared::sharedv1_simple::Either::Left(e) => {
-                                    let response_data = shared::ServerResponseDataTypeV1 {
+                                    let response_data = shared::ServerResponseDataType {
                                         data_add_player: None,
-                                        data_type: content_data.datav1.req_type,
+                                        data_type: content_data.data.req_action_type,
                                         ..Default::default()
                                     };
                                     let response = tiny_http::Response::from_string(
                                         serde_json::to_string(&shared::ServerResponseType {
                                             app: content_data.app,
-                                            datav1: response_data,
+                                            data: response_data,
                                             msg: e,
                                             is_error: true,
                                             gamemode: Some(CURRENT_GAMEMODE),
@@ -231,14 +233,14 @@ fn handle_request(
                                     request.respond(response).ok();
                                 }
                                 gamemodes_shared::sharedv1_simple::Either::Right(_) => {
-                                    let response_data = shared::ServerResponseDataTypeV1 {
-                                        data_type: content_data.datav1.req_type,
+                                    let response_data = shared::ServerResponseDataType {
+                                        data_type: content_data.data.req_action_type,
                                         ..Default::default()
                                     };
                                     let response = tiny_http::Response::from_string(
                                         serde_json::to_string(&shared::ServerResponseType {
                                             app: content_data.app,
-                                            datav1: response_data,
+                                            data: response_data,
                                             msg: String::new(),
                                             is_error: false,
                                             gamemode: Some(CURRENT_GAMEMODE),
@@ -256,8 +258,8 @@ fn handle_request(
                             let response = tiny_http::Response::from_string(
                                 serde_json::to_string(&shared::ServerResponseType {
                                     app: content_data.app,
-                                    datav1: shared::ServerResponseDataTypeV1 {
-                                        data_type: content_data.datav1.req_type,
+                                    data: shared::ServerResponseDataType {
+                                        data_type: content_data.data.req_action_type,
                                         data_is_start: Some(
                                             shared::ServerResponseDataIsStartType {
                                                 is_start: is_start,
@@ -272,6 +274,9 @@ fn handle_request(
                                 .unwrap(),
                             );
                             request.respond(response).ok();
+                        }
+                        _ => {
+                            todo!("未完成")
                         }
                     }
                 }

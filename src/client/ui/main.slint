@@ -1,47 +1,53 @@
-// ui/main.slint
-
-import { Button } from "std-widgets.slint";
+import { Button, ScrollView } from "std-widgets.slint";
 
 export component MainWindow inherits Window {
-    width: 400px;
-    height: 300px;
+    //width: 1080px;
+    //height: 720px;
     title: "Slint Rust Demo";
-
+    min-width: 540px;
+    min-height: 360px;
+    max-width: 10800px;
+    max-height: 72000px;
+    background: #000000;
+    default-font-size: 30px;
     VerticalLayout {
         spacing: 20px;
         padding: 20px;
-
         Text {
-            text: "歡迎來到 Slint 世界";
-            font-size: 24px;
-            horizontal-alignment: center;
-            color: #2c3e50;
+            text: "PMJ Client";
+            font-size: 35px;
+            horizontal-alignment: TextHorizontalAlignment.left;
+            color: lightgray;
         }
 
         TextInput {
             //placeholder-text: "輸入資料...";
-            text <=> root.user_input;
+            text <=> root.server_ip;
+            single-line: true;
         }
 
         Button {
-            text: "執行背景任務 (模擬 POST)";
+            text: "測試連線";
             clicked => {
-                root.start_background_task();
+                root.test_connection();
             }
         }
 
-        Text {
-            text: root.status_text;
-            horizontal-alignment: center;
-            color: root.has_error ? red : green;
-            wrap: TextWrap.word-wrap;
+        ScrollView {
+            Text {
+                text: root.server_response_text;
+                horizontal-alignment: TextHorizontalAlignment.left;
+                color: lightgray;
+                wrap: TextWrap.word-wrap;
+            }
+
+            vertical-scrollbar-policy: ScrollBarPolicy.always-on;
+            horizontal-scrollbar-policy: ScrollBarPolicy.as-needed;
         }
     }
 
     // 屬性與回調定義
-    in-out property<string> user_input: "";
-    in-out property<string> status_text: "就緒狀態";
-    in-out property<bool> has_error: false;
-    
-    callback start_background_task();
+    in-out property <string> server_response_text: "";
+    in-out property <string> server_ip: "";
+    callback test_connection();
 }

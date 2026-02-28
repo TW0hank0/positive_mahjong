@@ -26,14 +26,15 @@ fn main() {
     let server_url = format!("http://{}:{}/", server_ip.clone(), shared::SERVER_PORT);
     let client = reqwest::blocking::Client::new();
     //
-    let _request_data = shared::ClientRequestDataType {
+    let request_data = shared::ClientRequestDataType {
         req_action_type: shared::ActionType::TestConnection,
         ..Default::default()
     };
     let request = serde_json::to_string(&shared::ClientRequestType {
         app: String::from("positive_mahjong"),
         client: String::from("pmj-client"),
-        datav1: None, //request_data
+        data: request_data,
+        game_data_v1: None,
         is_test_connection: true,
     })
     .unwrap();
@@ -55,7 +56,9 @@ fn main() {
     let request = serde_json::to_string(&shared::ClientRequestType {
         app: String::from("positive_mahjong"),
         client: String::from("pmj-client"),
-        datav1: Some(request_data),
+        data: request_data,
+        game_data_v1: None,
+        is_test_connection: false,
     })
     .unwrap();
     let response = client
@@ -67,7 +70,7 @@ fn main() {
     let body = response.text().unwrap(); //.await?;
     println!("回應: {}", body);
     let body_data: shared::ServerResponseType = serde_json::from_str(&body).unwrap();
-    let number = body_data.datav1.data_add_player.unwrap().number;
+    let number = body_data.data.data_add_player.unwrap().number;
     //
     loop {
         std::thread::sleep(std::time::Duration::from_secs(2));
@@ -81,7 +84,9 @@ fn main() {
         let request = serde_json::to_string(&shared::ClientRequestType {
             app: String::from("positive_mahjong"),
             client: String::from("pmj-client"),
-            datav1: request_data,
+            data: request_data,
+            game_data_v1: None,
+            is_test_connection: false,
         })
         .unwrap();
         let response = client
@@ -93,8 +98,7 @@ fn main() {
         let body = response.text().unwrap();
         println!("回應: {}", body);
         let resp_data: shared::ServerResponseType = serde_json::from_str(&body).unwrap();
-        if resp_data.datav1.data_is_start.is_some()
-            && resp_data.datav1.data_is_start.unwrap().is_start
+        if resp_data.data.data_is_start.is_some() && resp_data.data.data_is_start.unwrap().is_start
         {
             println!("這是測試連線的客戶端，無法遊玩！");
             break;

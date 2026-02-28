@@ -26,8 +26,9 @@ use serde_json;
 use slint_build;
 
 fn main() {
-    // 告訴 Cargo 重新執行 build.rs 當 Cargo.lock 變動
+    // 告訴 Cargo 重新執行 build.rs 當 Cargo.lock或src/client/ 變動
     println!("cargo:rerun-if-changed=Cargo.lock");
+    println!("cargo:rerun-if-changed=src/client/");
 
     let out_dir = positive_tool_rs::pt::find_project_path(env!("CARGO_PKG_NAME"), Some(15))
         .unwrap()
@@ -85,7 +86,12 @@ fn main() {
         panic!("error: cargo-about發生錯誤！")
     }
     //
-    slint_build::compile("src/client/ui/main.slint").ok();
+    match slint_build::compile("src/client/ui/main.slint") {
+        Ok(_) => {}
+        Err(e) => {
+            panic!("Slint編譯錯誤！訊息：{}", e);
+        }
+    }
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
