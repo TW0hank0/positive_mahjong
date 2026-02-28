@@ -1,3 +1,5 @@
 /target
 
-.venv/
+**/.venv/**
+**/__pycache__/**
+**/__pypy_cache__/**

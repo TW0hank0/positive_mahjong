@@ -23,11 +23,13 @@ use positive_tool_rs;
 use serde;
 use serde_json;
 
+use slint_build;
+
 fn main() {
     // 告訴 Cargo 重新執行 build.rs 當 Cargo.lock 變動
     println!("cargo:rerun-if-changed=Cargo.lock");
 
-    let out_dir = positive_tool_rs::pt::find_project_path(env!("CARGO_PKG_NAME"), None)
+    let out_dir = positive_tool_rs::pt::find_project_path(env!("CARGO_PKG_NAME"), Some(15))
         .unwrap()
         .join("src");
     //let out_dir = std::env::var("OUT_DIR").unwrap();
@@ -80,8 +82,10 @@ fn main() {
         .status()
         .unwrap();
     if !status.success() {
-        panic!("error: cargo-about")
+        panic!("error: cargo-about發生錯誤！")
     }
+    //
+    slint_build::compile("src/client/ui/main.slint").ok();
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
