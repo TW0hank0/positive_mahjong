@@ -30,7 +30,22 @@ def main():
             "generate",
             "--output-file",
             "ThirdPartyLicense-Rust.html",
-            "about.hbs",
+            "about_html.hbs",
+            "--threshold",
+            "1.0",
+        ],
+        check=True,
+        stdout=sys.stdout,
+        stdin=sys.stdin,
+        stderr=sys.stderr,
+    )
+    subprocess.run(
+        [
+            "cargo-about",
+            "generate",
+            "--output-file",
+            "src/licenses_rust.json",
+            "about_json.hbs",
             "--threshold",
             "1.0",
         ],

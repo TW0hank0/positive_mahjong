@@ -15,3 +15,4 @@
 - [x] rename gamemode v1 to `simple`
 - [ ] Gamemode v2 (name: `better`)
 - [ ] 伺服器：玩家數量限制
+- [ ] gamemode 過度版本 只有牌/補花 無：檢查勝利、碰槓吃判斷(暫時交給玩家) (name: `base`)

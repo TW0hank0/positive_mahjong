@@ -270,21 +270,13 @@ pub enum Either<A, B> {
     Right(B),
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
-pub struct ServerResponseDataTypeV1 {
-    pub data_add_player: Option<ServerResponseDataAddPlayerType>,
-    pub data_test_connection: Option<ServerResponseDataTestConnectionType>,
-    pub data_is_start: Option<ServerResponseDataIsStartType>,
-    pub data_type: ActionType,
-}
-
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+/* #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub enum ActionType {
     AddPlayer,
     RemovePlayer,
     TestConnection,
     IsStart,
-}
+} */
 
 impl std::default::Default for ServerResponseDataTypeV1 {
     fn default() -> Self {

@@ -1,0 +1,16 @@
+{
+"generated_at": "{{now}}",
+"project_name": "{{crate.name}}",
+"project_version": "{{crate.version}}",
+"dependencies": [
+{{#each licenses}}
+{
+"name": "{{name}}",
+"version": "{{version}}",
+"license_id": "{{id}}",
+"license_text": {{json text}},
+"repository": {{json repository}}
+}{{#if @last}}{{else}},{{/if}}
+{{/each}}
+]
+}

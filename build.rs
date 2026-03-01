@@ -13,15 +13,15 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-use std::fs;
-use std::path::Path;
+//use std::fs;
+//use std::path::Path;
 
-use cargo_metadata::MetadataCommand;
+//use cargo_metadata::MetadataCommand;
 
-use positive_tool_rs;
+//use positive_tool_rs;
 
-use serde;
-use serde_json;
+/* use serde;
+use serde_json; */
 
 use slint_build;
 
@@ -30,21 +30,21 @@ fn main() {
     println!("cargo:rerun-if-changed=Cargo.lock");
     println!("cargo:rerun-if-changed=src/client/");
 
-    let out_dir = positive_tool_rs::pt::find_project_path(env!("CARGO_PKG_NAME"), Some(15))
+    /* let out_dir = positive_tool_rs::pt::find_project_path(env!("CARGO_PKG_NAME"), Some(15))
         .unwrap()
         .join("src");
     //let out_dir = std::env::var("OUT_DIR").unwrap();
     let dest_path_rust = Path::new(&out_dir).join("licenses_rust.rs");
-    let dest_path_json = Path::new(&out_dir).join("licenses_rust.json");
+    let dest_path_json = Path::new(&out_dir).join("licenses_rust.json"); */
 
-    let metadata = MetadataCommand::new()
+    /* let metadata = MetadataCommand::new()
         .exec()
         .expect("Failed to get cargo metadata");
 
-    let mut licenses: Vec<LicenseEntry> = Vec::new();
+    let mut licenses: Vec<LicenseEntry> = Vec::new(); */
 
     // 遍歷所有解析後的套件（包含 transitive）
-    for pkg in &metadata.packages {
+    /* for pkg in &metadata.packages {
         // 跳過 workspace 內的本機套件（避免重複）
         if metadata.workspace_members.contains(&pkg.id) {
             continue;
@@ -61,17 +61,17 @@ fn main() {
             license: license.to_string(),
             authors: authors.clone(),
         });
-    }
+    } */
 
     // 排序以確保輸出穩定
-    licenses.sort_by(|a, b| a.name.cmp(&b.name));
+    /* licenses.sort_by(|a, b| a.name.cmp(&b.name));
 
     let content_rust = generate_rust_code(&licenses);
     fs::write(dest_path_rust, content_rust).expect("Failed to write licenses_rust.rs");
     let content_json = generate_json_code(&licenses);
-    fs::write(dest_path_json, content_json).expect("Failed to write licenses.json");
+    fs::write(dest_path_json, content_json).expect("Failed to write licenses.json"); */
     //
-    let status = std::process::Command::new("cargo-about")
+    /* let status = std::process::Command::new("cargo-about")
         .args(vec![
             "generate",
             "--output-file",
@@ -84,7 +84,7 @@ fn main() {
         .unwrap();
     if !status.success() {
         panic!("error: cargo-about發生錯誤！")
-    }
+    } */
     //
     match slint_build::compile("src/client/ui/main.slint") {
         Ok(_) => {}
@@ -94,19 +94,19 @@ fn main() {
     }
 }
 
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
+/* #[derive(Debug, serde::Deserialize, serde::Serialize)]
 struct LicenseEntry {
     name: String,
     version: String,
     license: String,
     authors: Vec<String>,
-}
+} */
 
-fn generate_json_code(entries: &[LicenseEntry]) -> String {
+/* fn generate_json_code(entries: &[LicenseEntry]) -> String {
     serde_json::to_string_pretty(entries).unwrap()
-}
+} */
 
-fn generate_rust_code(entries: &[LicenseEntry]) -> String {
+/* fn generate_rust_code(entries: &[LicenseEntry]) -> String {
     let mut code = String::from(
         "#[allow(dead_code)]\npub fn get_licenses() -> Vec<LicenseInfo> {\n  return vec![\n",
     );
@@ -145,8 +145,8 @@ pub struct LicenseInfo {
     );
 
     code
-}
+} */
 
-fn escape_str(s: &str) -> String {
+/* fn escape_str(s: &str) -> String {
     s.replace('\\', "\\\\").replace('"', "\\\"")
-}
+} */
