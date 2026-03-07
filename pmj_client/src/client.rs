@@ -1,4 +1,3 @@
-use slint;
 use slint::{ComponentHandle, SharedString, Weak};
 
 use std::thread;

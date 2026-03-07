@@ -8,6 +8,9 @@ build = "build.rs"
 
 [dependencies]
 reqwest.workspace = true
+pmj_shared.workspace = true
+slint.workspace = true
+
 
 [build-dependencies]
 #cargo_metadata = "0.19"

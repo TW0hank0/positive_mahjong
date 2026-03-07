@@ -15,12 +15,21 @@
 
 [package]
 name = "positive_mahjong"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[workspace.package]
 version = "0.1.0"
 edition = "2024"
 repository = "https://github.com/TW0hank0/positive_mahjong"
-default-run = "pmj_server"
 license = "AGPL-3.0-only"
 authors = ["TW0hank0"]
+rust-version = "1.94"
+
 
 # [[bin]]
 # name = "pmj_test_connection"
@@ -46,12 +55,18 @@ path = "pmj_server/src/main.rs" # for computer
 name = "pmj_test_connection"
 path = "pmj_test_connection/src/client.rs"
 
-[lib]
-crate-type = ["lib", "rlib", "cdylib"]
-path = "pmj_shared/src/lib.rs"
-name = "pmj_shared"
+# [lib]
+# crate-type = ["lib", "rlib", "cdylib"]
+# path = "pmj_shared/src/lib.rs"
+# name = "pmj_shared_libary"
 
 [workspace.dependencies]
+positive_mahjong = { path = "." }
+pmj_client = { path = "pmj_client" }
+pmj_server = { path = "pmj_server" }
+pmj_shared = { path = "pmj_shared" }
+pmj_test_connection = { path = "pmj_test_connection" }
+
 iced = { version = "0.14.0" }
 local-ip-address = "0.6.10"
 rand = "0.10.0"
