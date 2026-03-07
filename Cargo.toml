@@ -13,15 +13,6 @@
 # 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-[package]
-name = "positive_mahjong"
-version.workspace = true
-edition.workspace = true
-authors.workspace = true
-license.workspace = true
-repository.workspace = true
-rust-version.workspace = true
-
 [workspace.package]
 version = "0.1.0"
 edition = "2024"
@@ -43,17 +34,17 @@ rust-version = "1.94"
 # name = "pmj_client"
 # path = "src/client/client.rs"
 
-[[bin]]
-name = "pmj_client"
-path = "pmj_client/src/main.rs" # for computer
+# [[bin]]
+# name = "pmj_client"
+# path = "pmj_client/src/main.rs" # for computer
 
-[[bin]]
-name = "pmj_server"
-path = "pmj_server/src/main.rs" # for computer
+# [[bin]]
+# name = "pmj_server"
+# path = "pmj_server/src/main.rs" # for computer
 
-[[bin]]
-name = "pmj_test_connection"
-path = "pmj_test_connection/src/client.rs"
+# [[bin]]
+# name = "pmj_test_connection"
+# path = "pmj_test_connection/src/client.rs"
 
 # [lib]
 # crate-type = ["lib", "rlib", "cdylib"]
@@ -62,10 +53,10 @@ path = "pmj_test_connection/src/client.rs"
 
 [workspace.dependencies]
 positive_mahjong = { path = "." }
-pmj_client = { path = "pmj_client" }
-pmj_server = { path = "pmj_server" }
+#pmj_client = { path = "pmj_client" }
+#pmj_server = { path = "pmj_server" }
 pmj_shared = { path = "pmj_shared" }
-pmj_test_connection = { path = "pmj_test_connection" }
+#pmj_test_connection = { path = "pmj_test_connection" }
 
 iced = { version = "0.14.0" }
 local-ip-address = "0.6.10"
@@ -77,6 +68,7 @@ slint = { version = "1.14.1", features = ["backend-android-activity-06"] }
 tiny_http = { version = "0.12.0" }
 
 [workspace]
+resolver = "3"
 members = ["pmj_client", "pmj_server", "pmj_shared", "pmj_test_connection"]
 
 [profile.release]

@@ -37,3 +37,6 @@ accepted = [
 #self_cell = "Apache-2.0 OR GPL-2.0-only"
 #name = "self_cell"
 #expression = "Apache-2.0"
+
+ignore-build-dependencies = false
+ignore-dev-dependencies = false

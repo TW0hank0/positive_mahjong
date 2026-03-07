@@ -5,13 +5,16 @@ edition = "2024"
 repository = "https://github.com/TW0hank0/positive_mahjong"
 license = "AGPL-3.0-only"
 authors = ["TW0hank0"]
+default-run = "pmj_server"
 
 [dependencies]
-local-ip-address.workspace = true
-serde_json.workspace = true
-tiny_http.workspace = true
-pmj_shared.workspace = true
+local-ip-address = { workspace = true }
+serde_json = { workspace = true }
+tiny_http = { workspace = true }
+pmj_shared = { workspace = true }
+rand = { workspace = true }
+serde = { workspace = true }
 
-# [[bin]]
-# name = "pmj_server"
-# path = "src/main.rs" # for computer
+[[bin]]
+name = "pmj_server"
+path = "src/main.rs" # for computer

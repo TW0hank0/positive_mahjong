@@ -1,4 +1,5 @@
-use slint::{ComponentHandle, SharedString, Weak};
+use slint::{self, ComponentHandle, SharedString, Weak};
+use crate::MainWindow;
 
 use std::thread;
 use std::time::Duration;

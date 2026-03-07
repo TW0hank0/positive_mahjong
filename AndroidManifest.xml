@@ -1,16 +1,23 @@
-<?xml version="1.0" encoding="utf-8"?>
+<!-- android_app/app/src/main/AndroidManifest.xml -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="tw0hank0.positive_mahjong">
-
-    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="35" />
+    package="io.github.positive_mahjong.tw0hank0">
 
     <application
-        android:label="PMJ Client"
+        android:label="Positive Mahjong"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         android:icon="@mipmap/ic_launcher">
         
         <activity
-            android:name="rust.android.NativeActivity"
-            android:exported="true">
+            android:name="android.app.NativeActivity"
+            android:label="Positive Mahjong"
+            android:configChanges="orientation|keyboardHidden|screenSize">
+            
+            <!-- 這裡的 value 必須對應 Cargo.toml 中的 [lib] name -->
+            <!-- 假設 Cargo.toml 設定 name = "positive_mahjong"，則此處為 positive_mahjong -->
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="positive_mahjong" />
+                
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

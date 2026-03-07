@@ -6,7 +6,7 @@ repository.workspace = true
 authors.workspace = true
 
 [dependencies]
-serde.workspace = true
+serde = { workspace = true }
 
 # [lib]
 # crate-type = ["lib", "rlib", "cdylib"]

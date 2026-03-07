@@ -1,5 +1,5 @@
-use positive_mahjong::gamemodes_shared;
-use positive_mahjong::shared;
+use pmj_shared::gamemodes_shared;
+use pmj_shared::shared;
 
 pub struct PositiveMahjong {
     players: Vec<gamemodes_shared::shared_base::PMJPlayer>,

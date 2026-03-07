@@ -5,11 +5,18 @@ edition = "2024"
 repository = "https://github.com/TW0hank0/positive_mahjong"
 authors = ["TW0hank0"]
 build = "build.rs"
+default-run = "pmj_client"
+
+[[bin]]
+name = "pmj_client"
+path = "src/main.rs"
 
 [dependencies]
-reqwest.workspace = true
-pmj_shared.workspace = true
-slint.workspace = true
+reqwest = { workspace = true }
+pmj_shared = { workspace = true }
+slint = { workspace = true }
+serde_json = { workspace = true }
+serde = { workspace = true }
 
 
 [build-dependencies]

@@ -6,9 +6,10 @@ repository = "https://github.com/TW0hank0/positive_mahjong"
 authors = ["TW0hank0"]
 
 [dependencies]
-reqwest.workspace = true
-serde_json.workspace = true
-pmj_shared.workspace = true
+reqwest = { workspace = true }
+serde_json = { workspace = true }
+pmj_shared = { workspace = true }
+serde = { workspace = true }
 
 # [[bin]]
 # name = "pmj_test_connection"
