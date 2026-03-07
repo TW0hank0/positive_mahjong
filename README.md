@@ -20,7 +20,7 @@
 
 第三方專案授權見：
 
-- [ThirdPartyLicense-Rust.html](./ThirdPartyLicense-Rust.html)
+- [ThirdPartyLicense-Rust.html](./auto_generated/ThirdPartyLicense-Rust.html)
 
 "The Slint Logo used in this project is licensed under [CC BY-ND 4.0](./assets/CC-BY-ND-4.0.txt)
 . Original work by [Slint Developers/Sixtyfps GmbH]. No modifications have been made to the logo file."
