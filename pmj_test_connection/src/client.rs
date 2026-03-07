@@ -13,12 +13,12 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-use positive_mahjong::shared::{self, ClientRequestDataIsStartType};
+use pmj_shared::shared::{self, ClientRequestDataIsStartType};
 use reqwest;
 use serde_json;
 use std;
 
-fn main() {
+pub fn main() {
     let mut server_ip = String::new();
     let timeout_duration = std::time::Duration::from_secs(15);
     println!("輸入網路地址 (ip)：");

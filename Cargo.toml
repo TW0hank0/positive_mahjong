@@ -34,10 +34,24 @@ authors = ["TW0hank0"]
 # name = "pmj_client"
 # path = "src/client/client.rs"
 
-# [lib]
-# crate-type = ["cdylib"]
+[[bin]]
+name = "pmj_client"
+path = "pmj_client/src/main.rs" # for computer
 
-[dependencies]
+[[bin]]
+name = "pmj_server"
+path = "pmj_server/src/main.rs" # for computer
+
+[[bin]]
+name = "pmj_test_connection"
+path = "pmj_test_connection/src/client.rs"
+
+[lib]
+crate-type = ["lib", "rlib", "cdylib"]
+path = "pmj_shared/src/lib.rs"
+name = "pmj_shared"
+
+[workspace.dependencies]
 iced = { version = "0.14.0" }
 local-ip-address = "0.6.10"
 rand = "0.10.0"
@@ -48,8 +62,13 @@ slint = { version = "1.14.1", features = ["backend-android-activity-06"] }
 tiny_http = { version = "0.12.0" }
 
 [workspace]
-members = ["pmj_client"]
+members = ["pmj_client", "pmj_server", "pmj_shared", "pmj_test_connection"]
 
+[profile.release]
+opt-level = 3
+
+[profile.dev]
+debug = 2
 
 # [package.metadata.android]
 # # 指定目標 API 版本 (需確保已安裝該版本的 Platform)

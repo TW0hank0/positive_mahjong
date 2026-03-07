@@ -27,7 +27,7 @@ use slint_build;
 
 fn main() {
     println!("cargo:rerun-if-changed=ui/main.slint");
-    match slint_build::compile("src/client/ui/main.slint") {
+    match slint_build::compile("ui/main.slint") {
         Ok(_) => {}
         Err(e) => {
             panic!("Slint編譯錯誤！訊息：{}", e);

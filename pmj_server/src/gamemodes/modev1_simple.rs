@@ -5,9 +5,9 @@ use std::sync;
 use rand;
 use rand::{prelude::SliceRandom, seq::IndexedRandom};
 
-use positive_mahjong::shared;
+use pmj_shared::shared;
 
-use positive_mahjong::gamemodes_shared::sharedv1_simple::{
+use pmj_shared::gamemodes_shared::sharedv1_simple::{
     Either, GameActionAfter, GameActionPlayerRound, GameActionWaitRound, PMJCard, PMJCardFlowers,
     PMJCardTypes, PMJCardWords, PMJPlayer,
 };

@@ -4,10 +4,10 @@ version = "0.1.0"
 edition = "2024"
 repository = "https://github.com/TW0hank0/positive_mahjong"
 authors = ["TW0hank0"]
+build = "build.rs"
 
-[[bin]]
-name = "pmj_client"
-path = "src/main.rs" # for computer
+[dependencies]
+reqwest.workspace = true
 
 [build-dependencies]
 #cargo_metadata = "0.19"

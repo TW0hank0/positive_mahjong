@@ -23,16 +23,16 @@ use tiny_http;
 //use rand;
 //use rand::{prelude::SliceRandom, seq::IndexedRandom};
 
-use positive_mahjong::gamemodes_shared;
-use positive_mahjong::shared;
+use pmj_shared::gamemodes_shared;
+use pmj_shared::shared;
 //use positive_mahjong::shared::{self, GameActionAfter, GameActionPlayerRound, GameActionWaitRound};
 //use positive_mahjong::shared::{PMJCard, PMJCardFlowers, PMJCardTypes, PMJCardWords};
 
-mod gamemodes;
+use crate::gamemodes;
 
 const CURRENT_GAMEMODE: shared::GameModes = shared::GameModes::Base;
 
-fn main() {
+pub fn main() {
     println!("ipv4: {}", local_ip_address::local_ip().unwrap());
     println!("ipv6: {}", local_ip_address::local_ipv6().unwrap());
     //

@@ -6,10 +6,7 @@ use std::time::Duration;
 
 use reqwest;
 
-use positive_mahjong::{gamemodes_shared, shared};
-
-// 引入 Slint 模組
-slint::include_modules!();
+use pmj_shared::{gamemodes_shared, shared};
 
 pub fn main() -> Result<(), slint::PlatformError> {
     // 初始化視窗
