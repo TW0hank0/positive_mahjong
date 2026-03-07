@@ -1,0 +1,10 @@
+[package]
+name = "pmj_shared"
+version = "0.1.0"
+edition = "2024"
+repository = "https://github.com/TW0hank0/positive_mahjong"
+authors = ["TW0hank0"]
+
+[lib]
+crate-type = ["lib", "rlib", "cdylib"]
+path = "src/lib.rs"

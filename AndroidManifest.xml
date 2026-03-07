@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="tw0hank0.positive_mahjong">
+
+    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="35" />
+
+    <application
+        android:label="PMJ Client"
+        android:icon="@mipmap/ic_launcher">
+        
+        <activity
+            android:name="rust.android.NativeActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

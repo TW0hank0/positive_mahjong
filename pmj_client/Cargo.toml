@@ -1,0 +1,18 @@
+[package]
+name = "pmj_client"
+version = "0.1.0"
+edition = "2024"
+repository = "https://github.com/TW0hank0/positive_mahjong"
+authors = ["TW0hank0"]
+
+[[bin]]
+name = "pmj_client"
+path = "src/main.rs" # for computer
+
+[build-dependencies]
+#cargo_metadata = "0.19"
+#heck = "0.5"
+#positive_tool_rs = { git = "https://github.com/TW0hank0/positive_tool_rs" }
+#serde = { version = "1.0.228", features = ["serde_derive"] }
+#serde_json = "1.0.149"
+slint-build = "1.14.1"

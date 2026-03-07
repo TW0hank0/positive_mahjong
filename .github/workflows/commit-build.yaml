@@ -155,7 +155,7 @@ jobs:
         run: |
           echo '----create_release----'
           gh release create "ci-pre-v${{ steps.get_version.outputs.version }}-${{ github.sha }}" \
-            --title "PTB_ci_pre-release_${{ steps.get_version.outputs.version }}+${{ steps.get_datetime.outputs.datetime }} (${{ github.sha }})" \
+            --title "pre-release: ${{ steps.get_version.outputs.version }}+${{ steps.get_datetime.outputs.datetime }} (${{ github.sha }})" \
             --notes "**這是使用Github Action製作的測試版**
             - 版本： ${{ steps.get_version.outputs.version }}
             - 臺北時間： ${{ steps.get_datetime.outputs.datetime }}
