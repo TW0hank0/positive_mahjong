@@ -1,6 +1,7 @@
 # positive_mahjong 計劃
 
-- [ ] (Current) V1Server & V1Client Demo
+- [ ] (**Current**) V1Server & V1Client Demo
+- [ ] (**Current**) 檔案結構更換
 - [ ] (gmv2 `better`) 保護伺服器端 (避免客戶端錯誤導致伺服器崩潰)
 - [ ] 伺服器GUI (rs + iced)
 - [ ] 客戶端+GUI (rust + slint)
