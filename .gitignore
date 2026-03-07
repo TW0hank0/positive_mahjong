@@ -3,3 +3,6 @@
 **/.venv/**
 **/__pycache__/**
 **/__pypy_cache__/**
+
+# build script generate
+positive_*_v*_*.zip
