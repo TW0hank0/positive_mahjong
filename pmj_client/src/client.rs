@@ -1,11 +1,13 @@
 use slint::{self, ComponentHandle, SharedString, Weak};
 
-use std::thread;
-//use std::time::Duration;
-
+///use std::time::Duration;
 use reqwest;
+use std::thread;
 
 use pmj_shared::{gamemodes_shared, shared};
+
+// 引入 Slint 模組
+slint::include_modules!();
 
 pub fn main() -> Result<(), slint::PlatformError> {
     // 初始化視窗
