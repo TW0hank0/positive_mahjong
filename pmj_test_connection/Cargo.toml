@@ -1,9 +1,10 @@
 [package]
 name = "pmj_test_connection"
-version = "0.1.0"
-edition = "2024"
-repository = "https://github.com/TW0hank0/positive_mahjong"
-authors = ["TW0hank0"]
+version = { workspace = true }
+edition = { workspace = true }
+repository = { workspace = true }
+authors = { workspace = true }
+license = { workspace = true }
 
 [dependencies]
 reqwest = { workspace = true }
