@@ -10,7 +10,7 @@ def main():
     )
     with open(info_file, "rb") as f:
         project_info = tomllib.load(f)
-    version = project_info["package"]["version"]
+    version = project_info["workspace"]["package"]["version"]
     #
     include_files = []
     target_path = os.path.join(

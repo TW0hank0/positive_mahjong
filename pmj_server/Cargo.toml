@@ -1,10 +1,10 @@
 [package]
 name = "pmj_server"
-version = "0.1.0"
-edition = "2024"
-repository = "https://github.com/TW0hank0/positive_mahjong"
-license = "AGPL-3.0-only"
-authors = ["TW0hank0"]
+version = { workspace = true }
+edition = { workspace = true }
+repository = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
 default-run = "pmj_server"
 
 [dependencies]

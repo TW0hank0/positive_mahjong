@@ -13,6 +13,13 @@
 # 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
+# [package]
+# name = "positive_mahjong"
+# version.workspace = true
+# repository.workspace = true
+# authors.workspace = true
+# license.workspace = true
+
 [workspace.package]
 version = "0.1.0"
 edition = "2024"
