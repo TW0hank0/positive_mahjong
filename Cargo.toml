@@ -74,6 +74,7 @@ serde_json = "1.0.149"
 slint = { version = "1.15.1", features = ["backend-android-activity-06"] }
 tiny_http = { version = "0.12.0" }
 openssl = { version = "0.10", features = ["vendored"] }
+openssl-sys = { version = "0.9", features = ["vendored"] }
 
 [workspace]
 resolver = "3"
@@ -81,6 +82,8 @@ members = ["pmj_client", "pmj_server", "pmj_shared", "pmj_test_connection"]
 
 [profile.release]
 opt-level = 3
+lto = true
+debug = false
 
 [profile.dev]
 debug = 2

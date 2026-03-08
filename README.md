@@ -4,7 +4,7 @@
 
 伺服器使用Rust編寫
 
-客戶端GUI使用Slint
+客戶端GUI使用Slint框架
 
 ![MadeWithSlint-logo](./assets/MadeWithSlint-logo-light.png)
 
