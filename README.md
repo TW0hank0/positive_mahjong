@@ -1,5 +1,7 @@
 # positive_mahjong
 
+**開發中**
+
 伺服器使用Rust編寫
 
 客戶端GUI使用Slint
@@ -11,6 +13,23 @@
 [Github Repo](https://github.com/TW0hank0/positive_mahjong)
 
 [Codeberg Repo](https://codeberg.org/TW0hank0/positive_mahjong)
+
+### 檔案結構
+
+```
+project_root
+└─ .cargo/ => Cargo設定
+└─ .github/workflows/ => 工作流(CI)
+└─ android/ => Android手機版客戶端
+└─ auto_generate/ => 使用build_script產生的License檔案
+└─ ci/ => 工作流(CI)
+└─ pmj_client/ => 客戶端 (rust)
+└─ pmj_server/ => 伺服器 (rust)
+└─ pmj_shared/ => 共用資料
+└─ pmj_test_connection/ => 測試連線
+└─ build_script.py => 編譯腳本 (Release腳本)
+└─ TODO.md => 開發計劃
+```
 
 ### 授權
 
