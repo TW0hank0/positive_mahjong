@@ -27,6 +27,7 @@ use slint_build;
 
 fn main() {
     println!("cargo:rerun-if-changed=ui/main.slint");
+    println!("cargo:rerun-if-changed=src/client.rs");
     match slint_build::compile("ui/main.slint") {
         Ok(_) => {}
         Err(e) => {

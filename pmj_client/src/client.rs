@@ -1,7 +1,7 @@
 use slint::{self, ComponentHandle, SharedString, Weak};
 
 use std::thread;
-use std::time::Duration;
+//use std::time::Duration;
 
 use reqwest;
 

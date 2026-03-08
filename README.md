@@ -26,6 +26,9 @@ project_root
 └─ pmj_client/ => 客戶端 (rust)
 └─ pmj_server/ => 伺服器 (rust)
 └─ pmj_shared/ => 共用資料
+...└─ src/
+......└─ shared.rs => 通用資料 (玩法通用資料)
+......└─ gamemodes_shared => 玩法資料
 └─ pmj_test_connection/ => 測試連線
 └─ build_script.py => 編譯腳本 (Release腳本)
 └─ TODO.md => 開發計劃
