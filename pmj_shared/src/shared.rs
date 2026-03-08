@@ -219,3 +219,11 @@ pub const SERVER_CONFIG_FILE_NAME: &str = "pmj_server_config.json";
 pub struct PMJConfig {
     pub gamemode: GameModes,
 }
+
+impl Default for PMJConfig {
+    fn default() -> Self {
+        Self {
+            gamemode: GameModes::V1Simple,
+        }
+    }
+}

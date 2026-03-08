@@ -6,3 +6,6 @@
 
 # build script generate
 positive_*_v*_*.zip
+
+# config
+pmj_server_config.json

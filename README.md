@@ -24,13 +24,16 @@ project_root
 └─ auto_generate/ => 使用build_script產生的License檔案
 └─ ci/ => 工作流(CI)
 └─ pmj_client/ => 客戶端 (rust)
+...└─ ui/ => Slint UI檔案
+...└─ src/ => Rust 客戶端程式碼
 └─ pmj_server/ => 伺服器 (rust)
 └─ pmj_shared/ => 共用資料
 ...└─ src/
 ......└─ shared.rs => 通用資料 (玩法通用資料)
 ......└─ gamemodes_shared/ => 玩法資料
 └─ pmj_test_connection/ => 測試連線
-└─ build_script.py => 編譯腳本 (Release腳本)
+└─ build_script_computer.py => 電腦編譯腳本 (Release腳本)
+└─ build_script_android.py => Android手機編譯腳本 (Release腳本)
 └─ TODO.md => 開發計劃
 └─ about_html.hbs => cargo-about的html格式生成模板
 └─ about_json.hbs => cargo-about的json格式生成模板

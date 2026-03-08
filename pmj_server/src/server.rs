@@ -30,14 +30,20 @@ use pmj_shared::shared;
 
 use crate::gamemodes;
 
-const CURRENT_GAMEMODE: shared::GameModes = shared::GameModes::Base;
+const CURRENT_GAMEMODE: shared::GameModes = shared::GameModes::V1Simple;
 
 pub fn main() {
     println!("ipv4: {}", local_ip_address::local_ip().unwrap());
     println!("ipv6: {}", local_ip_address::local_ipv6().unwrap());
     //
-    let config_str = fs::read_to_string(shared::SERVER_CONFIG_FILE_NAME).unwrap();
-    let config: shared::PMJConfig = serde_json::from_str(&config_str).unwrap();
+    let config: shared::PMJConfig = if fs::exists(shared::SERVER_CONFIG_FILE_NAME).is_ok()
+        && fs::exists(shared::SERVER_CONFIG_FILE_NAME).unwrap()
+    {
+        let config_str = fs::read_to_string(shared::SERVER_CONFIG_FILE_NAME).unwrap();
+        serde_json::from_str(&config_str).unwrap()
+    } else {
+        shared::PMJConfig::default()
+    };
     match config.gamemode {
         shared::GameModes::Base => {
             println!("還未支援");
