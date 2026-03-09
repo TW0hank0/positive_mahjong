@@ -21,40 +21,40 @@ import time
 
 def main():
     start_time = time.time()
-    print("-" * 10, "cargo-about", "-" * 10)
-    command = [
-        "cargo",
-        "about",
-        "generate",
-        "--output-file",
-        "auto_generated/ThirdPartyLicense-Rust.html",
-        "--threshold",
-        "1.0",
-        "about_html.hbs",
-    ]
-    print(f"Run Command: {' '.join(command)}")
-    subprocess.run(
-        command,
-        check=True,
-        stdout=sys.stdout,
-        stdin=sys.stdin,
-        stderr=sys.stderr,
-    )
-    subprocess.run(
-        [
-            "cargo-about",
-            "generate",
-            "--output-file",
-            "auto_generated/licenses_rust.json",
-            "about_json.hbs",
-            "--threshold",
-            "1.0",
-        ],
-        check=True,
-        stdout=sys.stdout,
-        stdin=sys.stdin,
-        stderr=sys.stderr,
-    )
+    # print("-" * 10, "cargo-about", "-" * 10)
+    # command = [
+    #     "cargo",
+    #     "about",
+    #     "generate",
+    #     "--output-file",
+    #     "auto_generated/ThirdPartyLicense-Rust.html",
+    #     "--threshold",
+    #     "1.0",
+    #     "about_html.hbs",
+    # ]
+    # print(f"Run Command: {' '.join(command)}")
+    # subprocess.run(
+    #     command,
+    #     check=True,
+    #     stdout=sys.stdout,
+    #     stdin=sys.stdin,
+    #     stderr=sys.stderr,
+    # )
+    # subprocess.run(
+    #     [
+    #         "cargo-about",
+    #         "generate",
+    #         "--output-file",
+    #         "auto_generated/licenses_rust.json",
+    #         "about_json.hbs",
+    #         "--threshold",
+    #         "1.0",
+    #     ],
+    #     check=True,
+    #     stdout=sys.stdout,
+    #     stdin=sys.stdin,
+    #     stderr=sys.stderr,
+    # )
     #     print("-" * 10, "pip-licenses", "-" * 10)
     #     subprocess.run(
     #         [
