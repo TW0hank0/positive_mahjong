@@ -29,7 +29,15 @@ fn main() {
     println!("cargo:rerun-if-changed=ui/main.slint");
     println!("cargo:rerun-if-changed=src/client.rs");
     println!("cargo:rerun-if-changed=build.rs");
-    match slint_build::compile("ui/main.slint") {
+    //
+    let config = slint_build::CompilerConfiguration::new().with_library_paths(
+        std::collections::HashMap::from([(
+            "material".to_string(),
+            std::path::Path::new(&std::env::var_os("CARGO_MANIFEST_DIR").unwrap())
+                .join("material-1.0/material.slint"),
+        )]),
+    );
+    match slint_build::compile_with_config("ui/main.slint", config) {
         Ok(_) => {}
         Err(e) => {
             panic!("Slint編譯錯誤！訊息：{}", e);

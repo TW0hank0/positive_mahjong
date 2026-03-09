@@ -9,9 +9,9 @@ use pmj_shared::{gamemodes_shared, shared};
 // 引入 Slint 模組
 slint::include_modules!();
 
-pub fn main() -> Result<(), slint::PlatformError> {
+pub fn main() -> MainWindow {
     // 初始化視窗
-    let main_window = MainWindow::new()?;
+    let main_window = MainWindow::new().unwrap();
     // 建立弱參考，用於子執行緒安全更新 UI
     let weak_window: Weak<MainWindow> = main_window.as_weak();
     //
@@ -67,7 +67,5 @@ pub fn main() -> Result<(), slint::PlatformError> {
         });
     });
 
-    // 事件迴圈
-    main_window.run()?;
-    Ok(())
+    return main_window;
 }

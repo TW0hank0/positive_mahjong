@@ -1,7 +1,7 @@
-use slint;
+//use slint;
 
-mod client;
+use crate::main as ui_main;
 
-fn main() -> Result<(), slint::PlatformError> {
-    client::main()
+fn main() {
+    ui_main();
 }

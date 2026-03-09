@@ -22,16 +22,19 @@ import time
 def main():
     start_time = time.time()
     print("-" * 10, "cargo-about", "-" * 10)
+    command = [
+        "cargo",
+        "about",
+        "generate",
+        "--output-file",
+        "auto_generated/ThirdPartyLicense-Rust.html",
+        "--threshold",
+        "1.0",
+        "about_html.hbs",
+    ]
+    print(f"Run Command: {' '.join(command)}")
     subprocess.run(
-        [
-            "cargo-about",
-            "generate",
-            "--output-file",
-            "auto_generated/ThirdPartyLicense-Rust.html",
-            "about_html.hbs",
-            "--threshold",
-            "1.0",
-        ],
+        command,
         check=True,
         stdout=sys.stdout,
         stdin=sys.stdin,

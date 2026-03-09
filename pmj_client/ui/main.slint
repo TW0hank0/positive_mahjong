@@ -1,9 +1,12 @@
 import { Button, ScrollView } from "std-widgets.slint";
+import { ScrollBar } from "../material/ui/components/scroll_view.slint";
+
+export { MaterialWindowAdapter } from "../material/material.slint";
 
 export component MainWindow inherits Window {
     //width: 1080px;
     //height: 720px;
-    title: "Slint Rust Demo";
+    title: "PositiveMahjong Client";
     min-width: 540px;
     min-height: 360px;
     max-width: 10800px;
@@ -42,8 +45,10 @@ export component MainWindow inherits Window {
                 wrap: TextWrap.word-wrap;
             }
 
+            ScrollBar { }
+
             vertical-scrollbar-policy: ScrollBarPolicy.always-on;
-            horizontal-scrollbar-policy: ScrollBarPolicy.as-needed;
+            horizontal-scrollbar-policy: ScrollBarPolicy.always-on;
         }
     }
 
