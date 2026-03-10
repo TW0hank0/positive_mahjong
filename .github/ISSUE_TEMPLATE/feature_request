@@ -1,0 +1,16 @@
+name: 功能請求 (Feature Request)
+description: 建議新功能或改進現有功能
+title: "[Feature Request]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    id: action_now
+    attributes:
+      label: 現在的行為
+
+  - type: markdown
+    id: action_want
+    attributes:
+      label: 預期的行為
+      description: 描述希望的功能
+      #placeholder: More Eazier to use
