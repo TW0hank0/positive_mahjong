@@ -1,0 +1,27 @@
+name: 功能請求（Feature request）
+description: 為這個專案提供建議
+title: "[Feature] "
+labels:
+  - enhancement
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        填寫此issue前，請確認沒有重复的issue。
+
+  - type: textarea
+    attributes:
+      label: 你想要什么新功能？
+      description: |
+        你想要什麼新功能？
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: know
+    attributes:
+      label: 這個issue是唯一的
+      options:
+        - label: I have searched the issue tracker and did not find an issue describing my bug. - 我已经搜索问题追踪器并且没有发现相同的 issue。
+          required: true
