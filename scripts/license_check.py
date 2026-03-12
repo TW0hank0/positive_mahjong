@@ -22,7 +22,7 @@ def main():
         "addlicense",
         "-check",
         "-f",
-        "addlicense.template",
+        "templates/addlicense.template",
         "-ignore",
         ".git/**",
         "-ignore",

@@ -6,9 +6,8 @@ pmj version {{crate.version}}
 Third Party Project/Library:
 
 {{#each licenses}}
-#### {{crate.name}} v{{crate.version}}
-
 {{#each used_by}}
+#### {{crate.name}} v{{crate.version}}
 
 [{{#if crate.repository}}{{crate.repository}} {{else}}https://crates.io/crates/{{crate.name}}{{/if}}]({{#if
 crate.repository}}{{crate.repository}} {{else}}https://crates.io/crates/{{crate.name}}{{/if}})

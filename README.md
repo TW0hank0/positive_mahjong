@@ -32,8 +32,7 @@ project_root
 ......└─ shared.rs => 通用資料 (玩法通用資料)
 ......└─ gamemodes_shared/ => 玩法資料
 └─ pmj_test_connection/ => 測試連線
-└─ build_script_computer.py => 電腦編譯腳本 (Release腳本)
-└─ build_script_android.py => Android手機編譯腳本 (Release腳本)
+└─ scripts/ => 腳本 (編譯腳本)
 └─ TODO.md => 開發計劃
 └─ about_html.hbs => cargo-about的html格式生成模板
 └─ about_json.hbs => cargo-about的json格式生成模板
