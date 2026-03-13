@@ -28,7 +28,7 @@ def main():
         "--threshold",
         "1.0",
         "--output-file",
-        "auto_generated/licenses_rust.json",
+        "auto_generated/ThirdPartyLicense-Rust.json",
         "templates/about_json.hbs",
     ]
     print(f"Run Command: {' '.join(command2)}")
@@ -43,7 +43,7 @@ def main():
         "cargo-about",
         "generate",
         "--output-file",
-        "auto_generated/licenses_rust.md",
+        "auto_generated/ThirdPartyLicense-Rust.md",
         "--threshold",
         "1.0",
         "templates/about_markdown.hbs",

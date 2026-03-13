@@ -1,5 +1,8 @@
-import { Button, ScrollView } from "std-widgets.slint";
-import { ScrollBar } from "../material/ui/components/scroll_view.slint";
+import { Button } from "std-widgets.slint";
+import {
+    MaterialText,
+    ScrollView,
+} from "../material/material.slint";
 
 export { MaterialWindowAdapter } from "../material/material.slint";
 
@@ -38,14 +41,12 @@ export component MainWindow inherits Window {
         }
 
         ScrollView {
-            Text {
+            MaterialText {
                 text: root.server_response_text;
                 horizontal-alignment: TextHorizontalAlignment.left;
-                //color: white;
+                //color: Colors.rgba();
                 wrap: TextWrap.word-wrap;
             }
-
-            ScrollBar { }
 
             vertical-scrollbar-policy: ScrollBarPolicy.always-on;
             horizontal-scrollbar-policy: ScrollBarPolicy.always-on;

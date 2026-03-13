@@ -4,7 +4,7 @@
 **/__pycache__/**
 **/__pypy_cache__/**
 
-# build script generate
+# positive project build script generate
 positive_*_v*_*.zip
 
 # config
