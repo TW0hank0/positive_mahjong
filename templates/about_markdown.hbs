@@ -1,24 +1,28 @@
 # PositiveMahjong Third Party License
 
 generated at: {{now}}
-pmj version {{crate.version}}
+PMJ version: {{#if crate.version}}{{crate.version}}{{else}}can not detect version
 
 Third Party Project/Library:
 
 {{#each licenses}}
-{{#each used_by}}
-#### {{crate.name}} v{{crate.version}}
 
-[{{#if crate.repository}}{{crate.repository}} {{else}}https://crates.io/crates/{{crate.name}}{{/if}}]({{#if
-crate.repository}}{{crate.repository}} {{else}}https://crates.io/crates/{{crate.name}}{{/if}})
+**All Licenses:**
+
+### {{name}} ({{id}})
+
+**used by:**
+
+{{#each used_by}}
+- [{{#if crate.repository}}{{crate.repository}}{{else}}https://crates.io/crates/{{crate.name}}{{/if}}]({{#if
+crate.repository}}{{crate.repository}}{{else}}https://crates.io/crates/{{crate.name}}{{/if}})
+
 {{/each}}
 
-license_id: {{id}}
+full license text:
 
-license_text:
 ```plaintext
 {{text}}
 ```
-
 
 {{/each}}
