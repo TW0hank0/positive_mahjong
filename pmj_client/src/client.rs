@@ -9,8 +9,6 @@ use pmj_shared::{gamemodes_shared, shared};
 // 引入 Slint 模組
 slint::include_modules!();
 
-const FONT_BYTES: &[u8] = include_bytes!("../../assets/Noto_Sans_TC/static/NotoSansTC-Regular.ttf");
-
 pub fn main() -> MainWindow {
     // 初始化視窗
     let main_window = MainWindow::new().unwrap();
@@ -20,11 +18,12 @@ pub fn main() -> MainWindow {
     let timeout_duration = std::time::Duration::from_secs(15);
     // 設定Callback
     let window_for_callback = main_window.clone_strong();
-    main_window.on_test_connection(move || {
+    main_window.on_home_page_test_connection(move || {
         // 克隆弱參考給新執行緒
         let thread_weak: Weak<MainWindow> = weak_window.clone();
+
         //
-        let input_server_ip: String = window_for_callback.get_server_ip().into();
+        let input_server_ip: String = window_for_callback.get_home_page_server_ip().into();
         let mut resp_body_text = String::new();
         // 線程
         thread::spawn(move || {
@@ -32,18 +31,13 @@ pub fn main() -> MainWindow {
             if input_server_ip.is_empty() {
                 resp_body_text.push_str("錯誤！未輸入正確伺服器Ip！");
             } else {
-                let server_url = format!(
-                    "http://{}:{}/",
-                    input_server_ip.clone(),
-                    shared::SERVER_PORT
-                );
+                let server_url = format!("http://{}:{}/", input_server_ip, shared::SERVER_PORT);
                 let clone_server_url = server_url.clone();
                 thread_weak
                     .upgrade_in_event_loop(move |upgraded_window| {
-                        upgraded_window.set_server_response_text(SharedString::from(format!(
-                            "正在發送Post到伺服器 ({})...",
-                            clone_server_url
-                        )));
+                        upgraded_window.set_home_page_server_response_text(SharedString::from(
+                            format!("正在發送Post到伺服器 ({})...", clone_server_url),
+                        ));
                     })
                     .ok();
                 let client = reqwest::blocking::Client::new();
@@ -72,7 +66,8 @@ pub fn main() -> MainWindow {
             // 安全地回到主執行緒更新 UI
             thread_weak
                 .upgrade_in_event_loop(move |upgraded_window| {
-                    upgraded_window.set_server_response_text(SharedString::from(resp_body_text));
+                    upgraded_window
+                        .set_home_page_server_response_text(SharedString::from(resp_body_text));
                 })
                 .ok();
         });

@@ -1,8 +1,9 @@
-import { Button } from "std-widgets.slint";
+import { Button, LineEdit } from "std-widgets.slint";
 import {
     MaterialText,
     ScrollView,
 } from "../material/material.slint";
+import "../../../assets/Noto_Sans_TC/static/NotoSansTC-Regular.ttf";
 
 export { MaterialWindowAdapter } from "../material/material.slint";
 
@@ -22,10 +23,9 @@ component HomePage {
             text: "伺服器Ip：";
         }
 
-        TextInput {
+        LineEdit {
             //placeholder-text: "輸入資料...";
             text <=> root.server_ip;
-            single-line: true;
             //color: lightgray;
         }
 
@@ -108,8 +108,10 @@ export component MainWindow inherits Window {
             }
         }
     } */
+    window_home_page := HomePage { }
 
-    if current_window == "HomePage": HomePage { }
     in-out property <string> current_window: "HomePage";
-    /* in-out property <string> home_page_: "HomePage"; */
+    in-out property <string> home_page_server_ip <=> window_home_page.server_ip;
+    in-out property <string> home_page_server_response_text <=> window_home_page.server_response_text;
+    callback home_page_test_connection <=> window_home_page.test_connection;
 }
