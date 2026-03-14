@@ -4,13 +4,13 @@ import sys
 
 def main():
     targets = [
-        "armv7-linux-androideabi",
         "aarch64-linux-android",
+        # "armv7-linux-androideabi",
     ]
-    print("Targets: ", ", ".join(targets))
+    print("Targets: " + ", ".join(targets))
     for target in targets:
         print("-" * 10)
-        command = [
+        command: list[str] = [
             "cargo",
             "apk",
             "build",
@@ -19,8 +19,9 @@ def main():
             "--package",
             "pmj_client",
             "--release",
+            "--lib",
         ]
-        print(f"Run Command: {' '.join(command)}")
+        print("Run Command: " + " ".join(command))
         subprocess.run(
             command,
             check=True,
