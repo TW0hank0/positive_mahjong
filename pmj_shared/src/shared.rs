@@ -213,7 +213,7 @@ impl std::default::Default for ServerResponseDataType {
     }
 }
 
-pub const SERVER_CONFIG_FILE_NAME: &str = "pmj_server_config.json";
+pub static SERVER_CONFIG_FILE_NAME: &str = "pmj_server_config.json";
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct PMJConfig {

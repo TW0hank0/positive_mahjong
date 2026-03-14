@@ -1,6 +1,6 @@
 # positive_mahjong
 
-**開發中**
+**仍在開發中**
 
 伺服器使用Rust編寫
 
@@ -14,15 +14,18 @@
 
 [Codeberg Repo](https://codeberg.org/TW0hank0/positive_mahjong)
 
+[Keep Android Open Website](https://keepandroidopen.org/)
+
 ### 檔案結構
 
 ```
 project_root
 └─ .cargo/ => Cargo設定
-└─ .github/workflows/ => 工作流(CI)
-└─ android/ => Android手機版客戶端
-└─ auto_generate/ => 使用build_script產生的License檔案
-└─ ci/ => 工作流(CI)
+└─ .github/
+...└─ workflows/ => 工作流(CI)
+...└─ ISSUE_TEMPLATE/ => Issue模板
+└─ auto_generate/ => 使用腳本產生的檔案
+└─ ci/ => 工作流 (workflow - CI)
 └─ pmj_client/ => 客戶端 (rust)
 ...└─ ui/ => Slint UI檔案
 ...└─ src/ => Rust 客戶端程式碼
@@ -32,11 +35,13 @@ project_root
 ......└─ shared.rs => 通用資料 (玩法通用資料)
 ......└─ gamemodes_shared/ => 玩法資料
 └─ pmj_test_connection/ => 測試連線
-└─ scripts/ => 腳本 (編譯腳本)
+└─ scripts/ => 腳本 (像是編譯腳本)
+└─ templates/ => 模板
+...└─ about_html.hbs => cargo-about的html格式生成模板
+...└─ about_json.hbs => cargo-about的json格式生成模板
+...└─ about_markdown.hbs => cargo-about的markdown格式生成模板
+...└─ addlicense.template => addlicense的檔案Headler模板
 └─ TODO.md => 開發計劃
-└─ about_html.hbs => cargo-about的html格式生成模板
-└─ about_json.hbs => cargo-about的json格式生成模板
-└─ addlicense.template => addlicense的檔案Headler模板
 ```
 
 ### 授權

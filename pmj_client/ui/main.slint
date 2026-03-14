@@ -1,5 +1,8 @@
-import { Button, ScrollView } from "std-widgets.slint";
-import { ScrollBar } from "../material/ui/components/scroll_view.slint";
+import { Button } from "std-widgets.slint";
+import {
+    MaterialText,
+    ScrollView,
+} from "../material/material.slint";
 
 export { MaterialWindowAdapter } from "../material/material.slint";
 
@@ -12,15 +15,19 @@ export component MainWindow inherits Window {
     max-width: 10800px;
     max-height: 72000px;
     //background: darkgray;
-    default-font-size: 30px;
+    default-font-size: 25px;
     VerticalLayout {
         spacing: 20px;
         padding: 20px;
-        Text {
+        MaterialText {
             text: "PMJ Client";
             font-size: 35px;
             horizontal-alignment: TextHorizontalAlignment.left;
             //color: lightgray;
+        }
+
+        MaterialText {
+            text: "伺服器Ip：";
         }
 
         TextInput {
@@ -38,14 +45,12 @@ export component MainWindow inherits Window {
         }
 
         ScrollView {
-            Text {
+            MaterialText {
                 text: root.server_response_text;
                 horizontal-alignment: TextHorizontalAlignment.left;
-                //color: white;
+                //color: Colors.rgba();
                 wrap: TextWrap.word-wrap;
             }
-
-            ScrollBar { }
 
             vertical-scrollbar-policy: ScrollBarPolicy.always-on;
             horizontal-scrollbar-policy: ScrollBarPolicy.always-on;
@@ -54,6 +59,6 @@ export component MainWindow inherits Window {
 
     // 屬性與回調定義
     in-out property <string> server_response_text: "";
-    in-out property <string> server_ip: "請輸入伺服器Ip";
+    in-out property <string> server_ip: "";
     callback test_connection();
 }

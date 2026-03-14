@@ -42,7 +42,13 @@ pub fn main() {
         let config_str = fs::read_to_string(shared::SERVER_CONFIG_FILE_NAME).unwrap();
         serde_json::from_str(&config_str).unwrap()
     } else {
-        shared::PMJConfig::default()
+        let default_config = shared::PMJConfig::default();
+        fs::write(
+            shared::SERVER_CONFIG_FILE_NAME,
+            serde_json::to_string_pretty(&default_config).unwrap(),
+        )
+        .ok();
+        default_config
     };
     match config.gamemode {
         shared::GameModes::Base => {
@@ -113,13 +119,13 @@ fn handle_server_v1_simple(
         for request in server.incoming_requests() {
             let arc_backend = sync::Arc::clone(&backend);
             std::thread::spawn(move || {
-                handle_request(request, arc_backend);
+                handle_request_v1_simple(request, arc_backend);
             });
         }
     })
 }
 
-fn handle_request(
+fn handle_request_v1_simple(
     mut request: tiny_http::Request,
     backend: sync::Arc<sync::RwLock<gamemodes::modev1_simple::PositiveMahjong>>,
 ) {
