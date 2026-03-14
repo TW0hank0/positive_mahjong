@@ -6,16 +6,8 @@ import {
 
 export { MaterialWindowAdapter } from "../material/material.slint";
 
-export component MainWindow inherits Window {
-    //width: 1080px;
-    //height: 720px;
-    title: "PositiveMahjong Client";
-    min-width: 540px;
-    min-height: 360px;
-    max-width: 10800px;
-    max-height: 72000px;
-    //background: darkgray;
-    default-font-size: 25px;
+
+component HomePage {
     VerticalLayout {
         spacing: 20px;
         padding: 20px;
@@ -57,8 +49,67 @@ export component MainWindow inherits Window {
         }
     }
 
-    // 屬性與回調定義
+    callback test_connection();
     in-out property <string> server_response_text: "";
     in-out property <string> server_ip: "";
-    callback test_connection();
+}
+
+export component MainWindow inherits Window {
+    //width: 1080px;
+    //height: 720px;
+    title: "PositiveMahjong Client";
+    min-width: 540px;
+    min-height: 360px;
+    max-width: 10800px;
+    max-height: 72000px;
+    //background: darkgray;
+    default-font-size: 25px;
+    default-font-family: "Noto Sans TC";
+
+    /* component HomePage {
+        VerticalLayout {
+            spacing: 20px;
+            padding: 20px;
+            MaterialText {
+                text: "PMJ Client";
+                font-size: 35px;
+                horizontal-alignment: TextHorizontalAlignment.left;
+            //color: lightgray;
+        }
+
+            MaterialText {
+                text: "伺服器Ip：";
+            }
+
+            TextInput {
+            //placeholder-text: "輸入資料...";
+            text <=> root.server_ip;
+                single-line: true;
+            //color: lightgray;
+        }
+
+            Button {
+                text: "測試連線";
+                clicked => {
+                    root.test_connection();
+                }
+            }
+
+            ScrollView {
+                MaterialText {
+                    text: root.server_response_text;
+                    horizontal-alignment: TextHorizontalAlignment.left;
+                //color: Colors.rgba();
+                wrap: TextWrap.word-wrap;
+                }
+
+                vertical-scrollbar-policy: ScrollBarPolicy.always-on;
+                horizontal-scrollbar-policy: ScrollBarPolicy.always-on;
+            }
+        }
+    } */
+
+    if current_window == "HomePage": HomePage { }
+    in-out property <string> current_window: "HomePage";
+    /* in-out property <string> home_page_: "HomePage"; */
 }

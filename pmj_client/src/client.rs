@@ -9,6 +9,8 @@ use pmj_shared::{gamemodes_shared, shared};
 // 引入 Slint 模組
 slint::include_modules!();
 
+const FONT_BYTES: &[u8] = include_bytes!("../../assets/Noto_Sans_TC/static/NotoSansTC-Regular.ttf");
+
 pub fn main() -> MainWindow {
     // 初始化視窗
     let main_window = MainWindow::new().unwrap();

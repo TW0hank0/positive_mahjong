@@ -52,3 +52,7 @@ max_sdk_version = 36
 [package.metadata.android.signing.release]
 path = "../secret/TW0hank0.keystore"
 keystore_password = "tw0hank0_android"
+
+[[package.metadata.android.uses_feature]]
+name = "android.permission.INTERNET"
+required = true
