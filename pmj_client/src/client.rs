@@ -35,6 +35,15 @@ pub fn main() -> MainWindow {
                     input_server_ip.clone(),
                     shared::SERVER_PORT
                 );
+                let clone_server_url = server_url.clone();
+                thread_weak
+                    .upgrade_in_event_loop(move |upgraded_window| {
+                        upgraded_window.set_server_response_text(SharedString::from(format!(
+                            "正在發送Post到伺服器 ({})...",
+                            clone_server_url
+                        )));
+                    })
+                    .ok();
                 let client = reqwest::blocking::Client::new();
                 //
                 let request_data = shared::ClientRequestDataType {

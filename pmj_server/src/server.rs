@@ -119,13 +119,13 @@ fn handle_server_v1_simple(
         for request in server.incoming_requests() {
             let arc_backend = sync::Arc::clone(&backend);
             std::thread::spawn(move || {
-                handle_request(request, arc_backend);
+                handle_request_v1_simple(request, arc_backend);
             });
         }
     })
 }
 
-fn handle_request(
+fn handle_request_v1_simple(
     mut request: tiny_http::Request,
     backend: sync::Arc<sync::RwLock<gamemodes::modev1_simple::PositiveMahjong>>,
 ) {

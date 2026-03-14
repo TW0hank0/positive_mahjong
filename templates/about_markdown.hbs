@@ -1,28 +1,29 @@
 # PositiveMahjong Third Party License
 
-generated at: {{now}}
-PMJ version: {{#if crate.version}}{{crate.version}}{{else}}can not detect version
+製作時間： {{now}}
+PMJ 版本： {{#if crate.version}}{{crate.version}}{{else}}can not detect version
 
-Third Party Project/Library:
+所有使用的協議：
+{{#each overview}}
+- {{name}} ({{id}}) × {{count}}
+{{/each}}
+
+第三方專案/模組庫：
 
 {{#each licenses}}
 
-**All Licenses:**
-
 ### {{name}} ({{id}})
 
-**used by:**
+由使用下列程式使用：
 
 {{#each used_by}}
 - [{{#if crate.repository}}{{crate.repository}}{{else}}https://crates.io/crates/{{crate.name}}{{/if}}]({{#if
 crate.repository}}{{crate.repository}}{{else}}https://crates.io/crates/{{crate.name}}{{/if}})
-
 {{/each}}
 
-full license text:
+完整全文：
 
-```plaintext
-{{text}}
-```
-
-{{/each}}
+<details markdown='1'>
+    <summary>展開/摺疊</summary>
+    {{text}}
+</details>
