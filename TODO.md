@@ -25,4 +25,5 @@
 - [ ] (低優先度) git bench from `master` to `main`
 - [ ] (低優先度) android版伺服器
 - [ ] (低優先度) 重寫android編譯腳本
-- [ ] build_scrip針對無法自動畫的lib(slint-material, ring, webpki)增加license info
+- [ ] build_script針對無法自動畫的lib(slint-material, ring, webpki)增加license info
+- [ ] build_script增加apk處理
