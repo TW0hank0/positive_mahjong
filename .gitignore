@@ -1,5 +1,8 @@
 /target
 
+**/target/debug/**
+**/target/release/**
+
 **/.venv/**
 **/__pycache__/**
 **/__pypy_cache__/**
@@ -7,5 +10,11 @@
 # positive project build script generate
 positive_*_v*_*.zip
 
+# krita bakeup
+*.kra~
+
 # config
 pmj_server_config.json
+
+# secrets
+secret/**

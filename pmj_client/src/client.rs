@@ -13,7 +13,7 @@ pub fn main() -> MainWindow {
     // 初始化視窗
     let main_window = MainWindow::new().unwrap();
     // 建立弱參考，用於子執行緒安全更新 UI
-    let weak_window: Weak<MainWindow> = main_window.as_weak();
+    let weak_window = main_window.as_weak();
     //
     let timeout_duration = std::time::Duration::from_secs(15);
     // 設定Callback

@@ -42,7 +42,13 @@ pub fn main() {
         let config_str = fs::read_to_string(shared::SERVER_CONFIG_FILE_NAME).unwrap();
         serde_json::from_str(&config_str).unwrap()
     } else {
-        shared::PMJConfig::default()
+        let default_config = shared::PMJConfig::default();
+        fs::write(
+            shared::SERVER_CONFIG_FILE_NAME,
+            serde_json::to_string_pretty(&default_config).unwrap(),
+        )
+        .ok();
+        default_config
     };
     match config.gamemode {
         shared::GameModes::Base => {

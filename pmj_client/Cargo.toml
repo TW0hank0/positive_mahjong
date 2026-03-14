@@ -33,7 +33,7 @@ console_error_panic_hook = "0.1.5"
 #positive_tool_rs = { git = "https://github.com/TW0hank0/positive_tool_rs" }
 #serde = { version = "1.0.228", features = ["serde_derive"] }
 #serde_json = "1.0.149"
-slint-build = "1.14.1"
+slint-build = "1.15.1"
 
 [package.metadata.android]
 package = "io.github.positive_mahjong.tw0hank0"
@@ -47,3 +47,7 @@ label = "PositiveMahjong Client"
 min_sdk_version = 23
 target_sdk_version = 35
 max_sdk_version = 36
+
+[package.metadata.android.signing.release]
+path = "../secret/TW0hank0.keystore"
+keystore_password = "tw0hank0_android"

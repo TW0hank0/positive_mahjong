@@ -1,9 +1,10 @@
 use slint;
+use slint::{ComponentHandle, Global};
 
 mod client;
 
 // 引入 Slint 模組
-slint::include_modules!();
+//slint::include_modules!();
 
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
@@ -19,6 +20,6 @@ pub fn main() {
 fn android_main(android_app: slint::android::AndroidApp) {
     slint::android::init(android_app).unwrap();
     let ui = client::main();
-    MaterialWindowAdapter::get(&ui).set_disable_hover(true);
+    client::MaterialWindowAdapter::get(&ui).set_disable_hover(true);
     ui.run().unwrap();
 }
