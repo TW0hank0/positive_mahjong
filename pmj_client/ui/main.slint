@@ -18,6 +18,8 @@ component HomePage inherits VerticalLayout {
         min-width: 1000px;
         preferred-height: 100%;
         preferred-width: 100%;
+        horizontal_scrollbar_policy: ScrollBarPolicy.as-needed;
+        vertical_scrollbar_policy: ScrollBarPolicy.as-needed;
         VerticalLayout {
             spacing: 20px;
             padding: 20px;
@@ -90,8 +92,13 @@ export component MainWindow inherits Window {
     in-out property <bool> is-changing-scene: false;
     callback home_page_test_connection <=> window_home_page.test_connection;
 
-    window_home_page := HomePage {
-        opacity: 1.0;
+    ScrollView {
+        horizontal_scrollbar_policy: ScrollBarPolicy.as-needed;
+        vertical_scrollbar_policy: ScrollBarPolicy.as-needed;
+        //
+        window_home_page := HomePage {
+            opacity: 1.0;
+        }
     }
 
     states [
