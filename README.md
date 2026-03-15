@@ -1,5 +1,7 @@
 # positive_mahjong
 
+![icon](./assets/icon.png)
+
 **仍在開發中**
 
 伺服器使用Rust編寫
@@ -17,6 +19,8 @@
 [Keep Android Open Website](https://keepandroidopen.org/)
 
 ### 檔案結構
+
+**已過時**
 
 ```
 project_root

@@ -1,7 +1,7 @@
 /target
 
-**/target/debug/**
-**/target/release/**
+# **/target/**/debug/**
+# **/target/**/release/**
 
 **/.venv/**
 **/__pycache__/**

@@ -24,9 +24,9 @@ pub fn main() -> MainWindow {
 
         //
         let input_server_ip: String = window_for_callback.get_home_page_server_ip().into();
-        let mut resp_body_text = String::new();
         // 線程
         thread::spawn(move || {
+            let mut resp_body_text = String::new();
             //
             if input_server_ip.is_empty() {
                 resp_body_text.push_str("錯誤！未輸入正確伺服器Ip！");
@@ -54,14 +54,41 @@ pub fn main() -> MainWindow {
                     is_test_connection: true,
                 })
                 .unwrap();
-                let response = client
+                /* let response = client
+                .post(server_url.clone())
+                .body(request)
+                .timeout(timeout_duration.clone())
+                .send()
+                .unwrap(); */
+                match client
                     .post(server_url.clone())
                     .body(request)
                     .timeout(timeout_duration.clone())
                     .send()
-                    .unwrap();
+                {
+                    Ok(resp) => {
+                        let resp_text = resp.text().unwrap();
+                        let binding: Result<shared::ServerResponseType, serde_json::Error> =
+                            serde_json::from_str(&resp_text);
+                        match binding {
+                            Ok(value) => {
+                                resp_body_text.push_str(
+                                    &serde_json::to_string_pretty(&value)
+                                        .unwrap_or(String::from(resp_text)),
+                                );
+                            }
+                            Err(_e) => {
+                                /* log error */
+                                resp_body_text.push_str(&resp_text);
+                            }
+                        }
+                        /* resp_body_text.push_str(&resp_text.unwrap()); */
+                    }
+                    Err(e) => {
+                        resp_body_text.push_str(&format!("錯誤：{}", e.to_string()));
+                    }
+                }
                 //
-                resp_body_text.push_str(&response.text().unwrap());
             }
             // 安全地回到主執行緒更新 UI
             thread_weak

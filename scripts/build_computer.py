@@ -22,7 +22,7 @@ def main():
     start_time = time.time()
     print("-" * 10, "cargo build", "-" * 10)
     subprocess.run(
-        ["cargo", "build", "--release"],
+        ["cargo", "build", "--workspace", "--release"],
         check=True,
         stdout=sys.stdout,
         stdin=sys.stdin,
