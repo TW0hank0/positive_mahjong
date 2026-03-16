@@ -1,64 +1,112 @@
-import { Button } from "std-widgets.slint";
-import {
-    MaterialText,
-    ScrollView,
-} from "../material/material.slint";
+import { Button, LineEdit } from "std-widgets.slint";
+import { MaterialText, ScrollView } from "../material/material.slint";
+import "../../../assets/Noto_Sans_TC/static/NotoSansTC-Regular.ttf";
 
 export { MaterialWindowAdapter } from "../material/material.slint";
 
-export component MainWindow inherits Window {
-    //width: 1080px;
-    //height: 720px;
-    title: "PositiveMahjong Client";
-    min-width: 540px;
-    min-height: 360px;
-    max-width: 10800px;
-    max-height: 72000px;
-    //background: darkgray;
-    default-font-size: 25px;
-    VerticalLayout {
-        spacing: 20px;
-        padding: 20px;
-        MaterialText {
-            text: "PMJ Client";
-            font-size: 35px;
-            horizontal-alignment: TextHorizontalAlignment.left;
-            //color: lightgray;
-        }
+export enum Scenes {
+    HomePage
+}
 
-        MaterialText {
-            text: "伺服器Ip：";
-        }
-
-        TextInput {
-            //placeholder-text: "輸入資料...";
-            text <=> root.server_ip;
-            single-line: true;
-            //color: lightgray;
-        }
-
-        Button {
-            text: "測試連線";
-            clicked => {
-                root.test_connection();
-            }
-        }
-
-        ScrollView {
-            MaterialText {
-                text: root.server_response_text;
-                horizontal-alignment: TextHorizontalAlignment.left;
-                //color: Colors.rgba();
-                wrap: TextWrap.word-wrap;
-            }
-
-            vertical-scrollbar-policy: ScrollBarPolicy.always-on;
-            horizontal-scrollbar-policy: ScrollBarPolicy.always-on;
-        }
-    }
-
-    // 屬性與回調定義
+component HomePage inherits VerticalLayout {
     in-out property <string> server_response_text: "";
     in-out property <string> server_ip: "";
     callback test_connection();
+
+    ScrollView {
+        min-height: 800px;
+        min-width: 1000px;
+        preferred-height: 100%;
+        preferred-width: 100%;
+        horizontal_scrollbar_policy: ScrollBarPolicy.as-needed;
+        vertical_scrollbar_policy: ScrollBarPolicy.as-needed;
+        VerticalLayout {
+            spacing: 20px;
+            padding: 20px;
+            Rectangle {
+                height: 20px;
+            }
+
+            MaterialText {
+                text: "PMJ Client";
+                font-size: 40px;
+                horizontal-alignment: TextHorizontalAlignment.left;
+            }
+
+            MaterialText {
+                text: "伺服器Ip：";
+                font-size: 28px;
+            }
+
+            LineEdit {
+                text <=> root.server_ip;
+                min-width: 50px;
+                max-width: 2000px;
+                min-height: 30px;
+                max-height: 75px;
+                preferred-height: 55px;
+                preferred-width: 500px;
+            }
+
+            Button {
+                text: "測試連線";
+                clicked => {
+                    root.test_connection();
+                }
+                width: 35%;
+            }
+
+            Rectangle {
+                background: Colors.black;
+                ScrollView {
+                    MaterialText {
+                        text: root.server_response_text;
+                        horizontal-alignment: TextHorizontalAlignment.left;
+                        vertical-alignment: TextVerticalAlignment.top;
+                        wrap: TextWrap.char-wrap;
+                        font-size: 20px;
+                    }
+
+                    width: 100%;
+                    vertical-scrollbar-policy: ScrollBarPolicy.always-on;
+                    horizontal-scrollbar-policy: ScrollBarPolicy.always-on;
+                }
+            }
+        }
+    }
+}
+
+export component MainWindow inherits Window {
+    title: "PositiveMahjong Client";
+    min-width: 1080px;
+    min-height: 720px;
+    max-width: 108000px;
+    max-height: 720000px;
+    preferred-width: 100%;
+    preferred-height: 100%;
+    default-font-size: 30px;
+    default-font-family: "Noto Sans TC";
+    in-out property <string> home_page_server_ip <=> window_home_page.server_ip;
+    in-out property <string> home_page_server_response_text <=> window_home_page.server_response_text;
+    in-out property <Scenes> current-scene: Scenes.HomePage;
+    in-out property <bool> is-changing-scene: false;
+    callback home_page_test_connection <=> window_home_page.test_connection;
+
+    ScrollView {
+        horizontal_scrollbar_policy: ScrollBarPolicy.as-needed;
+        vertical_scrollbar_policy: ScrollBarPolicy.as-needed;
+        //
+        window_home_page := HomePage {
+            opacity: 1.0;
+        }
+    }
+
+    states [
+        active when current-scene == Scenes.HomePage: {
+            window_home_page.opacity: 1.0;
+        }
+        active when is-changing-scene: {
+            window_home_page.opacity: 0.0;
+        }
+    ]
 }

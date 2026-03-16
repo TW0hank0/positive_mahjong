@@ -18,30 +18,26 @@ pub fn main() -> MainWindow {
     let timeout_duration = std::time::Duration::from_secs(15);
     // 設定Callback
     let window_for_callback = main_window.clone_strong();
-    main_window.on_test_connection(move || {
+    main_window.on_home_page_test_connection(move || {
         // 克隆弱參考給新執行緒
         let thread_weak: Weak<MainWindow> = weak_window.clone();
+
         //
-        let input_server_ip: String = window_for_callback.get_server_ip().into();
-        let mut resp_body_text = String::new();
+        let input_server_ip: String = window_for_callback.get_home_page_server_ip().into();
         // 線程
         thread::spawn(move || {
+            let mut resp_body_text = String::new();
             //
             if input_server_ip.is_empty() {
                 resp_body_text.push_str("錯誤！未輸入正確伺服器Ip！");
             } else {
-                let server_url = format!(
-                    "http://{}:{}/",
-                    input_server_ip.clone(),
-                    shared::SERVER_PORT
-                );
+                let server_url = format!("http://{}:{}/", input_server_ip, shared::SERVER_PORT);
                 let clone_server_url = server_url.clone();
                 thread_weak
                     .upgrade_in_event_loop(move |upgraded_window| {
-                        upgraded_window.set_server_response_text(SharedString::from(format!(
-                            "正在發送Post到伺服器 ({})...",
-                            clone_server_url
-                        )));
+                        upgraded_window.set_home_page_server_response_text(SharedString::from(
+                            format!("正在發送Post到伺服器 ({})...", clone_server_url),
+                        ));
                     })
                     .ok();
                 let client = reqwest::blocking::Client::new();
@@ -58,19 +54,47 @@ pub fn main() -> MainWindow {
                     is_test_connection: true,
                 })
                 .unwrap();
-                let response = client
+                /* let response = client
+                .post(server_url.clone())
+                .body(request)
+                .timeout(timeout_duration.clone())
+                .send()
+                .unwrap(); */
+                match client
                     .post(server_url.clone())
                     .body(request)
                     .timeout(timeout_duration.clone())
                     .send()
-                    .unwrap();
+                {
+                    Ok(resp) => {
+                        let resp_text = resp.text().unwrap();
+                        let binding: Result<shared::ServerResponseType, serde_json::Error> =
+                            serde_json::from_str(&resp_text);
+                        match binding {
+                            Ok(value) => {
+                                resp_body_text.push_str(
+                                    &serde_json::to_string_pretty(&value)
+                                        .unwrap_or(String::from(resp_text)),
+                                );
+                            }
+                            Err(_e) => {
+                                /* log error */
+                                resp_body_text.push_str(&resp_text);
+                            }
+                        }
+                        /* resp_body_text.push_str(&resp_text.unwrap()); */
+                    }
+                    Err(e) => {
+                        resp_body_text.push_str(&format!("錯誤：{}", e.to_string()));
+                    }
+                }
                 //
-                resp_body_text.push_str(&response.text().unwrap());
             }
             // 安全地回到主執行緒更新 UI
             thread_weak
                 .upgrade_in_event_loop(move |upgraded_window| {
-                    upgraded_window.set_server_response_text(SharedString::from(resp_body_text));
+                    upgraded_window
+                        .set_home_page_server_response_text(SharedString::from(resp_body_text));
                 })
                 .ok();
         });

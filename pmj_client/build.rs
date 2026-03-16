@@ -23,19 +23,20 @@
 /* use serde;
 use serde_json; */
 
+use std;
+
 use slint_build;
 
 fn main() {
     println!("cargo:rerun-if-changed=ui/main.slint");
     println!("cargo:rerun-if-changed=src/client.rs");
     println!("cargo:rerun-if-changed=build.rs");
+    println!("cargo:rerun-if-changed=ui");
     //
+    let ui_lib_path = std::path::Path::new(&std::env::var_os("CARGO_MANIFEST_DIR").unwrap())
+        .join("material/material.slint");
     let config = slint_build::CompilerConfiguration::new().with_library_paths(
-        std::collections::HashMap::from([(
-            "material".to_string(),
-            std::path::Path::new(&std::env::var_os("CARGO_MANIFEST_DIR").unwrap())
-                .join("material-1.0/material.slint"),
-        )]),
+        std::collections::HashMap::from([("material".to_string(), ui_lib_path)]),
     );
     match slint_build::compile_with_config("ui/main.slint", config) {
         Ok(_) => {}

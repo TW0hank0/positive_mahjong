@@ -16,6 +16,7 @@ def main():
     target_path = os.path.join(
         os.path.dirname(os.path.dirname(__file__)),
         "target",
+        # "x86_64-pc-windows-msvc",
         "release",
     )
     for file in os.listdir(target_path):

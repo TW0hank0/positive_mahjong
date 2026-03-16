@@ -200,6 +200,7 @@ pub struct ServerResponseDataType {
     pub data_test_connection: Option<ServerResponseDataTestConnectionType>,
     pub data_is_start: Option<ServerResponseDataIsStartType>,
     pub data_type: ActionType,
+    /* pub gamedata_v1 */ //FIXME
 }
 
 impl std::default::Default for ServerResponseDataType {

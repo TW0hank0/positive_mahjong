@@ -1,12 +1,10 @@
 # positive_mahjong 計劃
 
-### v0.1
 - [ ] 手機版APK編譯
-- [ ] (**Current**) 檔案結構更換
-- [ ] (**Current**) V1Server & V1Client Demo
-- [ ] 客戶端+GUI (rust + slint)
+- [ ] (v0.1) 檔案結構更換
+- [ ] (v0.1) V1Server & V1Client Demo
+- [ ] (v0.1) 客戶端+GUI (rust + slint)
 
-## 未來計劃
 - [ ] (gmv2 `better`) 保護伺服器端 (避免客戶端錯誤導致伺服器崩潰)
 - [ ] 伺服器GUI (rs + iced)
 - [ ] (低優先度) 啟動器
@@ -25,5 +23,9 @@
 - [ ] (低優先度) git bench from `master` to `main`
 - [ ] (低優先度) android版伺服器
 - [ ] (低優先度) 重寫android編譯腳本
-- [ ] build_script針對無法自動畫的lib(slint-material, ring, webpki)增加license info
+- [ ] build_script針對無法自動產生協議信息的lib(slint-material, ring, webpki)增加license info
 - [ ] build_script增加apk處理
+- [ ] server: logger
+- [ ] project: TODO.md改用Github Issue
+- [ ] project: Github Issue template
+- [ ] project: WASM支援

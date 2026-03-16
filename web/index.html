@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>positive_mahjong</title>
+    <!-- <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            /* 防止捲軸 */
+            background-color: #000000;
+            /* 暫時設為黑色以便辨識 */
+        }
+
+        canvas {
+            display: block;
+            /* 確保 canvas 為塊級元素 */
+        }
+    </style> -->
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+    <script type="module">
+        // 載入 wasm-pack 生成的 JS 模組
+        import init from './pkg/positive_toolbox.js';
+        // 啟動 WASM 應用
+        init()/* .catch(console.error) */;
+    </script>
+</body>
+
+</html>
