@@ -1,8 +1,11 @@
 import subprocess
 import sys
+import os
 
 
 def main():
+    orig_cwd = os.getcwd()
+    os.chdir(os.path.abspath(os.path.join(__file__, "..", "..", "pmj_client")))
     command = [
         "wasm-pack",
         "build",
@@ -20,6 +23,7 @@ def main():
         stderr=sys.stderr,
         check=True,
     )
+    os.chdir(orig_cwd)
 
 
 if __name__ == "__main__":
