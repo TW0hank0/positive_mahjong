@@ -6,6 +6,8 @@ on:
       - "README.md"
       - "READMEs/**"
       - ".vscode/**"
+    branches:
+      - master
 
 jobs:
   build:
