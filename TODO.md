@@ -26,3 +26,6 @@
 - [ ] build_script針對無法自動產生協議信息的lib(slint-material, ring, webpki)增加license info
 - [ ] build_script增加apk處理
 - [ ] server: logger
+- [ ] project: TODO.md改用Github Issue
+- [ ] project: Github Issue template
+- [ ] project: WASM支援

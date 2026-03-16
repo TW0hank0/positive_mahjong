@@ -39,13 +39,38 @@ project_root
 ......└─ shared.rs => 通用資料 (玩法通用資料)
 ......└─ gamemodes_shared/ => 玩法資料
 └─ pmj_test_connection/ => 測試連線
-└─ scripts/ => 腳本 (像是編譯腳本)
+└─ scripts/ => 腳本 (含編譯腳本)
 └─ templates/ => 模板
 ...└─ about_html.hbs => cargo-about的html格式生成模板
 ...└─ about_json.hbs => cargo-about的json格式生成模板
 ...└─ about_markdown.hbs => cargo-about的markdown格式生成模板
 ...└─ addlicense.template => addlicense的檔案Headler模板
-└─ TODO.md => 開發計劃
+└─ secret/ => (**Ignored**) **不能上傳**的資料 (含Android用Keystore)
+└─ LICENSE => AGPL-3.0-only
+```
+
+### 編譯
+
+需求：uv(或官方Python)、rust工具鏈
+
+**電腦**
+
+執行：
+```bash
+uv run scripts/build_computer.py
+```
+或
+```bash
+cargo build --workspace --relase
+```
+
+**Android手機**
+
+需求：cargo-apk(`cargo install cargo-apk`)、java、Android sdk+ndk
+
+執行：
+```bash
+uv run scripts/build_android.py
 ```
 
 ### 授權
@@ -57,6 +82,8 @@ project_root
 第三方專案授權見：
 
 - [ThirdPartyLicense-Rust.html](./auto_generated/ThirdPartyLicense-Rust.html)
+- [ThirdPartyLicense-Rust.md](./auto_generated/ThirdPartyLicense-Rust.md)
+- [ThirdPartyLicense-Rust.json](./auto_generated/ThirdPartyLicense-Rust.json)
 
 "The Slint Logo used in this project is licensed under [CC BY-ND 4.0](./assets/CC-BY-ND-4.0.txt)
 . Original work by [Slint Developers/Sixtyfps GmbH]. No modifications have been made to the logo file."
