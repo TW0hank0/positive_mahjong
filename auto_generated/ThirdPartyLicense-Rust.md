@@ -1,6 +1,8 @@
 # PositiveMahjong Third Party License
 
-PMJ 版本： can not detect version
+PMJ 版本：*無法取得*
+
+製作時間：*無法取得*
 
 所有使用的協議：
 - Apache License 2.0 (Apache-2.0) × 448
@@ -12848,5 +12850,3 @@ the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
     ```
 </details>
-
-製作時間： 

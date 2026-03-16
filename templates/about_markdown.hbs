@@ -1,6 +1,8 @@
 # PositiveMahjong Third Party License
 
-PMJ 版本： {{#if crate.version}}{{crate.version}}{{else}}can not detect version{{/if}}
+PMJ 版本：{{#if crate.version}}{{crate.version}}{{else}}*無法取得*{{/if}}
+
+製作時間：{{#if now}}{{now}}{{else}}*無法取得*{{/if}}
 
 所有使用的協議：
 {{#each overview}}
@@ -29,5 +31,3 @@ crate.repository}}{{crate.repository}}{{else}}https://crates.io/crates/{{crate.n
     ```
 </details>
 {{/each}}
-
-製作時間： {{now}}

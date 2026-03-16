@@ -48,7 +48,7 @@ def main():
             stderr=sys.stderr,
         )
     #
-    print("Indenting json file...")
+    print("Indenting json file...", end="")
     json_file_path = os.path.abspath(
         os.path.join(
             __file__,
@@ -62,6 +62,7 @@ def main():
         json_data = json.load(f)
     with open(json_file_path, "w", encoding="utf-8") as f:
         json.dump(json_data, f, ensure_ascii=False, sort_keys=True, indent=4)
+    print("Finish!")
     #
     # command = [
     #     "cargo",
@@ -122,4 +123,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    finally:
+        print()
