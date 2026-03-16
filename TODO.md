@@ -1,7 +1,5 @@
 # positive_mahjong 計劃
 
-- [ ] 手機版APK編譯
-- [ ] (v0.1) 檔案結構更換
 - [ ] (v0.1) V1Server & V1Client Demo
 - [ ] (v0.1) 客戶端+GUI (rust + slint)
 
@@ -9,7 +7,6 @@
 - [ ] 伺服器GUI (rs + iced)
 - [ ] (低優先度) 啟動器
 - [ ] (低優先度) Server-Crash-Handler (python + pyinstaller)
-- [ ] (低優先度) ICON
 - [ ] 伺服器：設定
 - [ ] (gmv2 `better`) 伺服器：更好的錯誤訊息
 - [ ] (Not Plan Now) GameMode v1重寫
@@ -29,3 +26,4 @@
 - [ ] project: TODO.md改用Github Issue
 - [ ] project: Github Issue template
 - [ ] project: WASM支援
+- [ ] project -> wasm: WASM target使用async (pmj_shared/wasm.rs實作)

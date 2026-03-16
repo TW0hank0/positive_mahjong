@@ -46,6 +46,7 @@ project_root
 ...└─ about_markdown.hbs => cargo-about的markdown格式生成模板
 ...└─ addlicense.template => addlicense的檔案Headler模板
 └─ secret/ => (**Ignored**) **不能上傳**的資料 (含Android用Keystore)
+└─ res/ => Android用
 └─ LICENSE => AGPL-3.0-only
 ```
 
