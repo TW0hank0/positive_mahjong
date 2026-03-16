@@ -73,6 +73,10 @@ cargo build --workspace --relase
 uv run scripts/build_android.py
 ```
 
+**WEB-WASM**
+
+未完成
+
 ### 授權
 
 版權所有 (C) 2026 TW0hank0
