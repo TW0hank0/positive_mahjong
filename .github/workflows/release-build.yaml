@@ -23,7 +23,7 @@ on:
     types: [published]
 
 jobs:
-  build:
+  build_computer:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -102,8 +102,68 @@ jobs:
           name: ${{ steps.zip_files_windows.outputs.zip_path }}
           path: ${{ steps.zip_files_windows.outputs.zip_path }}
 
+  build_android:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Checkout Secret
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ secrets.SECRET_REPO }}
+          token: ${{ secrets.SECRET_REPO_TOKEN }} # Repo token
+          path: secret
+
+      - name: install rustup (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
+          ls
+          .\rustup-init.exe -y --profile minimal
+
+      - name: install rustup (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          curl https://sh.rustup.rs -o rust-init.sh
+          sh rust-init.sh -y
+
+      - name: check rust Install
+        run: |
+          rustc --version
+          cargo --version
+
+      - name: install cargo-apk
+        run: |
+          cargo install cargo-apk
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: check uv install
+        run: |
+          uv self version
+
+      - name: build apk
+        run: |
+          uv run scripts/build_android.py
+
+      - name: Upload apk artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: target/release/apk/pmj_client.apk
+          path: target/release/apk/pmj_client.apk
+
   upload:
-    needs: build
+    needs:
+      - build_computer
+      - build_android
     runs-on: ubuntu-latest
     steps:
       - name: Download all artifacts
