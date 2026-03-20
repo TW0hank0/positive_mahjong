@@ -36,8 +36,7 @@ pub fn main() {
     println!("ipv4: {}", local_ip_address::local_ip().unwrap());
     println!("ipv6: {}", local_ip_address::local_ipv6().unwrap());
     //
-    let config: shared::PMJConfig = if fs::exists(shared::SERVER_CONFIG_FILE_NAME).is_ok()
-        && fs::exists(shared::SERVER_CONFIG_FILE_NAME).unwrap()
+    let config: shared::PMJConfig = if fs::exists(shared::SERVER_CONFIG_FILE_NAME).unwrap_or(false)
     {
         let config_str = fs::read_to_string(shared::SERVER_CONFIG_FILE_NAME).unwrap();
         serde_json::from_str(&config_str).unwrap()

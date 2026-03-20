@@ -14,7 +14,7 @@
 
 [Github Repo](https://github.com/TW0hank0/positive_mahjong)
 
-[Codeberg Repo](https://codeberg.org/TW0hank0/positive_mahjong)
+[Codeberg Mirror Repo](https://codeberg.org/TW0hank0/positive_mahjong)
 
 [Keep Android Open Website](https://keepandroidopen.org/)
 
@@ -28,6 +28,7 @@ project_root
 └─ .github/
 ...└─ workflows/ => 工作流(CI)
 ...└─ ISSUE_TEMPLATE/ => Issue模板
+└─ assets/ => 資料
 └─ auto_generate/ => 使用腳本產生的檔案
 └─ ci/ => 工作流 (workflow - CI)
 └─ pmj_client/ => 客戶端 (rust)
@@ -45,9 +46,11 @@ project_root
 ...└─ about_json.hbs => cargo-about的json格式生成模板
 ...└─ about_markdown.hbs => cargo-about的markdown格式生成模板
 ...└─ addlicense.template => addlicense的檔案Headler模板
-└─ secret/ => (**Ignored**) **不能上傳**的資料 (含Android用Keystore)
-└─ res/ => Android用
+└─ secret/ => (**Ignored**) **不能上傳** 的資料 (含Android用Keystore)
+...└─ TW0hank0.keystore => Android用
+└─ res/ => Android用assets
 └─ LICENSE => AGPL-3.0-only
+└─ about.toml => cargo-about 設定
 ```
 
 ### 編譯

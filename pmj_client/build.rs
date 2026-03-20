@@ -28,8 +28,8 @@ use std;
 use slint_build;
 
 fn main() {
-    println!("cargo:rerun-if-changed=ui/main.slint");
-    println!("cargo:rerun-if-changed=src/client.rs");
+    //println!("cargo:rerun-if-changed=ui/main.slint");
+    //println!("cargo:rerun-if-changed=src/client.rs");
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=ui");
     //

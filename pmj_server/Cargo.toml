@@ -15,6 +15,9 @@ pmj_shared = { workspace = true }
 rand = { workspace = true }
 serde = { workspace = true }
 
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+getrandom = { version = "0.2.17", features = ["js"] }
+
 [[bin]]
 name = "pmj_server"
 path = "src/main.rs" # for computer
