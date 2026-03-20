@@ -156,6 +156,12 @@ jobs:
         run: |
           uv run scripts/build_android.py
 
+      - name: Upload apk artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: target/release/apk/pmj_client.apk
+          path: target/release/apk/pmj_client.apk
+
   upload:
     needs:
       - build_computer
