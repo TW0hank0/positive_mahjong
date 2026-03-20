@@ -5,72 +5,94 @@ import "../../../assets/Noto_Sans_TC/static/NotoSansTC-Regular.ttf";
 export { MaterialWindowAdapter } from "../material/material.slint";
 
 export enum Scenes {
-    HomePage
+    HomePage,
+    GamePlayV1Simple,
 }
 
-component HomePage inherits VerticalLayout {
+component HomePage inherits ScrollView {
     in-out property <string> server_response_text: "";
     in-out property <string> server_ip: "";
     callback test_connection();
 
-    ScrollView {
-        min-height: 800px;
-        min-width: 1000px;
-        preferred-height: 100%;
-        preferred-width: 100%;
-        horizontal_scrollbar_policy: ScrollBarPolicy.as-needed;
-        vertical_scrollbar_policy: ScrollBarPolicy.as-needed;
-        VerticalLayout {
-            spacing: 20px;
-            padding: 20px;
-            Rectangle {
-                height: 20px;
-            }
-
-            MaterialText {
-                text: "PMJ Client";
-                font-size: 40px;
-                horizontal-alignment: TextHorizontalAlignment.left;
-            }
-
-            MaterialText {
-                text: "伺服器Ip：";
-                font-size: 28px;
-            }
-
-            LineEdit {
-                text <=> root.server_ip;
-                min-width: 50px;
-                max-width: 2000px;
-                min-height: 30px;
-                max-height: 75px;
-                preferred-height: 55px;
-                preferred-width: 500px;
-            }
-
-            Button {
-                text: "測試連線";
-                clicked => {
-                    root.test_connection();
+    VerticalLayout {
+        ScrollView {
+            width: 100%;
+            height: 100%;
+            horizontal_scrollbar_policy: ScrollBarPolicy.as-needed;
+            vertical_scrollbar_policy: ScrollBarPolicy.as-needed;
+            VerticalLayout {
+                spacing: 10px;
+                padding: 10px;
+                Rectangle {
+                    height: 14px;
                 }
-                width: 35%;
-            }
 
-            Rectangle {
-                background: Colors.black;
-                ScrollView {
-                    MaterialText {
-                        text: root.server_response_text;
-                        horizontal-alignment: TextHorizontalAlignment.left;
-                        vertical-alignment: TextVerticalAlignment.top;
-                        wrap: TextWrap.char-wrap;
-                        font-size: 20px;
+                MaterialText {
+                    text: "PMJ Client";
+                    font-size: 40px;
+                    horizontal-alignment: TextHorizontalAlignment.left;
+                }
+
+                MaterialText {
+                    text: "伺服器Ip：";
+                    font-size: 28px;
+                }
+
+                LineEdit {
+                    text <=> root.server_ip;
+                    min-width: 50px;
+                    //max-width: 2000px;
+                    min-height: 30px;
+                    //max-height: 75px;
+                    width: 95%;
+                    height: 5%;
+                    //placeholder-text: "伺服器Ip地址";
+                    enabled: true;
+                }
+
+                Button {
+                    text: "測試連線";
+                    clicked => {
+                        root.test_connection();
                     }
-
-                    width: 100%;
-                    vertical-scrollbar-policy: ScrollBarPolicy.always-on;
-                    horizontal-scrollbar-policy: ScrollBarPolicy.always-on;
+                    width: 35%;
                 }
+
+                Rectangle {
+                    background: Colors.black;
+                    ScrollView {
+                        MaterialText {
+                            text: root.server_response_text;
+                            horizontal-alignment: TextHorizontalAlignment.left;
+                            vertical-alignment: TextVerticalAlignment.top;
+                            wrap: TextWrap.char-wrap;
+                            font-size: 20px;
+                        }
+
+                        width: 100%;
+                        vertical-scrollbar-policy: ScrollBarPolicy.always-on;
+                        horizontal-scrollbar-policy: ScrollBarPolicy.always-on;
+                    }
+                }
+            }
+        }
+    }
+}
+
+component GamePlayV1Simple inherits ScrollView {
+    in-out property <string> server_ip: "unknown";
+
+    horizontal_scrollbar_policy: ScrollBarPolicy.as-needed;
+    vertical_scrollbar_policy: ScrollBarPolicy.as-needed;
+    VerticalLayout {
+        HorizontalLayout {
+            Rectangle {
+                width: 75%;
+            }
+
+            MaterialText {
+                text: "伺服器Ip：" + root.server_ip;
+                font-size: 14px;
             }
         }
     }
@@ -80,33 +102,54 @@ export component MainWindow inherits Window {
     title: "PositiveMahjong Client";
     min-width: 1080px;
     min-height: 720px;
-    max-width: 108000px;
-    max-height: 720000px;
+    /* 
     preferred-width: 100%;
     preferred-height: 100%;
+     */
     default-font-size: 30px;
     default-font-family: "Noto Sans TC";
-    in-out property <string> home_page_server_ip <=> window_home_page.server_ip;
-    in-out property <string> home_page_server_response_text <=> window_home_page.server_response_text;
+    // == Var ==
+    // HomePage
+    in-out property <string> home_page_server_ip <=> scene_home_page.server_ip;
+    in-out property <string> home_page_server_response_text <=> scene_home_page.server_response_text;
+    // GamePlayV1Simple
+    in-out property <string> game_play_v1_simple_server_ip <=> scene_game_play_v1_simple.server_ip;
+    // MainWindow / Other
     in-out property <Scenes> current-scene: Scenes.HomePage;
     in-out property <bool> is-changing-scene: false;
-    callback home_page_test_connection <=> window_home_page.test_connection;
+    // == CallBack ==
+    // HomePage
+    callback home_page_test_connection <=> scene_home_page.test_connection;
 
     ScrollView {
         horizontal_scrollbar_policy: ScrollBarPolicy.as-needed;
         vertical_scrollbar_policy: ScrollBarPolicy.as-needed;
         //
-        window_home_page := HomePage {
+        scene_home_page := HomePage {
             opacity: 1.0;
+            enabled: true;
+        }
+
+        scene_game_play_v1_simple := GamePlayV1Simple {
+            opacity: 0.0;
+            enabled: false;
         }
     }
 
     states [
         active when current-scene == Scenes.HomePage: {
-            window_home_page.opacity: 1.0;
+            scene_home_page.opacity: 1.0;
+            scene_home_page.enabled: true;
+        }
+        active when current-scene == Scenes.GamePlayV1Simple: {
+            scene_game_play_v1_simple.opacity: 1.0;
+            scene_game_play_v1_simple.enabled: true;
         }
         active when is-changing-scene: {
-            window_home_page.opacity: 0.0;
+            scene_home_page.opacity: 0.0;
+            scene_home_page.enabled: false;
+            scene_game_play_v1_simple.opacity: 0.0;
+            scene_game_play_v1_simple.enabled: false;
         }
     ]
 }
