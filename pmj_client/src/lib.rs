@@ -1,16 +1,16 @@
 use slint;
-use slint::{ComponentHandle, Global};
+use slint::ComponentHandle;
+
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::prelude::*;
 
 mod client;
 
 // 引入 Slint 模組
 //slint::include_modules!();
 
-#[cfg(target_arch = "wasm32")]
-use wasm_bindgen::prelude::*;
-
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen(start))]
-pub fn main() {
+pub fn ui_main() {
     let ui = client::main();
     ui.run().unwrap();
 }

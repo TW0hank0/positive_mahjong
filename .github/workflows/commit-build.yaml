@@ -25,7 +25,7 @@ on:
       - master
 
 jobs:
-  build:
+  build_computer:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -105,7 +105,7 @@ jobs:
           path: ${{ steps.zip_files_windows.outputs.zip_path }}
 
   upload:
-    needs: build
+    needs: build_computer
     runs-on: ubuntu-latest
     permissions:
       contents: write
