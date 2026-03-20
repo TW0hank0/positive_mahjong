@@ -27,3 +27,5 @@
 - [ ] project: Github Issue template
 - [ ] project: WASM支援
 - [ ] project -> wasm: WASM target使用async (pmj_shared/wasm.rs實作)
+- [ ] project: Gitlab Mirror
+- [ ] pmj_client: async支援

@@ -1,7 +1,1 @@
-{
-    "rust-analyzer.check.targets": [
-        "x86_64-pc-windows-msvc",
-        "wasm32-unknown-unknown",
-        "aarch64-linux-android"
-    ]
-}
+{}

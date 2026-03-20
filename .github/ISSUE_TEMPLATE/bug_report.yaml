@@ -1,8 +1,8 @@
-name: 功能請求（Feature request）
-description: 為這個專案提供建議
-title: "[Feature] "
+name: 錯誤回報（Bug report）
+description: 回報非預期行為
+title: "[Bug] "
 labels:
-  - enhancement
+  - bug
 
 body:
   - type: markdown
@@ -12,9 +12,17 @@ body:
 
   - type: textarea
     attributes:
-      label: 你想要什么新功能？
+      label: 目前行為
       description: |
-        你想要什麼新功能？
+        目前行為
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: 正常行為
+      description: |
+        正常行為
     validations:
       required: true
 
