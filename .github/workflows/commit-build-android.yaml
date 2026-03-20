@@ -10,7 +10,7 @@ on:
       - master
 
 jobs:
-  build:
+  build_android:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
