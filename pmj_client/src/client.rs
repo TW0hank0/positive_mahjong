@@ -1,3 +1,18 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// 著作權所有 (C) 2026 TW0hank0
+//
+// 本檔案屬於 positive_mahjong 專案的一部分。
+// 專案儲存庫：https://github.com/TW0hank0/positive_mahjong
+//
+// 本程式為自由軟體：您可以根據自由軟體基金會發佈的 GNU Affero 通用公共授權條款
+// 第 3 版（僅此版本）重新發佈及/或修改本程式。
+//
+// 本程式的發佈是希望它能發揮功用，但不提供任何擔保；
+// 甚至沒有隱含的適銷性或特定目的適用性擔保。詳見 GNU Affero 通用公共授權條款。
+//
+// 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
+// 如果沒有，請參見 <https://www.gnu.org/licenses/>。
+
 use slint::{self, ComponentHandle, SharedString, Weak};
 
 ///use std::time::Duration;
@@ -5,12 +20,6 @@ use reqwest;
 use std::thread;
 
 use pmj_shared::{gamemodes_shared, shared};
-
-#[cfg(not(target_arch = "wasm32"))]
-use pmj_shared::sync_net as net;
-
-#[cfg(target_arch = "wasm32")]
-use pmj_shared::async_net as net;
 
 // 引入 Slint 模組
 slint::include_modules!();
@@ -23,7 +32,7 @@ pub fn main() -> MainWindow {
     //
     let timeout_duration = std::time::Duration::from_secs(10);
     // 設定Callback
-    let window_for_callback = main_window.clone_strong();
+    //let window_for_callback = main_window.clone_strong();
     main_window.window().set_maximized(true);
     let _ = main_window.window().show();
     main_window.on_home_page_test_connection(move || {

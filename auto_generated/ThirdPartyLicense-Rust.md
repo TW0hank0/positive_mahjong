@@ -24,19 +24,16 @@ PMJ 版本：*無法取得*
 
 ### GNU Affero General Public License v3.0 only (AGPL-3.0-only)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [pmj_client](https://github.com/TW0hank0/positive_mahjong)
 - [pmj_server](https://github.com/TW0hank0/positive_mahjong)
 - [pmj_shared](https://github.com/TW0hank0/positive_mahjong)
 - [pmj_test_connection](https://github.com/TW0hank0/positive_mahjong)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    GNU AFFERO GENERAL PUBLIC LICENSE
+GNU AFFERO GENERAL PUBLIC LICENSE
 Version 3, 19 November 2007
 
 Copyright (C) 2007 Free Software Foundation, Inc. &lt;http://fsf.org/&gt;
@@ -272,21 +269,19 @@ If your software can interact with users remotely through a computer network, yo
 
 You should also get your employer (if you work as a programmer) or school, if any, to sign a &quot;copyright disclaimer&quot; for the program, if necessary. For more information on this, and how to apply and follow the GNU AGPL, see &lt;http://www.gnu.org/licenses/&gt;.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [xkeysym](https://github.com/notgull/xkeysym)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    
+
                                  Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
@@ -489,21 +484,19 @@ You should also get your employer (if you work as a programmer) or school, if an
    See the License for the specific language governing permissions and
    limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [cursor-icon](https://github.com/rust-windowing/cursor-icon)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    
+
                                  Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
@@ -706,12 +699,13 @@ You should also get your employer (if you work as a programmer) or school, if an
    See the License for the specific language governing permissions and
    limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [as-raw-xcb-connection](https://github.com/psychon/as-raw-xcb-connection)
 - [encoding_rs](https://github.com/hsivonen/encoding_rs)
@@ -726,12 +720,9 @@ You should also get your employer (if you work as a programmer) or school, if an
 - [x11rb](https://github.com/psychon/x11rb)
 - [zeroize](https://github.com/RustCrypto/utils)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    
+
                                  Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
@@ -934,21 +925,19 @@ You should also get your employer (if you work as a programmer) or school, if an
    See the License for the specific language governing permissions and
    limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [clang-sys](https://github.com/KyleMayes/clang-sys)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    
+
                                  Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
@@ -1151,12 +1140,13 @@ You should also get your employer (if you work as a programmer) or school, if an
    See the License for the specific language governing permissions and
    limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [windows-collections](https://github.com/microsoft/windows-rs)
 - [windows-collections](https://github.com/microsoft/windows-rs)
@@ -1216,12 +1206,9 @@ You should also get your employer (if you work as a programmer) or school, if an
 - [windows_x86_64_msvc](https://github.com/microsoft/windows-rs)
 - [windows_x86_64_msvc](https://github.com/microsoft/windows-rs)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                     Apache License
+                                 Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
 
@@ -1423,21 +1410,19 @@ You should also get your employer (if you work as a programmer) or school, if an
    See the License for the specific language governing permissions and
    limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [tinyvec_macros](https://github.com/Soveu/tinyvec_macros)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                     Apache License
+                                 Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
 
@@ -1640,21 +1625,19 @@ You should also get your employer (if you work as a programmer) or school, if an
    limitations under the License.
 
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [local-ip-address](https://github.com/LeoBorai/local-ip-address)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                     Apache License
+                                 Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
 
@@ -1856,22 +1839,20 @@ You should also get your employer (if you work as a programmer) or school, if an
    See the License for the specific language governing permissions and
    limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [zerocopy-derive](https://github.com/google/zerocopy)
 - [zerocopy](https://github.com/google/zerocopy)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                     Apache License
+                                 Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
 
@@ -2074,21 +2055,19 @@ You should also get your employer (if you work as a programmer) or school, if an
    limitations under the License.
 
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [web-time](https://github.com/daxpedda/web-time)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                     Apache License
+                                 Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
 
@@ -2290,22 +2269,20 @@ You should also get your employer (if you work as a programmer) or school, if an
    See the License for the specific language governing permissions and
    limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [moxcms](https://github.com/awxkee/moxcms.git)
 - [pxfm](https://github.com/awxkee/pxfm)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                     Apache License
+                                 Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
 
@@ -2507,12 +2484,13 @@ You should also get your employer (if you work as a programmer) or school, if an
    See the License for the specific language governing permissions and
    limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [imgref](https://github.com/kornelski/imgref)
 - [java-locator](https://github.com/astonbitecode/java-locator)
@@ -2522,12 +2500,9 @@ You should also get your employer (if you work as a programmer) or school, if an
 - [zune-core](https://github.com/etemesi254/zune-image)
 - [zune-jpeg](https://github.com/etemesi254/zune-image/tree/dev/crates/zune-jpeg)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                     Apache License
+                                 Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
 
@@ -2729,21 +2704,19 @@ You should also get your employer (if you work as a programmer) or school, if an
    See the License for the specific language governing permissions and
    limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [ipnet](https://github.com/krisprice/ipnet)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                     Apache License
+                                 Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
 
@@ -2945,22 +2918,20 @@ You should also get your employer (if you work as a programmer) or school, if an
    See the License for the specific language governing permissions and
    limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [bit_field](https://github.com/phil-opp/rust-bit-field)
 - [winapi](https://github.com/retep998/winapi-rs)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                     Apache License
+                                 Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
 
@@ -3162,12 +3133,13 @@ You should also get your employer (if you work as a programmer) or school, if an
    See the License for the specific language governing permissions and
    limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [annotate-snippets](https://github.com/rust-lang/annotate-snippets-rs)
 - [anstyle](https://github.com/rust-cli/anstyle.git)
@@ -3190,12 +3162,9 @@ You should also get your employer (if you work as a programmer) or school, if an
 - [toml_parser](https://github.com/toml-rs/toml)
 - [toml_writer](https://github.com/toml-rs/toml)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                     Apache License
+                                 Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
 
@@ -3398,12 +3367,13 @@ You should also get your employer (if you work as a programmer) or school, if an
    limitations under the License.
 
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [futures-channel](https://github.com/rust-lang/futures-rs)
 - [futures-core](https://github.com/rust-lang/futures-rs)
@@ -3415,12 +3385,9 @@ You should also get your employer (if you work as a programmer) or school, if an
 - [futures-util](https://github.com/rust-lang/futures-rs)
 - [futures](https://github.com/rust-lang/futures-rs)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                  Apache License
+                              Apache License
                         Version 2.0, January 2004
                      http://www.apache.org/licenses/
 
@@ -3623,21 +3590,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [reqwest](https://github.com/seanmonstar/reqwest)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                  Apache License
+                              Apache License
                         Version 2.0, January 2004
                      http://www.apache.org/licenses/
 
@@ -3839,21 +3804,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [http](https://github.com/hyperium/http)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                  Apache License
+                              Apache License
                         Version 2.0, January 2004
                      http://www.apache.org/licenses/
 
@@ -4055,21 +4018,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [tokio-rustls](https://github.com/rustls/tokio-rustls)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                  Apache License
+                              Apache License
                         Version 2.0, January 2004
                      http://www.apache.org/licenses/
 
@@ -4271,21 +4232,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [pin-utils](https://github.com/rust-lang-nursery/pin-utils)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                  Apache License
+                              Apache License
                         Version 2.0, January 2004
                      http://www.apache.org/licenses/
 
@@ -4487,21 +4446,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [ppv-lite86](https://github.com/cryptocorrosion/cryptocorrosion)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                  Apache License
+                              Apache License
                         Version 2.0, January 2004
                      http://www.apache.org/licenses/
 
@@ -4703,22 +4660,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [snafu-derive](https://github.com/shepmaster/snafu)
 - [snafu](https://github.com/shepmaster/snafu)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                  Apache License
+                              Apache License
                         Version 2.0, January 2004
                      http://www.apache.org/licenses/
 
@@ -4920,21 +4875,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [proc-macro-error-attr2](https://github.com/GnomedDev/proc-macro-error-2)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                  Apache License
+                              Apache License
                         Version 2.0, January 2004
                      http://www.apache.org/licenses/
 
@@ -5136,22 +5089,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [iana-time-zone-haiku](https://github.com/strawlab/iana-time-zone)
 - [iana-time-zone](https://github.com/strawlab/iana-time-zone)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                  Apache License
+                              Apache License
                         Version 2.0, January 2004
                      http://www.apache.org/licenses/
 
@@ -5353,21 +5304,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [rustls-pki-types](https://github.com/rustls/pki-types)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                  Apache License
+                              Apache License
                         Version 2.0, January 2004
                      http://www.apache.org/licenses/
 
@@ -5569,21 +5518,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [memmap2](https://github.com/RazrFalcon/memmap2-rs)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                  Apache License
+                              Apache License
                         Version 2.0, January 2004
                      http://www.apache.org/licenses/
 
@@ -5785,24 +5732,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [async-recursion](https://github.com/dcchut/async-recursion)
 - [gif](https://github.com/image-rs/image-gif)
 - [keyboard-types](https://github.com/pyfisch/keyboard-types)
 - [weezl](https://github.com/image-rs/weezl)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                  Apache License
+                              Apache License
                         Version 2.0, January 2004
                      http://www.apache.org/licenses/
 
@@ -6003,12 +5948,13 @@ distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [ahash](https://github.com/tkaitchuck/ahash)
 - [aligned](https://github.com/rust-embedded-community/aligned)
@@ -6174,12 +6120,9 @@ limitations under the License.
 - [wit-bindgen](https://github.com/bytecodealliance/wit-bindgen)
 - [xattr](https://github.com/Stebalien/xattr)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                  Apache License
+                              Apache License
                         Version 2.0, January 2004
                      http://www.apache.org/licenses/
 
@@ -6381,24 +6324,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [downcast-rs](https://github.com/marcianx/downcast-rs)
 - [linked-hash-map](https://github.com/contain-rs/linked-hash-map)
 - [minimal-lexical](https://github.com/Alexhuszagh/minimal-lexical)
 - [qoi](https://github.com/aldanor/qoi-rust)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                  Apache License
+                              Apache License
                         Version 2.0, January 2004
                      http://www.apache.org/licenses/
 
@@ -6600,22 +6541,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [chacha20](https://github.com/RustCrypto/stream-ciphers)
 - [cpufeatures](https://github.com/RustCrypto/utils)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                  Apache License
+                              Apache License
                         Version 2.0, January 2004
                      http://www.apache.org/licenses/
 
@@ -6817,21 +6756,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [console_error_panic_hook](https://github.com/rustwasm/console_error_panic_hook)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                  Apache License
+                              Apache License
                         Version 2.0, January 2004
                      http://www.apache.org/licenses/
 
@@ -7033,23 +6970,21 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [getrandom](https://github.com/rust-random/getrandom)
 - [getrandom](https://github.com/rust-random/getrandom)
 - [getrandom](https://github.com/rust-random/getrandom)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                  Apache License
+                              Apache License
                         Version 2.0, January 2004
                      https://www.apache.org/licenses/
 
@@ -7251,22 +7186,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [adler2](https://github.com/oyvindln/adler2)
 - [proc-macro-crate](https://github.com/bkchr/proc-macro-crate)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                  Apache License
+                              Apache License
                         Version 2.0, January 2004
                      https://www.apache.org/licenses/LICENSE-2.0
 
@@ -7468,21 +7401,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [proc-macro-error2](https://github.com/GnomedDev/proc-macro-error-2)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                  Apache License
+                              Apache License
                         Version 2.0, January 2004
                      http://www.apache.org/licenses/
 
@@ -7684,21 +7615,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [unicode-script](https://github.com/unicode-rs/unicode-script)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                  Apache License
+                              Apache License
                         Version 2.0, January 2004
                      http://www.apache.org/licenses/
 
@@ -7900,21 +7829,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [glow](https://github.com/grovesNL/glow)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                  Apache License
+                              Apache License
                         Version 2.0, January 2004
                      http://www.apache.org/licenses/
 
@@ -8115,22 +8042,20 @@ distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [text-size](https://github.com/rust-analyzer/text-size)
 - [zeno](https://github.com/dfrg/zeno)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-                                  Apache License
+                              Apache License
                         Version 2.0, January 2004
                      http://www.apache.org/licenses/
 
@@ -8332,21 +8257,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [ascii](https://github.com/tomprogrammer/rust-ascii)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-      Apache License
+  Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
 
@@ -8548,23 +8471,21 @@ limitations under the License.
    See the License for the specific language governing permissions and
    limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [atspi-common](https://github.com/odilia-app/atspi)
 - [atspi-proxies](https://github.com/odilia-app/atspi)
 - [atspi](https://github.com/odilia-app/atspi)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Apache License
+Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
 
@@ -8766,12 +8687,13 @@ limitations under the License.
    See the License for the specific language governing permissions and
    limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [glutin](https://github.com/rust-windowing/glutin)
 - [glutin_egl_sys](https://github.com/rust-windowing/glutin)
@@ -8779,12 +8701,9 @@ limitations under the License.
 - [glutin_wgl_sys](https://github.com/rust-windowing/glutin)
 - [softbuffer](https://github.com/rust-windowing/softbuffer)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Apache License
+Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
 
@@ -8986,23 +8905,21 @@ limitations under the License.
    See the License for the specific language governing permissions and
    limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [copypasta](https://github.com/alacritty/copypasta)
 - [dpi](https://github.com/rust-windowing/winit)
 - [winit](https://github.com/rust-windowing/winit)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Apache License
+Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
 
@@ -9203,22 +9120,20 @@ limitations under the License.
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [bytemuck](https://github.com/Lokathor/bytemuck)
 - [bytemuck_derive](https://github.com/Lokathor/bytemuck)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Apache License
+Apache License
 Version 2.0, January 2004
 http://www.apache.org/licenses/
 
@@ -9280,21 +9195,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [httpdate](https://github.com/pyfisch/httpdate)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Apache License
+Apache License
 Version 2.0, January 2004
 http://www.apache.org/licenses/
 
@@ -9496,12 +9409,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### Apache License 2.0 (Apache-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [ab_glyph](https://github.com/alexheretic/ab-glyph)
 - [ab_glyph_rasterizer](https://github.com/alexheretic/ab-glyph)
@@ -9623,12 +9537,9 @@ limitations under the License.
 - [zune-inflate](https://crates.io/crates/zune-inflate)
 - [zune-jpeg](https://github.com/etemesi254/zune-image/tree/dev/crates/zune-jpeg)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Apache License
+Apache License
 Version 2.0, January 2004
 http://www.apache.org/licenses/
 
@@ -9702,24 +9613,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-    ```
-</details>
+
+=====
+
 
 ### BSD 2-Clause &quot;Simplified&quot; License (BSD-2-Clause)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [arrayref](https://github.com/droundy/arrayref)
 - [av1-grain](https://github.com/rust-av/av1-grain)
 - [rav1e](https://github.com/xiph/rav1e/)
 - [v_frame](https://github.com/rust-av/v_frame)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) &lt;year&gt; &lt;owner&gt; 
+Copyright (c) &lt;year&gt; &lt;owner&gt; 
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
@@ -9729,21 +9638,19 @@ Redistribution and use in source and binary forms, with or without modification,
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-    ```
-</details>
+
+=====
+
 
 ### BSD 3-Clause &quot;New&quot; or &quot;Revised&quot; License (BSD-3-Clause)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [subtle](https://github.com/dalek-cryptography/subtle)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2016-2017 Isis Agora Lovecruft, Henry de Valence. All rights reserved.
+Copyright (c) 2016-2017 Isis Agora Lovecruft, Henry de Valence. All rights reserved.
 Copyright (c) 2016-2024 Isis Agora Lovecruft. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -9773,21 +9680,19 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
 
-    ```
-</details>
+
+=====
+
 
 ### BSD 3-Clause &quot;New&quot; or &quot;Revised&quot; License (BSD-3-Clause)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [lebe](https://github.com/johannesvollmer/lebe)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2022 Contributors to the lebe Project. All rights reserved.
+Copyright (c) 2022 Contributors to the lebe Project. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
@@ -9814,12 +9719,13 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
 USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-    ```
-</details>
+
+=====
+
 
 ### BSD 3-Clause &quot;New&quot; or &quot;Revised&quot; License (BSD-3-Clause)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [avif-serialize](https://github.com/kornelski/avif-serialize)
 - [bindgen](https://github.com/rust-lang/rust-bindgen)
@@ -9830,12 +9736,9 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 - [tiny-skia-path](https://github.com/RazrFalcon/tiny-skia/tree/master/path)
 - [tiny-skia](https://github.com/RazrFalcon/tiny-skia)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) &lt;year&gt; &lt;owner&gt;. 
+Copyright (c) &lt;year&gt; &lt;owner&gt;. 
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
@@ -9847,21 +9750,19 @@ Redistribution and use in source and binary forms, with or without modification,
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-    ```
-</details>
+
+=====
+
 
 ### BSD 3-Clause &quot;New&quot; or &quot;Revised&quot; License (BSD-3-Clause)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [encoding_rs](https://github.com/hsivonen/encoding_rs)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright © WHATWG (Apple, Google, Mozilla, Microsoft).
+Copyright © WHATWG (Apple, Google, Mozilla, Microsoft).
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -9888,21 +9789,19 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-    ```
-</details>
+
+=====
+
 
 ### Boost Software License 1.0 (BSL-1.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [error-code](https://github.com/DoumanAsh/error-code)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Boost Software License - Version 1.0 - August 17th, 2003
+Boost Software License - Version 1.0 - August 17th, 2003
 
 Permission is hereby granted, free of charge, to any person or organization
 obtaining a copy of the software and accompanying documentation covered by
@@ -9926,21 +9825,19 @@ FOR ANY DAMAGES OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### Boost Software License 1.0 (BSL-1.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [clipboard-win](https://github.com/DoumanAsh/clipboard-win)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Boost Software License - Version 1.0 - August 17th, 2003
+Boost Software License - Version 1.0 - August 17th, 2003
 
 Permission is hereby granted, free of charge, to any person or organization obtaining a copy of the software and accompanying documentation covered by this license (the &quot;Software&quot;) to use, reproduce, display, distribute, execute, and transmit the Software, and to prepare derivative works of the Software, and to permit third-parties to whom the Software is furnished to do so, all subject to the following:
 
@@ -9948,21 +9845,19 @@ The copyright notices in the Software and this entire statement, including the a
 
 THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR ANYONE DISTRIBUTING THE SOFTWARE BE LIABLE FOR ANY DAMAGES OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### Community Data License Agreement Permissive 2.0 (CDLA-Permissive-2.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [webpki-root-certs](https://github.com/rustls/webpki-roots)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    # Community Data License Agreement - Permissive - Version 2.0
+# Community Data License Agreement - Permissive - Version 2.0
 
 This is the Community Data License Agreement - Permissive, Version
 2.0 (the &quot;agreement&quot;). Data Provider(s) and Data Recipient(s) agree
@@ -10024,12 +9919,13 @@ agreement.
 of Data, including for example machine learning models and models&#x27;
 insights.
 
-    ```
-</details>
+
+=====
+
 
 ### GNU General Public License v3.0 only (GPL-3.0-only)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [i-slint-backend-android-activity](https://github.com/slint-ui/slint)
 - [i-slint-backend-qt](https://github.com/slint-ui/slint)
@@ -10046,12 +9942,9 @@ insights.
 - [slint-macros](https://github.com/slint-ui/slint)
 - [slint](https://github.com/slint-ui/slint)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    GNU GENERAL PUBLIC LICENSE
+GNU GENERAL PUBLIC LICENSE
 Version 3, 29 June 2007
 
 Copyright © 2007 Free Software Foundation, Inc. &lt;https://fsf.org/&gt;
@@ -10284,12 +10177,13 @@ You should also get your employer (if you work as a programmer) or school, if an
 
 The GNU General Public License does not permit incorporating your program into proprietary programs. If your program is a subroutine library, you may consider it more useful to permit linking proprietary applications with the library. If this is what you want to do, use the GNU Lesser General Public License instead of this License. But first, please read &lt;https://www.gnu.org/philosophy/why-not-lgpl.html&gt;.
 
-    ```
-</details>
+
+=====
+
 
 ### ISC License (ISC)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [aws-lc-rs](https://github.com/aws/aws-lc-rs)
 - [aws-lc-sys](https://github.com/aws/aws-lc-rs)
@@ -10300,12 +10194,9 @@ The GNU General Public License does not permit incorporating your program into p
 - [untrusted](https://github.com/briansmith/untrusted)
 - [untrusted](https://github.com/briansmith/untrusted)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    ISC License:
+ISC License:
 
 Copyright (c) 2004-2010 by Internet Systems Consortium, Inc. (&quot;ISC&quot;)
 Copyright (c) 1995-2003 by Internet Software Consortium
@@ -10314,21 +10205,19 @@ Permission to use, copy, modify, and/or distribute this software for any purpose
 
 THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND ISC DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL ISC BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [rustybuzz](https://github.com/harfbuzz/rustybuzz)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-        MIT License
+    MIT License
 
     Copyright (c) Microsoft Corporation.
 
@@ -10350,21 +10239,19 @@ THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND ISC DISCLAIMS ALL WARRANTIES WITH
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [uds_windows](https://github.com/haraldh/rust_uds_windows)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-        MIT License
+    MIT License
 
     Copyright (c) Microsoft Corporation. All rights reserved.
 
@@ -10386,21 +10273,19 @@ THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND ISC DISCLAIMS ALL WARRANTIES WITH
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [harfrust](https://github.com/harfbuzz/harfrust)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-        MIT License
+    MIT License
 
     Copyright (c) Microsoft Corporation.
 
@@ -10422,21 +10307,19 @@ THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND ISC DISCLAIMS ALL WARRANTIES WITH
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [mio](https://github.com/tokio-rs/mio)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2014 Carl Lerche and other MIO contributors
+Copyright (c) 2014 Carl Lerche and other MIO contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the &quot;Software&quot;), to deal
@@ -10456,22 +10339,20 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [nom](https://github.com/Geal/nom)
 - [nom](https://github.com/rust-bakery/nom)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2014-2019 Geoffroy Couprie
+Copyright (c) 2014-2019 Geoffroy Couprie
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -10492,21 +10373,19 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [float-cmp](https://github.com/mikedilger/float-cmp)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2014-2020 Optimal Computing (NZ) Ltd
+Copyright (c) 2014-2020 Optimal Computing (NZ) Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the &quot;Software&quot;), to deal in
@@ -10526,21 +10405,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [hyper](https://github.com/hyperium/hyper)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2014-2025 Sean McArthur
+Copyright (c) 2014-2025 Sean McArthur
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the &quot;Software&quot;), to deal
@@ -10560,12 +10437,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [wayland-backend](https://github.com/smithay/wayland-rs)
 - [wayland-client](https://github.com/smithay/wayland-rs)
@@ -10578,12 +10456,9 @@ THE SOFTWARE.
 - [wayland-scanner](https://github.com/smithay/wayland-rs)
 - [wayland-sys](https://github.com/smithay/wayland-rs)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2015 Elinor Berger
+Copyright (c) 2015 Elinor Berger
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the &quot;Software&quot;), to deal
@@ -10603,21 +10478,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [new_debug_unreachable](https://github.com/mbrubeck/rust-debug-unreachable)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2015 Jonathan Reem
+Copyright (c) 2015 Jonathan Reem
 
 Permission is hereby granted, free of charge, to any
 person obtaining a copy of this software and associated
@@ -10643,21 +10516,19 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [dlib](https://github.com/elinorbgr/dlib)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2015 Victor Berger
+Copyright (c) 2015 Victor Berger
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the &quot;Software&quot;), to deal
@@ -10676,21 +10547,19 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [schannel](https://github.com/steffengy/schannel-rs)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2015 steffengy
+Copyright (c) 2015 steffengy
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the &quot;Software&quot;), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
@@ -10698,21 +10567,19 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [memoffset](https://github.com/Gilnaa/memoffset)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2017 Gilad Naaman
+Copyright (c) 2017 Gilad Naaman
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the &quot;Software&quot;), to deal
@@ -10731,21 +10598,19 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [h2](https://github.com/hyperium/h2)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2017 h2 authors
+Copyright (c) 2017 h2 authors
 
 Permission is hereby granted, free of charge, to any
 person obtaining a copy of this software and associated
@@ -10771,21 +10636,19 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [bytes](https://github.com/tokio-rs/bytes)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2018 Carl Lerche
+Copyright (c) 2018 Carl Lerche
 
 Permission is hereby granted, free of charge, to any
 person obtaining a copy of this software and associated
@@ -10811,21 +10674,19 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [smithay-clipboard](https://github.com/smithay/smithay-clipboard)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2018 Lucas Timmins &amp; Victor Berger
+Copyright (c) 2018 Lucas Timmins &amp; Victor Berger
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the &quot;Software&quot;), to deal
@@ -10845,56 +10706,20 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [smithay-client-toolkit](https://github.com/smithay/client-toolkit)
 - [smithay-client-toolkit](https://github.com/smithay/client-toolkit)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2018 Victor Berger
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the &quot;Software&quot;), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-    ```
-</details>
-
-### MIT License (MIT)
-
-由使用下列程式使用：
-
-- [calloop](https://github.com/Smithay/calloop)
-- [calloop](https://github.com/Smithay/calloop)
-
-完整全文：
-
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2018 Victor Berger
+Copyright (c) 2018 Victor Berger
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the &quot;Software&quot;), to deal
@@ -10914,21 +10739,51 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-    ```
-</details>
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
+
+- [calloop](https://github.com/Smithay/calloop)
+- [calloop](https://github.com/Smithay/calloop)
+
+=====完整全文=====
+
+Copyright (c) 2018 Victor Berger
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the &quot;Software&quot;), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+
+=====
+
+
+### MIT License (MIT)
+
+由下列程式使用：
 
 - [want](https://github.com/seanmonstar/want)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2018-2019 Sean McArthur
+Copyright (c) 2018-2019 Sean McArthur
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the &quot;Software&quot;), to deal
@@ -10949,21 +10804,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [try-lock](https://github.com/seanmonstar/try-lock)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2018-2023 Sean McArthur
+Copyright (c) 2018-2023 Sean McArthur
 Copyright (c) 2016 Alex Crichton
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -10985,21 +10838,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [slab](https://github.com/tokio-rs/slab)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2019 Carl Lerche
+Copyright (c) 2019 Carl Lerche
 
 Permission is hereby granted, free of charge, to any
 person obtaining a copy of this software and associated
@@ -11025,23 +10876,21 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [tracing-attributes](https://github.com/tokio-rs/tracing)
 - [tracing-core](https://github.com/tokio-rs/tracing)
 - [tracing](https://github.com/tokio-rs/tracing)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2019 Tokio Contributors
+Copyright (c) 2019 Tokio Contributors
 
 Permission is hereby granted, free of charge, to any
 person obtaining a copy of this software and associated
@@ -11067,23 +10916,21 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [tower-layer](https://github.com/tower-rs/tower)
 - [tower-service](https://github.com/tower-rs/tower)
 - [tower](https://github.com/tower-rs/tower)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2019 Tower Contributors
+Copyright (c) 2019 Tower Contributors
 
 Permission is hereby granted, free of charge, to any
 person obtaining a copy of this software and associated
@@ -11109,21 +10956,19 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [pico-args](https://github.com/RazrFalcon/pico-args)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2019 Yevhenii Reizner
+Copyright (c) 2019 Yevhenii Reizner
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the &quot;Software&quot;), to deal
@@ -11144,21 +10989,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [skia-bindings](https://github.com/rust-skia/rust-skia)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2019-2020 Advanced Micro Devices, Inc. All rights reserved.
+Copyright (c) 2019-2020 Advanced Micro Devices, Inc. All rights reserved.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the &quot;Software&quot;), to deal
@@ -11178,21 +11021,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [tower-http](https://github.com/tower-rs/tower-http)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2019-2021 Tower Contributors
+Copyright (c) 2019-2021 Tower Contributors
 
 Permission is hereby granted, free of charge, to any
 person obtaining a copy of this software and associated
@@ -11218,21 +11059,19 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [http-body](https://github.com/hyperium/http-body)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2019-2024 Sean McArthur &amp; Hyper Contributors
+Copyright (c) 2019-2024 Sean McArthur &amp; Hyper Contributors
 
 Permission is hereby granted, free of charge, to any
 person obtaining a copy of this software and associated
@@ -11258,21 +11097,19 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [http-body-util](https://github.com/hyperium/http-body)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2019-2025 Sean McArthur &amp; Hyper Contributors
+Copyright (c) 2019-2025 Sean McArthur &amp; Hyper Contributors
 
 Permission is hereby granted, free of charge, to any
 person obtaining a copy of this software and associated
@@ -11298,21 +11135,19 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [pin-weak](https://github.com/sixtyfpsui/pin-weak)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2020 Olivier Goffart &lt;ogoffart@sixtyfps.io&gt;
+Copyright (c) 2020 Olivier Goffart &lt;ogoffart@sixtyfps.io&gt;
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the &quot;Software&quot;), to deal
@@ -11332,21 +11167,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [clru](https://github.com/marmeladema/clru-rs)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2020 Élie ROUDNINSKI (marmeladema) &lt;xademax@gmail.com&gt;
+Copyright (c) 2020 Élie ROUDNINSKI (marmeladema) &lt;xademax@gmail.com&gt;
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the &quot;Software&quot;), to deal
@@ -11366,21 +11199,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [strict-num](https://github.com/RazrFalcon/strict-num)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2022 Yevhenii Reizner
+Copyright (c) 2022 Yevhenii Reizner
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the &quot;Software&quot;), to deal
@@ -11400,22 +11231,20 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [calloop-wayland-source](https://github.com/smithay/calloop-wayland-source)
 - [calloop-wayland-source](https://github.com/smithay/calloop-wayland-source)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2023 Kirill Chibisov
+Copyright (c) 2023 Kirill Chibisov
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the &quot;Software&quot;), to deal
@@ -11434,21 +11263,19 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [wayland-csd-frame](https://github.com/rust-windowing/wayland-csd-frame)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2023 Kirill Chibisov
+Copyright (c) 2023 Kirill Chibisov
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the &quot;Software&quot;), to deal in
@@ -11468,21 +11295,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [hyper-util](https://github.com/hyperium/hyper-util)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2023-2025 Sean McArthur
+Copyright (c) 2023-2025 Sean McArthur
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the &quot;Software&quot;), to deal
@@ -11502,12 +11327,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [zbus](https://github.com/z-galaxy/zbus/)
 - [zbus_macros](https://github.com/z-galaxy/zbus/)
@@ -11516,12 +11342,9 @@ THE SOFTWARE.
 - [zvariant](https://github.com/z-galaxy/zbus/)
 - [zvariant_derive](https://github.com/z-galaxy/zbus/)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2024 Zeeshan Ali Khan &amp; zbus contributors
+Copyright (c) 2024 Zeeshan Ali Khan &amp; zbus contributors
 
 Permission is hereby granted, free of charge, to any
 person obtaining a copy of this software and associated
@@ -11547,21 +11370,19 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [synstructure](https://github.com/mystor/synstructure)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright 2016 Nika Layzell
+Copyright 2016 Nika Layzell
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the &quot;Software&quot;), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
@@ -11569,21 +11390,19 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [glutin-winit](https://github.com/rust-windowing/glutin)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright © 2022 Kirill Chibisov
+Copyright © 2022 Kirill Chibisov
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the “Software”), to deal
@@ -11603,21 +11422,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [fs_extra](https://github.com/webdesus/fs_extra)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    MIT License
+MIT License
 
 Copyright (c) 2017 Denis Kurilenko
 
@@ -11639,23 +11456,21 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [darling](https://github.com/TedDriggs/darling)
 - [darling_core](https://github.com/TedDriggs/darling)
 - [darling_macro](https://github.com/TedDriggs/darling)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    MIT License
+MIT License
 
 Copyright (c) 2017 Ted Driggs
 
@@ -11677,21 +11492,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [built](https://github.com/lukaslueg/built)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    MIT License
+MIT License
 
 Copyright (c) 2017-2023 Lukas Lueg
 
@@ -11713,22 +11526,20 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [arg_enum_proc_macro](https://github.com/lu-zero/arg_enum_proc_macro)
 - [interpolate_name](https://github.com/lu-zero/interpolate_name)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    MIT License
+MIT License
 
 Copyright (c) 2018 Luca Barbato
 
@@ -11750,21 +11561,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [tiff](https://github.com/image-rs/image-tiff)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    MIT License
+MIT License
 
 Copyright (c) 2018 PistonDevelopers
 
@@ -11786,21 +11595,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [rgb](https://github.com/kornelski/rust-rgb)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    MIT License
+MIT License
 
 Copyright (c) 2019 Kornel
 
@@ -11822,21 +11629,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [noop_proc_macro](https://github.com/lu-zero/noop_proc_macro)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    MIT License
+MIT License
 
 Copyright (c) 2019 Luca Barbato
 
@@ -11858,21 +11663,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [av-scenechange](https://github.com/rust-av/av-scenechange)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    MIT License
+MIT License
 
 Copyright (c) 2019 Multimedia and Rust
 
@@ -11894,22 +11697,20 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [strum](https://github.com/Peternator7/strum)
 - [strum_macros](https://github.com/Peternator7/strum)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    MIT License
+MIT License
 
 Copyright (c) 2019 Peter Glotfelty
 
@@ -11931,21 +11732,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [cfg_aliases](https://github.com/katharostech/cfg_aliases)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    MIT License
+MIT License
 
 Copyright (c) 2020 Katharos Technology
 
@@ -11955,21 +11754,19 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [android-properties](https://github.com/miklelappo/android-properties)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    MIT License
+MIT License
 
 Copyright (c) 2020 Mikhail Lappo
 
@@ -11991,21 +11788,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [xcursor](https://github.com/esposm03/xcursor-rs)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    MIT License
+MIT License
 
 Copyright (c) 2020 Samuele Esposito
 
@@ -12027,21 +11822,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [maybe-rayon](https://github.com/shssoichiro/maybe-rayon)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    MIT License
+MIT License
 
 Copyright (c) 2021 Joshua Holmer
 
@@ -12063,21 +11856,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [sctk-adwaita](https://github.com/PolyMeilex/sctk-adwaita)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    MIT License
+MIT License
 
 Copyright (c) 2022 Bartłomiej Maryńczak
 
@@ -12099,21 +11890,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [aligned-vec](https://github.com/sarah-ek/aligned-vec/)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    MIT License
+MIT License
 
 Copyright (c) 2022 sarah
 
@@ -12135,21 +11924,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [libredox](https://gitlab.redox-os.org/redox-os/libredox.git)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    MIT License
+MIT License
 
 Copyright (c) 2023 4lDO2
 
@@ -12171,22 +11958,20 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [equator-macro](https://github.com/sarah-ek/equator/)
 - [equator](https://github.com/sarah-ek/equator/)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    MIT License
+MIT License
 
 Copyright (c) 2023 sarah
 
@@ -12208,21 +11993,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [core_maths](https://github.com/robertbastian/core_maths)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    MIT License
+MIT License
 
 Copyright (c) 2024 Robert Bastian
 
@@ -12243,21 +12026,19 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [convert_case](https://github.com/rutrum/convert-case)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    MIT License
+MIT License
 
 Copyright (c) 2025 rutrum
 
@@ -12278,12 +12059,13 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [aho-corasick](https://github.com/BurntSushi/aho-corasick)
 - [android-build](https://github.com/project-robius/android-build)
@@ -12333,12 +12115,9 @@ SOFTWARE.
 - [xmlwriter](https://github.com/RazrFalcon/xmlwriter)
 - [y4m](https://github.com/image-rs/y4m.git)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    MIT License
+MIT License
 
 Copyright (c) &lt;year&gt; &lt;copyright holders&gt;
 
@@ -12357,22 +12136,20 @@ EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [tokio-util](https://github.com/tokio-rs/tokio)
 - [tokio](https://github.com/tokio-rs/tokio)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    MIT License
+MIT License
 
 Copyright (c) Tokio Contributors
 
@@ -12394,21 +12171,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [simd-adler32](https://github.com/mcountryman/simd-adler32)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    MIT License
+MIT License
 
 Copyright (c) [2021] [Marvin Countryman]
 
@@ -12430,21 +12205,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [getset](https://github.com/jbaublitz/getset)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    MIT License
+MIT License
 
 Copyright (c) [year] [fullname]
 
@@ -12466,21 +12239,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [imagesize](https://github.com/Roughsketch/imagesize)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    MIT License
+MIT License
 
 Copyright (c) 2017 Maiddog
 
@@ -12502,12 +12273,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [endi](https://github.com/zeenix/endi)
 - [x11-dl](https://github.com/AltF02/x11-rs.git)
@@ -12516,12 +12288,9 @@ SOFTWARE.
 - [zmij](https://github.com/dtolnay/zmij)
 - [zvariant_utils](https://github.com/z-galaxy/zbus/)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Permission is hereby granted, free of charge, to any
+Permission is hereby granted, free of charge, to any
 person obtaining a copy of this software and associated
 documentation files (the &quot;Software&quot;), to deal in the
 Software without restriction, including without
@@ -12545,21 +12314,19 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [winnow](https://github.com/winnow-rs/winnow)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Permission is hereby granted, free of charge, to any person obtaining
+Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
 &quot;Software&quot;), to deal in the Software without restriction, including
 without limitation the rights to use, copy, modify, merge, publish,
@@ -12578,22 +12345,20 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### MIT License (MIT)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [pulldown-cmark-escape](https://github.com/raphlinus/pulldown-cmark)
 - [pulldown-cmark](https://github.com/raphlinus/pulldown-cmark)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    The MIT License
+The MIT License
 
 Copyright 2015 Google Inc. All rights reserved.
 
@@ -12615,21 +12380,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### University of Illinois/NCSA Open Source License (NCSA)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [libfuzzer-sys](https://github.com/rust-fuzz/libfuzzer)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    University of Illinois/NCSA Open Source License
+University of Illinois/NCSA Open Source License
 
 Copyright (c) &lt;Year&gt; &lt;Owner Organization Name&gt;. All rights reserved.
 
@@ -12645,21 +12408,19 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 
 THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
 
-    ```
-</details>
+
+=====
+
 
 ### OpenSSL License (OpenSSL)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [aws-lc-sys](https://github.com/aws/aws-lc-rs)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    OpenSSL License
+OpenSSL License
 
 Copyright (c) 1998-2008 The OpenSSL Project. All rights reserved.
 
@@ -12708,12 +12469,13 @@ THIS SOFTWARE IS PROVIDED BY ERIC YOUNG &#x60;&#x60;AS IS&#x27;&#x27; AND ANY EX
 
 The licence and distribution terms for any publically available version or derivative of this code cannot be changed. i.e. this code cannot simply be copied and put under another distribution licence [including the GNU Public Licence.]
 
-    ```
-</details>
+
+=====
+
 
 ### Unicode License v3 (Unicode-3.0)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [icu_collections](https://github.com/unicode-org/icu4x)
 - [icu_locale_core](https://github.com/unicode-org/icu4x)
@@ -12735,12 +12497,9 @@ The licence and distribution terms for any publically available version or deriv
 - [zerovec-derive](https://github.com/unicode-org/icu4x)
 - [zerovec](https://github.com/unicode-org/icu4x)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    UNICODE LICENSE V3
+UNICODE LICENSE V3
 
 COPYRIGHT AND PERMISSION NOTICE
 
@@ -12780,21 +12539,19 @@ not be used in advertising or otherwise to promote the sale, use or other
 dealings in these Data Files or Software without prior written
 authorization of the copyright holder.
 
-    ```
-</details>
+
+=====
+
 
 ### zlib License (Zlib)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [slotmap](https://github.com/orlp/slotmap)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2021 Orson Peters &lt;orsonpeters@gmail.com&gt;
+Copyright (c) 2021 Orson Peters &lt;orsonpeters@gmail.com&gt;
 
 This software is provided &#x27;as-is&#x27;, without any express or implied warranty. In
 no event will the authors be held liable for any damages arising from the use of
@@ -12814,22 +12571,20 @@ the following restrictions:
 
  3. This notice may not be removed or altered from any source distribution.
 
-    ```
-</details>
+
+=====
+
 
 ### zlib License (Zlib)
 
-由使用下列程式使用：
+由下列程式使用：
 
 - [foldhash](https://github.com/orlp/foldhash)
 - [foldhash](https://github.com/orlp/foldhash)
 
-完整全文：
+=====完整全文=====
 
-<details markdown='1'>
-    <summary>展開/摺疊</summary>
-    ```plaintext
-    Copyright (c) 2024 Orson Peters
+Copyright (c) 2024 Orson Peters
 
 This software is provided &#x27;as-is&#x27;, without any express or implied warranty. In
 no event will the authors be held liable for any damages arising from the use of
@@ -12848,5 +12603,8 @@ the following restrictions:
     misrepresented as being the original software.
 
 3. This notice may not be removed or altered from any source distribution.
-    ```
-</details>
+
+=====
+
+
+---

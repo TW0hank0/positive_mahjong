@@ -2,7 +2,7 @@
 
 ![icon](./assets/icon.png)
 
-**仍在開發中**
+**仍在開發中，未完成**
 
 伺服器使用Rust編寫
 
@@ -70,7 +70,7 @@ cargo build --workspace --relase
 
 **Android手機**
 
-需求：cargo-apk(`cargo install cargo-apk`)、java、Android sdk+ndk
+需求：cargo-apk(`cargo install cargo-apk`)、java、Android sdk+ndk、android-target(`rustup target add aarch64-linux-android`)
 
 執行：
 ```bash
@@ -79,9 +79,9 @@ uv run scripts/build_android.py
 
 **WEB-WASM**
 
-未完成
+未完成 (目前問題：wasm 不支援sync只支援async(reqwest) )
 
-### 授權
+### 授權/聲明
 
 版權所有 (C) 2026 TW0hank0
 
