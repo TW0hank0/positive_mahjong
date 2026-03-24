@@ -200,17 +200,13 @@ jobs:
       - name: Get datetime
         id: get_datetime
         run: |
-          cd ci
-          datetime=$(uv run get_datetime.py)
+          datetime=$(uv run scripts/ci/get_datetime.py)
           echo "datetime=$datetime" >> $GITHUB_OUTPUT
-          cd ..
 
       - name: Get package get_version
         id: get_version
         run: |
-          cd ci
-          version=$(uv run get_version.py)
-          cd ..
+          version=$(uv run scripts/ci/get_version.py)
           echo "version=$version" >> $GITHUB_OUTPUT
 
       - name: List Dir (for debug)
