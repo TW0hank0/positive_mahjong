@@ -6,12 +6,6 @@ use std::thread;
 
 use pmj_shared::{gamemodes_shared, shared};
 
-#[cfg(not(target_arch = "wasm32"))]
-use pmj_shared::sync_net as net;
-
-#[cfg(target_arch = "wasm32")]
-use pmj_shared::async_net as net;
-
 // 引入 Slint 模組
 slint::include_modules!();
 
