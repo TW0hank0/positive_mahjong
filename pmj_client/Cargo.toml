@@ -32,7 +32,7 @@ console_error_panic_hook = "0.1.5"
 slint-build = "1.15.1"
 
 [package.metadata.android]
-package = "io.github.positive_mahjong.tw0hank0"
+package = "io.github.tw0hank0.positive_mahjong"
 apk_name = "pmj_client"
 resources = "../res"
 build_targets = ["aarch64-linux-android"]
