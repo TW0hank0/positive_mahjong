@@ -28,7 +28,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        #python: [cpython-3.13, pypy-3.11]
         os: [ubuntu-latest, windows-latest]
 
     steps:
