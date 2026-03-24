@@ -80,14 +80,14 @@ jobs:
         id: zip_files_linux
         if: runner.os == 'Linux'
         run: |
-          file=$(uv run scripts/build_zip.py)
+          file=$(uv run scripts/zip_files.py)
           echo "zip_path=$file" >> $GITHUB_OUTPUT
 
       - name: zip files (Windows)
         id: zip_files_windows
         if: runner.os == 'Windows'
         run: |
-          $file = (uv run scripts/build_zip.py)
+          $file = (uv run scripts/zip_files.py)
           echo "zip_path=$file" >> $env:GITHUB_OUTPUT
 
       - name: Upload exe artifact (Linux)
