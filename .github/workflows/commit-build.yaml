@@ -73,10 +73,6 @@ jobs:
       # - name: sync dep
       #   run: uv sync --all-extras
 
-      - name: install fontconfig
-        run: |
-          apt install fontconfig
-
       - name: use build script
         run: uv run scripts/build_computer.py
 
@@ -166,10 +162,16 @@ jobs:
         run: |
           uv run scripts/build_android.py
 
+      - name: Get package get_version
+        id: get_version
+        run: |
+          version=$(uv run scripts/ci/get_version.py)
+          echo "version=$version" >> $GITHUB_OUTPUT
+
       - name: Upload apk artifact
         uses: actions/upload-artifact@v6
         with:
-          name: target/release/apk/pmj_client.apk
+          name: pmj_client_${{ steps.get_version.outputs.version }}.apk
           path: target/release/apk/pmj_client.apk
 
   upload:
