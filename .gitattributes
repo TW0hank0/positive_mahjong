@@ -1,1 +1,3 @@
-auto_generated linguist-generated=true
+auto_generated linguist-vendored
+pmj_client/material linguist-vendored
+#docs/*.md linguist-documentation
