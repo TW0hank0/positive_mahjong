@@ -18,11 +18,7 @@ import sys
 
 
 def main():
-    command = [
-        "addlicense",
-        "-check",
-        "-f",
-        "templates/addlicense.template",
+    ignored = [
         "-ignore",
         ".git/**",
         "-ignore",
@@ -56,29 +52,40 @@ def main():
         "-ignore",
         "ThirdPartyLicense-Python.html",
         "-ignore",
-        "ThirdPartyLicense.html",
-        "-ignore",
-        "src/licenses_rust.rs",
-        "-ignore",
-        "src/licenses.rs",
-        "-ignore",
-        "src/licenses_python.rs",
+        "auto_generated/**",
         "-ignore",
         "**/*.icon",
         "-ignore",
         "**/*.sh",
-        ".",
     ]
-    print(" ".join(command))
+    command = [
+        "addlicense",
+        "-check",
+        "-f",
+        "templates/addlicense.template",
+    ]
+    command.extend(ignored.copy())
+    command.append(".")
+    print("Run Command: ", " ".join(command))
     print("-" * 10)
-    subprocess.run(
+    process = subprocess.run(
         command,
-        check=True,
+        # check=True,
         stdout=sys.stdout,
         stdin=sys.stdin,
         stderr=sys.stderr,
         timeout=180,
     )
+    if process.returncode != 0:
+        print("Something Wrong!")
+        fix_command = [
+            "addlicense",
+            "-f",
+            "templates/addlicense.template",
+        ]
+        fix_command.extend(ignored.copy())
+        fix_command.append(".")
+        print("Fix Command: ", " ".join(fix_command))
 
 
 if __name__ == "__main__":

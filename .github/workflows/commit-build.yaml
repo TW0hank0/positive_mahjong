@@ -73,6 +73,10 @@ jobs:
       # - name: sync dep
       #   run: uv sync --all-extras
 
+      - name: install fontconfig
+        run: |
+          apt install fontconfig
+
       - name: use build script
         run: uv run scripts/build_computer.py
 
