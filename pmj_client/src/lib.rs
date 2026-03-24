@@ -33,6 +33,7 @@ pub fn ui_main() {
 #[cfg(target_os = "android")]
 #[unsafe(no_mangle)]
 fn android_main(android_app: slint::android::AndroidApp) {
+    use slint::Global;
     slint::android::init(android_app).unwrap();
     let ui = client::main();
     client::MaterialWindowAdapter::get(&ui).set_disable_hover(true);
