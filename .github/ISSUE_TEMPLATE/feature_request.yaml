@@ -38,5 +38,5 @@ body:
     attributes:
       label: 這個issue是唯一的
       options:
-        - label: I have searched the issue tracker and did not find an issue describing my bug. - 我已经搜索問題追踪器并且没有發現相同的 issue。
+        - label: 我已经搜索問題追踪器并且没有發現相同的 issue。
           required: true
