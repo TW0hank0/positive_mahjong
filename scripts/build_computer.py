@@ -17,6 +17,8 @@ import subprocess
 import sys
 import time
 
+import zip_files
+
 
 def main():
     start_time = time.time()
@@ -28,6 +30,8 @@ def main():
         stdin=sys.stdin,
         stderr=sys.stderr,
     )
+    print("-" * 10, "zip-files", "-" * 10)
+    zip_files.main()
     print("finish in", time.time() - start_time)
 
 
