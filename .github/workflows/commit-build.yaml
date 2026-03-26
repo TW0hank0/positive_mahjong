@@ -73,7 +73,9 @@ jobs:
       - name: Install Dep (Linux)
         if: runner.os == 'Linux'
         run: |
-          sudo apt install fontconfig
+          sudo apt-get update
+          sudo apt-get install libfontconfig1-dev pkg-config
+
         
       - name: use build script
         run: uv run scripts/build_computer.py
