@@ -194,9 +194,7 @@ jobs:
 
       - name: Prepare CI Venv
         run: |
-          cd ci
           uv venv --python cpython-3.13
-          cd ..
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
