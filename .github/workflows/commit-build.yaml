@@ -158,6 +158,11 @@ jobs:
         run: |
           uv self version
 
+      - name: Install Dep (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt install fontconfig
+
       - name: build apk
         run: |
           uv run scripts/build_android.py
