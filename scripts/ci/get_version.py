@@ -23,7 +23,7 @@ def main():
         "rb",
     ) as f:
         d = tomllib.load(f)
-    v = d["package"]["version"]
+    v = d["workspace"]["package"]["version"]
     print(v)
 
 
