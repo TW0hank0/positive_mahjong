@@ -69,10 +69,12 @@ jobs:
       - name: check uv install
         run: |
           uv self version
-
-      # - name: sync dep
-      #   run: uv sync --all-extras
-
+      
+      - name: Install Dep (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt install fontconfig
+        
       - name: use build script
         run: uv run scripts/build_computer.py
 
@@ -157,12 +159,7 @@ jobs:
       - name: check uv install
         run: |
           uv self version
-
-      - name: Install Dep (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt install fontconfig
-
+      
       - name: build apk
         run: |
           uv run scripts/build_android.py
