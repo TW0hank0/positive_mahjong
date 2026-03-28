@@ -73,6 +73,22 @@ required = true
 name = "android.permission.WRITE_EXTERNAL_STORAGE"
 max_sdk_version = 18
 
+[[package.metadata.android.uses_permission]]
+name = "android.permission.READ_EXTERNAL_STORAGE"
+max_sdk_version = 18
+
+[[package.metadata.android.uses_permission]]
+name = "android.permission.ACCESS_WIFI_STATE"
+
+[[package.metadata.android.uses_permission]]
+name = "android.permission.ACCESS_NETWORK_SATEGE"
+
+[[package.metadata.android.uses_permission]]
+name = "android.permission.FOREGROUND_SERVICE"
+
+[[package.metadata.android.uses_permission]]
+name = "android.permission.WAKE_LOCK"
+
 [package.metadata.android.application.activity]
 # See https://developer.android.com/guide/topics/manifest/activity-element#screen
 #
