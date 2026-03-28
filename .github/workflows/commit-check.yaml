@@ -61,6 +61,12 @@ jobs:
         run: |
           cargo-about --version
 
+      - name: Install Dep (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install libfontconfig1-dev pkg-config
+
       - name: debug check
         run: cargo check
 
@@ -85,4 +91,4 @@ jobs:
       - name: Run License Check
         run: |
           echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
-          uv run license_check.py
+          uv run scripts/license_check.py
