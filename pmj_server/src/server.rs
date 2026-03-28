@@ -124,7 +124,7 @@ fn handle_server_v1_simple(
     })
 }
 
-fn handle_server_request_v1_simple(
+fn handle_request_v1_simple(
     mut request: tiny_http::Request,
     backend: sync::Arc<sync::RwLock<gamemodes::modev1_simple::PositiveMahjong>>,
 ) {
