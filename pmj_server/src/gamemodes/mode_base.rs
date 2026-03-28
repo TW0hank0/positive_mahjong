@@ -16,6 +16,11 @@
 use pmj_shared::gamemodes_shared;
 use pmj_shared::shared;
 
+use std::io::{self, Read, Write};
+use std::net::TcpStream;
+use tungstenite::stream::MaybeTlsStream;
+use tungstenite::{Message, WebSocket, connect};
+
 pub struct PositiveMahjong {
     players: Vec<gamemodes_shared::shared_base::PMJPlayer>,
 }

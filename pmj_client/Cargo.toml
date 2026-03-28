@@ -36,7 +36,7 @@ pmj_shared = { workspace = true }
 slint = { workspace = true }
 serde_json = { workspace = true }
 serde = { workspace = true }
-
+tungstenite = { workspace = true }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm-bindgen = { version = "0.2" }

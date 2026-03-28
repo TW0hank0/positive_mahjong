@@ -29,6 +29,7 @@ tiny_http = { workspace = true }
 pmj_shared = { workspace = true }
 rand = { workspace = true }
 serde = { workspace = true }
+tungstenite = { workspace = true }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 getrandom = { version = "0.2.17", features = ["js"] }
