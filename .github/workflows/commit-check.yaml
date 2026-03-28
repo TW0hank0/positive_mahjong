@@ -75,7 +75,7 @@ jobs:
           uv self version
 
       - name: Install Go (Required for addlicense)
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version: "stable"
 

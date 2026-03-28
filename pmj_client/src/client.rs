@@ -47,7 +47,6 @@ pub fn main() -> MainWindow {
                     {
                         let input_server_ip: String =
                             upgraded_window.get_home_page_server_ip().into();
-                        //let mut resp_body_text = String::new();
                         //
                         if input_server_ip.is_empty() {
                             resp_body_text.push_str("錯誤！未輸入正確伺服器Ip！");
