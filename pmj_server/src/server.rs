@@ -20,13 +20,13 @@ use std::fs;
 use std::sync;
 use tiny_http;
 
-//use rand;
-//use rand::{prelude::SliceRandom, seq::IndexedRandom};
+use std::net::{TcpListener, TcpStream};
+use std::thread;
+use tungstenite::protocol::Role;
+use tungstenite::{Error, Message, WebSocket, accept};
 
 use pmj_shared::gamemodes_shared;
 use pmj_shared::shared;
-//use positive_mahjong::shared::{self, GameActionAfter, GameActionPlayerRound, GameActionWaitRound};
-//use positive_mahjong::shared::{PMJCard, PMJCardFlowers, PMJCardTypes, PMJCardWords};
 
 use crate::gamemodes;
 
@@ -315,4 +315,124 @@ fn handle_request_v1_simple(
     }
     let guard = backend.read().unwrap();
     println!("{}", guard);
+}
+
+fn handle_server_base(
+    addr: std::net::SocketAddr,
+    backend: sync::Arc<sync::RwLock<gamemodes::mode_base::PositiveMahjong>>,
+) {
+    // 建立 TCP 監聽器
+    let listener: TcpListener = match TcpListener::bind(addr) {
+        Ok(l) => l,
+        Err(e) => {
+            eprintln!("無法綁定埠號：{}", e);
+            return;
+        }
+    };
+
+    //println!("伺服器已啟動，監聽 {}", addr);
+
+    // 接受傳入連線
+    // 使用 blocking iterator
+    for stream_result in listener.incoming() {
+        match stream_result {
+            Ok(stream) => {
+                // 為每個連線啟動新執行緒
+                // 使用 move 將 stream 所有權移轉至執行緒
+                let thread_backend = sync::Arc::clone(&backend);
+                let _handle = std::thread::spawn(move || {
+                    handle_request_base(stream, thread_backend);
+                });
+            }
+            Err(e) => {
+                eprintln!("連線失敗：{}", e);
+            }
+        }
+    }
+}
+
+// 處理單一客戶端連線的函式
+fn handle_request_base(
+    stream: TcpStream,
+    backend: sync::Arc<sync::RwLock<gamemodes::mode_base::PositiveMahjong>>,
+) {
+    // 進行 WebSocket 握手，建立 WebSocket 物件
+    // 顯式宣告類型以符合規範
+    let mut websocket: WebSocket<TcpStream> = match accept(stream) {
+        Ok(ws) => ws,
+        Err(e) => {
+            eprintln!("握手失敗：{}", e);
+            return;
+        }
+    };
+
+    println!("客戶端連線成功");
+
+    // 進入訊息接收迴圈
+    loop {
+        // 讀取訊息
+        let msg: Result<Message, Error> = websocket.read();
+
+        match msg {
+            Ok(message) => {
+                match message {
+                    Message::Text(text) => {
+                        println!("收到文字訊息：{}", text);
+                        // 回覆訊息
+                        let reply: Message = Message::Text(format!("伺服器收到：{}", text).into());
+                        let _write_result: Result<(), Error> = websocket.write(reply);
+                    }
+                    Message::Binary(data) => {
+                        println!("收到二進位資料，長度：{}", data.len());
+                    }
+                    Message::Ping(_) => {
+                        // 函式庫通常會自動處理 Pong，亦可手動處理
+                    }
+                    Message::Pong(_) => {
+                        // 忽略 Pong
+                    }
+                    Message::Close(_) => {
+                        println!("客戶端請求關閉連線");
+                        break;
+                    }
+                    Message::Frame(_) => {
+                        // 忽略原始帧
+                    }
+                }
+            }
+            Err(e) => {
+                eprintln!("讀取錯誤：{}", e);
+                break;
+            }
+        }
+    }
+
+    // 關閉連線
+    let _close_result: Result<(), Error> = websocket.close(None);
+    println!("連線已終止");
+}
+
+fn main_base() {
+    let backend = sync::Arc::new(sync::RwLock::new(
+        gamemodes::mode_base::PositiveMahjong::new(),
+    ));
+    let server_addr_ipv4 = std::net::SocketAddr::V4(std::net::SocketAddrV4::new(
+        std::net::Ipv4Addr::UNSPECIFIED,
+        shared::SERVER_PORT,
+    ));
+    let server_addr_ipv6 = std::net::SocketAddr::V6(std::net::SocketAddrV6::new(
+        std::net::Ipv6Addr::UNSPECIFIED,
+        shared::SERVER_PORT,
+        0,
+        0,
+    ));
+    let mut servers = Vec::new();
+    servers.push(handle_server_base(
+        server_addr_ipv4,
+        sync::Arc::clone(&backend),
+    ));
+    servers.push(handle_server_base(
+        server_addr_ipv6,
+        sync::Arc::clone(&backend),
+    ));
 }

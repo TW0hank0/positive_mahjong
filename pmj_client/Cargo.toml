@@ -36,7 +36,7 @@ pmj_shared = { workspace = true }
 slint = { workspace = true }
 serde_json = { workspace = true }
 serde = { workspace = true }
-
+tungstenite = { workspace = true }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm-bindgen = { version = "0.2" }
@@ -72,6 +72,22 @@ required = true
 [[package.metadata.android.uses_permission]]
 name = "android.permission.WRITE_EXTERNAL_STORAGE"
 max_sdk_version = 18
+
+[[package.metadata.android.uses_permission]]
+name = "android.permission.READ_EXTERNAL_STORAGE"
+max_sdk_version = 18
+
+[[package.metadata.android.uses_permission]]
+name = "android.permission.ACCESS_WIFI_STATE"
+
+[[package.metadata.android.uses_permission]]
+name = "android.permission.ACCESS_NETWORK_SATEGE"
+
+[[package.metadata.android.uses_permission]]
+name = "android.permission.FOREGROUND_SERVICE"
+
+[[package.metadata.android.uses_permission]]
+name = "android.permission.WAKE_LOCK"
 
 [package.metadata.android.application.activity]
 # See https://developer.android.com/guide/topics/manifest/activity-element#screen

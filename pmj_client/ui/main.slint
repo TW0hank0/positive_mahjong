@@ -1,11 +1,16 @@
 import { Button, LineEdit } from "std-widgets.slint";
-import { MaterialText, ScrollView } from "../material/material.slint";
+import {
+    MaterialText,
+    ScrollView,
+    DropDownMenu,
+} from "../material/material.slint";
 import "../../../assets/Noto_Sans_TC/static/NotoSansTC-Regular.ttf";
 
 export { MaterialWindowAdapter } from "../material/material.slint";
 
 export enum Scenes {
     HomePage,
+    GamePlayBase,
     GamePlayV1Simple,
 }
 
@@ -71,7 +76,7 @@ component HomePage inherits ScrollView {
                                 font-size: 20px;
                             }
 
-                            width: 100%;
+                            preferred-width: 100%;
                             min-height: 200px;
                             min-width: 300px;
                             vertical-scrollbar-policy: ScrollBarPolicy.always-on;
@@ -79,6 +84,25 @@ component HomePage inherits ScrollView {
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+component GamePlayBase inherits ScrollView {
+    in-out property <string> server_ip: "unknown";
+
+    horizontal_scrollbar_policy: ScrollBarPolicy.as-needed;
+    vertical_scrollbar_policy: ScrollBarPolicy.as-needed;
+    VerticalLayout {
+        HorizontalLayout {
+            Rectangle {
+                width: 75%;
+            }
+
+            MaterialText {
+                text: "伺服器Ip：" + root.server_ip;
+                font-size: 14px;
             }
         }
     }
@@ -119,6 +143,8 @@ export component MainWindow inherits Window {
     in-out property <string> home_page_server_response_text/*  <=> scene_home_page.server_response_text */;
     // GamePlayV1Simple
     in-out property <string> game_play_v1_simple_server_ip/*  <=> scene_game_play_v1_simple.server_ip */;
+    // GamePlayBase
+    in-out property <string> game_play_base_server_ip;
     // MainWindow / Other
     in-out property <Scenes> current-scene: Scenes.HomePage;
     in-out property <bool> is-changing-scene: false;
@@ -144,6 +170,12 @@ export component MainWindow inherits Window {
             enabled: false;
             server_ip <=> game_play_v1_simple_server_ip;
         }
+
+        if current-scene == Scenes.GamePlayBase: scene_game_play_base := GamePlayBase {
+            opacity: 0.0;
+            enabled: false;
+            server_ip <=> game_play_base_server_ip;
+        }
     }
 
     /* 
@@ -155,6 +187,10 @@ export component MainWindow inherits Window {
         active when current-scene == Scenes.GamePlayV1Simple: {
             scene_game_play_v1_simple.opacity: 1.0;
             scene_game_play_v1_simple.enabled: true;
+        }
+        active when current-scene == Scenes.GamePlayBase : {
+            scene_game_play_base.opacity: 1.0;
+            scene_game_play_base.enabled: true;
         }
         active when is-changing-scene: {
             scene_home_page.opacity: 0.0;

@@ -24,10 +24,7 @@ rust-version = "1.94"
 
 [workspace.dependencies]
 positive_mahjong = { path = "." }
-#pmj_client = { path = "pmj_client" }
-#pmj_server = { path = "pmj_server" }
 pmj_shared = { path = "pmj_shared" }
-#pmj_test_connection = { path = "pmj_test_connection" }
 
 iced = { version = "0.14.0" }
 local-ip-address = "0.6.10"
@@ -43,6 +40,11 @@ serde = { version = "1.0.228", features = ["serde_derive"] }
 serde_json = "1.0.149"
 slint = { version = "1.15.1", features = ["backend-android-activity-06"] }
 tiny_http = { version = "0.12.0", features = ["ssl-rustls"] }
+tungstenite = { version = "0.29.0", features = [
+    "rustls",
+    "rustls-native-certs",
+] }
+
 
 [workspace]
 resolver = "3"
