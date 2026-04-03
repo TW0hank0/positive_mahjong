@@ -69,14 +69,13 @@ jobs:
       - name: check uv install
         run: |
           uv self version
-      
+
       - name: Install Dep (Linux)
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install libfontconfig1-dev pkg-config
 
-        
       - name: use build script
         run: uv run scripts/build_computer.py
 
@@ -125,7 +124,6 @@ jobs:
           repository: ${{ secrets.SECRET_REPO }} # Android Keystore Repo
           ssh-key: ${{ secrets.SECRET_REPO_TOKEN }} # Repo ssh-key
           path: secret
-          branch: main
 
       - name: install rustup (Windows)
         if: runner.os == 'Windows'
@@ -161,7 +159,7 @@ jobs:
       - name: check uv install
         run: |
           uv self version
-      
+
       - name: build apk
         run: |
           uv run scripts/build_android.py

@@ -30,7 +30,7 @@ pub fn main() {
         req_action_type: shared::ActionType::TestConnection,
         ..Default::default()
     };
-    let request = serde_json::to_string(&shared::ClientRequestType {
+    let request = serde_json::to_string(&shared::OldClientRequestType {
         app: String::from("positive_mahjong"),
         client: String::from("pmj-client"),
         data: request_data,
@@ -53,7 +53,7 @@ pub fn main() {
         req_action_type: shared::ActionType::AddPlayer,
         ..Default::default()
     };
-    let request = serde_json::to_string(&shared::ClientRequestType {
+    let request = serde_json::to_string(&shared::OldClientRequestType {
         app: String::from("positive_mahjong"),
         client: String::from("pmj-client"),
         data: request_data,
@@ -81,7 +81,7 @@ pub fn main() {
             }),
             ..Default::default()
         };
-        let request = serde_json::to_string(&shared::ClientRequestType {
+        let request = serde_json::to_string(&shared::OldClientRequestType {
             app: String::from("positive_mahjong"),
             client: String::from("pmj-client"),
             data: request_data,

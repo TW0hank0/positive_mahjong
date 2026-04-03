@@ -4044,6 +4044,7 @@ name = "pmj_shared"
 version = "0.1.0"
 dependencies = [
  "serde",
+ "tungstenite",
 ]
 
 [[package]]

@@ -13,22 +13,241 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-use pmj_shared::gamemodes_shared;
+use pmj_shared::gamemodes_shared::shared_base::PMJPlayer;
+use pmj_shared::gamemodes_shared::{self, shared_base};
 use pmj_shared::shared;
 
-use std::io::{self, Read, Write};
-use std::net::TcpStream;
-use tungstenite::stream::MaybeTlsStream;
-use tungstenite::{Message, WebSocket, connect};
+use std::io::Read;
+use std::net;
+//use tungstenite::stream::MaybeTlsStream;
+use std::net::{TcpListener, TcpStream};
+use std::sync;
+use std::thread;
+use tungstenite::protocol::Role;
+use tungstenite::{Error, Message, WebSocket, accept, connect};
+
+use crate::gamemodes;
+
+fn write_reply(
+    text: String,
+    websocket: sync::Arc<sync::RwLock<WebSocket<TcpStream>>>,
+) -> Result<(), Error> {
+    let reply: Message = Message::Text(text.into());
+    let write_result: Result<(), Error> = websocket.write().unwrap().write(reply);
+    write_result
+}
+
+// 處理單一客戶端連線的函式
+fn handle_request_base(
+    stream: TcpStream,
+    backend: sync::Arc<sync::RwLock<gamemodes::mode_base::PositiveMahjong>>,
+) {
+    let client_ip = stream.peer_addr().unwrap().ip();
+    // 進行 WebSocket 握手，建立 WebSocket 物件
+    // 顯式宣告類型以符合規範
+    let mut websocket: WebSocket<TcpStream> = match accept(stream) {
+        Ok(ws) => ws,
+        Err(e) => {
+            eprintln!("握手失敗：{}", e);
+            return;
+        }
+    };
+    let ws: sync::Arc<sync::RwLock<WebSocket<TcpStream>>> =
+        sync::Arc::new(sync::RwLock::new(websocket));
+
+    println!("客戶端連線成功");
+
+    // 進入訊息接收迴圈
+    loop {
+        // 讀取訊息
+        let msg: Result<Message, Error> = ws.write().unwrap().read();
+
+        match msg {
+            Ok(message) => {
+                match message {
+                    Message::Text(text) => {
+                        let value: Result<shared::ClientConnectRequestType, serde_json::Error> =
+                            serde_json::from_str(&text);
+                        match value {
+                            Ok(req) => {
+                                if req.app_name != String::from("positive_mahjong") {
+                                    let _reply_result = write_reply(
+                                        format!("這是 `positive_mahjong` 的伺服器！"),
+                                        sync::Arc::clone(&ws),
+                                    );
+                                } else {
+                                    let mut guard = backend.write().unwrap();
+                                    let result_player_id =
+                                        guard.add_player(client_ip, sync::Arc::clone(&ws));
+                                    let resp = if result_player_id.is_none() {
+                                        shared::ServerConnectResponceType {
+                                            gamemode: shared::GameModes::Base,
+                                            player_id: None,
+                                            too_many_player: true,
+                                        }
+                                    } else {
+                                        shared::ServerConnectResponceType {
+                                            gamemode: shared::GameModes::Base,
+                                            player_id: result_player_id,
+                                            too_many_player: false,
+                                        }
+                                    };
+                                    let resp_msg = serde_json::to_string(&resp).unwrap();
+                                    let _wrist_result =
+                                        write_reply(resp_msg, sync::Arc::clone(&ws));
+                                }
+                            }
+                            Err(e) => {
+                                let _reply_result =
+                                    write_reply(format!("json錯誤：{}", e), sync::Arc::clone(&ws));
+                            }
+                        }
+                    }
+                    Message::Binary(_data) => {
+                        println!("跳過Binary Message!");
+                    }
+                    Message::Ping(_) => {
+                        // 函式庫通常會自動處理 Pong，亦可手動處理
+                    }
+                    Message::Pong(_) => {
+                        // 忽略 Pong
+                    }
+                    Message::Close(_) => {
+                        println!("客戶端請求關閉連線");
+                        break;
+                    }
+                    Message::Frame(_) => {
+                        // 忽略原始帧
+                    }
+                }
+            }
+            Err(e) => {
+                eprintln!("讀取錯誤：{}", e);
+                break;
+            }
+        }
+    }
+
+    // 關閉連線
+    let _close_result: Result<(), Error> = ws.write().unwrap().close(None);
+    //println!("連線已終止");
+}
+
+pub fn main_base() {
+    let backend = sync::Arc::new(sync::RwLock::new(
+        gamemodes::mode_base::PositiveMahjong::new(),
+    ));
+    let server_addr_ipv4 = std::net::SocketAddr::V4(std::net::SocketAddrV4::new(
+        std::net::Ipv4Addr::UNSPECIFIED,
+        shared::SERVER_PORT,
+    ));
+    let server_addr_ipv6 = std::net::SocketAddr::V6(std::net::SocketAddrV6::new(
+        std::net::Ipv6Addr::UNSPECIFIED,
+        shared::SERVER_PORT,
+        0,
+        0,
+    ));
+    let mut servers = Vec::new();
+    servers.push(handle_server_base(
+        server_addr_ipv4,
+        sync::Arc::clone(&backend),
+    ));
+    servers.push(handle_server_base(
+        server_addr_ipv6,
+        sync::Arc::clone(&backend),
+    ));
+}
+
+fn handle_server_base(
+    addr: std::net::SocketAddr,
+    backend: sync::Arc<sync::RwLock<gamemodes::mode_base::PositiveMahjong>>,
+) {
+    // 建立 TCP 監聽器
+    let listener: TcpListener = match TcpListener::bind(addr) {
+        Ok(l) => l,
+        Err(e) => {
+            eprintln!("無法綁定Port：{}", e);
+            return;
+        }
+    };
+    for stream_result in listener.incoming() {
+        match stream_result {
+            Ok(stream) => {
+                // 為每個連線啟動新執行緒
+                // 使用 move 將 stream 所有權移轉至執行緒
+                let thread_backend = sync::Arc::clone(&backend);
+                let _handle = std::thread::spawn(move || {
+                    handle_request_base(stream, thread_backend);
+                });
+            }
+            Err(e) => {
+                eprintln!("連線失敗：{}", e);
+            }
+        }
+    }
+}
 
 pub struct PositiveMahjong {
     players: Vec<gamemodes_shared::shared_base::PMJPlayer>,
+    is_game_start: bool,
+    is_game_finish: bool,
 }
 
 impl PositiveMahjong {
     pub fn new() -> Self {
         Self {
             players: Vec::new(),
+            is_game_finish: false,
+            is_game_start: false,
+        }
+    }
+
+    /// 返回player_id或是 None(人數已滿)
+    pub fn add_player(
+        &mut self,
+        player_ip_addr: net::IpAddr,
+        player_ws: sync::Arc<sync::RwLock<WebSocket<TcpStream>>>,
+    ) -> Option<u8> {
+        let current_player_count = self.players.len();
+        if current_player_count < 4 {
+            let player_id: u8 = (current_player_count + 1) as u8;
+            self.players.push(PMJPlayer {
+                player_ip_addr,
+                player_id,
+                player_ws,
+            });
+            Some(player_id)
+        } else {
+            None
+        }
+    }
+
+    /// 開始遊戲
+    pub fn start_game(&mut self) {
+        self.is_game_start = true;
+        let game_start_msg = serde_json::to_string(&shared_base::ServerMessageType {
+            msg_type: shared_base::ServerMessageTypeKinds::GameStart,
+        })
+        .unwrap();
+        for player in self.players.iter() {
+            let _write_result =
+                write_reply(game_start_msg.clone(), sync::Arc::clone(&player.player_ws));
+        }
+        self.game_loop();
+    }
+
+    fn game_loop(&self) {
+        loop {
+            for current_player_id in 1..((self.players.len() + 1) as u8) {
+                let turn_msg = serde_json::to_string(&shared_base::ServerMessageType {
+                    msg_type: shared_base::ServerMessageTypeKinds::ChangedTurn(current_player_id),
+                })
+                .unwrap();
+                for player in self.players.iter() {
+                    let _write_result =
+                        write_reply(turn_msg.clone(), sync::Arc::clone(&player.player_ws));
+                }
+            }
         }
     }
 }
