@@ -21,8 +21,23 @@ use crate::gamemodes_shared;
 
 pub const SERVER_PORT: u16 = 6060;
 
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
+pub struct ClientConnectRequestType {
+    /// 需為 `positive_mahjong`
+    /// 否則會拒絕
+    pub app_name: String,
+    pub client: String,
+}
+
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
+pub struct ServerConnectResponceType {
+    pub gamemode: GameModes,
+    pub player_id: Option<u8>,
+    pub too_many_player: bool,
+}
+
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
-pub struct ClientRequestType {
+pub struct OldClientRequestType {
     /// 需為 `positive_mahjong`
     /// 否則會拒絕
     pub app: String,
@@ -34,7 +49,7 @@ pub struct ClientRequestType {
     pub is_test_connection: bool,
 }
 
-impl std::default::Default for ClientRequestType {
+impl std::default::Default for OldClientRequestType {
     fn default() -> Self {
         Self {
             app: String::from("positive_mahjong"),
@@ -46,7 +61,7 @@ impl std::default::Default for ClientRequestType {
     }
 }
 
-impl std::fmt::Display for ClientRequestType {
+impl std::fmt::Display for OldClientRequestType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
@@ -217,14 +232,14 @@ impl std::default::Default for ServerResponseDataType {
 pub static SERVER_CONFIG_FILE_NAME: &str = "pmj_server_config.json";
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
-pub struct PMJConfig {
+pub struct PMJServerConfig {
     pub gamemode: GameModes,
 }
 
-impl Default for PMJConfig {
+impl Default for PMJServerConfig {
     fn default() -> Self {
         Self {
-            gamemode: GameModes::V1Simple,
+            gamemode: GameModes::Base,
         }
     }
 }

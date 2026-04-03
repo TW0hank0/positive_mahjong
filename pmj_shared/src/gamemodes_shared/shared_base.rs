@@ -13,12 +13,30 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-use std::net;
+use std::net::TcpStream;
 use std::sync;
+use tungstenite::WebSocket;
 
-use serde;
+//use serde;
+
+pub const MAX_PLAYER_COUNT: u8 = 4;
+
+#[derive(Debug)]
+pub struct PMJPlayer {
+    pub player_ip_addr: std::net::IpAddr,
+    pub player_id: u8,
+    pub player_ws: sync::Arc<sync::RwLock<WebSocket<TcpStream>>>,
+}
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
-pub struct PMJPlayer {
-    ip_addr: std::net::IpAddr,
+pub struct ServerMessageType {
+    pub msg_type: ServerMessageTypeKinds,
+}
+
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
+pub enum ServerMessageTypeKinds {
+    GameStart,
+    GameFinish,
+    /// ChangedTurn(玩家id)
+    ChangedTurn(u8),
 }
