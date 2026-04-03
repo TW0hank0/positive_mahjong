@@ -1,13 +1,11 @@
 /target
 
-# **/target/**/debug/**
-# **/target/**/release/**
-
+# Python
 **/.venv/**
-**/__pycache__/**
+**/__pycache__/
 **/__pypy_cache__/**
 
-# positive project build script generate
+# build script generated
 positive_*_v*_*.zip
 
 # krita bakeup
@@ -18,3 +16,7 @@ pmj_server_config.json
 
 # secrets
 secret/**
+
+# editor
+**/.vscode/
+**/.idea/
