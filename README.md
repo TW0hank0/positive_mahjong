@@ -79,7 +79,7 @@ uv run scripts/build_android.py
 
 **WEB-WASM**
 
-未完成 (目前問題：wasm 不支援sync只支援async(reqwest) )
+未完成 原因：wasm 不支援sync只支援asyn
 
 ### 授權/聲明
 

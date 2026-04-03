@@ -20,7 +20,6 @@ on:
     paths-ignore:
       - "README.md"
       - "READMEs/**"
-      - ".vscode/**"
     branches:
       - master
 
@@ -70,7 +69,7 @@ jobs:
         run: |
           uv self version
 
-      - name: Install Dep (Linux)
+      - name: Install Linux Dep
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
@@ -229,7 +228,7 @@ jobs:
             --notes "**這是使用Github Action製作的測試版**
             - 版本： ${{ steps.get_version.outputs.version }}
             - 臺北時間： ${{ steps.get_datetime.outputs.datetime }}
-            > UTC時間：臺北時間-8 
+            > UTC時間：臺北時間-8
             - github_sha： ${{ github.sha }}" \
             --prerelease \
             --repo="${{ github.repository }}"
