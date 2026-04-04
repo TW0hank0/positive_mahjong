@@ -27,6 +27,10 @@ pub struct PMJPlayer {
     pub player_ip_addr: std::net::IpAddr,
     pub player_id: u8,
     pub player_ws: sync::Arc<sync::RwLock<WebSocket<TcpStream>>>,
+    /// 可使用的牌
+    pub player_hand_cards: Vec<PMJCard>,
+    /// 存放使用過的牌，例：碰、槓、吃
+    pub player_used_cards: Vec<Vec<PMJCard>>,
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
@@ -66,6 +70,9 @@ pub enum ClientMessageTypeKinds {
     ConcealedKong,
 }
 
+/// Mode: **Base**
+///
+/// 卡牌
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct PMJCard {
     /// 種類

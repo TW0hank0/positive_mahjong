@@ -13,7 +13,9 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-use pmj_shared::gamemodes_shared::shared_base::PMJPlayer;
+use pmj_shared::gamemodes_shared::shared_base::{
+    PMJCard, PMJCardFlowerType, PMJCardType, PMJCardWordsType, PMJPlayer,
+};
 use pmj_shared::gamemodes_shared::{self, shared_base};
 use pmj_shared::shared;
 
@@ -194,14 +196,104 @@ pub struct PositiveMahjong {
     players: Vec<gamemodes_shared::shared_base::PMJPlayer>,
     is_game_start: bool,
     is_game_finish: bool,
+    /// 未被 使用/抽 的牌
+    unused_card: Vec<PMJCard>,
 }
 
 impl PositiveMahjong {
     pub fn new() -> Self {
+        let mut unused_card: Vec<PMJCard> = Vec::new();
+        //初始化`筒`
+        for card_id in 1..=4 {
+            for card_number in 1..=9 {
+                unused_card.push(PMJCard {
+                    card_type: PMJCardType::Dots,
+                    card_id: card_id,
+                    info_ten_thousand: None,
+                    info_line: None,
+                    info_dots: Some(card_number),
+                    info_flower: None,
+                    info_words: None,
+                });
+            }
+        }
+        //初始化`條`
+        for card_id in 1..=4 {
+            for card_number in 1..=9 {
+                unused_card.push(PMJCard {
+                    card_type: PMJCardType::Line,
+                    card_id: card_id,
+                    info_ten_thousand: None,
+                    info_line: Some(card_number),
+                    info_dots: None,
+                    info_flower: None,
+                    info_words: None,
+                });
+            }
+        }
+        //初始化`萬`
+        for card_id in 1..=4 {
+            for card_number in 1..=9 {
+                unused_card.push(PMJCard {
+                    card_type: PMJCardType::TenThousand,
+                    card_id: card_id,
+                    info_ten_thousand: Some(card_number),
+                    info_line: None,
+                    info_dots: None,
+                    info_flower: None,
+                    info_words: None,
+                });
+            }
+        }
+        //初始化`花`
+        for flower_type in [
+            PMJCardFlowerType::Bamboo,
+            PMJCardFlowerType::Chrysanthemum,
+            PMJCardFlowerType::Fall,
+            PMJCardFlowerType::Orchid,
+            PMJCardFlowerType::Plum,
+            PMJCardFlowerType::Spring,
+            PMJCardFlowerType::Summer,
+            PMJCardFlowerType::Winter,
+        ] {
+            unused_card.push(PMJCard {
+                card_type: PMJCardType::Flower,
+                card_id: 1,
+                info_ten_thousand: None,
+                info_line: None,
+                info_dots: None,
+                info_flower: Some(flower_type),
+                info_words: None,
+            });
+        }
+        //初始化`字`
+        for card_id in 1..=4 {
+            for word_type in [
+                PMJCardWordsType::East,
+                PMJCardWordsType::GreenDragon,
+                PMJCardWordsType::North,
+                PMJCardWordsType::RedDragon,
+                PMJCardWordsType::South,
+                PMJCardWordsType::West,
+                PMJCardWordsType::WhiteDragon,
+            ] {
+                unused_card.push(PMJCard {
+                    card_type: PMJCardType::Words,
+                    card_id: card_id,
+                    info_ten_thousand: None,
+                    info_line: None,
+                    info_dots: None,
+                    info_flower: None,
+                    info_words: Some(word_type),
+                });
+            }
+        }
+        //
         Self {
             players: Vec::new(),
             is_game_finish: false,
             is_game_start: false,
+            unused_card: unused_card,
         }
     }
 
@@ -226,6 +318,8 @@ impl PositiveMahjong {
                 player_ip_addr,
                 player_id,
                 player_ws,
+                player_hand_cards: Vec::new(),
+                player_used_cards: Vec::new(),
             });
             Some(player_id)
         } else {
