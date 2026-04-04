@@ -169,11 +169,15 @@ jobs:
           version=$(uv run scripts/ci/get_version.py)
           echo "version=$version" >> $GITHUB_OUTPUT
 
+      - name: Rename apk file
+        run: |
+          uv run scripts/ci/rename_apk.py ${{ steps.get_version.outputs.version }}
+
       - name: Upload apk artifact
         uses: actions/upload-artifact@v6
         with:
           name: pmj_client_${{ steps.get_version.outputs.version }}.apk
-          path: target/release/apk/pmj_client.apk
+          path: target/release/apk/pmj_client_${{ steps.get_version.outputs.version }}.apk
 
   upload:
     needs:

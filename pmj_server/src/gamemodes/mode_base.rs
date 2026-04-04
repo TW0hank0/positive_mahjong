@@ -23,7 +23,7 @@ use std::net;
 use std::net::{TcpListener, TcpStream};
 use std::sync;
 use std::thread;
-use tungstenite::protocol::Role;
+//use tungstenite::protocol::Role;
 use tungstenite::{Error, Message, WebSocket, accept, connect};
 
 use crate::gamemodes;
@@ -148,14 +148,17 @@ pub fn main_base() {
         0,
     ));
     let mut servers = Vec::new();
-    servers.push(handle_server_base(
-        server_addr_ipv4,
-        sync::Arc::clone(&backend),
-    ));
-    servers.push(handle_server_base(
-        server_addr_ipv6,
-        sync::Arc::clone(&backend),
-    ));
+    let server_backend_ipv4 = sync::Arc::clone(&backend);
+    servers.push(thread::spawn(move || {
+        handle_server_base(server_addr_ipv4, server_backend_ipv4)
+    }));
+    let server_backend_ipv6 = sync::Arc::clone(&backend);
+    servers.push(thread::spawn(move || {
+        handle_server_base(server_addr_ipv6, server_backend_ipv6)
+    }));
+    for server in servers {
+        let _thread_result = server.join();
+    }
 }
 
 fn handle_server_base(
