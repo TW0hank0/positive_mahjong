@@ -38,14 +38,14 @@ fn write_reply(
 }
 
 // 處理單一客戶端連線的函式
-fn handle_request_base(
+fn handle_client(
     stream: TcpStream,
     backend: sync::Arc<sync::RwLock<gamemodes::mode_base::PositiveMahjong>>,
 ) {
     let client_ip = stream.peer_addr().unwrap().ip();
+    println!("建立連線：{}", client_ip.clone());
     // 進行 WebSocket 握手，建立 WebSocket 物件
-    // 顯式宣告類型以符合規範
-    let mut websocket: WebSocket<TcpStream> = match accept(stream) {
+    let websocket: WebSocket<TcpStream> = match accept(stream) {
         Ok(ws) => ws,
         Err(e) => {
             eprintln!("握手失敗：{}", e);
@@ -165,7 +165,7 @@ fn handle_server_base(
     addr: std::net::SocketAddr,
     backend: sync::Arc<sync::RwLock<gamemodes::mode_base::PositiveMahjong>>,
 ) {
-    // 建立 TCP 監聽器
+    // 建立 TCP Listener
     let listener: TcpListener = match TcpListener::bind(addr) {
         Ok(l) => l,
         Err(e) => {
@@ -180,7 +180,7 @@ fn handle_server_base(
                 // 使用 move 將 stream 所有權移轉至執行緒
                 let thread_backend = sync::Arc::clone(&backend);
                 let _handle = std::thread::spawn(move || {
-                    handle_request_base(stream, thread_backend);
+                    handle_client(stream, thread_backend);
                 });
             }
             Err(e) => {
@@ -203,6 +203,14 @@ impl PositiveMahjong {
             is_game_finish: false,
             is_game_start: false,
         }
+    }
+
+    pub fn is_game_start(&self) -> bool {
+        self.is_game_start
+    }
+
+    pub fn is_game_finish(&self) -> bool {
+        self.is_game_finish
     }
 
     /// 返回player_id或是 None(人數已滿)
@@ -241,9 +249,11 @@ impl PositiveMahjong {
 
     fn game_loop(&self) {
         loop {
-            for current_player_id in 1..((self.players.len() + 1) as u8) {
+            for current_turn_player_id in 1..((self.players.len() + 1) as u8) {
                 let turn_msg = serde_json::to_string(&shared_base::ServerMessageType {
-                    msg_type: shared_base::ServerMessageTypeKinds::ChangedTurn(current_player_id),
+                    msg_type: shared_base::ServerMessageTypeKinds::ChangedTurn(
+                        current_turn_player_id,
+                    ),
                 })
                 .unwrap();
                 for player in self.players.iter() {

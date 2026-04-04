@@ -13,6 +13,7 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
+use std::fmt::Display;
 use std::net::TcpStream;
 use std::sync;
 use tungstenite::WebSocket;
@@ -39,4 +40,135 @@ pub enum ServerMessageTypeKinds {
     GameFinish,
     /// ChangedTurn(玩家id)
     ChangedTurn(u8),
+    Error,
+}
+
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
+pub struct ClientMessageType {
+    pub msg_type: ClientMessageTypeKinds,
+}
+
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
+pub enum ClientMessageTypeKinds {
+    ///抽牌
+    GetCard,
+    /// 丟牌
+    ThrowCard,
+    ///補花
+    ReplacingAFlower,
+    ///吃
+    Eat,
+    ///碰
+    Triplet,
+    ///明槓
+    ExposedKong,
+    ///暗槓
+    ConcealedKong,
+}
+
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
+pub struct PMJCard {
+    /// 種類
+    pub card_type: PMJCardType,
+    /// 此卡牌第`card_id`張
+    pub card_id: u8,
+    ///萬
+    pub info_ten_thousand: Option<u8>,
+    ///條
+    pub info_line: Option<u8>,
+    ///筒
+    pub info_dots: Option<u8>,
+    ///花
+    pub info_flower: Option<PMJCardFlowerType>,
+    /// 字
+    pub info_words: Option<PMJCardWordsType>,
+}
+
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
+pub enum PMJCardType {
+    ///萬
+    TenThousand,
+    ///條
+    Line,
+    ///筒
+    Dots,
+    ///花
+    Flower,
+    ///字
+    Words,
+}
+
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
+pub enum PMJCardFlowerType {
+    ///春
+    Spring,
+    ///夏
+    Summer,
+    ///秋
+    Fall,
+    ///冬
+    Winter,
+    ///梅
+    Plum,
+    ///蘭
+    Orchid,
+    ///竹
+    Bamboo,
+    ///菊
+    Chrysanthemum,
+}
+
+impl Display for PMJCardFlowerType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::Spring => "春",
+                Self::Summer => "夏",
+                Self::Fall => "秋",
+                Self::Winter => "冬",
+                Self::Plum => "梅",
+                Self::Orchid => "蘭",
+                Self::Bamboo => "竹",
+                Self::Chrysanthemum => "菊",
+            }
+        )
+    }
+}
+
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
+pub enum PMJCardWordsType {
+    ///東
+    East,
+    ///南
+    South,
+    ///西
+    West,
+    ///北
+    North,
+    ///紅中
+    RedDragon,
+    ///青發
+    GreenDragon,
+    ///白板
+    WhiteDragon,
+}
+
+impl std::fmt::Display for PMJCardWordsType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::East => "東",
+                Self::South => "南",
+                Self::West => "西",
+                Self::North => "北",
+                Self::RedDragon => "中",
+                Self::GreenDragon => "青發",
+                Self::WhiteDragon => "白板",
+            }
+        )
+    }
 }
