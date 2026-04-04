@@ -13,6 +13,7 @@ def main():
     )
     orig_name = os.path.join(apk_path, "pmj_client.apk")
     new_name = os.path.join(apk_path, f"pmj_client_{sys.argv[1]}.apk")
+    print(f"Rename `{orig_name}` to `{new_name}`")
     os.rename(orig_name, new_name)
 
 
