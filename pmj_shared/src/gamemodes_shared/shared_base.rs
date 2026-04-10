@@ -44,6 +44,7 @@ pub enum ServerMessageTypeKinds {
     GameFinish,
     /// ChangedTurn(玩家id)
     ChangedTurn(u8),
+    HandCardChange(Vec<PMJCard>),
     Error,
 }
 
@@ -70,10 +71,8 @@ pub enum ClientMessageTypeKinds {
     ConcealedKong,
 }
 
-/// Mode: **Base**
-///
-/// 卡牌
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
+/// Base玩法的卡牌
+#[derive(Debug, serde::Deserialize, serde::Serialize, PartialEq, PartialOrd, Ord, Eq, Clone)]
 pub struct PMJCard {
     /// 種類
     pub card_type: PMJCardType,
@@ -91,7 +90,7 @@ pub struct PMJCard {
     pub info_words: Option<PMJCardWordsType>,
 }
 
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, serde::Deserialize, serde::Serialize, PartialEq, PartialOrd, Ord, Eq, Clone)]
 pub enum PMJCardType {
     ///萬
     TenThousand,
@@ -105,7 +104,7 @@ pub enum PMJCardType {
     Words,
 }
 
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, serde::Deserialize, serde::Serialize, PartialEq, PartialOrd, Ord, Eq, Clone)]
 pub enum PMJCardFlowerType {
     ///春
     Spring,
@@ -144,7 +143,7 @@ impl Display for PMJCardFlowerType {
     }
 }
 
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, serde::Deserialize, serde::Serialize, PartialEq, PartialOrd, Ord, Eq, Clone)]
 pub enum PMJCardWordsType {
     ///東
     East,

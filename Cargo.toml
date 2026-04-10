@@ -44,6 +44,7 @@ tungstenite = { version = "0.29.0", features = [
     "rustls",
     "rustls-native-certs",
 ] }
+image = "0.25.10"
 
 
 [workspace]

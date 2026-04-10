@@ -24,3 +24,4 @@ license = { workspace = true }
 [dependencies]
 serde = { workspace = true }
 tungstenite = { workspace = true}
+image = { workspace = true }

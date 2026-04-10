@@ -19,7 +19,27 @@ use serde;
 
 use crate::gamemodes_shared;
 
+pub const PROJECT_NAME: &str = env!("CARGO_PKG_NAME");
+pub const PROJECT_VERSION: &str = env!("CARGO_PKG_VERSION");
+
+pub const ICON_PNG_BYTES: &[u8] = include_bytes!("../../assets/icon.png");
+pub const FONT_NOTO_SANS_REG_BYTES: &[u8] =
+    include_bytes!("../../assets/Noto_Sans_TC/static/NotoSansTC-Regular.ttf");
+
+//pub const FONT_NOTO_SANS_REG: iced::font::Font = iced::font::Font::with_name("Noto Sans TC");
+
 pub const SERVER_PORT: u16 = 6060;
+
+/*pub fn gui_init() -> Option<iced::window::Icon> {
+    let _ = iced::font::load(FONT_NOTO_SANS_REG_BYTES);
+    //
+    let img = image::load_from_memory_with_format(ICON_PNG_BYTES, image::ImageFormat::Png)
+        .unwrap()
+        .into_rgba8();
+    let (img_width, img_height) = img.dimensions();
+    let icon = iced::window::icon::from_rgba(img.into_raw(), img_width, img_height).ok();
+    icon
+}*/
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct ClientConnectRequestType {
