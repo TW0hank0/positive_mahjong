@@ -13,18 +13,21 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-use pmj_shared::gamemodes_shared::shared_base::PMJPlayer;
-use pmj_shared::gamemodes_shared::{self, shared_base};
-use pmj_shared::shared;
+use rand;
+use rand::{prelude::SliceRandom, seq::IndexedRandom};
 
 use std::io::Read;
 use std::net;
-//use tungstenite::stream::MaybeTlsStream;
 use std::net::{TcpListener, TcpStream};
-use std::sync;
+use std::sync::{self, Arc, RwLock};
 use std::thread;
-//use tungstenite::protocol::Role;
-use tungstenite::{Error, Message, WebSocket, accept, connect};
+use tungstenite::{Error, Message, WebSocket, accept};
+
+use pmj_shared::gamemodes_shared::shared_base::{
+    PMJCard, PMJCardFlowerType, PMJCardType, PMJCardWordsType, PMJPlayer,
+};
+use pmj_shared::gamemodes_shared::{self, shared_base};
+use pmj_shared::shared;
 
 use crate::gamemodes;
 
@@ -38,14 +41,14 @@ fn write_reply(
 }
 
 // 處理單一客戶端連線的函式
-fn handle_request_base(
+fn handle_client(
     stream: TcpStream,
     backend: sync::Arc<sync::RwLock<gamemodes::mode_base::PositiveMahjong>>,
 ) {
     let client_ip = stream.peer_addr().unwrap().ip();
+    println!("建立連線：{}", client_ip.clone());
     // 進行 WebSocket 握手，建立 WebSocket 物件
-    // 顯式宣告類型以符合規範
-    let mut websocket: WebSocket<TcpStream> = match accept(stream) {
+    let websocket: WebSocket<TcpStream> = match accept(stream) {
         Ok(ws) => ws,
         Err(e) => {
             eprintln!("握手失敗：{}", e);
@@ -133,7 +136,7 @@ fn handle_request_base(
     //println!("連線已終止");
 }
 
-pub fn main_base() {
+pub fn main_base(gui_mode: bool) -> Arc<RwLock<gamemodes::mode_base::PositiveMahjong>> {
     let backend = sync::Arc::new(sync::RwLock::new(
         gamemodes::mode_base::PositiveMahjong::new(),
     ));
@@ -156,8 +159,13 @@ pub fn main_base() {
     servers.push(thread::spawn(move || {
         handle_server_base(server_addr_ipv6, server_backend_ipv6)
     }));
-    for server in servers {
-        let _thread_result = server.join();
+    if gui_mode {
+        backend
+    } else {
+        for server in servers {
+            let _thread_result = server.join();
+        }
+        backend
     }
 }
 
@@ -165,7 +173,7 @@ fn handle_server_base(
     addr: std::net::SocketAddr,
     backend: sync::Arc<sync::RwLock<gamemodes::mode_base::PositiveMahjong>>,
 ) {
-    // 建立 TCP 監聽器
+    // 建立 TCP Listener
     let listener: TcpListener = match TcpListener::bind(addr) {
         Ok(l) => l,
         Err(e) => {
@@ -180,7 +188,7 @@ fn handle_server_base(
                 // 使用 move 將 stream 所有權移轉至執行緒
                 let thread_backend = sync::Arc::clone(&backend);
                 let _handle = std::thread::spawn(move || {
-                    handle_request_base(stream, thread_backend);
+                    handle_client(stream, thread_backend);
                 });
             }
             Err(e) => {
@@ -190,19 +198,118 @@ fn handle_server_base(
     }
 }
 
+#[derive(Debug)]
 pub struct PositiveMahjong {
     players: Vec<gamemodes_shared::shared_base::PMJPlayer>,
     is_game_start: bool,
     is_game_finish: bool,
+    /// 未被 使用/抽取 的牌
+    unused_card: Vec<PMJCard>,
 }
 
 impl PositiveMahjong {
     pub fn new() -> Self {
+        let mut unused_card: Vec<PMJCard> = Vec::new();
+        //初始化`筒`
+        for card_id in 1..=4 {
+            for card_number in 1..=9 {
+                unused_card.push(PMJCard {
+                    card_type: PMJCardType::Dots,
+                    card_id: card_id,
+                    info_ten_thousand: None,
+                    info_line: None,
+                    info_dots: Some(card_number),
+                    info_flower: None,
+                    info_words: None,
+                });
+            }
+        }
+        //初始化`條`
+        for card_id in 1..=4 {
+            for card_number in 1..=9 {
+                unused_card.push(PMJCard {
+                    card_type: PMJCardType::Line,
+                    card_id: card_id,
+                    info_ten_thousand: None,
+                    info_line: Some(card_number),
+                    info_dots: None,
+                    info_flower: None,
+                    info_words: None,
+                });
+            }
+        }
+        //初始化`萬`
+        for card_id in 1..=4 {
+            for card_number in 1..=9 {
+                unused_card.push(PMJCard {
+                    card_type: PMJCardType::TenThousand,
+                    card_id: card_id,
+                    info_ten_thousand: Some(card_number),
+                    info_line: None,
+                    info_dots: None,
+                    info_flower: None,
+                    info_words: None,
+                });
+            }
+        }
+        //初始化`花`
+        for flower_type in [
+            PMJCardFlowerType::Bamboo,
+            PMJCardFlowerType::Chrysanthemum,
+            PMJCardFlowerType::Fall,
+            PMJCardFlowerType::Orchid,
+            PMJCardFlowerType::Plum,
+            PMJCardFlowerType::Spring,
+            PMJCardFlowerType::Summer,
+            PMJCardFlowerType::Winter,
+        ] {
+            unused_card.push(PMJCard {
+                card_type: PMJCardType::Flower,
+                card_id: 1,
+                info_ten_thousand: None,
+                info_line: None,
+                info_dots: None,
+                info_flower: Some(flower_type),
+                info_words: None,
+            });
+        }
+        //初始化`字`
+        for card_id in 1..=4 {
+            for word_type in [
+                PMJCardWordsType::East,
+                PMJCardWordsType::GreenDragon,
+                PMJCardWordsType::North,
+                PMJCardWordsType::RedDragon,
+                PMJCardWordsType::South,
+                PMJCardWordsType::West,
+                PMJCardWordsType::WhiteDragon,
+            ] {
+                unused_card.push(PMJCard {
+                    card_type: PMJCardType::Words,
+                    card_id: card_id,
+                    info_ten_thousand: None,
+                    info_line: None,
+                    info_dots: None,
+                    info_flower: None,
+                    info_words: Some(word_type),
+                });
+            }
+        }
+        //
         Self {
             players: Vec::new(),
             is_game_finish: false,
             is_game_start: false,
+            unused_card: unused_card,
         }
+    }
+
+    pub fn is_game_start(&self) -> bool {
+        self.is_game_start
+    }
+
+    pub fn is_game_finish(&self) -> bool {
+        self.is_game_finish
     }
 
     /// 返回player_id或是 None(人數已滿)
@@ -218,6 +325,8 @@ impl PositiveMahjong {
                 player_ip_addr,
                 player_id,
                 player_ws,
+                player_hand_cards: Vec::new(),
+                player_used_cards: Vec::new(),
             });
             Some(player_id)
         } else {
@@ -236,14 +345,46 @@ impl PositiveMahjong {
             let _write_result =
                 write_reply(game_start_msg.clone(), sync::Arc::clone(&player.player_ws));
         }
+        //
+        let mut rng = rand::rng();
+        self.unused_card.shuffle(&mut rng);
+        //
+        for _ in 0..4 {
+            for player in self.players.iter_mut() {
+                let card = self.unused_card.choose(&mut rng).unwrap();
+                let mut index = 0;
+                'find_index: for i in self.unused_card.iter() {
+                    if i == card {
+                        break 'find_index;
+                    } else {
+                        index += 1;
+                    }
+                }
+                let player_card = self.unused_card.remove(index);
+                player.player_hand_cards.push(player_card);
+            }
+        }
+        // 通知手排變動
+        for player in self.players.iter() {
+            let hand_card_msg = serde_json::to_string(&shared_base::ServerMessageType {
+                msg_type: shared_base::ServerMessageTypeKinds::HandCardChange(
+                    player.player_hand_cards.clone(),
+                ),
+            })
+            .unwrap();
+            let _write_result = write_reply(hand_card_msg, sync::Arc::clone(&player.player_ws));
+        }
+        //
         self.game_loop();
     }
 
     fn game_loop(&self) {
         loop {
-            for current_player_id in 1..((self.players.len() + 1) as u8) {
+            for current_turn_player_id in 1..((self.players.len() + 1) as u8) {
                 let turn_msg = serde_json::to_string(&shared_base::ServerMessageType {
-                    msg_type: shared_base::ServerMessageTypeKinds::ChangedTurn(current_player_id),
+                    msg_type: shared_base::ServerMessageTypeKinds::ChangedTurn(
+                        current_turn_player_id,
+                    ),
                 })
                 .unwrap();
                 for player in self.players.iter() {

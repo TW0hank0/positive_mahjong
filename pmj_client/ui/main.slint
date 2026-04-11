@@ -48,14 +48,10 @@ component HomePage inherits ScrollView {
                     LineEdit {
                         text <=> root.server_ip;
                         min-width: 50px;
-                    //max-width: 2000px;
-                    min-height: 30px;
-                    //max-height: 75px;
-                    width: 95%;
+                        min-height: 30px;
+                        width: 95%;
                         height: 5%;
-                    //placeholder-text: "伺服器Ip地址";
-                    //enabled: true;
-                }
+                    }
 
                     Button {
                         text: "測試連線";
@@ -131,7 +127,7 @@ export component MainWindow inherits Window {
     title: "PositiveMahjong Client";
     min-width: 1080px;
     min-height: 720px;
-    /* 
+    /*
     preferred-width: 100%;
     preferred-height: 100%;
      */
@@ -178,7 +174,7 @@ export component MainWindow inherits Window {
         }
     }
 
-    /* 
+    /*
     states [
         active when current-scene == Scenes.HomePage: {
             scene_home_page.opacity: 1.0;
@@ -198,6 +194,6 @@ export component MainWindow inherits Window {
             scene_game_play_v1_simple.opacity: 0.0;
             scene_game_play_v1_simple.enabled: false;
         }
-    ] 
+    ]
     */
 }
