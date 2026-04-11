@@ -1,6 +1,9 @@
 //! Base玩法的GUI
 
-use std::sync::{self, Arc, RwLock};
+use std::{
+    sync::{self, Arc, RwLock},
+    thread,
+};
 
 use iced::{
     self,
@@ -53,6 +56,7 @@ struct ServerGUI {
     local_ipv4_address: std::net::IpAddr,
     local_ipv6_address: std::net::IpAddr,
     msg: String,
+    is_start: bool,
 }
 
 impl ServerGUI {
@@ -65,38 +69,54 @@ impl ServerGUI {
             local_ipv4_address: ipv4_address,
             local_ipv6_address: ipv6_address,
             msg: String::new(),
+            is_start: false,
         }
     }
 
     fn update(&mut self, msg: GUIMessages) {
         match msg {
-            GUIMessages::StartGame => match self.backend.write() {
-                Ok(mut guard) => {
-                    guard.start_game();
-                }
-                Err(err) => self.msg = format!("{}\n---\n{}\n", self.msg, err),
-            },
+            GUIMessages::StartGame => {
+                self.is_start = true;
+                let thread_backend = sync::Arc::clone(&self.backend);
+                let _ = thread::spawn(move || match thread_backend.write() {
+                    Ok(mut guard) => {
+                        guard.start_game();
+                    }
+                    Err(_err) => { /* TODO: error handle */ }
+                });
+            }
         }
     }
 
     fn view(&self) -> iced::widget::Column<'_, GUIMessages> {
-        let mut layout: iced::widget::Column<'_, GUIMessages> = Column::new();
+        let mut layout: iced::widget::Column<'_, GUIMessages> = Column::new().spacing(20);
         //
-        let mut ip_bar_layout = Row::new();
+        let mut ip_bar_layout = Row::new().spacing(30);
         ip_bar_layout =
             ip_bar_layout.push(text(format!("Ipv4: {}", self.local_ipv4_address)).size(28));
         ip_bar_layout = ip_bar_layout.spacing(40);
         ip_bar_layout = ip_bar_layout
-            .push(text(format!("Ipv6: {}", self.local_ipv6_address)).size(iced::Pixels::from(28)));
+            .push(text(format!("Ipv6: {}", self.local_ipv6_address)).size(iced::Pixels::from(28)))
+            .spacing(20);
         let ip_bar_container = container(ip_bar_layout).style(|_theme| {
             iced::widget::container::Style::default()
                 .background(iced::Background::Color(iced::Color::from_rgb8(99, 99, 99)))
                 .border(iced::border::Border::default().rounded(iced::border::radius(10.0)))
         });
-        layout = layout.push(ip_bar_container);
+        layout = layout.push(ip_bar_container).spacing(80);
         //
-        layout =
-            layout.push(widget::button(widget::text("Start")).on_press(GUIMessages::StartGame));
+        if !self.is_start {
+            let start_button = widget::button(widget::text("Start").size(34))
+                .on_press(GUIMessages::StartGame)
+                /* .style(|_theme, _status| {
+                    let mut button_style = widget::button::Style::default();
+                    button_style.border = iced::border::rounded(iced::border::radius(12.0));
+                    button_style.background =
+                        Some(iced::Background::Color(iced::Color::from_rgb8(99, 99, 99)));
+                    button_style
+                })*/;
+            layout = layout.push(start_button);
+        }
         return layout;
     }
 }

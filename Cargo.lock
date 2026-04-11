@@ -4558,6 +4558,7 @@ name = "pmj_client"
 version = "0.1.0"
 dependencies = [
  "console_error_panic_hook",
+ "log",
  "pmj_shared",
  "reqwest",
  "serde",
@@ -4591,16 +4592,6 @@ dependencies = [
  "image",
  "serde",
  "tungstenite",
-]
-
-[[package]]
-name = "pmj_test_connection"
-version = "0.1.0"
-dependencies = [
- "pmj_shared",
- "reqwest",
- "serde",
- "serde_json",
 ]
 
 [[package]]

@@ -18,66 +18,70 @@ component HomePage inherits ScrollView {
     in-out property <string> server_response_text: "";
     in-out property <string> server_ip: "";
     in-out property <Scenes> current-scene;
-    callback test_connection();
+    callback add_player();
 
     VerticalLayout {
-        HorizontalLayout {
-            ScrollView {
-                width: 100%;
-                height: 100%;
-                horizontal_scrollbar_policy: ScrollBarPolicy.as-needed;
-                vertical_scrollbar_policy: ScrollBarPolicy.as-needed;
-                VerticalLayout {
-                    spacing: 10px;
-                    padding: 10px;
-                    Rectangle {
-                        height: 14px;
-                    }
+        ScrollView {
+            width: 100%;
+            height: 100%;
+            horizontal_scrollbar_policy: ScrollBarPolicy.as-needed;
+            vertical_scrollbar_policy: ScrollBarPolicy.as-needed;
+            VerticalLayout {
+                spacing: 10px;
+                padding: 10px;
+                Rectangle {
+                    height: 14px;
+                }
 
-                    MaterialText {
-                        text: "PMJ Client";
-                        font-size: 40px;
-                        horizontal-alignment: TextHorizontalAlignment.left;
-                    }
+                MaterialText {
+                    text: "PMJ Client";
+                    font-size: 30px;
+                    horizontal-alignment: TextHorizontalAlignment.left;
+                }
 
-                    MaterialText {
-                        text: "伺服器Ip：";
-                        font-size: 28px;
-                    }
+                MaterialText {
+                    text: "伺服器Ip：";
+                    font-size: 22px;
+                }
 
+                HorizontalLayout {
                     LineEdit {
                         text <=> root.server_ip;
-                        min-width: 50px;
+                        //min-width: 50px;
                         min-height: 30px;
-                        width: 95%;
-                        height: 5%;
+                        max-height: 150px;
+                        width: 75%;
+                    }
+
+                    Rectangle {
+                        width: 2%;
                     }
 
                     Button {
-                        text: "測試連線";
+                        text: "加入";
                         clicked => {
-                            root.test_connection();
+                            root.add_player();
                         }
-                        width: 35%;
+                        width: 20%;
                     }
+                }
 
-                    Rectangle {
-                        background: Colors.black;
-                        ScrollView {
-                            MaterialText {
-                                text: root.server_response_text;
-                                horizontal-alignment: TextHorizontalAlignment.left;
-                                vertical-alignment: TextVerticalAlignment.top;
-                                wrap: TextWrap.char-wrap;
-                                font-size: 20px;
-                            }
-
-                            preferred-width: 100%;
-                            min-height: 200px;
-                            min-width: 300px;
-                            vertical-scrollbar-policy: ScrollBarPolicy.always-on;
-                            horizontal-scrollbar-policy: ScrollBarPolicy.always-on;
+                Rectangle {
+                    background: Colors.black;
+                    ScrollView {
+                        MaterialText {
+                            text: root.server_response_text;
+                            horizontal-alignment: TextHorizontalAlignment.left;
+                            vertical-alignment: TextVerticalAlignment.top;
+                            wrap: TextWrap.char-wrap;
+                            font-size: 20px;
                         }
+
+                        preferred-width: 100%;
+                        min-height: 200px;
+                        min-width: 300px;
+                        vertical-scrollbar-policy: ScrollBarPolicy.always-on;
+                        horizontal-scrollbar-policy: ScrollBarPolicy.always-on;
                     }
                 }
             }
@@ -87,11 +91,17 @@ component HomePage inherits ScrollView {
 
 component GamePlayBase inherits ScrollView {
     in-out property <string> server_ip: "unknown";
+    in-out property <int> player_id: 0;
 
     horizontal_scrollbar_policy: ScrollBarPolicy.as-needed;
     vertical_scrollbar_policy: ScrollBarPolicy.as-needed;
     VerticalLayout {
         HorizontalLayout {
+            MaterialText {
+                text: "玩家id：" + root.player_id;
+                font-size: 14px;
+            }
+
             Rectangle {
                 width: 75%;
             }
@@ -127,11 +137,7 @@ export component MainWindow inherits Window {
     title: "PositiveMahjong Client";
     min-width: 1080px;
     min-height: 720px;
-    /*
-    preferred-width: 100%;
-    preferred-height: 100%;
-     */
-    default-font-size: 30px;
+    default-font-size: 20px;
     default-font-family: "Noto Sans TC";
     // == Var ==
     // HomePage
@@ -141,12 +147,13 @@ export component MainWindow inherits Window {
     in-out property <string> game_play_v1_simple_server_ip/*  <=> scene_game_play_v1_simple.server_ip */;
     // GamePlayBase
     in-out property <string> game_play_base_server_ip;
+    in-out property <int> game-play-base-player-id;
     // MainWindow / Other
     in-out property <Scenes> current-scene: Scenes.HomePage;
     in-out property <bool> is-changing-scene: false;
     // == CallBack ==
     // HomePage
-    callback home_page_test_connection/*  <=> scene_home_page.test_connection */;
+    callback home_page_add_player/*  <=> scene_home_page.test_connection */;
 
     ScrollView {
         horizontal_scrollbar_policy: ScrollBarPolicy.as-needed;
@@ -157,7 +164,7 @@ export component MainWindow inherits Window {
             enabled: true;
             server_ip <=> home_page_server_ip;
             server_response_text <=> home_page_server_response_text;
-            test_connection => home_page_test_connection();
+            add_player => home_page_add_player();
             current-scene <=> root.current-scene;
         }
 
@@ -171,6 +178,7 @@ export component MainWindow inherits Window {
             opacity: 0.0;
             enabled: false;
             server_ip <=> game_play_base_server_ip;
+            player_id <=> game-play-base-player-id;
         }
     }
 

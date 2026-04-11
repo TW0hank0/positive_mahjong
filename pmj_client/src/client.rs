@@ -19,7 +19,13 @@ use slint::{self, ComponentHandle, SharedString, Weak};
 use reqwest;
 use std::thread;
 
-use pmj_shared::{gamemodes_shared, shared};
+use log;
+use tungstenite::{Message, connect};
+
+use pmj_shared::{
+    gamemodes_shared::{self, shared_base},
+    shared,
+};
 
 // 引入 Slint 模組
 slint::include_modules!();
@@ -35,7 +41,7 @@ pub fn main() -> MainWindow {
     //let window_for_callback = main_window.clone_strong();
     main_window.window().set_maximized(true);
     let _ = main_window.window().show();
-    main_window.on_home_page_test_connection(move || {
+    main_window.on_home_page_add_player(move || {
         // 克隆弱參考給新執行緒
         let thread_weak: Weak<MainWindow> = weak_window.clone();
         // 線程
@@ -52,56 +58,39 @@ pub fn main() -> MainWindow {
                             resp_body_text.push_str("錯誤！未輸入正確伺服器Ip！");
                         } else {
                             let server_url =
-                                format!("http://{}:{}/", input_server_ip, shared::SERVER_PORT);
+                                format!("ws://{}:{}/", input_server_ip, shared::SERVER_PORT);
                             let clone_server_url = server_url.clone();
                             println!("post to: {}", server_url.clone());
                             upgraded_window.set_home_page_server_response_text(SharedString::from(
-                                format!("正在發送Post到伺服器 ({})...", clone_server_url),
+                                format!("正在連線到伺服器 ({})...", clone_server_url),
                             ));
-                            let client = reqwest::blocking::Client::new();
-                            //
-                            let request_data = shared::ClientRequestDataType {
-                                req_action_type: shared::ActionType::TestConnection,
-                                ..Default::default()
-                            };
-                            let request = serde_json::to_string(&shared::OldClientRequestType {
-                                app: String::from("positive_mahjong"),
-                                client: String::from("pmj-client"),
-                                data: request_data,
-                                game_data_v1: None,
-                                is_test_connection: true,
-                            })
-                            .unwrap();
-                            match client
-                                .post(server_url.clone())
-                                .body(request)
-                                .timeout(timeout_duration.clone())
-                                .send()
-                            {
-                                Ok(resp) => {
-                                    let resp_text = resp.text().unwrap();
-                                    let binding: Result<
-                                        shared::ServerResponseType,
-                                        serde_json::Error,
-                                    > = serde_json::from_str(&resp_text);
-                                    match binding {
-                                        Ok(value) => {
-                                            resp_body_text.push_str(
-                                                &serde_json::to_string_pretty(&value)
-                                                    .unwrap_or(String::from(resp_text)),
-                                            );
-                                        }
-                                        Err(_e) => {
-                                            /* log error */
-                                            resp_body_text.push_str(&resp_text);
-                                        }
+                            let (mut ws, _resp) = connect(server_url).unwrap();
+                            let req_text =
+                                serde_json::to_string(&shared::ClientConnectRequestType {
+                                    app_name: String::from("positive_mahjong"),
+                                    client: String::from("pmj_client"),
+                                })
+                                .unwrap();
+                            let _ = ws.send(Message::Text(req_text.into()));
+                            let raw_msg = ws.read().unwrap();
+                            match raw_msg {
+                                Message::Text(text) => {
+                                    let msg: shared::ServerConnectResponceType =
+                                        serde_json::from_str(&text.to_string()).unwrap();
+                                    if msg.too_many_player {
+                                        upgraded_window.set_home_page_server_response_text(
+                                            SharedString::from(format!(
+                                                "{}\n{}",
+                                                upgraded_window
+                                                    .get_home_page_server_response_text(),
+                                                "加入失敗：人數過多！"
+                                            )),
+                                        );
+                                    } else {
                                     }
                                 }
-                                Err(e) => {
-                                    resp_body_text.push_str(&format!("錯誤：{}", e.to_string()));
-                                }
+                                _ => { /*忽略*/ }
                             }
-                            //
                         }
                     }
                     upgraded_window

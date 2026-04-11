@@ -16,7 +16,7 @@
 use rand;
 use rand::{prelude::SliceRandom, seq::IndexedRandom};
 
-use std::io::Read;
+use std;
 use std::net;
 use std::net::{TcpListener, TcpStream};
 use std::sync::{self, Arc, RwLock};
@@ -61,7 +61,7 @@ fn handle_client(
     println!("客戶端連線成功");
 
     // 進入訊息接收迴圈
-    loop {
+    'connection: loop {
         // 讀取訊息
         let msg: Result<Message, Error> = ws.write().unwrap().read();
 
@@ -98,6 +98,7 @@ fn handle_client(
                                     let resp_msg = serde_json::to_string(&resp).unwrap();
                                     let _wrist_result =
                                         write_reply(resp_msg, sync::Arc::clone(&ws));
+                                    thread::sleep(std::time::Duration::from_secs(30));
                                 }
                             }
                             Err(e) => {
@@ -107,6 +108,7 @@ fn handle_client(
                         }
                     }
                     Message::Binary(_data) => {
+                        // TODO: msgpack
                         println!("跳過Binary Message!");
                     }
                     Message::Ping(_) => {
@@ -117,7 +119,7 @@ fn handle_client(
                     }
                     Message::Close(_) => {
                         println!("客戶端請求關閉連線");
-                        break;
+                        break 'connection;
                     }
                     Message::Frame(_) => {
                         // 忽略原始帧
@@ -129,6 +131,7 @@ fn handle_client(
                 break;
             }
         }
+        thread::sleep(std::time::Duration::from_secs(1));
     }
 
     // 關閉連線
@@ -345,26 +348,29 @@ impl PositiveMahjong {
             let _write_result =
                 write_reply(game_start_msg.clone(), sync::Arc::clone(&player.player_ws));
         }
-        //
+        // rng init
         let mut rng = rand::rng();
         self.unused_card.shuffle(&mut rng);
-        //
+        // 四次
         for _ in 0..4 {
             for player in self.players.iter_mut() {
-                let card = self.unused_card.choose(&mut rng).unwrap();
-                let mut index = 0;
-                'find_index: for i in self.unused_card.iter() {
-                    if i == card {
-                        break 'find_index;
-                    } else {
-                        index += 1;
+                // 一次4張
+                for _ in 0..4 {
+                    let card = self.unused_card.choose(&mut rng).unwrap();
+                    let mut index = 0;
+                    'find_index: for i in self.unused_card.iter() {
+                        if i == card {
+                            break 'find_index;
+                        } else {
+                            index += 1;
+                        }
                     }
+                    let player_card = self.unused_card.remove(index);
+                    player.player_hand_cards.push(player_card);
                 }
-                let player_card = self.unused_card.remove(index);
-                player.player_hand_cards.push(player_card);
             }
         }
-        // 通知手排變動
+        // 通知手牌變動
         for player in self.players.iter() {
             let hand_card_msg = serde_json::to_string(&shared_base::ServerMessageType {
                 msg_type: shared_base::ServerMessageTypeKinds::HandCardChange(
@@ -379,19 +385,21 @@ impl PositiveMahjong {
     }
 
     fn game_loop(&self) {
+        let mut current_turn_player_id = 1;
+        let players_count = self.players.len() as u8;
         loop {
-            for current_turn_player_id in 1..((self.players.len() + 1) as u8) {
-                let turn_msg = serde_json::to_string(&shared_base::ServerMessageType {
-                    msg_type: shared_base::ServerMessageTypeKinds::ChangedTurn(
-                        current_turn_player_id,
-                    ),
-                })
-                .unwrap();
-                for player in self.players.iter() {
-                    let _write_result =
-                        write_reply(turn_msg.clone(), sync::Arc::clone(&player.player_ws));
-                }
+            if current_turn_player_id > players_count {
+                current_turn_player_id = 1;
             }
+            let turn_msg = serde_json::to_string(&shared_base::ServerMessageType {
+                msg_type: shared_base::ServerMessageTypeKinds::ChangedTurn(current_turn_player_id),
+            })
+            .unwrap();
+            for player in self.players.iter() {
+                let _write_result =
+                    write_reply(turn_msg.clone(), sync::Arc::clone(&player.player_ws));
+            }
+            current_turn_player_id += 1;
         }
     }
 }
