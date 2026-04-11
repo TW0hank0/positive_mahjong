@@ -73,7 +73,8 @@ def main():
 def create_release(tag: str, title: str, notes: str, is_prerelease: bool, repo: str):
     command: list[str] = [
         "gh",
-        "releasecreate",
+        "release",
+        "create",
         tag,
         "--title",
         title,
