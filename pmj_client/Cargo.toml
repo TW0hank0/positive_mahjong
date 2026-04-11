@@ -37,6 +37,7 @@ slint = { workspace = true }
 serde_json = { workspace = true }
 serde = { workspace = true }
 tungstenite = { workspace = true }
+log = {workspace=true}
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm-bindgen = { version = "0.2" }
@@ -55,6 +56,8 @@ build_targets = ["aarch64-linux-android"]
 [package.metadata.android.application]
 label = "PMJ Client"
 icon = "@mipmap/icon"
+is_game = true
+app_category = "game"
 
 [package.metadata.android.sdk]
 min_sdk_version = 23

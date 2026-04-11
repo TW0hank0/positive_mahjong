@@ -45,11 +45,17 @@ tungstenite = { version = "0.29.0", features = [
     "rustls-native-certs",
 ] }
 image = "0.25.10"
+log = "0.4.29"
 
 
 [workspace]
 resolver = "3"
-members = ["pmj_client", "pmj_server", "pmj_shared", "pmj_test_connection"]
+members = [
+    "pmj_client",
+    "pmj_server",
+    "pmj_shared",
+    #"pmj_test_connection"
+]
 
 [profile.release]
 opt-level = 3

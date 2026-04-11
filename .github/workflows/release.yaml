@@ -54,6 +54,32 @@ jobs:
           rustc --version
           cargo --version
 
+      - name: install java
+        uses: actions/setup-java@v5
+        with:
+          distribution: "temurin" # See 'Supported distributions' for available options
+          java-version: "21"
+
+      - name: Setup Android
+        uses: android-actions/setup-android@v4
+
+      - name: Install Android SDK and NDK
+        run: |
+          # 安裝基本工具與平台
+          sdkmanager "platform-tools" \
+          "platforms;android-35" \
+          "build-tools;35.0.0" \
+          "extras;android;m2repository" \
+          "extras;google;m2repository" \
+          # 安裝指定版本的 NDK
+          # 請將 '26.3.11579264' 替換為你專案需要的確切版本
+          "ndk;26.3.11579264" \
+          # 若使用 CMake，建議同時安裝對應版本的 CMake
+          "cmake;3.22.1"
+
+          # 驗證安裝
+          sdkmanager --list_installed
+
       - name: install cargo-about
         run: |
           cargo install cargo-about

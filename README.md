@@ -4,9 +4,11 @@
 
 **仍在開發中，未完成**
 
-伺服器使用Rust編寫
+使用Rust編寫
 
-客戶端GUI使用Slint框架
+伺服器使用Iced框架
+
+客戶端使用Slint框架
 
 ![MadeWithSlint-logo](./assets/MadeWithSlint-logo-light.png)
 
@@ -19,8 +21,6 @@
 [Keep Android Open Website](https://keepandroidopen.org/)
 
 ### 檔案結構
-
-**已過時**
 
 ```
 project_root
@@ -46,9 +46,9 @@ project_root
 ...└─ about_json.hbs => cargo-about的json格式生成模板
 ...└─ about_markdown.hbs => cargo-about的markdown格式生成模板
 ...└─ addlicense.template => addlicense的檔案Headler模板
-└─ secret/ => (**Ignored**) **不能上傳** 的資料 (含Android用Keystore)
-...└─ TW0hank0.keystore => Android用
-└─ res/ => Android用assets
+└─ secret/ => (**Ignored**) **不能上傳** 的資料
+...└─ TW0hank0.keystore => Android用 Keystore
+└─ res/ => Android用 assets
 └─ LICENSE => AGPL-3.0-only
 └─ about.toml => cargo-about 設定
 ```
@@ -79,7 +79,7 @@ uv run scripts/build_android.py
 
 **WEB-WASM**
 
-未完成 原因：wasm 不支援sync只支援asyn
+尚未完成
 
 ### 授權/聲明
 
