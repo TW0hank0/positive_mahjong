@@ -384,6 +384,7 @@ impl PositiveMahjong {
         self.game_loop();
     }
 
+    /// 遊戲旋環
     fn game_loop(&self) {
         let mut current_turn_player_id = 1;
         let players_count = self.players.len() as u8;

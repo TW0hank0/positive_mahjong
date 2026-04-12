@@ -5,7 +5,8 @@
 格式：
 
 ```plaintext
-### [version] - { publish? {日期} : '未發布' }
+{每個版本：
+## [version] - { publish? {發布日期} : "未發布" }
 
 {版本更改}
 
@@ -15,19 +16,21 @@
 **{日期} - {當日開發重點}**
 {開發/更改 內容}
 }
+}
 ```
 
 ---
 
-### [0.1.0] - 未發布
+## [0.1.0] - 未發布
 
 第一版
 
 #### 紀錄
 
-**2026-4-12 - 客戶端UI**
+**2026-4-12 - 客戶端UI優化**
 
 - 開始此紀錄
 - 新增引用：material-symbols
 - 新增zed 專案設定
-- pmj_client：homepage UI 更改
+- pmj_client：homepage UI 優化
+- 移除V1Simple 玩法引用

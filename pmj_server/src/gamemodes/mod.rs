@@ -20,4 +20,4 @@ pub mod gui_base;
 pub mod mode_base;
 
 // v1 - `simple`
-pub mod modev1_simple;
+//pub mod modev1_simple;

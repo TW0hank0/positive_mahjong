@@ -72,6 +72,14 @@ keystore_password = "tw0hank0_android"
 name = "android.permission.INTERNET"
 required = true
 
+# See https://developer.android.com/guide/topics/manifest/uses-feature-element
+#
+# Note: there can be multiple .uses_feature entries.
+[[package.metadata.android.uses_feature]]
+name = "android.hardware.vulkan.level"
+required = true
+version = 1
+
 [[package.metadata.android.uses_permission]]
 name = "android.permission.WRITE_EXTERNAL_STORAGE"
 max_sdk_version = 18
