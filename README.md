@@ -6,9 +6,7 @@
 
 使用Rust編寫
 
-伺服器使用Iced框架
-
-客戶端使用Slint框架
+伺服器使用Iced框架，客戶端使用Slint框架
 
 ![MadeWithSlint-logo](./assets/MadeWithSlint-logo-light.png)
 
@@ -55,31 +53,29 @@ project_root
 
 ### 編譯
 
-需求：uv(或官方Python)、rust工具鏈
+需要rust工具鏈
 
 **電腦**
 
 執行：
+
 ```bash
 uv run scripts/build_computer.py
-```
-或
-```bash
-cargo build --workspace --relase
 ```
 
 **Android手機**
 
-需求：cargo-apk(`cargo install cargo-apk`)、java、Android sdk+ndk、android-target(`rustup target add aarch64-linux-android`)
+需要cargo-apk(`cargo install cargo-apk`)、java、Android sdk+ndk、android-target(`rustup target add aarch64-linux-android`)
 
 執行：
+
 ```bash
 uv run scripts/build_android.py
 ```
 
 **WEB-WASM**
 
-尚未完成
+目前不支援
 
 ### 授權/聲明
 

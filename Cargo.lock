@@ -5683,6 +5683,7 @@ dependencies = [
  "i-slint-core-macros",
  "i-slint-renderer-femtovg",
  "i-slint-renderer-software",
+ "log",
  "num-traits",
  "once_cell",
  "pin-weak",

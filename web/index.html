@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <!--
  SPDX-License-Identifier: AGPL-3.0-only
  著作權所有 (C) 2026 TW0hank0
@@ -16,13 +16,11 @@
  如果沒有，請參見 <https://www.gnu.org/licenses/>。
 -->
 
-
 <html>
-
-<head>
-    <meta charset="utf-8">
-    <title>positive_mahjong</title>
-    <!-- <style>
+    <head>
+        <meta charset="utf-8" />
+        <title>positive_mahjong - client (wasm)</title>
+        <!-- <style>
         html,
         body {
             width: 100%;
@@ -40,16 +38,15 @@
             /* 確保 canvas 為塊級元素 */
         }
     </style> -->
-</head>
+    </head>
 
-<body>
-    <canvas id="canvas"></canvas>
-    <script type="module">
-        // 載入 wasm-pack 生成的 JS 模組
-        import init from './pkg/positive_toolbox.js';
-        // 啟動 WASM 應用
-        init()/* .catch(console.error) */;
-    </script>
-</body>
-
+    <body>
+        <canvas id="canvas"></canvas>
+        <script type="module">
+            // 載入 wasm-pack 生成的 JS 模組
+            import init from "./pkg/pmj_client.js";
+            // 啟動 WASM 應用
+            init() /* .catch(console.error) */;
+        </script>
+    </body>
 </html>

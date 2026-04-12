@@ -16,7 +16,3 @@ pmj_server_config.json
 
 # secrets
 secret/**
-
-# editor
-**/.vscode/
-**/.idea/
