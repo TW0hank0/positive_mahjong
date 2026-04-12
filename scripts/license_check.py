@@ -18,46 +18,33 @@ import sys
 
 
 def main():
-    ignored = [
-        "-ignore",
-        ".git/**",
-        "-ignore",
+    ignore_dir = [
+        "**/.git/**",
         "**/.venv/**",
-        "-ignore",
         "dist/**",
-        "-ignore",
         "pkg/**",
-        "-ignore",
         "target/**",
-        "-ignore",
         "build/**",
-        "-ignore",
         "**/__pycache__/**",
-        "-ignore",
         "**/*.lock",
-        "-ignore",
-        ".python-version",
-        "-ignore",
+        "/.python-version",
         "**/*.png",
-        "-ignore",
         "**/*.kra",
-        "-ignore",
         "**/*.ttf",
-        "-ignore",
-        "assets/",
-        "-ignore",
+        "**/*.otf",
+        "assets/**",
         "**/*.json",
-        "-ignore",
-        "ThirdPartyLicense-Rust.html",
-        "-ignore",
-        "ThirdPartyLicense-Python.html",
-        "-ignore",
+        "ThirdPartyLicense-Rust.*",
+        "ThirdPartyLicense-Python.*",
         "auto_generated/**",
-        "-ignore",
         "**/*.icon",
-        "-ignore",
+        "**/*.ico",
         "**/*.sh",
+        "**/*.bat",
     ]
+    ignored = []
+    for dir in ignore_dir:
+        ignored.extend(["-ignore", dir])
     command = [
         "addlicense",
         "-check",
@@ -66,7 +53,7 @@ def main():
     ]
     command.extend(ignored.copy())
     command.append(".")
-    print("Run Command: ", " ".join(command))
+    print("Run Command:", " ".join(command))
     print("-" * 10)
     process = subprocess.run(
         command,
@@ -74,8 +61,9 @@ def main():
         stdout=sys.stdout,
         stdin=sys.stdin,
         stderr=sys.stderr,
-        timeout=180,
+        timeout=60,
     )
+    print("-" * 10)
     if process.returncode != 0:
         print("Something Wrong!")
         fix_command = [
@@ -85,7 +73,9 @@ def main():
         ]
         fix_command.extend(ignored.copy())
         fix_command.append(".")
-        print("Fix Command: ", " ".join(fix_command))
+        print("Fix Command:", " ".join(fix_command))
+    else:
+        print("Check Finish.")
 
 
 if __name__ == "__main__":

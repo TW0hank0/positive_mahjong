@@ -2,9 +2,15 @@ import { Button, LineEdit } from "std-widgets.slint";
 import {
     MaterialText,
     ScrollView,
-    DropDownMenu,
+    OutlineButton,
+    MaterialPalette,
 } from "../material/material.slint";
+
+/// Noto Sans TC
 import "../../../assets/Noto_Sans_TC/static/NotoSansTC-Regular.ttf";
+
+/// Material Symbols Outlined
+import "../../../assets/material_symbols/MaterialSymbolsOutlined[FILL,GRAD,opsz,wght].ttf";
 
 export { MaterialWindowAdapter } from "../material/material.slint";
 
@@ -17,71 +23,140 @@ export enum Scenes {
 component HomePage inherits ScrollView {
     in-out property <string> server_response_text: "";
     in-out property <string> server_ip: "";
-    in-out property <Scenes> current-scene;
+    in-out property <string> project-version: "unknown-version";
     callback add_player();
 
-    VerticalLayout {
-        ScrollView {
+    ScrollView {
+        width: 100%;
+        height: 100%;
+        horizontal_scrollbar_policy: ScrollBarPolicy.as-needed;
+        vertical_scrollbar_policy: ScrollBarPolicy.as-needed;
+
+        VerticalLayout {
             width: 100%;
             height: 100%;
-            horizontal_scrollbar_policy: ScrollBarPolicy.as-needed;
-            vertical_scrollbar_policy: ScrollBarPolicy.as-needed;
-            VerticalLayout {
-                spacing: 10px;
-                padding: 10px;
-                Rectangle {
-                    height: 14px;
-                }
+            alignment: LayoutAlignment.start;
 
+            Rectangle {
+                height: 14px;
+            }
+
+            HorizontalLayout {
+                alignment: LayoutAlignment.start;
                 MaterialText {
                     text: "PMJ Client";
                     font-size: 30px;
                     horizontal-alignment: TextHorizontalAlignment.left;
+                    vertical-alignment: TextVerticalAlignment.bottom;
+                }
+
+                Rectangle {
+                    width: 10px;
                 }
 
                 MaterialText {
-                    text: "伺服器Ip：";
-                    font-size: 22px;
+                    text: root.project-version;
+                    font-size: 18px;
+                    vertical-alignment: TextVerticalAlignment.bottom;
                 }
+            }
 
-                HorizontalLayout {
-                    LineEdit {
-                        text <=> root.server_ip;
-                        //min-width: 50px;
-                        min-height: 30px;
-                        max-height: 150px;
-                        width: 75%;
-                    }
+            Rectangle {
+                height: 15px;
+            }
 
-                    Rectangle {
-                        width: 2%;
-                    }
+            HorizontalLayout {
+                alignment: LayoutAlignment.start;
+                //height: 60px;
 
-                    Button {
-                        text: "加入";
-                        clicked => {
-                            root.add_player();
-                        }
-                        width: 20%;
+                Rectangle {
+                    border-radius: 22px;
+                    background: MaterialPalette.primary;
+                    width: 160px;
+                    MaterialText {
+                        text: "Base模式";
+                        color: MaterialPalette.on_primary;
+                        font-size: 20px;
                     }
                 }
 
                 Rectangle {
-                    background: Colors.black;
-                    ScrollView {
-                        MaterialText {
-                            text: root.server_response_text;
-                            horizontal-alignment: TextHorizontalAlignment.left;
-                            vertical-alignment: TextVerticalAlignment.top;
-                            wrap: TextWrap.char-wrap;
-                            font-size: 20px;
-                        }
+                    width: 3%;
+                }
 
-                        preferred-width: 100%;
-                        min-height: 200px;
-                        min-width: 300px;
-                        vertical-scrollbar-policy: ScrollBarPolicy.always-on;
-                        horizontal-scrollbar-policy: ScrollBarPolicy.always-on;
+                MaterialText {
+                    text: "伺服器Ip：";
+                    font-size: 24px;
+                    width: 130px;
+                }
+
+                MaterialText {
+                    text: "ws://";
+                    color: Colors.gray;
+                    font-size: 22px;
+                    width: 65px;
+                }
+
+                Rectangle {
+                    width: 5px;
+                }
+
+                LineEdit {
+                    text <=> root.server_ip;
+                    min-height: 30px;
+                    max-height: 150px;
+                    width: 60%;
+                }
+
+                Rectangle {
+                    width: 15px;
+                }
+
+                OutlineButton {
+                    text: "加入遊戲";
+                    clicked => {
+                        root.add_player();
+                    }
+                    width: 160px;
+                }
+            }
+
+            Rectangle {
+                height: 15px;
+            }
+
+            Rectangle {
+                background: MaterialPalette.secondary_container;
+                border-radius: 15px;
+                min-height: 700px;
+                min-width: 200px;
+
+                ScrollView {
+                    vertical-scrollbar-policy: ScrollBarPolicy.as-needed;
+                    horizontal-scrollbar-policy: ScrollBarPolicy.as-needed;
+                    width: 100%;
+                    height: 100%;
+                    VerticalLayout {
+                        alignment: LayoutAlignment.start;
+                        width: 100%;
+                        height: 100%;
+
+                        HorizontalLayout {
+                            alignment: LayoutAlignment.start;
+                            width: 100%;
+                            height: 100%;
+
+                            MaterialText {
+                                text: "Client Log:\n" + root.server_response_text;
+                                horizontal-alignment: TextHorizontalAlignment.left;
+                                vertical-alignment: TextVerticalAlignment.top;
+                                //wrap: TextWrap.char-wrap;
+                                font-size: 18px;
+                                width: 90%;
+                                height: 90%;
+                                color: MaterialPalette.on_secondary_container;
+                            }
+                        }
                     }
                 }
             }
@@ -90,25 +165,29 @@ component HomePage inherits ScrollView {
 }
 
 component GamePlayBase inherits ScrollView {
-    in-out property <string> server_ip: "unknown";
     in-out property <int> player_id: 0;
+    in-out property <bool> is-game-start: false;
 
     horizontal_scrollbar_policy: ScrollBarPolicy.as-needed;
     vertical_scrollbar_policy: ScrollBarPolicy.as-needed;
     VerticalLayout {
-        HorizontalLayout {
-            MaterialText {
-                text: "玩家id：" + root.player_id;
-                font-size: 14px;
-            }
+        Rectangle {
+            background: MaterialPalette.surface;
 
-            Rectangle {
-                width: 75%;
-            }
+            HorizontalLayout {
+                MaterialText {
+                    text: "玩家id：" + root.player_id;
+                    font-size: 14px;
+                }
 
-            MaterialText {
-                text: "伺服器Ip：" + root.server_ip;
-                font-size: 14px;
+                Rectangle {
+                    width: 20%;
+                }
+
+                MaterialText {
+                    text: is-game-start ? "遊戲已開始" : "遊戲準備中";
+                    font-size: 14px;
+                }
             }
         }
     }
@@ -143,10 +222,10 @@ export component MainWindow inherits Window {
     // HomePage
     in-out property <string> home_page_server_ip/*  <=> scene_home_page.server_ip */;
     in-out property <string> home_page_server_response_text/*  <=> scene_home_page.server_response_text */;
+    in-out property <string> home-page-project-version;
     // GamePlayV1Simple
     in-out property <string> game_play_v1_simple_server_ip/*  <=> scene_game_play_v1_simple.server_ip */;
     // GamePlayBase
-    in-out property <string> game_play_base_server_ip;
     in-out property <int> game-play-base-player-id;
     // MainWindow / Other
     in-out property <Scenes> current-scene: Scenes.HomePage;
@@ -159,31 +238,24 @@ export component MainWindow inherits Window {
         horizontal_scrollbar_policy: ScrollBarPolicy.as-needed;
         vertical_scrollbar_policy: ScrollBarPolicy.as-needed;
         //
-        scene_home_page := HomePage {
-            opacity: 1.0;
-            enabled: true;
+        if current-scene == Scenes.HomePage: scene_home_page := HomePage {
             server_ip <=> home_page_server_ip;
             server_response_text <=> home_page_server_response_text;
+            project-version <=> home-page-project-version;
             add_player => home_page_add_player();
-            current-scene <=> root.current-scene;
         }
 
-        if current-scene == Scenes.GamePlayV1Simple:scene_game_play_v1_simple := GamePlayV1Simple {
-            opacity: 0.0;
-            enabled: false;
+        if current-scene == Scenes.GamePlayV1Simple: scene_game_play_v1_simple := GamePlayV1Simple {
+            //opacity: 0.0;
             server_ip <=> game_play_v1_simple_server_ip;
         }
 
         if current-scene == Scenes.GamePlayBase: scene_game_play_base := GamePlayBase {
-            opacity: 0.0;
-            enabled: false;
-            server_ip <=> game_play_base_server_ip;
             player_id <=> game-play-base-player-id;
         }
     }
 
-    /*
-    states [
+    /*states [
         active when current-scene == Scenes.HomePage: {
             scene_home_page.opacity: 1.0;
             scene_home_page.enabled: true;
@@ -202,6 +274,5 @@ export component MainWindow inherits Window {
             scene_game_play_v1_simple.opacity: 0.0;
             scene_game_play_v1_simple.enabled: false;
         }
-    ]
-    */
+    ]*/
 }
