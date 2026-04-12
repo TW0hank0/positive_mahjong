@@ -24,6 +24,8 @@ component HomePage inherits ScrollView {
     in-out property <string> server_response_text: "";
     in-out property <string> server_ip: "";
     in-out property <string> project-version: "unknown-version";
+    in-out property <length> window-size-width;
+    in-out property <length> window-size-height;
     callback add_player();
 
     ScrollView {
@@ -41,6 +43,7 @@ component HomePage inherits ScrollView {
                 height: 14px;
             }
 
+            /// Title
             HorizontalLayout {
                 alignment: LayoutAlignment.start;
                 MaterialText {
@@ -65,9 +68,10 @@ component HomePage inherits ScrollView {
                 height: 15px;
             }
 
+            /// Server Ip
             HorizontalLayout {
                 alignment: LayoutAlignment.start;
-                //height: 60px;
+                preferred-height: 100px;
 
                 Rectangle {
                     border-radius: 22px;
@@ -81,35 +85,48 @@ component HomePage inherits ScrollView {
                 }
 
                 Rectangle {
-                    width: 3%;
+                    width: root.window-size-width * 0.05;
                 }
 
                 MaterialText {
                     text: "伺服器Ip：";
                     font-size: 24px;
-                    width: 130px;
+                    min-width: 125px;
+                    max-width: 135px;
+                    preferred-width: 130px;
+                }
+
+                Rectangle {
+                    min-width: 5px;
+                    max-width: 10px;
+                    preferred-width: 5px;
                 }
 
                 MaterialText {
                     text: "ws://";
                     color: Colors.gray;
                     font-size: 22px;
-                    width: 65px;
+                    //width: 65px;
                 }
 
                 Rectangle {
-                    width: 5px;
+                    min-width: 5px;
+                    max-width: 10px;
+                    preferred-width: 5px;
                 }
 
                 LineEdit {
                     text <=> root.server_ip;
                     min-height: 30px;
                     max-height: 150px;
-                    width: 60%;
+                    min-width: 100px;
+                    max-width: 1000px;
+                    preferred-width: root.window-size-width * 0.6;
                 }
 
                 Rectangle {
-                    width: 15px;
+                    preferred-width: root.window-size-width * 0.02;
+                    max-width: 30px;
                 }
 
                 OutlineButton {
@@ -117,7 +134,9 @@ component HomePage inherits ScrollView {
                     clicked => {
                         root.add_player();
                     }
-                    width: 160px;
+                    min-width: 80px;
+                    max-width: 250px;
+                    preferred-width: root.window-size-width * 0.3;
                 }
             }
 
@@ -242,6 +261,8 @@ export component MainWindow inherits Window {
             server_ip <=> home_page_server_ip;
             server_response_text <=> home_page_server_response_text;
             project-version <=> home-page-project-version;
+            window-size-height <=> root.height;
+            window-size-width <=> root.width;
             add_player => home_page_add_player();
         }
 

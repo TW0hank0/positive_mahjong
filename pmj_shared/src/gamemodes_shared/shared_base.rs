@@ -51,16 +51,69 @@ pub enum ServerMessageTypeKinds {
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct ClientMessageType {
     pub msg_type: ClientMessageTypeKinds,
+    ///丟牌
+    pub info_throw_card: Option<PMJCard>,
+    ///補花
+    pub info_replace_a_flower: Option<PMJCard>,
+    ///吃
+    pub info_eat: Option<(PMJCard, PMJCard)>,
+    ///碰
+    pub info_triplet: Option<(PMJCard, PMJCard)>,
+    ///明槓
+    pub info_exposed_kong: Option<(PMJCard, PMJCard, PMJCard)>,
+    ///暗槓
+    pub info_concealed_kong: Option<(PMJCard, PMJCard, PMJCard)>,
+}
+
+impl Default for ClientMessageType {
+    fn default() -> Self {
+        Self {
+            msg_type: ClientMessageTypeKinds::GetCard,
+            info_throw_card: None,
+            info_replace_a_flower: None,
+            info_concealed_kong: None,
+            info_eat: None,
+            info_exposed_kong: None,
+            info_triplet: None,
+        }
+    }
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub enum ClientMessageTypeKinds {
     ///抽牌
     GetCard,
-    /// 丟牌
+    ///丟牌
     ThrowCard,
     ///補花
     ReplacingAFlower,
+    ///吃
+    Eat,
+    ///碰
+    Triplet,
+    ///明槓
+    ExposedKong,
+    ///暗槓
+    ConcealedKong,
+}
+
+pub fn need_throw_after_action(act: ClientMessageTypeKinds) -> bool {
+    match act {
+        ClientMessageTypeKinds::GetCard => true,
+        ClientMessageTypeKinds::ConcealedKong => true,
+        ClientMessageTypeKinds::ExposedKong => true,
+        ClientMessageTypeKinds::Eat => true,
+        ClientMessageTypeKinds::Triplet => true,
+        _ => false,
+    }
+}
+
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
+pub enum GameTurnTypes {
+    ///抽牌
+    GetCard,
+    ///丟牌
+    ThrowCard,
     ///吃
     Eat,
     ///碰

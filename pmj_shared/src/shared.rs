@@ -64,7 +64,7 @@ pub struct OldClientRequestType {
     /// 客戶端程式名，無限制
     pub client: String,
     pub data: ClientRequestDataType,
-    pub game_data_v1: Option<gamemodes_shared::sharedv1_simple::GameDataV1>,
+    //pub game_data_v1: Option<gamemodes_shared::sharedv1_simple::GameDataV1>,
     //pub game_action_v1: Option<gamemodes_shared::sharedv1_simple::GameActions>,
     pub is_test_connection: bool,
 }
@@ -75,7 +75,7 @@ impl std::default::Default for OldClientRequestType {
             app: String::from("positive_mahjong"),
             client: String::from("pmj_client"),
             data: ClientRequestDataType::default(),
-            game_data_v1: None,
+            //game_data_v1: None,
             is_test_connection: true,
         }
     }
