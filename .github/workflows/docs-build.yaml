@@ -62,6 +62,10 @@ jobs:
           rustc --version
           cargo --version
 
+      - name: install caego-about
+        run: |
+          cargo install cargo-about
+
       - name: build license
         run: |
           uv run scripts/build_license.py
