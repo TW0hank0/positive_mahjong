@@ -13,10 +13,11 @@
 # 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
+import json
 import os
+import shutil
 import subprocess
 import sys
-import json
 
 
 def main():
@@ -77,6 +78,22 @@ def main():
         json_data = json.load(f)
     with open(json_file_path, "w", encoding="utf-8") as f:
         json.dump(json_data, f, ensure_ascii=False, sort_keys=True, indent=4)
+    print("Finish!")
+    print("Copying ThirdPartyLicense.md ...", end="")
+    shutil.copyfile(
+        os.path.join(
+            os.path.dirname(os.path.dirname(__file__)),
+            "auto_generated",
+            "ThirdPartyLicense-Rust.md",
+        ),
+        os.path.join(
+            os.path.dirname(os.path.dirname(__file__)),
+            "docs",
+            "src",
+            "license",
+            "ThirdPartyLicense-Rust.md",
+        ),
+    )
     print("Finish!")
     #
     # command = [
