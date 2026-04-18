@@ -24,7 +24,9 @@ on:
       - master
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   build:
@@ -41,10 +43,42 @@ jobs:
         run: |
           uv self version
 
-      - name: prepare dep
+      - name: install rustup (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
         run: |
-          uv venv
-          uv pip install mkdocs mkdocs-material
+          Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
+          ls
+          .\rustup-init.exe -y --profile minimal
 
-      - name: deploy
-        run: mkdocs gh-deploy --force
+      - name: install rustup (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          curl https://sh.rustup.rs -o rust-init.sh
+          sh rust-init.sh -y
+
+      - name: check rust Install
+        run: |
+          rustc --version
+          cargo --version
+
+      - name: install mdbook
+        run: |
+          cargo install mdbook --version "^0.5"
+
+      - name: build doc
+        run: |
+          cd docs
+          mdbook build
+          cd ..
+
+      - name: setup pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./docs/book
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4

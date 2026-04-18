@@ -39,4 +39,4 @@
 
 - 新增英文版Readme:`READMEs/README_en.md`
 - 新增readme 字體授權聲明
-- 新增mkdocs
+- 新增mdbook
