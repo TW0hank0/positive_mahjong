@@ -6,7 +6,7 @@
 
 **Please use the Chinese version as the main one.**
 
-### 特色
+### Features
 
 **Still in deving. Not finish.**
 

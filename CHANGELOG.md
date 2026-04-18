@@ -37,6 +37,7 @@
 
 **2026-4-18 - 文件docs**
 
-- 新增英文版Readme:`READMEs/README_en.md`
+- 新增英文版Readme: `READMEs/README_en.md`
 - 新增readme 字體授權聲明
 - 新增mdbook
+- 協議模板移除無效欄位

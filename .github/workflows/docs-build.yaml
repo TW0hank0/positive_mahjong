@@ -62,6 +62,10 @@ jobs:
           rustc --version
           cargo --version
 
+      - name: build license
+        run: |
+          uv run scripts/build_license.py
+
       - name: install mdbook
         run: |
           cargo install mdbook --version "^0.5"
@@ -72,11 +76,8 @@ jobs:
           mdbook build
           cd ..
 
-      #- name: setup pages
-      #uses: actions/configure-pages@v4
-
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: ./docs/book
 

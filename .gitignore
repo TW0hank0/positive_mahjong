@@ -2,10 +2,11 @@
 
 # Python
 **/.venv/**
-**/__pycache__/
+**/__pycache__/**
 **/__pypy_cache__/**
 
 # build script generated
+# format: positive_{project_name[1:]}_v{version}_{platform).zip
 positive_*_v*_*.zip
 
 # krita bakeup
