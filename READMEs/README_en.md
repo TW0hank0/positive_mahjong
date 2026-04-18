@@ -4,17 +4,19 @@
 
 **繁體中文** | [English](READMEs/README_en.md)
 
+**Please use the Chinese version as the main one.**
+
 ### 特色
 
-**仍在開發中，未完成**
+**Still in deving. Not finish.**
 
-使用Rust製作
+written in rust
 
-伺服器使用Iced框架，客戶端使用Slint框架
+Server's gui framework is `iced`, client's gui framework is `slint`.
 
 ![MadeWithSlint-logo](./assets/MadeWithSlint-logo-light.png)
 
-### 連結
+### Links
 
 [Github Repo](https://github.com/TW0hank0/positive_mahjong)
 
@@ -22,15 +24,15 @@
 
 [Keep Android Open Website](https://keepandroidopen.org/)
 
-### 檔案結構
+### File struct
 
 ```
 project_root
-└─ .cargo/ => Cargo設定
+└─ .cargo/ => Cargo settings
 └─ .github/
-...└─ workflows/ => 工作流(CI)
-...└─ ISSUE_TEMPLATE/ => Issue模板
-└─ assets/ => 資料
+...└─ workflows/ => workflow (CI)
+...└─ ISSUE_TEMPLATE/ => Issue templates
+└─ assets/ => project assets
 └─ auto_generate/ => 使用腳本產生的檔案
 └─ ci/ => 工作流 (workflow - CI)
 └─ pmj_client/ => 客戶端 (rust)
@@ -55,23 +57,23 @@ project_root
 └─ about.toml => cargo-about 設定
 ```
 
-### 編譯
+### Compile
 
-需要rust工具鏈
+Need rust toolchain.
 
-**電腦**
+**Computer**
 
-執行：
+Run：
 
 ```bash
 uv run scripts/build_computer.py
 ```
 
-**Android手機**
+**Android phone**
 
-需要cargo-apk(`cargo install cargo-apk`)、java、Android sdk+ndk、android-target(`rustup target add aarch64-linux-android`)
+Need cargo-apk(`cargo install cargo-apk`), java, Android sdk+ndk and android-target rust-std(`rustup target add aarch64-linux-android`)
 
-執行：
+Run：
 
 ```bash
 uv run scripts/build_android.py
@@ -79,7 +81,7 @@ uv run scripts/build_android.py
 
 **WEB-WASM**
 
-目前不支援
+Not support now.
 
 ### 授權與聲明
 
