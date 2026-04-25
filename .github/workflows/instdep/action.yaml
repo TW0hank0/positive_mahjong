@@ -79,4 +79,9 @@ runs:
       run: go install github.com/google/addlicense@latest
 
     - name: Install Cargo-audit
+      shell: pwsh
       run: cargo install cargo-audit
+
+    - name: Install cargo-apk
+      shell: pwsh
+      run: cargo install cargo-apk

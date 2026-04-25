@@ -36,7 +36,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Install Dep
-        run: ./.github/workflows/instdep/
+        uses: ./.github/workflows/instdep
 
       # - name: install rustup (Windows)
       #   if: runner.os == 'Windows'
@@ -153,40 +153,43 @@ jobs:
           ssh-key: ${{ secrets.SECRET_REPO_TOKEN }} # Repo ssh-key
           path: secret
 
-      - name: install rustup (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
-          ls
-          .\rustup-init.exe -y --profile minimal
+      - name: Install Dep
+        uses: ./.github/workflows/instdep
 
-      - name: install rustup (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          curl https://sh.rustup.rs -o rust-init.sh
-          sh rust-init.sh -y
+      # - name: install rustup (Windows)
+      #   if: runner.os == 'Windows'
+      #   shell: pwsh
+      #   run: |
+      #     Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
+      #     ls
+      #     .\rustup-init.exe -y --profile minimal
 
-      - name: check rust Install
-        run: |
-          rustc --version
-          cargo --version
+      # - name: install rustup (Linux)
+      #   if: runner.os == 'Linux'
+      #   run: |
+      #     curl https://sh.rustup.rs -o rust-init.sh
+      #     sh rust-init.sh -y
+
+      # - name: check rust Install
+      #   run: |
+      #     rustc --version
+      #     cargo --version
 
       - name: install android target
         run: |
           rustup target add aarch64-linux-android
           rustup update
 
-      - name: install cargo-apk
-        run: |
-          cargo install cargo-apk
+      # - name: install cargo-apk
+      #   run: |
+      #     cargo install cargo-apk
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
+      # - name: Install uv
+      #   uses: astral-sh/setup-uv@v7
 
-      - name: check uv install
-        run: |
-          uv self version
+      # - name: check uv install
+      #   run: |
+      #     uv self version
 
       - name: build apk
         env:
@@ -221,8 +224,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
+      - name: Install Dep
+        uses: ./.github/workflows/instdep
+
+      # - name: Install uv
+      #   uses: astral-sh/setup-uv@v7
 
       - name: Prepare CI Venv
         run: |

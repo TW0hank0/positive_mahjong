@@ -17,10 +17,6 @@ name: commit-check
 
 on:
   push:
-    paths-ignore:
-      - "README.md"
-      - "READMEs/**"
-      - ".vscode/**"
 
 jobs:
   check:
@@ -35,7 +31,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Install Dep
-        run: ./.github/workflows/instdep/
+        uses: ./.github/workflows/instdep
 
       # - name: install rustup (Windows)
       #   if: runner.os == 'Windows'

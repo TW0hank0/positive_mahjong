@@ -35,24 +35,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: install rustup (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
-          ls
-          .\rustup-init.exe -y --profile minimal
+      - name: Install Dep
+        uses: ./.github/workflows/instdep
 
-      - name: install rustup (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          curl https://sh.rustup.rs -o rust-init.sh
-          sh rust-init.sh -y
+      # - name: install rustup (Windows)
+      #   if: runner.os == 'Windows'
+      #   shell: pwsh
+      #   run: |
+      #     Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
+      #     ls
+      #     .\rustup-init.exe -y --profile minimal
 
-      - name: check rust Install
-        run: |
-          rustc --version
-          cargo --version
+      # - name: install rustup (Linux)
+      #   if: runner.os == 'Linux'
+      #   run: |
+      #     curl https://sh.rustup.rs -o rust-init.sh
+      #     sh rust-init.sh -y
+
+      # - name: check rust Install
+      #   run: |
+      #     rustc --version
+      #     cargo --version
 
       - name: install java
         uses: actions/setup-java@v5
