@@ -54,19 +54,21 @@ resources = "../res"
 build_targets = ["aarch64-linux-android"]
 
 [package.metadata.android.application]
-label = "PMJ Client"
+label = "pmj_client"
 icon = "@mipmap/icon"
-is_game = true
-app_category = "game"
+# 無效欄位
+#is_game = true
+# 無效欄位
+#app_category = "game"
+# See https://developer.android.com/guide/topics/manifest/application-element#theme
+#
+# Example shows setting the theme of an application to fullscreen.
+theme = "@android:style/Theme.DeviceDefault.NoActionBar.Fullscreen"
 
 [package.metadata.android.sdk]
 min_sdk_version = 23
 target_sdk_version = 35
 max_sdk_version = 36
-
-[package.metadata.android.signing.release]
-path = "../secret/TW0hank0.keystore"
-keystore_password = "tw0hank0_android"
 
 [[package.metadata.android.uses_permission]]
 name = "android.permission.INTERNET"

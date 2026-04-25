@@ -30,21 +30,40 @@ pub struct PMJPlayer {
     /// 可使用的牌
     pub player_hand_cards: Vec<PMJCard>,
     /// 存放使用過的牌，例：碰、槓、吃
+    ///
+    /// 格式為：
+    ///
+    /// [ [A, A, A], [B, C, D] ]
+    ///   ^碰~~~~     ^吃~~~~~
     pub player_used_cards: Vec<Vec<PMJCard>>,
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct ServerMessageType {
     pub msg_type: ServerMessageTypeKinds,
+    pub info_change_turn: Option<u8>,
+    pub info_hand_card_change: Option<Vec<PMJCard>>,
+    pub info_error: Option<String>,
+}
+
+impl Default for ServerMessageType {
+    fn default() -> Self {
+        Self {
+            msg_type: ServerMessageTypeKinds::Error,
+            info_change_turn: None,
+            info_hand_card_change: None,
+            info_error: None,
+        }
+    }
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub enum ServerMessageTypeKinds {
     GameStart,
     GameFinish,
-    /// ChangedTurn(玩家id)
-    ChangedTurn(u8),
-    HandCardChange(Vec<PMJCard>),
+    ChangedTurn,
+    /// 手牌變動
+    HandCardChange,
     Error,
 }
 
@@ -97,7 +116,7 @@ pub enum ClientMessageTypeKinds {
     ConcealedKong,
 }
 
-pub fn need_throw_after_action(act: ClientMessageTypeKinds) -> bool {
+/*pub fn need_throw_after_action(act: ClientMessageTypeKinds) -> bool {
     match act {
         ClientMessageTypeKinds::GetCard => true,
         ClientMessageTypeKinds::ConcealedKong => true,
@@ -106,7 +125,7 @@ pub fn need_throw_after_action(act: ClientMessageTypeKinds) -> bool {
         ClientMessageTypeKinds::Triplet => true,
         _ => false,
     }
-}
+}*/
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub enum GameTurnTypes {
@@ -122,6 +141,8 @@ pub enum GameTurnTypes {
     ExposedKong,
     ///暗槓
     ConcealedKong,
+    ///補花
+    ReplaceFlower,
 }
 
 /// Base玩法的卡牌
@@ -179,20 +200,16 @@ pub enum PMJCardFlowerType {
 
 impl Display for PMJCardFlowerType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{}",
-            match self {
-                Self::Spring => "春",
-                Self::Summer => "夏",
-                Self::Fall => "秋",
-                Self::Winter => "冬",
-                Self::Plum => "梅",
-                Self::Orchid => "蘭",
-                Self::Bamboo => "竹",
-                Self::Chrysanthemum => "菊",
-            }
-        )
+        f.write_str(match self {
+            Self::Spring => "春",
+            Self::Summer => "夏",
+            Self::Fall => "秋",
+            Self::Winter => "冬",
+            Self::Plum => "梅",
+            Self::Orchid => "蘭",
+            Self::Bamboo => "竹",
+            Self::Chrysanthemum => "菊",
+        })
     }
 }
 

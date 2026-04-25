@@ -15,11 +15,13 @@
 
 //! 通用資料
 
+use std::fmt::Display;
+
 use serde;
 
 use crate::gamemodes_shared;
 
-pub const PROJECT_NAME: &str = env!("CARGO_PKG_NAME");
+pub const PROJECT_NAME: &str = "positive_mahjong";
 pub const PROJECT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 pub const ICON_PNG_BYTES: &[u8] = include_bytes!("../../assets/icon.png");
@@ -40,6 +42,45 @@ pub const SERVER_PORT: u16 = 6060;
     let icon = iced::window::icon::from_rgba(img.into_raw(), img_width, img_height).ok();
     icon
 }*/
+
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
+pub struct ClientFirstConnectType {
+    /// 需為 `positive_mahjong` 。
+    ///
+    /// 否則會拒絕連線
+    pub app_name: String,
+    /// 無限制。
+    ///
+    /// 不影響連線。
+    pub client: String,
+}
+
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
+pub struct ServerFirstConnectType {
+    pub is_start: Option<bool>,
+    pub is_error: bool,
+    #[serde(default)]
+    pub player_id: Option<u8>,
+    #[serde(default)]
+    pub error_type: Option<ServerFirstConnectErrorTypes>,
+}
+
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
+pub enum ServerFirstConnectErrorTypes {
+    TooManyPlayer,
+    IpBlocked,
+    Unknown,
+}
+
+impl Display for ServerFirstConnectErrorTypes {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(match self {
+            Self::TooManyPlayer => "玩家數量超出限制",
+            Self::IpBlocked => "Ip被封鎖",
+            Self::Unknown => "伺服器端未知錯誤",
+        })
+    }
+}
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct ClientConnectRequestType {
@@ -249,7 +290,7 @@ impl std::default::Default for ServerResponseDataType {
     }
 }
 
-pub static SERVER_CONFIG_FILE_NAME: &str = "pmj_server_config.json";
+pub const SERVER_CONFIG_FILE_NAME: &str = "pmj_server_config.json";
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct PMJServerConfig {

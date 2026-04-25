@@ -2,6 +2,12 @@
 
 ## 電腦
 
+第一次編譯的準備：
+
+```
+python scripts/build_license.py
+```
+
 使用編譯腳本：
 
 ```bash

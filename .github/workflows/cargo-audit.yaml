@@ -13,7 +13,24 @@
 # 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-[book]
-title = "positive_mahjong documents"
-authors = ["TW0hank0"]
-language = "zh-TW"
+name: docs-build
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install Dep
+        run: ./.github/workflows/instdep/
+
+      - name: Run cargo-audit
+        run: |
+          cargo audit --deny

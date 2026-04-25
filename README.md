@@ -4,9 +4,9 @@
 
 **繁體中文** | [English](READMEs/README_en.md)
 
-### 特色
-
 **仍在開發中，未完成**
+
+### 特色
 
 使用Rust製作
 
@@ -16,13 +16,19 @@
 
 ### 連結
 
-[Github Repo](https://github.com/TW0hank0/positive_mahjong)
+[Github 儲存庫](https://github.com/TW0hank0/positive_mahjong)
 
-[Codeberg Mirror Repo](https://codeberg.org/TW0hank0/positive_mahjong)
+[Codeberg 鏡像儲存庫](https://codeberg.org/TW0hank0/positive_mahjong)
 
-[Keep Android Open Website](https://keepandroidopen.org/)
+[專案文檔](https://tw0hank0.github.io/positive_mahjong)
+
+[KeepAndroidOpen 網站](https://keepandroidopen.org/)
 
 ### 檔案結構
+
+見：[專案文檔](https://tw0hank0.github.io/positive_mahjong)
+
+**已過時**
 
 ```
 project_root
@@ -56,6 +62,8 @@ project_root
 ```
 
 ### 編譯
+
+見：[專案文檔](https://tw0hank0.github.io/positive_mahjong)
 
 需要rust工具鏈
 

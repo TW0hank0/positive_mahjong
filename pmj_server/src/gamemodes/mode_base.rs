@@ -24,7 +24,7 @@ use std::thread;
 use tungstenite::{Error, Message, WebSocket, accept};
 
 use pmj_shared::gamemodes_shared::shared_base::{
-    PMJCard, PMJCardFlowerType, PMJCardType, PMJCardWordsType, PMJPlayer,
+    GameTurnTypes, PMJCard, PMJCardFlowerType, PMJCardType, PMJCardWordsType, PMJPlayer,
 };
 use pmj_shared::gamemodes_shared::{self, shared_base};
 use pmj_shared::shared;
@@ -342,6 +342,7 @@ impl PositiveMahjong {
         self.is_game_start = true;
         let game_start_msg = serde_json::to_string(&shared_base::ServerMessageType {
             msg_type: shared_base::ServerMessageTypeKinds::GameStart,
+            ..Default::default()
         })
         .unwrap();
         for player in self.players.iter() {
@@ -373,9 +374,9 @@ impl PositiveMahjong {
         // 通知手牌變動
         for player in self.players.iter() {
             let hand_card_msg = serde_json::to_string(&shared_base::ServerMessageType {
-                msg_type: shared_base::ServerMessageTypeKinds::HandCardChange(
-                    player.player_hand_cards.clone(),
-                ),
+                msg_type: shared_base::ServerMessageTypeKinds::HandCardChange,
+                info_hand_card_change: Some(player.player_hand_cards.clone()),
+                ..Default::default()
             })
             .unwrap();
             let _write_result = write_reply(hand_card_msg, sync::Arc::clone(&player.player_ws));
@@ -385,15 +386,67 @@ impl PositiveMahjong {
     }
 
     /// 遊戲旋環
-    fn game_loop(&self) {
-        let mut current_turn_player_id = 1;
+    fn game_loop(&mut self) {
+        let mut current_turn_player_id: u8 = 1;
+        let mut current_action: GameTurnTypes = GameTurnTypes::GetCard;
         let players_count = self.players.len() as u8;
+        // rng init
+        let mut rng = rand::rng();
+        self.unused_card.shuffle(&mut rng);
         loop {
-            if current_turn_player_id > players_count {
-                current_turn_player_id = 1;
+            match current_action {
+                GameTurnTypes::GetCard => {
+                    let player = self
+                        .players
+                        .get_mut(current_turn_player_id as usize)
+                        .unwrap();
+                    {
+                        let card = self.unused_card.choose(&mut rng).unwrap();
+                        let mut index = 0;
+                        'find_index: for i in self.unused_card.iter() {
+                            if i == card {
+                                break 'find_index;
+                            } else {
+                                index += 1;
+                            }
+                        }
+                        let player_card = self.unused_card.remove(index);
+                        player.player_hand_cards.push(player_card);
+                    }
+                    let client_msg = serde_json::to_string(&shared_base::ServerMessageType {
+                        msg_type: shared_base::ServerMessageTypeKinds::HandCardChange,
+                        info_hand_card_change: Some(player.player_hand_cards.clone()),
+                        ..Default::default()
+                    })
+                    .unwrap();
+                    let _write_result = write_reply(client_msg, player.player_ws.clone());
+                    // 丟牌
+                    let raw_msg = player.player_ws.write().unwrap().read().unwrap();
+                    match raw_msg {
+                        Message::Text(text) => {
+                            let msg: shared_base::ClientMessageType =
+                                serde_json::from_str(&text).unwrap();
+                            match msg.msg_type {
+                                shared_base::ClientMessageTypeKinds::ThrowCard => {}
+                                _ => {
+                                    eprintln!("客戶端錯誤行為！");
+                                }
+                            }
+                        }
+                        _ => {
+                            eprintln!("不支援的Message::?");
+                        }
+                    }
+                }
+                _ => {
+                    eprintln!("不支援的動作！Action：{:?}", current_action)
+                }
             }
+            //
             let turn_msg = serde_json::to_string(&shared_base::ServerMessageType {
-                msg_type: shared_base::ServerMessageTypeKinds::ChangedTurn(current_turn_player_id),
+                msg_type: shared_base::ServerMessageTypeKinds::ChangedTurn,
+                info_change_turn: Some(current_turn_player_id),
+                ..Default::default()
             })
             .unwrap();
             for player in self.players.iter() {
