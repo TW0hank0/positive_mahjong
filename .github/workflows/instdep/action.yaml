@@ -1,0 +1,82 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# 著作權所有 (C) 2026 TW0hank0
+#
+# 本檔案屬於 positive_mahjong 專案的一部分。
+# 專案儲存庫：https://github.com/TW0hank0/positive_mahjong
+#
+# 本程式為自由軟體：您可以根據自由軟體基金會發佈的 GNU Affero 通用公共授權條款
+# 第 3 版（僅此版本）重新發佈及/或修改本程式。
+#
+# 本程式的發佈是希望它能發揮功用，但不提供任何擔保；
+# 甚至沒有隱含的適銷性或特定目的適用性擔保。詳見 GNU Affero 通用公共授權條款。
+#
+# 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
+# 如果沒有，請參見 <https://www.gnu.org/licenses/>。
+
+name: Install Dep
+
+description: Install workflow needed dep
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Rust cache
+      uses: Swatinem/rust-cache@v2
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v7
+
+    - name: check uv install
+      shell: pwsh
+      run: |
+        uv self version
+
+    - name: install rustup (Windows)
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
+        ls
+        .\rustup-init.exe -y --profile minimal
+
+    - name: install rustup (Linux)
+      shell: pwsh
+      if: runner.os == 'Linux'
+      run: |
+        curl https://sh.rustup.rs -o rust-init.sh
+        sh rust-init.sh -y
+
+    - name: check rust Install
+      shell: pwsh
+      run: |
+        rustc --version
+        cargo --version
+
+    - name: install caego-about
+      shell: pwsh
+      run: |
+        cargo install cargo-about --locked
+
+    - name: install mdbook
+      shell: pwsh
+      run: |
+        cargo install mdbook --version "^0.5"
+
+    - name: Install Linux Dep
+      shell: pwsh
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install libfontconfig1-dev pkg-config
+
+    - name: Install Go-lang
+      uses: actions/setup-go@v6
+      with:
+        go-version: "stable"
+
+    - name: Install addlicense
+      shell: pwsh
+      run: go install github.com/google/addlicense@latest
+
+    - name: Install Cargo-audit
+      run: cargo install cargo-audit

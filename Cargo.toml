@@ -54,7 +54,6 @@ members = [
     "pmj_client",
     "pmj_server",
     "pmj_shared",
-    #"pmj_test_connection"
 ]
 
 [profile.release]

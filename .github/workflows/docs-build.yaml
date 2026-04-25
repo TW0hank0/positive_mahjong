@@ -36,43 +36,46 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
+      - name: Install Dep
+        run: ./.github/workflows/instdep/
 
-      - name: check uv install
-        run: |
-          uv self version
+      # - name: Install uv
+      #   uses: astral-sh/setup-uv@v7
 
-      - name: install rustup (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
-          ls
-          .\rustup-init.exe -y --profile minimal
+      # - name: check uv install
+      #   run: |
+      #     uv self version
 
-      - name: install rustup (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          curl https://sh.rustup.rs -o rust-init.sh
-          sh rust-init.sh -y
+      # - name: install rustup (Windows)
+      #   if: runner.os == 'Windows'
+      #   shell: pwsh
+      #   run: |
+      #     Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
+      #     ls
+      #     .\rustup-init.exe -y --profile minimal
 
-      - name: check rust Install
-        run: |
-          rustc --version
-          cargo --version
+      # - name: install rustup (Linux)
+      #   if: runner.os == 'Linux'
+      #   run: |
+      #     curl https://sh.rustup.rs -o rust-init.sh
+      #     sh rust-init.sh -y
 
-      - name: install caego-about
-        run: |
-          cargo install cargo-about
+      # - name: check rust Install
+      #   run: |
+      #     rustc --version
+      #     cargo --version
+
+      # - name: install caego-about
+      #   run: |
+      #     cargo install cargo-about
 
       - name: build license
         run: |
           uv run scripts/build_license.py
 
-      - name: install mdbook
-        run: |
-          cargo install mdbook --version "^0.5"
+      # - name: install mdbook
+      #   run: |
+      #     cargo install mdbook --version "^0.5"
 
       - name: build doc
         run: |

@@ -35,24 +35,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: install rustup (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
-          ls
-          .\rustup-init.exe -y --profile minimal
+      - name: Install Dep
+        run: ./.github/workflows/instdep/
 
-      - name: install rustup (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          curl https://sh.rustup.rs -o rust-init.sh
-          sh rust-init.sh -y
+      # - name: install rustup (Windows)
+      #   if: runner.os == 'Windows'
+      #   shell: pwsh
+      #   run: |
+      #     Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
+      #     ls
+      #     .\rustup-init.exe -y --profile minimal
 
-      - name: check rust Install
-        run: |
-          rustc --version
-          cargo --version
+      # - name: install rustup (Linux)
+      #   if: runner.os == 'Linux'
+      #   run: |
+      #     curl https://sh.rustup.rs -o rust-init.sh
+      #     sh rust-init.sh -y
+
+      # - name: check rust Install
+      #   run: |
+      #     rustc --version
+      #     cargo --version
 
       - name: install java
         uses: actions/setup-java@v5
@@ -80,26 +83,26 @@ jobs:
       #     # 驗證安裝
       #     sdkmanager --list_installed
 
-      - name: install cargo-about
-        run: |
-          cargo install cargo-about
+      # - name: install cargo-about
+      #   run: |
+      #     cargo install cargo-about
 
-      - name: check cargo-about install
-        run: |
-          cargo-about --version
+      # - name: check cargo-about install
+      #   run: |
+      #     cargo-about --version
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
+      # - name: Install uv
+      #   uses: astral-sh/setup-uv@v7
 
-      - name: check uv install
-        run: |
-          uv self version
+      # - name: check uv install
+      #   run: |
+      #     uv self version
 
-      - name: Install Linux Dep
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install libfontconfig1-dev pkg-config
+      # - name: Install Linux Dep
+      #   if: runner.os == 'Linux'
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install libfontconfig1-dev pkg-config
 
       - name: use build script
         run: uv run scripts/build_computer.py
@@ -186,6 +189,8 @@ jobs:
           uv self version
 
       - name: build apk
+        env:
+          CARGO_APK_RELEASE_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         run: |
           uv run scripts/build_android.py
 

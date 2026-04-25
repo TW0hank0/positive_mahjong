@@ -61,7 +61,7 @@ def main():
         stdout=sys.stdout,
         stdin=sys.stdin,
         stderr=sys.stderr,
-        timeout=60,
+        timeout=180,
     )
     print("-" * 10)
     if process.returncode != 0:

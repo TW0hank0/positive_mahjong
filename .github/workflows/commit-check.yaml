@@ -34,38 +34,41 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: install rustup (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
-          ls
-          .\rustup-init.exe -y --profile minimal
+      - name: Install Dep
+        run: ./.github/workflows/instdep/
 
-      - name: install rustup (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          curl https://sh.rustup.rs -o rust-init.sh
-          sh rust-init.sh -y
+      # - name: install rustup (Windows)
+      #   if: runner.os == 'Windows'
+      #   shell: pwsh
+      #   run: |
+      #     Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
+      #     ls
+      #     .\rustup-init.exe -y --profile minimal
 
-      - name: check Install
-        run: |
-          rustc --version
-          cargo --version
+      # - name: install rustup (Linux)
+      #   if: runner.os == 'Linux'
+      #   run: |
+      #     curl https://sh.rustup.rs -o rust-init.sh
+      #     sh rust-init.sh -y
 
-      - name: install cargo-about
-        run: |
-          cargo install cargo-about
+      # - name: check Install
+      #   run: |
+      #     rustc --version
+      #     cargo --version
 
-      - name: check cargo-about install
-        run: |
-          cargo-about --version
+      # - name: install cargo-about
+      #   run: |
+      #     cargo install cargo-about
 
-      - name: Install Dep (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install libfontconfig1-dev pkg-config
+      # - name: check cargo-about install
+      #   run: |
+      #     cargo-about --version
+
+      # - name: Install Dep (Linux)
+      #   if: runner.os == 'Linux'
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install libfontconfig1-dev pkg-config
 
       - name: debug check
         run: cargo check
@@ -73,20 +76,20 @@ jobs:
       - name: release check
         run: cargo check --release
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
+      # - name: Install uv
+      #   uses: astral-sh/setup-uv@v7
 
-      - name: check uv install
-        run: |
-          uv self version
+      # - name: check uv install
+      #   run: |
+      #     uv self version
 
-      - name: Install Go (Required for addlicense)
-        uses: actions/setup-go@v6
-        with:
-          go-version: "stable"
+      # - name: Install Go (Required for addlicense)
+      #   uses: actions/setup-go@v6
+      #   with:
+      #     go-version: "stable"
 
-      - name: Install addlicense
-        run: go install github.com/google/addlicense@latest
+      # - name: Install addlicense
+      #   run: go install github.com/google/addlicense@latest
 
       - name: Run License Check
         run: |
