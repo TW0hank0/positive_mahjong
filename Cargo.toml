@@ -25,6 +25,7 @@ rust-version = "1.94"
 [workspace.dependencies]
 positive_mahjong = { path = "." }
 pmj_shared = { path = "pmj_shared" }
+pmj_gamemodes = { path = "pmj_gamemodes" }
 
 iced = { version = "0.14.0" }
 local-ip-address = "0.6.10"
@@ -54,6 +55,7 @@ members = [
     "pmj_client",
     "pmj_server",
     "pmj_shared",
+    "pmj_gamemodes",
 ]
 
 [profile.release]

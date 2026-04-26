@@ -16,11 +16,10 @@
 use local_ip_address;
 use std;
 
-use pmj_shared::gamemodes_shared;
 use pmj_shared::shared;
 
-use pmj_server_lib::gamemodes;
-use pmj_server_lib::gamemodes::mode_base::main_base;
+use pmj_gamemodes;
+use pmj_gamemodes::base;
 
 use pmj_server_lib;
 
@@ -31,7 +30,7 @@ pub fn main() {
     let config: shared::PMJServerConfig = pmj_server_lib::shared::read_server_config();
     match config.gamemode {
         shared::GameModes::Base => {
-            let _ = main_base(false);
+            let _ = base::mode::main_base(false);
         }
         shared::GameModes::V1Simple => {
             println!("還未支援！");

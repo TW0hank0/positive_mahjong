@@ -246,10 +246,6 @@ jobs:
       - name: List Dir (for debug)
         run: |
           ls .
-          echo '--------'
-          ls artifacts
-          echo '--------'
-          ls -la artifacts
 
       - name: Release
         env:

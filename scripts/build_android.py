@@ -52,7 +52,7 @@ def main():
                 stderr=sys.stderr,
                 stdin=sys.stdin,
                 stdout=sys.stdout,
-                env={"CARGO_APK_RELEASE_KEYSTORE": secret_ks_path},
+                env={"CARGO_APK_RELEASE_KEYSTORE": secret_ks_path}.update(os.environ),
             )
         else:
             subprocess.run(

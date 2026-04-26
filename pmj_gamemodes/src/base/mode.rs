@@ -23,13 +23,12 @@ use std::sync::{self, Arc, RwLock};
 use std::thread;
 use tungstenite::{Error, Message, WebSocket, accept};
 
-use pmj_shared::gamemodes_shared::shared_base::{
+use crate::base::shared::{
     GameTurnTypes, PMJCard, PMJCardFlowerType, PMJCardType, PMJCardWordsType, PMJPlayer,
 };
-use pmj_shared::gamemodes_shared::{self, shared_base};
+use crate::base::shared as shared_base;
+use crate::base;
 use pmj_shared::shared;
-
-use crate::gamemodes;
 
 fn write_reply(
     text: String,
@@ -43,7 +42,7 @@ fn write_reply(
 // 處理單一客戶端連線的函式
 fn handle_client(
     stream: TcpStream,
-    backend: sync::Arc<sync::RwLock<gamemodes::mode_base::PositiveMahjong>>,
+    backend: sync::Arc<sync::RwLock<crate::base::mode::PositiveMahjong>>,
 ) {
     let client_ip = stream.peer_addr().unwrap().ip();
     println!("建立連線：{}", client_ip.clone());
@@ -139,9 +138,9 @@ fn handle_client(
     //println!("連線已終止");
 }
 
-pub fn main_base(gui_mode: bool) -> Arc<RwLock<gamemodes::mode_base::PositiveMahjong>> {
+pub fn main_base(gui_mode: bool) -> Arc<RwLock<crate::base::mode::PositiveMahjong>> {
     let backend = sync::Arc::new(sync::RwLock::new(
-        gamemodes::mode_base::PositiveMahjong::new(),
+        crate::base::mode::PositiveMahjong::new(),
     ));
     let server_addr_ipv4 = std::net::SocketAddr::V4(std::net::SocketAddrV4::new(
         std::net::Ipv4Addr::UNSPECIFIED,
@@ -174,7 +173,7 @@ pub fn main_base(gui_mode: bool) -> Arc<RwLock<gamemodes::mode_base::PositiveMah
 
 fn handle_server_base(
     addr: std::net::SocketAddr,
-    backend: sync::Arc<sync::RwLock<gamemodes::mode_base::PositiveMahjong>>,
+    backend: sync::Arc<sync::RwLock<crate::base::mode::PositiveMahjong>>,
 ) {
     // 建立 TCP Listener
     let listener: TcpListener = match TcpListener::bind(addr) {
@@ -203,7 +202,7 @@ fn handle_server_base(
 
 #[derive(Debug)]
 pub struct PositiveMahjong {
-    players: Vec<gamemodes_shared::shared_base::PMJPlayer>,
+    players: Vec<base::shared::PMJPlayer>,
     is_game_start: bool,
     is_game_finish: bool,
     /// 未被 使用/抽取 的牌

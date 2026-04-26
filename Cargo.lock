@@ -4559,6 +4559,7 @@ version = "0.1.0"
 dependencies = [
  "console_error_panic_hook",
  "log",
+ "pmj_gamemodes",
  "pmj_shared",
  "reqwest",
  "serde",
@@ -4570,6 +4571,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "pmj_gamemodes"
+version = "0.1.0"
+dependencies = [
+ "getrandom 0.2.17",
+ "iced",
+ "image",
+ "local-ip-address",
+ "pmj_shared",
+ "rand 0.10.0",
+ "serde",
+ "serde_json",
+ "tiny_http",
+ "tungstenite",
+]
+
+[[package]]
 name = "pmj_server"
 version = "0.1.0"
 dependencies = [
@@ -4577,6 +4594,7 @@ dependencies = [
  "iced",
  "image",
  "local-ip-address",
+ "pmj_gamemodes",
  "pmj_shared",
  "rand 0.10.0",
  "serde",
