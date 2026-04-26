@@ -49,3 +49,7 @@
 - 客戶端Cargo.toml 移除無效Android設定
 - 更新README
 - 修復檔案Header
+
+**2026-4-26**
+
+- 修復CI

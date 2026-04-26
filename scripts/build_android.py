@@ -13,6 +13,7 @@
 # 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
+import os
 import subprocess
 import sys
 
@@ -37,13 +38,30 @@ def main():
             "--lib",
         ]
         print("Run Command: " + " ".join(command))
-        subprocess.run(
-            command,
-            check=True,
-            stderr=sys.stderr,
-            stdin=sys.stdin,
-            stdout=sys.stdout,
-        )
+        if "--ci" in sys.argv:
+            secret_ks_path = os.path.abspath(
+                os.path.join(
+                    os.path.dirname(os.path.dirname(__file__)),
+                    "secret",
+                    "TW0hank0.keystore",
+                )
+            )
+            subprocess.run(
+                command,
+                check=True,
+                stderr=sys.stderr,
+                stdin=sys.stdin,
+                stdout=sys.stdout,
+                env={"CARGO_APK_RELEASE_KEYSTORE": secret_ks_path},
+            )
+        else:
+            subprocess.run(
+                command,
+                check=True,
+                stderr=sys.stderr,
+                stdin=sys.stdin,
+                stdout=sys.stdout,
+            )
 
 
 if __name__ == "__main__":

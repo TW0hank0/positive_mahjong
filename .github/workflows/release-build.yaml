@@ -34,33 +34,36 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: install rustup (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
-          ls
-          .\rustup-init.exe -y --profile minimal
+      - name: Install Dep
+        uses: ./.github/workflows/instdep
 
-      - name: install rustup (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          curl https://sh.rustup.rs -o rust-init.sh
-          sh rust-init.sh -y
+      # - name: install rustup (Windows)
+      #   if: runner.os == 'Windows'
+      #   shell: pwsh
+      #   run: |
+      #     Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
+      #     ls
+      #     .\rustup-init.exe -y --profile minimal
 
-      - name: check rust Install
-        run: |
-          rustc --version
-          cargo --version
+      # - name: install rustup (Linux)
+      #   if: runner.os == 'Linux'
+      #   run: |
+      #     curl https://sh.rustup.rs -o rust-init.sh
+      #     sh rust-init.sh -y
 
-      - name: install java
-        uses: actions/setup-java@v5
-        with:
-          distribution: "temurin" # See 'Supported distributions' for available options
-          java-version: "21"
+      # - name: check rust Install
+      #   run: |
+      #     rustc --version
+      #     cargo --version
 
-      - name: Setup Android
-        uses: android-actions/setup-android@v4
+      # - name: install java
+      #   uses: actions/setup-java@v5
+      #   with:
+      #     distribution: "temurin" # See 'Supported distributions' for available options
+      #     java-version: "21"
+
+      # - name: Setup Android
+      #   uses: android-actions/setup-android@v4
 
       # - name: Install Android SDK and NDK
       #   run: |
@@ -79,39 +82,39 @@ jobs:
       #     # 驗證安裝
       #     sdkmanager --list_installed
 
-      - name: install cargo-about
-        run: |
-          cargo install cargo-about
+      # - name: install cargo-about
+      #   run: |
+      #     cargo install cargo-about
 
-      - name: check cargo-about install
-        run: |
-          cargo-about --version
+      # - name: check cargo-about install
+      #   run: |
+      #     cargo-about --version
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
+      # - name: Install uv
+      #   uses: astral-sh/setup-uv@v7
 
-      - name: check uv install
-        run: |
-          uv self version
+      # - name: check uv install
+      #   run: |
+      #     uv self version
 
       - name: sync dep
         run: uv sync --all-extras
 
       - name: use build script
-        run: uv run build_script.py
+        run: uv run scripts/build_script.py
 
       - name: zip files (Linux)
         id: zip_files_linux
         if: runner.os == 'Linux'
         run: |
-          file=$(uv run ci/zip_files.py)
+          file=$(uv run scripts/zip_files.py)
           echo "zip_path=$file" >> $GITHUB_OUTPUT
 
       - name: zip files (Windows)
         if: runner.os == 'Windows'
         id: zip_files_windows
         run: |
-          $file = (uv run ci/zip_files.py)
+          $file = (uv run scripts/zip_files.py)
           echo "zip_path=$file" >> $env:GITHUB_OUTPUT
 
       - name: Upload exe artifact (Linux)
@@ -146,35 +149,38 @@ jobs:
           token: ${{ secrets.SECRET_REPO_TOKEN }} # Repo token
           path: secret
 
-      - name: install rustup (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
-          ls
-          .\rustup-init.exe -y --profile minimal
+      - name: Install Dep
+        uses: ./.github/workflows/instdep
 
-      - name: install rustup (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          curl https://sh.rustup.rs -o rust-init.sh
-          sh rust-init.sh -y
+      # - name: install rustup (Windows)
+      #   if: runner.os == 'Windows'
+      #   shell: pwsh
+      #   run: |
+      #     Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
+      #     ls
+      #     .\rustup-init.exe -y --profile minimal
 
-      - name: check rust Install
-        run: |
-          rustc --version
-          cargo --version
+      # - name: install rustup (Linux)
+      #   if: runner.os == 'Linux'
+      #   run: |
+      #     curl https://sh.rustup.rs -o rust-init.sh
+      #     sh rust-init.sh -y
 
-      - name: install cargo-apk
-        run: |
-          cargo install cargo-apk
+      # - name: check rust Install
+      #   run: |
+      #     rustc --version
+      #     cargo --version
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
+      # - name: install cargo-apk
+      #   run: |
+      #     cargo install cargo-apk
 
-      - name: check uv install
-        run: |
-          uv self version
+      # - name: Install uv
+      #   uses: astral-sh/setup-uv@v7
+
+      # - name: check uv install
+      #   run: |
+      #     uv self version
 
       - name: build apk
         run: |
