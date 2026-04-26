@@ -14,7 +14,7 @@
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 [package]
-name = "pmj_gamemodes"
+name = "pmj_gamemode_guis"
 version = { workspace = true }
 edition = { workspace = true }
 repository = { workspace = true }
@@ -26,17 +26,19 @@ local-ip-address = { workspace = true }
 serde_json = { workspace = true }
 tiny_http = { workspace = true }
 pmj_shared = { workspace = true }
+pmj_gamemodes = { workspace = true }
 rand = { workspace = true }
 serde = { workspace = true }
 tungstenite = { workspace = true }
+iced = { workspace = true }
 image = {workspace = true}
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 getrandom = { version = "0.2.17", features = ["js"] }
 
-[lib]
-name = "pmj_gamemodes"
-path = "src/lib.rs"
+[[bin]]
+name = "pmj_server_gui" # gui
+path = "src/gui_main.rs" # for computer
 
 # [[bin]]
 # name = "pmj_server" #tui (cli)

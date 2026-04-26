@@ -21,13 +21,11 @@ use pmj_shared::shared;
 use pmj_gamemodes;
 use pmj_gamemodes::base;
 
-use pmj_server_lib;
-
 pub fn main() {
     println!("ipv4: {}", local_ip_address::local_ip().unwrap());
     println!("ipv6: {}", local_ip_address::local_ipv6().unwrap());
     //
-    let config: shared::PMJServerConfig = pmj_server_lib::shared::read_server_config();
+    let config: shared::PMJServerConfig = shared::read_server_config();
     match config.gamemode {
         shared::GameModes::Base => {
             let _ = base::mode::main_base(false);

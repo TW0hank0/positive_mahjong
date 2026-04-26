@@ -56,6 +56,7 @@ members = [
     "pmj_server",
     "pmj_shared",
     "pmj_gamemodes",
+    "pmj_gamemode_guis",
 ]
 
 [profile.release]

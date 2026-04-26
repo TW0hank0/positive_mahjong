@@ -21,9 +21,7 @@ use std::{sync, thread};
 use log;
 use tungstenite::{Message, connect};
 
-use pmj_shared::{
-    shared,
-};
+use pmj_shared::shared;
 use pmj_gamemodes::base;
 
 // 引入 Slint 模組

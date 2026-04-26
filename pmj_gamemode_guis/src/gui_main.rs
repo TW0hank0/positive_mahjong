@@ -15,15 +15,14 @@
 
 use iced;
 
-use pmj_server_lib;
+mod base;
 use pmj_shared;
-use pmj_gamemodes::base;
 
 fn main() -> iced::Result {
-    let config = pmj_server_lib::shared::read_server_config();
+    let config = pmj_shared::shared::read_server_config();
     match config.gamemode {
         pmj_shared::shared::GameModes::Base => {
-            base::gui::main()?;
+            base::main()?;
         }
         pmj_shared::shared::GameModes::V1Simple => {
             println!("還未支援！");

@@ -52,7 +52,7 @@ runs:
     - name: install caego-about
       shell: pwsh
       run: |
-        cargo install cargo-about
+        cargo install cargo-about --features="cli" --locked
 
     - name: install mdbook
       shell: pwsh

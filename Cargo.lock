@@ -4571,11 +4571,27 @@ dependencies = [
 ]
 
 [[package]]
-name = "pmj_gamemodes"
+name = "pmj_gamemode_guis"
 version = "0.1.0"
 dependencies = [
  "getrandom 0.2.17",
  "iced",
+ "image",
+ "local-ip-address",
+ "pmj_gamemodes",
+ "pmj_shared",
+ "rand 0.10.0",
+ "serde",
+ "serde_json",
+ "tiny_http",
+ "tungstenite",
+]
+
+[[package]]
+name = "pmj_gamemodes"
+version = "0.1.0"
+dependencies = [
+ "getrandom 0.2.17",
  "image",
  "local-ip-address",
  "pmj_shared",
@@ -4609,6 +4625,7 @@ version = "0.1.0"
 dependencies = [
  "image",
  "serde",
+ "serde_json",
  "tungstenite",
 ]
 

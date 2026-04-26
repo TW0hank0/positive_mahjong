@@ -27,7 +27,7 @@ use iced::{
 use image;
 use local_ip_address;
 
-use crate::base;
+use pmj_gamemodes::base;
 
 use pmj_shared::shared::{FONT_NOTO_SANS_REG_BYTES, ICON_PNG_BYTES, PROJECT_NAME};
 
