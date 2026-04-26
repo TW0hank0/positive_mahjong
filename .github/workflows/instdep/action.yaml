@@ -20,9 +20,6 @@ description: Install workflow needed dep
 runs:
   using: composite
   steps:
-    - name: Setup Rust cache
-      uses: Swatinem/rust-cache@v2
-
     - name: Install uv
       uses: astral-sh/setup-uv@v7
 
@@ -85,3 +82,12 @@ runs:
     - name: Install cargo-apk
       shell: pwsh
       run: cargo install cargo-apk
+
+    - name: install java
+      uses: actions/setup-java@v5
+      with:
+        distribution: "temurin" # See 'Supported distributions' for available options
+        java-version: "21"
+
+    - name: Setup Android
+      uses: android-actions/setup-android@v4

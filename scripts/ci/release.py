@@ -38,8 +38,8 @@ def get_latest_commit_message(repo_path: str = ".") -> Optional[str]:
             cwd=repo_path,
             capture_output=True,
             text=True,
-            check=True,  # 如果返回碼非零，引發 CalledProcessError
-            timeout=10,  # 設定超時防止掛起
+            check=True,
+            timeout=30,
         )
 
         # 移除首尾空白字元（包含換行符）
@@ -73,14 +73,14 @@ def main():
             import get_version
 
             version = get_version.main()
-            owner = "TW0hank0"
+            # owner = "TW0hank0"
             repo = "positive_mahjong"
             tag = f"v{version}"
             title = f"{repo} v{version}"
             date = datetime.datetime.now().date()
             notes = f"v{version} released: {date.year}/{date.month}/{date.day}"
             create_release(tag, title, notes, is_prerelease=False, repo=repo)
-            upload_file(files=os.listdir("artifacts"), tag=tag, owner=owner, repo=repo)
+            # upload_file(files=os.listdir("artifacts"), tag=tag, owner=owner, repo=repo)
         else:
             print("No release.")
 
