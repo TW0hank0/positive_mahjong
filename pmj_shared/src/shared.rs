@@ -19,8 +19,6 @@ use std::fmt::Display;
 
 use serde;
 
-use crate::gamemodes_shared;
-
 pub const PROJECT_NAME: &str = "positive_mahjong";
 pub const PROJECT_VERSION: &str = env!("CARGO_PKG_VERSION");
 

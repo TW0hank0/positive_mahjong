@@ -53,3 +53,5 @@
 **2026-4-26**
 
 - 修復CI
+- 刪除`pmj_test_connection` (將整合`pmj_client`)
+- 玩法獨立

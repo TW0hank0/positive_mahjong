@@ -22,9 +22,9 @@ use log;
 use tungstenite::{Message, connect};
 
 use pmj_shared::{
-    gamemodes_shared::{self, shared_base},
     shared,
 };
+use pmj_gamemodes::base;
 
 // 引入 Slint 模組
 slint::include_modules!();
@@ -142,9 +142,9 @@ pub fn main() -> MainWindow {
                                                         let row_msg = thread_ws.write().unwrap().read().unwrap();
                                                         match row_msg {
                                                             Message::Text(text) => {
-                                                                let msg: shared_base::ServerMessageType = serde_json::from_str(&text).unwrap();
+                                                                let msg: base::shared::ServerMessageType = serde_json::from_str(&text).unwrap();
                                                                 match msg.msg_type {
-                                                                    shared_base::ServerMessageTypeKinds::GameStart => {}
+                                                                    base::shared::ServerMessageTypeKinds::GameStart => {}
                                                                     _ => {}
                                                                 }
                                                             }

@@ -27,7 +27,7 @@ use iced::{
 use image;
 use local_ip_address;
 
-use crate::gamemodes::mode_base;
+use crate::base;
 
 use pmj_shared::shared::{FONT_NOTO_SANS_REG_BYTES, ICON_PNG_BYTES, PROJECT_NAME};
 
@@ -67,7 +67,7 @@ enum GUIMessages {
 
 #[derive(Debug)]
 struct ServerGUI {
-    backend: Arc<RwLock<mode_base::PositiveMahjong>>,
+    backend: Arc<RwLock<base::mode::PositiveMahjong>>,
     local_ipv4_address: std::net::IpAddr,
     local_ipv6_address: std::net::IpAddr,
     msg: String,
@@ -78,7 +78,7 @@ impl ServerGUI {
     fn new() -> Self {
         let ipv4_address = local_ip_address::local_ip().unwrap();
         let ipv6_address = local_ip_address::local_ipv6().unwrap();
-        let backend = mode_base::main_base(true);
+        let backend = base::mode::main_base(true);
         Self {
             backend: backend,
             local_ipv4_address: ipv4_address,
