@@ -103,6 +103,8 @@ uv run scripts/build_android.py
 - [ThirdPartyLicense-Rust.md](./auto_generated/ThirdPartyLicense-Rust.md)
 - [ThirdPartyLicense-Rust.json](./auto_generated/ThirdPartyLicense-Rust.json)
 
+#### 第三方靜態專案聲明
+
 **Slint Logo**
 
 本專案使用的 `Slint Logo` 依據 [CC BY-ND 4.0](./assets/CC-BY-ND-4.0.txt) 授權。作者為 [Slint 開發團隊]。本專案未對該 Logo 檔案進行任何修改。
