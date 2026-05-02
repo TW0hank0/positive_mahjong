@@ -13,17 +13,38 @@
 # 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-[package]
-name = "pmj_shared"
-version.workspace = true
-edition.workspace = true
-repository.workspace = true
-authors.workspace = true
-license = { workspace = true }
-rust-version.workspace = true
+name: cargo-msrv
 
-[dependencies]
-serde = { workspace = true }
-serde_json = {workspace=true}
-tungstenite = { workspace = true}
-image = { workspace = true }
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install Dep
+        uses: ./.github/workflows/instdep
+
+      - name: Run cargo-msrv
+        run: |
+          cargo msrv verify -- --workspace
+
+  find:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install Dep
+        uses: ./.github/workflows/instdep
+
+      - name: Run cargo-msrv
+        run: |
+          cargo msrv find -- --workspace
