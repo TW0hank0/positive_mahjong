@@ -95,3 +95,7 @@ runs:
 
     - name: Setup Android
       uses: android-actions/setup-android@v4
+
+    - name: install cargo-msrv
+      shell: pwsh
+      run: cargo install cargo-msrv
