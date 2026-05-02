@@ -24,19 +24,20 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
+      - run: echo 'current main repo is gitlab.'
+      # - name: Checkout repository
+      #   uses: actions/checkout@v6
+      #   with:
+      #     fetch-depth: 0
 
-      - name: Configure SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.CODEBERG_SSH_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H codeberg.org >> ~/.ssh/known_hosts
+      # - name: Configure SSH
+      #   run: |
+      #     mkdir -p ~/.ssh
+      #     echo "${{ secrets.CODEBERG_SSH_KEY }}" > ~/.ssh/id_ed25519
+      #     chmod 600 ~/.ssh/id_ed25519
+      #     ssh-keyscan -H codeberg.org >> ~/.ssh/known_hosts
 
-      - name: Push to Codeberg
-        run: |
-          git remote add codeberg git@codeberg.org:${{ secrets.CODEBERG_USERNAME }}/${{ secrets.CODEBERG_REPO }}.git
-          git push --mirror codeberg
+      # - name: Push to Codeberg
+      #   run: |
+      #     git remote add codeberg git@codeberg.org:${{ secrets.CODEBERG_USERNAME }}/${{ secrets.CODEBERG_REPO }}.git
+      #     git push --mirror codeberg

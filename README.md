@@ -16,11 +16,13 @@
 
 ### 連結
 
-[Github 儲存庫](https://github.com/TW0hank0/positive_mahjong)
+[Gitlab 主儲存庫](https://gitlab.com/TW0hank0/positive_mahjong)
 
-[Codeberg 鏡像儲存庫](https://codeberg.org/TW0hank0/positive_mahjong)
+[Github 鏡像儲存庫](https://github.com/TW0hank0/positive_mahjong)
 
-[專案文檔](https://tw0hank0.github.io/positive_mahjong)
+[Codeberg 儲存庫](https://codeberg.org/TW0hank0/positive_mahjong)
+
+[Gh-pages 專案文檔](https://tw0hank0.github.io/positive_mahjong)
 
 [KeepAndroidOpen 網站](https://keepandroidopen.org/)
 
