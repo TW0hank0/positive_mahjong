@@ -22,7 +22,7 @@
 
 [Codeberg 儲存庫](https://codeberg.org/TW0hank0/positive_mahjong)
 
-[Gh-pages 專案文檔](https://tw0hank0.github.io/positive_mahjong)
+[Github-pages 專案文檔](https://tw0hank0.github.io/positive_mahjong)
 
 [KeepAndroidOpen 網站](https://keepandroidopen.org/)
 

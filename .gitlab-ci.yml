@@ -1,5 +1,6 @@
 stages:
   - sync
+  - pages
 
 sync_to_mirrors:
   stage: sync
@@ -29,8 +30,32 @@ sync_to_mirrors:
     - git remote add codeberg git@codeberg.org:TW0hank0/positive_mahjong.git
 
     # 鏡像同步
-    - git push --mirror github
-    - git push --mirror codeberg
+    - git push codeberg --all
+    - git push codeberg --tags
+    - git push github --all
+    - git push github --tags
 
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
+
+create-pages:
+  stage: pages
+  pages:
+    # The folder that contains the files to be exposed at the Page URL
+    publish: docs/book
+  rules:
+    # This ensures that only pushes to the default branch will trigger
+    # a pages deploy
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+  # Functions that should be executed before the build script is run
+  before_script:
+    - apk add --no-cache git curl bash llvm gcc pwsh
+    - curl https://sh.rustup.rs -o rustup-inst.sh
+    - sh rustup-inst.sh -y
+    - cargo install cargo-about
+    - cargo install mdbook
+    - curl -LsSf https://astral.sh/uv/install.sh | sh
+    - uv python install cpython-3.14
+  script:
+    - uv run scripts/build_license.py
+    - cd docs && mdbook build && cd ..
