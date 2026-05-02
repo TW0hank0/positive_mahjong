@@ -24,7 +24,7 @@ def main():
     start_time = time.time()
     print("-" * 10, "cargo build", "-" * 10)
     subprocess.run(
-        ["cargo", "build", "--workspace", "--release", "--locked"],
+        ["cargo", "build", "--workspace", "--release", "--locked", "--features=gui"],
         check=True,
         stdout=sys.stdout,
         stdin=sys.stdin,

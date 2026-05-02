@@ -35,7 +35,8 @@ def main():
             "templates/about_html.hbs",
         ],
         [
-            "cargo-about",
+            "cargo",
+            "about",
             "generate",
             "--threshold",
             "1.0",
@@ -44,7 +45,8 @@ def main():
             "templates/about_json.hbs",
         ],
         [
-            "cargo-about",
+            "cargo",
+            "about",
             "generate",
             "--output-file",
             "auto_generated/ThirdPartyLicense-Rust.md",
