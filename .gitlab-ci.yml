@@ -5,18 +5,15 @@ sync_to_mirrors:
   stage: sync
   image: alpine:latest
   before_script:
-    # 安裝必要工具 (Secure Files 下載需要 curl 和 bash)
+    # 安裝必要工具
     - apk add --no-cache git openssh-client curl bash
-
-    # 下載並執行官方 Secure Files 載入工具
-    # 這會將你的 sync_key 下載到專案目錄下的 .secure_files/ 資料夾
     - curl -s https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer | bash
 
     # 啟動 SSH Agent 並載入安全檔案中的私鑰
     - eval $(ssh-agent -s) > /dev/null
     #
-    - chmod 400 .secure_files/sync_key
-    - ssh-add .secure_files/sync_key > /dev/null 2>&1
+    - chmod 400 .secure_files/sync_bot
+    - ssh-add .secure_files/sync_bot > /dev/null 2>&1
 
     # 建立信任主機
     - mkdir -p ~/.ssh && chmod 700 ~/.ssh
