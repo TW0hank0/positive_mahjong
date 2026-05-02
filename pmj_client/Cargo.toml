@@ -21,6 +21,7 @@ repository = { workspace = true }
 authors = { workspace = true }
 default-run = "pmj_client"
 license = { workspace = true }
+rust-version.workspace = true
 
 [[bin]]
 name = "pmj_client"
