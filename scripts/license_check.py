@@ -74,6 +74,7 @@ def main():
         fix_command.extend(ignored.copy())
         fix_command.append(".")
         print("Fix Command:", " ".join(fix_command))
+        sys.exit(1)
     else:
         print("Check Finish.")
 
