@@ -17,6 +17,9 @@
 
 use std::fmt::Display;
 
+use serde_json;
+use std::fs;
+
 use serde;
 
 pub const PROJECT_NAME: &str = "positive_mahjong";
@@ -300,5 +303,20 @@ impl Default for PMJServerConfig {
         Self {
             gamemode: GameModes::Base,
         }
+    }
+}
+
+pub fn read_server_config() -> PMJServerConfig {
+    if fs::exists(SERVER_CONFIG_FILE_NAME).unwrap_or(false) {
+        let config_str = fs::read_to_string(SERVER_CONFIG_FILE_NAME).unwrap();
+        serde_json::from_str(&config_str).unwrap()
+    } else {
+        let default_config = PMJServerConfig::default();
+        fs::write(
+            SERVER_CONFIG_FILE_NAME,
+            serde_json::to_string_pretty(&default_config).unwrap(),
+        )
+        .ok();
+        default_config
     }
 }

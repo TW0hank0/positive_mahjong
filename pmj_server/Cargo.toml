@@ -37,14 +37,13 @@ image = {workspace = true}
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 getrandom = { version = "0.2.17", features = ["js"] }
 
-[[bin]]
-name = "pmj_server" #tui (cli)
-path = "src/main.rs" # for computer
+[features]
+gui=[]
 
 [[bin]]
-name = "pmj_server_gui" # gui
-path = "src/gui_main.rs" # for computer
+name = "pmj_server"
+path = "src/main.rs"
 
-[lib]
-name = "pmj_server_lib"
-path = "src/lib.rs"
+[[bin]]
+name = "pmj_server_gui"
+path = "src/gui_main.rs"

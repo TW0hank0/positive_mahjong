@@ -29,11 +29,14 @@ pmj_shared = { workspace = true }
 rand = { workspace = true }
 serde = { workspace = true }
 tungstenite = { workspace = true }
-iced = { workspace = true }
 image = {workspace = true}
+iced = {workspace=true, default-features=false, optional=true}
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 getrandom = { version = "0.2.17", features = ["js"] }
+
+[features]
+gui = ["dep:iced"]
 
 [lib]
 name = "pmj_gamemodes"

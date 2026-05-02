@@ -1,3 +1,16 @@
 {
-  "project_name": "positive_mahjong"
+  "project_name": "positive_mahjong",
+  "lsp": {
+    "rust-analyzer": {
+      "initialization_options": {
+        "cargo": {
+          "features": ["gui"],
+        },
+      },
+    },
+  },
+
+  // Zed 全域設定建議
+  "format_on_save": "on",
+  "ensure_final_newline_on_save": true,
 }

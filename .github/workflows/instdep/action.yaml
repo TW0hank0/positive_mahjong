@@ -52,7 +52,7 @@ runs:
     - name: install caego-about
       shell: pwsh
       run: |
-        cargo install cargo-about
+        cargo install cargo-about --features="cli" --locked
 
     - name: install mdbook
       shell: pwsh
@@ -95,3 +95,7 @@ runs:
 
     - name: Setup Android
       uses: android-actions/setup-android@v4
+
+    - name: install cargo-msrv
+      shell: pwsh
+      run: cargo install cargo-msrv
