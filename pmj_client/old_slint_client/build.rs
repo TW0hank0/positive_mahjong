@@ -13,23 +13,11 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-//use std::fs;
-//use std::path::Path;
-
-//use cargo_metadata::MetadataCommand;
-
-//use positive_tool_rs;
-
-/* use serde;
-use serde_json; */
-
 use std;
 
 use slint_build;
 
 fn main() {
-    //println!("cargo:rerun-if-changed=ui/main.slint");
-    //println!("cargo:rerun-if-changed=src/client.rs");
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=ui");
     //
@@ -41,7 +29,7 @@ fn main() {
     match slint_build::compile_with_config("ui/main.slint", config) {
         Ok(_) => {}
         Err(e) => {
-            panic!("Slint編譯錯誤！訊息：{}", e);
+            panic!("(pmj_client/build.rs) Slint編譯錯誤！訊息：{}", e);
         }
     }
 

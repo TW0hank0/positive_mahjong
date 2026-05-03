@@ -41,6 +41,9 @@ def main():
         "**/*.ico",
         "**/*.sh",
         "**/*.bat",
+        # pmj_client包含第三方程式碼
+        # [android-iced-example](https://github.com/ibaryshnikov/android-iced-example)
+        "pmj_client/src/**",
     ]
     ignored = []
     for dir in ignore_dir:

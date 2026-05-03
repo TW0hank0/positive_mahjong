@@ -55,3 +55,11 @@
 - 修復CI
 - 刪除`pmj_test_connection` (將整合`pmj_client`)
 - 玩法獨立
+
+**2026-5-2 - Gitlab**
+
+- 主Repo 移至Gitlab
+
+**2026-5-3**
+
+- 客戶端改用iced框架
