@@ -41,18 +41,19 @@ pub struct PMJPlayer {
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct ServerMessageType {
     pub msg_type: ServerMessageTypeKinds,
-    pub info_change_turn: Option<u8>,
     pub info_hand_card_change: Option<Vec<PMJCard>>,
     pub info_error: Option<String>,
+    /// Option<(玩家Id, 動作)>
+    pub info_player_action: Option<(u8, GameTurnTypes)>,
 }
 
 impl Default for ServerMessageType {
     fn default() -> Self {
         Self {
             msg_type: ServerMessageTypeKinds::Error,
-            info_change_turn: None,
+            info_player_action: None,
             info_hand_card_change: None,
-            info_error: None,
+            info_error: Some(String::from("Default `info_error` value.")),
         }
     }
 }
@@ -65,11 +66,14 @@ pub enum ServerMessageTypeKinds {
     /// 手牌變動
     HandCardChange,
     Error,
+    /// 玩家動作
+    PlayerAction,
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct ClientMessageType {
     pub msg_type: ClientMessageTypeKinds,
+    pub info_game_action: Option<GameTurnTypes>,
     ///丟牌
     pub info_throw_card: Option<PMJCard>,
     ///補花
@@ -87,7 +91,8 @@ pub struct ClientMessageType {
 impl Default for ClientMessageType {
     fn default() -> Self {
         Self {
-            msg_type: ClientMessageTypeKinds::GetCard,
+            msg_type: ClientMessageTypeKinds::GameAction,
+            info_game_action: None,
             info_throw_card: None,
             info_replace_a_flower: None,
             info_concealed_kong: None,
@@ -100,32 +105,8 @@ impl Default for ClientMessageType {
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub enum ClientMessageTypeKinds {
-    ///抽牌
-    GetCard,
-    ///丟牌
-    ThrowCard,
-    ///補花
-    ReplacingAFlower,
-    ///吃
-    Eat,
-    ///碰
-    Triplet,
-    ///明槓
-    ExposedKong,
-    ///暗槓
-    ConcealedKong,
+    GameAction,
 }
-
-/*pub fn need_throw_after_action(act: ClientMessageTypeKinds) -> bool {
-    match act {
-        ClientMessageTypeKinds::GetCard => true,
-        ClientMessageTypeKinds::ConcealedKong => true,
-        ClientMessageTypeKinds::ExposedKong => true,
-        ClientMessageTypeKinds::Eat => true,
-        ClientMessageTypeKinds::Triplet => true,
-        _ => false,
-    }
-}*/
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub enum GameTurnTypes {

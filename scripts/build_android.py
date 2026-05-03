@@ -36,6 +36,7 @@ def main():
             "pmj_client",
             "--release",
             "--lib",
+            "--features=android",
         ]
         print("Run Command: " + " ".join(command))
         if "--ci" in sys.argv:

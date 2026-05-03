@@ -1,19 +1,5 @@
 # license_assets
 
-### positive_mahjong
-
-版權所有 (C) 2026 TW0hank0
-
-本程式基於 GNU Affero General Public License v3 授權
-
-第三方專案授權聲明檔案：
-
-- [ThirdPartyLicense-Rust.html](./auto_generated/ThirdPartyLicense-Rust.html)
-- [ThirdPartyLicense-Rust.md](./auto_generated/ThirdPartyLicense-Rust.md)
-- [ThirdPartyLicense-Rust.json](./auto_generated/ThirdPartyLicense-Rust.json)
-
----
-
 下方 資料夾/檔案 路徑 相對於專案根目錄。
 
 ### Slint Logo
@@ -28,7 +14,6 @@
 
 > 資料夾路徑：`pmj_client/material/`
 
-
 ### Noto Sans TC
 
 本專案使用的 `Noto Sans TC` 依據 [SIL OPEN FONT LICENSE Version 1.1](assets/Noto_Sans_TC/OFL.txt) 授權。作者為 [Google 與 Adobe]。
@@ -40,3 +25,7 @@
 本專案使用的 `Material Symbols` 依據 [Apache License Version 2.0](assets/material_symbols/LICENSE) 授權。作者為 [Google]。
 
 > 資料夾路徑：`assets/material_symbols`
+
+### android-iced-example
+
+`pmj_client` 包含 [android-iced-example(https://github.com/ibaryshnikov/android-iced-example)](https://github.com/ibaryshnikov/android-iced-example) 的程式碼，依據 [MIT License](https://github.com/ibaryshnikov/android-iced-example/blob/master/LICENSE) 授權。作者為 [[ibaryshnikov](https://github.com/ibaryshnikov/)]。

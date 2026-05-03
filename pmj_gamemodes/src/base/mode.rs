@@ -13,21 +13,22 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-use rand;
-use rand::{prelude::SliceRandom, seq::IndexedRandom};
+use std::{
+    self,
+    net::{self, TcpListener, TcpStream},
+    sync::{self, Arc, RwLock},
+    thread,
+};
 
-use std;
-use std::net;
-use std::net::{TcpListener, TcpStream};
-use std::sync::{self, Arc, RwLock};
-use std::thread;
+use rand::{self, prelude::SliceRandom, seq::IndexedRandom};
+
 use tungstenite::{Error, Message, WebSocket, accept};
 
-use crate::base::shared::{
-    GameTurnTypes, PMJCard, PMJCardFlowerType, PMJCardType, PMJCardWordsType, PMJPlayer,
-};
 use crate::base::shared as shared_base;
-use crate::base;
+use crate::base::{
+    self,
+    shared::{GameTurnTypes, PMJCard, PMJCardFlowerType, PMJCardType, PMJCardWordsType, PMJPlayer},
+};
 use pmj_shared::shared;
 
 fn write_reply(
@@ -74,7 +75,7 @@ fn handle_client(
                             Ok(req) => {
                                 if req.app_name != String::from("positive_mahjong") {
                                     let _reply_result = write_reply(
-                                        format!("這是 `positive_mahjong` 的伺服器！"),
+                                        format!("這是 `positive_mahjong` 的伺服器端！"),
                                         sync::Arc::clone(&ws),
                                     );
                                 } else {
@@ -138,10 +139,8 @@ fn handle_client(
     //println!("連線已終止");
 }
 
-pub fn main_base(gui_mode: bool) -> Arc<RwLock<crate::base::mode::PositiveMahjong>> {
-    let backend = sync::Arc::new(sync::RwLock::new(
-        crate::base::mode::PositiveMahjong::new(),
-    ));
+pub fn main_base(gui_mode: bool) -> Option<Arc<RwLock<crate::base::mode::PositiveMahjong>>> {
+    let backend = sync::Arc::new(sync::RwLock::new(crate::base::mode::PositiveMahjong::new()));
     let server_addr_ipv4 = std::net::SocketAddr::V4(std::net::SocketAddrV4::new(
         std::net::Ipv4Addr::UNSPECIFIED,
         shared::SERVER_PORT,
@@ -162,12 +161,12 @@ pub fn main_base(gui_mode: bool) -> Arc<RwLock<crate::base::mode::PositiveMahjon
         handle_server_base(server_addr_ipv6, server_backend_ipv6)
     }));
     if gui_mode {
-        backend
+        Some(backend)
     } else {
         for server in servers {
             let _thread_result = server.join();
         }
-        backend
+        None
     }
 }
 
@@ -392,7 +391,8 @@ impl PositiveMahjong {
         // rng init
         let mut rng = rand::rng();
         self.unused_card.shuffle(&mut rng);
-        loop {
+        // main loop
+        'game: loop {
             match current_action {
                 GameTurnTypes::GetCard => {
                     let player = self
@@ -419,21 +419,39 @@ impl PositiveMahjong {
                     })
                     .unwrap();
                     let _write_result = write_reply(client_msg, player.player_ws.clone());
-                    // 丟牌
-                    let raw_msg = player.player_ws.write().unwrap().read().unwrap();
-                    match raw_msg {
+                    current_action = GameTurnTypes::ThrowCard;
+                }
+                GameTurnTypes::ThrowCard => {
+                    let player = self
+                        .players
+                        .get_mut(current_turn_player_id as usize)
+                        .unwrap();
+                    let player_ws = player.player_ws.clone();
+                    let mut guard = player_ws.write().unwrap();
+                    let ws_msg = guard.read().unwrap();
+                    match ws_msg {
                         Message::Text(text) => {
-                            let msg: shared_base::ClientMessageType =
+                            let msg: base::shared::ClientMessageType =
                                 serde_json::from_str(&text).unwrap();
                             match msg.msg_type {
-                                shared_base::ClientMessageTypeKinds::ThrowCard => {}
-                                _ => {
-                                    eprintln!("客戶端錯誤行為！");
-                                }
+                                base::shared::ClientMessageTypeKinds::GameAction => {
+                                    let player_action = msg.info_game_action.unwrap();
+                                    match player_action {
+                                        GameTurnTypes::ThrowCard => {}
+                                        _ => {
+                                            eprintln!("錯誤：客戶端錯誤訊息");
+                                            todo!("錯誤處理");
+                                        }
+                                    }
+                                } /* _ => {
+                                      eprintln!("錯誤：客戶端錯誤訊息");
+                                      todo!("錯誤處理");
+                                  } */
                             }
                         }
                         _ => {
-                            eprintln!("不支援的Message::?");
+                            eprintln!("錯誤：客戶端錯誤訊息");
+                            todo!("錯誤處理");
                         }
                     }
                 }
@@ -441,18 +459,6 @@ impl PositiveMahjong {
                     eprintln!("不支援的動作！Action：{:?}", current_action)
                 }
             }
-            //
-            let turn_msg = serde_json::to_string(&shared_base::ServerMessageType {
-                msg_type: shared_base::ServerMessageTypeKinds::ChangedTurn,
-                info_change_turn: Some(current_turn_player_id),
-                ..Default::default()
-            })
-            .unwrap();
-            for player in self.players.iter() {
-                let _write_result =
-                    write_reply(turn_msg.clone(), sync::Arc::clone(&player.player_ws));
-            }
-            current_turn_player_id += 1;
         }
     }
 }

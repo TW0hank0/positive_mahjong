@@ -2,7 +2,7 @@
 
 ![icon](./assets/icon.png)
 
-**繁體中文** | [English](READMEs/README_en.md)
+**繁體中文** | [English(Outdated)](READMEs/README_en.md)
 
 **仍在開發中，未完成**
 
@@ -26,70 +26,19 @@
 
 [KeepAndroidOpen 網站](https://keepandroidopen.org/)
 
-### 檔案結構
+### 安裝
 
-見：[專案文檔](https://tw0hank0.github.io/positive_mahjong)
+詳見：[專案文檔](https://tw0hank0.github.io/positive_mahjong)
 
-**已過時**
+#### Desktop
 
-```
-project_root
-└─ .cargo/ => Cargo設定
-└─ .github/
-...└─ workflows/ => 工作流(CI)
-...└─ ISSUE_TEMPLATE/ => Issue模板
-└─ assets/ => 資料
-└─ auto_generate/ => 使用腳本產生的檔案
-└─ ci/ => 工作流 (workflow - CI)
-└─ pmj_client/ => 客戶端 (rust)
-...└─ ui/ => Slint UI檔案
-...└─ src/ => Rust 客戶端程式碼
-└─ pmj_server/ => 伺服器 (rust)
-└─ pmj_shared/ => 共用資料
-...└─ src/
-......└─ shared.rs => 通用資料 (玩法通用資料)
-......└─ gamemodes_shared/ => 玩法資料
-└─ pmj_test_connection/ => 測試連線
-└─ scripts/ => 腳本 (含編譯腳本)
-└─ templates/ => 模板
-...└─ about_html.hbs => cargo-about的html格式生成模板
-...└─ about_json.hbs => cargo-about的json格式生成模板
-...└─ about_markdown.hbs => cargo-about的markdown格式生成模板
-...└─ addlicense.template => addlicense的檔案Headler模板
-└─ secret/ => (**Ignored**) **不能上傳** 的資料
-...└─ TW0hank0.keystore => Android用 Keystore
-└─ res/ => Android用 assets
-└─ LICENSE => AGPL-3.0-only
-└─ about.toml => cargo-about 設定
-```
+安裝程式開發中...
 
-### 編譯
+#### Android
 
-見：[專案文檔](https://tw0hank0.github.io/positive_mahjong)
+目前只有pmj_client可在Android使用，在Release下載pmj_client.apk並安裝。
 
-需要rust工具鏈
-
-**電腦**
-
-執行：
-
-```bash
-uv run scripts/build_computer.py
-```
-
-**Android手機**
-
-需要cargo-apk(`cargo install cargo-apk`)、java、Android sdk+ndk、android-target(`rustup target add aarch64-linux-android`)
-
-執行：
-
-```bash
-uv run scripts/build_android.py
-```
-
-**WEB-WASM**
-
-目前不支援
+> 之後會嘗試server在android的可行性
 
 ### 授權與聲明
 

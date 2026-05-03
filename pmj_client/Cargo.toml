@@ -1,27 +1,71 @@
-# SPDX-License-Identifier: AGPL-3.0-only
-# 著作權所有 (C) 2026 TW0hank0
-#
-# 本檔案屬於 positive_mahjong 專案的一部分。
-# 專案儲存庫：https://github.com/TW0hank0/positive_mahjong
-#
-# 本程式為自由軟體：您可以根據自由軟體基金會發佈的 GNU Affero 通用公共授權條款
-# 第 3 版（僅此版本）重新發佈及/或修改本程式。
-#
-# 本程式的發佈是希望它能發揮功用，但不提供任何擔保；
-# 甚至沒有隱含的適銷性或特定目的適用性擔保。詳見 GNU Affero 通用公共授權條款。
-#
-# 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
-# 如果沒有，請參見 <https://www.gnu.org/licenses/>。
-
 [package]
 name = "pmj_client"
 version = { workspace = true }
 edition = { workspace = true }
 repository = { workspace = true }
-authors = { workspace = true }
-default-run = "pmj_client"
 license = { workspace = true }
+authors = { workspace = true }
 rust-version.workspace = true
+
+[dependencies]
+# --- shared ---
+log = "0.4"
+futures = "0.3"
+pmj_shared = { workspace = true }
+# iced_widget = { version = "0.14", features = ["wgpu"] }
+# iced_core = { version = "0.14" }
+# iced_winit = { version = "0.14", default-features = false }
+# iced_wgpu = { version = "0.14" }
+# --- desktop ---
+iced = { optional = true, git = "https://github.com/ibaryshnikov/iced.git", rev = "1296490", default-features = false, features = ["wgpu", "tiny-skia", "thread-pool"] }
+# --- android ---
+android_logger = {version ="0.14.1", optional=true}
+android-activity = { version = "0.6", features = ["native-activity"], optional=true }
+ndk-context = {version ="0.1", optional=true}
+jni = { version = "0.21", features = ["invocation"], optional=true }
+winit = { version = "0.30", optional = true }
+# ndk-sys = "0.6.0"
+# ndk = "0.9.0"
+# --- wasm ---
+wasm-bindgen = { version = "0.2", optional=true }
+console_error_panic_hook = { version = "0.1.5", optional=true }
+
+[dependencies.iced_core]
+git = "https://github.com/ibaryshnikov/iced.git"
+rev = "1296490"
+# path = "../../iced/core"
+
+[dependencies.iced_widget]
+git = "https://github.com/ibaryshnikov/iced.git"
+rev = "1296490"
+features = ["wgpu"]
+# path = "../../iced/widget"
+
+[dependencies.iced_winit]
+git = "https://github.com/ibaryshnikov/iced.git"
+rev = "1296490"
+# path = "../../iced/winit"
+default-features = false
+
+[dependencies.iced_wgpu]
+git = "https://github.com/ibaryshnikov/iced.git"
+rev = "1296490"
+# path = "../../iced/wgpu"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = { version = "0.2" }
+console_error_panic_hook = "0.1.5"
+
+# [target.'cfg(target_os = "android")'.dependencies]
+# android_logger = "0.14.1"
+# android-activity = { version = "0.6", features = ["native-activity"] }
+# ndk-context = "0.1"
+
+[features]
+default = []
+desktop = ["dep:iced"]
+android = ["dep:android_logger", "dep:android-activity", "dep:ndk-context", "dep:jni", "dep:winit"]
+wasm = ["dep:wasm-bindgen", "dep:console_error_panic_hook"]
 
 [[bin]]
 name = "pmj_client"
@@ -30,24 +74,6 @@ path = "src/main.rs"
 [lib]
 crate-type = ["lib", "cdylib"]
 name = "pmj_client_lib"
-
-[dependencies]
-reqwest = { workspace = true, features = ["blocking"] }
-pmj_shared = { workspace = true }
-pmj_gamemodes = { workspace = true }
-slint = { workspace = true }
-serde_json = { workspace = true }
-serde = { workspace = true }
-tungstenite = { workspace = true }
-log = {workspace=true}
-
-[target.'cfg(target_arch = "wasm32")'.dependencies]
-wasm-bindgen = { version = "0.2" }
-console_error_panic_hook = "0.1.5"
-# tokio = "1.50.0"
-
-[build-dependencies]
-slint-build = "1.15.1"
 
 [package.metadata.android]
 package = "io.github.tw0hank0.positive_mahjong"
@@ -58,10 +84,6 @@ build_targets = ["aarch64-linux-android"]
 [package.metadata.android.application]
 label = "pmj_client"
 icon = "@mipmap/icon"
-# 無效欄位
-#is_game = true
-# 無效欄位
-#app_category = "game"
 # See https://developer.android.com/guide/topics/manifest/application-element#theme
 #
 # Example shows setting the theme of an application to fullscreen.

@@ -24,6 +24,7 @@ use iced::{
     self,
     widget::{self, Column, Row, container, text},
 };
+
 use image;
 use local_ip_address;
 
@@ -78,7 +79,7 @@ impl ServerGUI {
     fn new() -> Self {
         let ipv4_address = local_ip_address::local_ip().unwrap();
         let ipv6_address = local_ip_address::local_ipv6().unwrap();
-        let backend = base::mode::main_base(true);
+        let backend = base::mode::main_base(true).unwrap();
         Self {
             backend: backend,
             local_ipv4_address: ipv4_address,
@@ -97,7 +98,9 @@ impl ServerGUI {
                     Ok(mut guard) => {
                         guard.start_game();
                     }
-                    Err(_err) => { /* TODO: error handle */ }
+                    Err(_err) => {
+                        todo!("TODO: error handle")
+                    }
                 });
             }
         }

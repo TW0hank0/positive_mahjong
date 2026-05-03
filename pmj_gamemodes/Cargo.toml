@@ -25,7 +25,6 @@ rust-version.workspace = true
 [dependencies]
 local-ip-address = { workspace = true }
 serde_json = { workspace = true }
-tiny_http = { workspace = true }
 pmj_shared = { workspace = true }
 rand = { workspace = true }
 serde = { workspace = true }
