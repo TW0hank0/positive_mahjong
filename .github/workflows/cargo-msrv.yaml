@@ -21,30 +21,40 @@ on:
       - master
 
 jobs:
-  verify:
+  msrv:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
-
       - name: Install Dep
         uses: ./.github/workflows/instdep
+      - run: uv run scripts/ci/cargo_msrv.py
+  # verify:
+  #   runs-on: ubuntu-latest
 
-      - name: Run cargo-msrv
-        run: |
-          cargo msrv verify -- --workspace
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v6
 
-  find:
-    runs-on: ubuntu-latest
+  #     - name: Install Dep
+  #       uses: ./.github/workflows/instdep
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
+  #     - name: Run cargo-msrv
+  #       run: |
+  #         cargo msrv verify -- --workspace
 
-      - name: Install Dep
-        uses: ./.github/workflows/instdep
+  # find:
+  #   runs-on: ubuntu-latest
 
-      - name: Run cargo-msrv
-        run: |
-          cargo msrv find -- --workspace
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v6
+
+  #     - name: Install Dep
+  #       uses: ./.github/workflows/instdep
+
+  #     - name: Run cargo-msrv
+  #       run: |
+  #         cd pmj_client
+  #         cargo msrv find
+  #         cd ..

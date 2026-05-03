@@ -1734,7 +1734,7 @@ checksum = "000e01026c93ba643f8357a3db3ada0e6555265a377f6f9291c472f6dd701fb3"
 dependencies = [
  "iced_core 0.14.0",
  "iced_debug 0.14.0",
- "iced_devtools",
+ "iced_devtools 0.14.0",
  "iced_futures 0.14.0",
  "iced_renderer 0.14.0",
  "iced_runtime 0.14.0",
@@ -1751,6 +1751,7 @@ source = "git+https://github.com/ibaryshnikov/iced.git?rev=1296490#12964902550c3
 dependencies = [
  "iced_core 0.15.0-dev",
  "iced_debug 0.15.0-dev",
+ "iced_devtools 0.15.0-dev",
  "iced_futures 0.15.0-dev",
  "iced_renderer 0.15.0-dev",
  "iced_runtime 0.15.0-dev",
@@ -1768,6 +1769,21 @@ dependencies = [
  "bincode",
  "futures",
  "iced_core 0.14.0",
+ "log",
+ "semver",
+ "serde",
+ "thiserror 2.0.18",
+ "tokio",
+]
+
+[[package]]
+name = "iced_beacon"
+version = "0.15.0-dev"
+source = "git+https://github.com/ibaryshnikov/iced.git?rev=1296490#12964902550c35bd984d7628d646cd8190a92af6"
+dependencies = [
+ "bincode",
+ "futures",
+ "iced_core 0.15.0-dev",
  "log",
  "semver",
  "serde",
@@ -1806,6 +1822,7 @@ dependencies = [
  "log",
  "num-traits",
  "rustc-hash 2.1.1",
+ "serde",
  "smol_str",
  "thiserror 2.0.18",
  "web-time",
@@ -1817,7 +1834,7 @@ version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "25035ab0215a620e53f4103e36fc4e59a1fb2817e4bfc38a30ad27b4202ea0be"
 dependencies = [
- "iced_beacon",
+ "iced_beacon 0.14.0",
  "iced_core 0.14.0",
  "iced_futures 0.14.0",
  "log",
@@ -1828,6 +1845,7 @@ name = "iced_debug"
 version = "0.15.0-dev"
 source = "git+https://github.com/ibaryshnikov/iced.git?rev=1296490#12964902550c35bd984d7628d646cd8190a92af6"
 dependencies = [
+ "iced_beacon 0.15.0-dev",
  "iced_core 0.15.0-dev",
  "iced_futures 0.15.0-dev",
  "log",
@@ -1842,6 +1860,17 @@ dependencies = [
  "iced_debug 0.14.0",
  "iced_program 0.14.0",
  "iced_widget 0.14.2",
+ "log",
+]
+
+[[package]]
+name = "iced_devtools"
+version = "0.15.0-dev"
+source = "git+https://github.com/ibaryshnikov/iced.git?rev=1296490#12964902550c35bd984d7628d646cd8190a92af6"
+dependencies = [
+ "iced_debug 0.15.0-dev",
+ "iced_program 0.15.0-dev",
+ "iced_widget 0.15.0-dev",
  "log",
 ]
 
@@ -3307,6 +3336,7 @@ dependencies = [
  "iced_wgpu 0.15.0-dev",
  "iced_widget 0.15.0-dev",
  "iced_winit 0.15.0-dev",
+ "image",
  "jni",
  "log",
  "ndk-context",
