@@ -9,7 +9,8 @@ rust-version.workspace = true
 
 [dependencies]
 # --- shared ---
-log = "0.4"
+log.workspace = true
+image.workspace = true
 futures = "0.3"
 pmj_shared = { workspace = true }
 # iced_widget = { version = "0.14", features = ["wgpu"] }
@@ -17,7 +18,7 @@ pmj_shared = { workspace = true }
 # iced_winit = { version = "0.14", default-features = false }
 # iced_wgpu = { version = "0.14" }
 # --- desktop ---
-iced = { optional = true, git = "https://github.com/ibaryshnikov/iced.git", rev = "1296490", default-features = false, features = ["wgpu", "tiny-skia", "thread-pool"] }
+iced = { optional = true, git = "https://github.com/ibaryshnikov/iced.git", rev = "1296490", default-features = false, features = ["wgpu", "tiny-skia", "thread-pool", "debug"] }
 # --- android ---
 android_logger = {version ="0.14.1", optional=true}
 android-activity = { version = "0.6", features = ["native-activity"], optional=true }

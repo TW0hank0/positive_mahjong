@@ -28,8 +28,9 @@ pub const PROJECT_VERSION: &str = env!("CARGO_PKG_VERSION");
 pub const ICON_PNG_BYTES: &[u8] = include_bytes!("../../assets/icon.png");
 pub const FONT_NOTO_SANS_REG_BYTES: &[u8] =
     include_bytes!("../../assets/Noto_Sans_TC/static/NotoSansTC-Regular.ttf");
-
-//pub const FONT_NOTO_SANS_REG: iced::font::Font = iced::font::Font::with_name("Noto Sans TC");
+pub const FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES: &[u8] = include_bytes!(
+    "../../assets/material_symbols/MaterialSymbolsOutlined[FILL,GRAD,opsz,wght].ttf"
+);
 
 pub const SERVER_PORT: u16 = 6060;
 

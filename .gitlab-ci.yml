@@ -58,7 +58,7 @@ create-pages:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
   # Functions that should be executed before the build script is run
   before_script:
-    - apk add --no-cache git curl bash llvm gcc pwsh
+    - apk add --no-cache git curl bash llvm gcc clang
     - curl https://sh.rustup.rs -o rustup-inst.sh
     - sh rustup-inst.sh -y
     - cargo install cargo-about

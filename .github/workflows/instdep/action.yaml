@@ -42,6 +42,8 @@ runs:
       run: |
         curl https://sh.rustup.rs -o rust-init.sh
         sh rust-init.sh -y
+        rustup target add x86_64-unknown-linux-musl
+        rustup default x86_64-unknown-linux-musl
 
     - name: check rust Install
       shell: pwsh
