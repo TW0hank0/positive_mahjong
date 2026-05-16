@@ -1,4 +1,8 @@
-use std::{self, net::{IpAddr, TcpStream}, sync};
+use std::{
+    self,
+    net::{IpAddr, TcpStream},
+    sync,
+};
 
 use iced_core::{Border, Padding, border::Radius};
 use iced_wgpu::Renderer;
@@ -33,7 +37,7 @@ pub struct Client {
     current_scene: ClientScenes,
     status_home: HomeStatus,
     status_play_base: PlayBaseStatus,
-    ws: Option<sync::Arc<sync::RwLock<WebSocket<TcpStream>>>>,
+    ws: Option<sync::Arc<sync::RwLock<WebSocket<tungstenite::stream::MaybeTlsStream<TcpStream>>>>>,
     player_id: Option<u8>,
 }
 
@@ -80,7 +84,7 @@ impl Client {
             },
             status_play_base: PlayBaseStatus { server_ip: None },
             ws: None,
-            player_id:None,
+            player_id: None,
         }
     }
     pub fn update(&mut self, message: UIMessage) {
@@ -112,33 +116,32 @@ impl Client {
         match self.current_scene {
             ClientScenes::Home => {
                 let mut title_bar = Row::new().align_y(alignment::Vertical::Center);
-                title_bar = title_bar.push(
-                    text(format!(
-                        "{}",
-                        shared::PROJECT_NAME,
-                    ))
-                    .size(Pixels::from(26)),
-                );
-                title_bar = title_bar.push(text(format!("v{}", shared::PROJECT_VERSION)).size(Pixels::from(22)));
+                title_bar = title_bar
+                    .push(text(format!("{}", shared::PROJECT_NAME,)).size(Pixels::from(26)));
+                title_bar = title_bar
+                    .push(text(format!("v{}", shared::PROJECT_VERSION)).size(Pixels::from(22)));
                 layout = layout.push(title_bar).spacing(16);
                 let mut server_ip_input_bar = Row::new();
-                server_ip_input_bar = server_ip_input_bar.push(
-                    text_input("輸入伺服器地址...", &self.status_home.server_ip)
-                        .on_input(|content| {
-                            UIMessage::Home(HomeMessage::InputServerIpChanged(content))
-                        })
-                        .size(Pixels::from(24))
-                        .style(|theme: &Theme, status: text_input::Status| {
-                            let style = text_input::default(theme, status);
-                            style
-                                .border
-                                .rounded(Radius::new(Pixels::from(12)))
-                                .width(Pixels::from(7));
-                            style
-                        })
-                        .line_height(text::LineHeight::Relative(1.5)),
-                ).spacing(15);
-                server_ip_input_bar = server_ip_input_bar.push(button("connect").on_press(UIMessage::Home(HomeMessage::ConnectServer)));
+                server_ip_input_bar = server_ip_input_bar
+                    .push(
+                        text_input("輸入伺服器地址...", &self.status_home.server_ip)
+                            .on_input(|content| {
+                                UIMessage::Home(HomeMessage::InputServerIpChanged(content))
+                            })
+                            .size(Pixels::from(24))
+                            .style(|theme: &Theme, status: text_input::Status| {
+                                let style = text_input::default(theme, status);
+                                style
+                                    .border
+                                    .rounded(Radius::new(Pixels::from(12)))
+                                    .width(Pixels::from(7));
+                                style
+                            })
+                            .line_height(text::LineHeight::Relative(1.5)),
+                    )
+                    .spacing(15);
+                server_ip_input_bar = server_ip_input_bar
+                    .push(button("connect").on_press(UIMessage::Home(HomeMessage::ConnectServer)));
                 layout = layout.push(server_ip_input_bar).spacing(35);
                 let mut vsoft_keyboard = Grid::new()
                     .height(grid::Sizing::EvenlyDistribute(Length::Shrink))
@@ -231,22 +234,27 @@ impl Client {
 
     fn home_connect_server(&mut self) {
         match connect(self.status_home.server_ip.clone()) {
-            Ok((mut row_ws, _resp)) => {
-                let mut ws = sync::Arc::new(sync::RwLock::new(row_ws));
-                let req_text =
-                    serde_json::to_string(&shared::ClientConnectRequestType {
-                        app_name: String::from("positive_mahjong"),
-                        client: String::from("pmj_client"),
-                    })
-                    .unwrap();
+            Ok((row_ws, _resp)) => {
+                let ws: sync::Arc<
+                    sync::RwLock<WebSocket<tungstenite::stream::MaybeTlsStream<TcpStream>>>,
+                > = sync::Arc::new(sync::RwLock::new(row_ws));
+                let req_text = serde_json::to_string(&shared::ClientConnectRequestType {
+                    app_name: String::from("positive_mahjong"),
+                    client: String::from("pmj_client"),
+                })
+                .unwrap();
                 let _ = ws.write().unwrap().send(Message::Text(req_text.into()));
                 let raw_msg = ws.write().unwrap().read().unwrap();
                 match raw_msg {
                     Message::Text(text) => {
-                        let msg: shared::ServerFirstConnectType = serde_json::from_str(&text).unwrap();
+                        let msg: shared::ServerFirstConnectType =
+                            serde_json::from_str(&text).unwrap();
                         if msg.player_id.is_some() {
-                        self.ws = ws.clone()
-                            self.player_id = msg.player_id;} else {eprintln!("error: msg.player_id is None");}
+                            self.ws = Some(ws.clone());
+                            self.player_id = msg.player_id;
+                        } else {
+                            eprintln!("error: msg.player_id is None");
+                        }
                     }
                     _ => { /* 忽略 */ }
                 }
