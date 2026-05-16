@@ -22,7 +22,7 @@ use std::{
 
 use iced::{
     self,
-    widget::{self, Column, Row, container, text},
+    widget::{self, Column, Row, container, scrollable, text},
 };
 
 use image;
@@ -58,12 +58,15 @@ pub fn main() -> iced::Result {
     app_settings.id = Some(String::from(PROJECT_NAME));
     app_settings.default_text_size = iced::Pixels::from(24);
     app_settings.default_font = FONT_NOTO_SANS_REG;
-    iced::application(ServerGUI::new, ServerGUI::update, ServerGUI::view).title(ServerGUI::title).run()
+    iced::application(ServerGUI::new, ServerGUI::update, ServerGUI::view)
+        .title(ServerGUI::title)
+        .run()
 }
 
 #[derive(Debug, Clone, Copy)]
 enum GUIMessages {
     StartGame,
+    FetchPlayerInfo,
 }
 
 #[derive(Debug)]
@@ -73,6 +76,7 @@ struct ServerGUI {
     local_ipv6_address: std::net::IpAddr,
     msg: String,
     is_start: bool,
+    players: Vec<base::shared::PMJPlayer>,
 }
 
 impl ServerGUI {
@@ -86,6 +90,7 @@ impl ServerGUI {
             local_ipv6_address: ipv6_address,
             msg: String::new(),
             is_start: false,
+            players: Vec::new(),
         }
     }
 
@@ -102,6 +107,9 @@ impl ServerGUI {
                         todo!("TODO: error handle")
                     }
                 });
+            }
+            GUIMessages::FetchPlayerInfo => {
+                self.players = self.backend.read().unwrap().get_players_info();
             }
         }
     }
@@ -135,10 +143,31 @@ impl ServerGUI {
                 })*/;
             layout = layout.push(start_button);
         } else {
-            layout = layout.push(
-                text("遊戲已開始！")
-            )
+            layout = layout.push(text("遊戲已開始！"))
         }
+        layout = layout.spacing(50);
+        //
+        let mut player_info = Column::new();
+        for player in self.players.iter() {
+            let mut info_bar = Row::new();
+            info_bar = info_bar.push(text(player.player_id)).spacing(70);
+            info_bar = info_bar.push(text(player.player_ip_addr.to_string()));
+            player_info = player_info.push(container(info_bar).style(|theme: &iced::Theme| {
+                let ex_palette = theme.extended_palette();
+                container::Style::default()
+                    .border(iced::Border::default().rounded(12))
+                    .background(ex_palette.secondary.weak.color)
+            }));
+        }
+        layout = layout.push(scrollable(container(player_info).style(
+            |theme: &iced::Theme| {
+                let ex_palette = theme.extended_palette();
+                container::Style::default()
+                    .border(iced::border::Border::default().rounded(12))
+                    .background(ex_palette.primary.weak.color)
+            },
+        )));
+        //
         return layout;
     }
 

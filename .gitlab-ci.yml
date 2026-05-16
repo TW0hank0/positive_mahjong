@@ -65,7 +65,7 @@ pages:
     - curl https://sh.rustup.rs -o rustup-inst.sh
     - sh rustup-inst.sh -y
     - . "$HOME/.cargo/env"
-    - cargo install cargo-about
+    - cargo install cargo-about --features cli
     - cargo install mdbook
     - curl -LsSf https://astral.sh/uv/install.sh | sh
     - source $HOME/.local/bin/env

@@ -22,7 +22,7 @@ use tungstenite::WebSocket;
 
 pub const MAX_PLAYER_COUNT: u8 = 4;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PMJPlayer {
     pub player_ip_addr: std::net::IpAddr,
     pub player_id: u8,
@@ -38,7 +38,7 @@ pub struct PMJPlayer {
     pub player_used_cards: Vec<Vec<PMJCard>>,
 }
 
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
 pub struct ServerMessageType {
     pub msg_type: ServerMessageTypeKinds,
     pub info_hand_card_change: Option<Vec<PMJCard>>,
@@ -58,7 +58,7 @@ impl Default for ServerMessageType {
     }
 }
 
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
 pub enum ServerMessageTypeKinds {
     GameStart,
     GameFinish,
@@ -70,7 +70,7 @@ pub enum ServerMessageTypeKinds {
     PlayerAction,
 }
 
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
 pub struct ClientMessageType {
     pub msg_type: ClientMessageTypeKinds,
     pub info_game_action: Option<GameTurnTypes>,
@@ -103,12 +103,12 @@ impl Default for ClientMessageType {
     }
 }
 
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
 pub enum ClientMessageTypeKinds {
     GameAction,
 }
 
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
 pub enum GameTurnTypes {
     ///抽牌
     GetCard,

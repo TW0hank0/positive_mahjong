@@ -305,6 +305,10 @@ impl PositiveMahjong {
         }
     }
 
+    pub fn get_players_info(&self) -> Vec<PMJPlayer> {
+        self.players.clone()
+    }
+
     pub fn is_game_start(&self) -> bool {
         self.is_game_start
     }
