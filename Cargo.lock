@@ -2581,6 +2581,7 @@ dependencies = [
  "android-activity",
  "android_logger",
  "console_error_panic_hook",
+ "futures",
  "iced",
  "iced_core",
  "iced_wgpu",

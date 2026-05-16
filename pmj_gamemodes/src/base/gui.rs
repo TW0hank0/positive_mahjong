@@ -22,7 +22,7 @@ use std::{
 
 use iced::{
     self,
-    widget::{self, Column, Row, container, scrollable, text},
+    widget::{self, Column, Row, button, container, scrollable, text},
 };
 
 use image;
@@ -83,6 +83,8 @@ impl ServerGUI {
     fn new() -> Self {
         let ipv4_address = local_ip_address::local_ip().unwrap();
         let ipv6_address = local_ip_address::local_ipv6().unwrap();
+        println!("ipv4: {}", ipv4_address.to_string());
+        println!("ipv6: {}", ipv6_address.to_string());
         let backend = base::mode::main_base(true).unwrap();
         Self {
             backend: backend,
@@ -147,6 +149,7 @@ impl ServerGUI {
         }
         layout = layout.spacing(50);
         //
+        layout = layout.push(button("Refresh").on_press(GUIMessages::FetchPlayerInfo));
         let mut player_info = Column::new();
         for player in self.players.iter() {
             let mut info_bar = Row::new();
