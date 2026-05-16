@@ -1,6 +1,6 @@
 stages:
   - sync
-  - pages
+  - deploy
 
 sync_to_mirrors:
   stage: sync
@@ -46,12 +46,15 @@ sync_to_mirrors:
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
 
-create-pages:
-  stage: pages
+pages:
+  stage: deploy
   image: alpine:latest
   pages:
     # The folder that contains the files to be exposed at the Page URL
     publish: docs/book
+  artifacts:
+    paths:
+      - docs/book
   rules:
     # This ensures that only pushes to the default branch will trigger
     # a pages deploy
@@ -61,6 +64,7 @@ create-pages:
     - apk add --no-cache git curl bash llvm gcc clang
     - curl https://sh.rustup.rs -o rustup-inst.sh
     - sh rustup-inst.sh -y
+    - . "$HOME/.cargo/env"
     - cargo install cargo-about
     - cargo install mdbook
     - curl -LsSf https://astral.sh/uv/install.sh | sh

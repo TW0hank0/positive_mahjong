@@ -9,19 +9,16 @@ rust-version.workspace = true
 
 [dependencies]
 # --- shared ---
-log.workspace = true
-image.workspace = true
-futures = "0.3"
+log = { workspace = true }
+image = { workspace = true }
+serde_json = { workspace = true }
 pmj_shared = { workspace = true }
-# iced_widget = { version = "0.14", features = ["wgpu"] }
-# iced_core = { version = "0.14" }
-# iced_winit = { version = "0.14", default-features = false }
-# iced_wgpu = { version = "0.14" }
+tungstenite = { workspace = true }
 # --- desktop ---
-iced = { optional = true, git = "https://github.com/ibaryshnikov/iced.git", rev = "1296490", default-features = false, features = ["wgpu", "tiny-skia", "thread-pool", "debug"] }
+iced = { optional = true, git = "https://github.com/iced-rs/iced.git", rev = "1296490", default-features = false, features = ["wgpu", "tiny-skia", "thread-pool", "debug", "time-travel"] }
 # --- android ---
 android_logger = {version ="0.14.1", optional=true}
-android-activity = { version = "0.6", features = ["native-activity"], optional=true }
+android-activity = { version = "0.6", features = ["game-activity"], optional=true }
 ndk-context = {version ="0.1", optional=true}
 jni = { version = "0.21", features = ["invocation"], optional=true }
 winit = { version = "0.30", optional = true }
@@ -32,26 +29,22 @@ wasm-bindgen = { version = "0.2", optional=true }
 console_error_panic_hook = { version = "0.1.5", optional=true }
 
 [dependencies.iced_core]
-git = "https://github.com/ibaryshnikov/iced.git"
+git = "https://github.com/iced-rs/iced.git"
 rev = "1296490"
-# path = "../../iced/core"
 
 [dependencies.iced_widget]
-git = "https://github.com/ibaryshnikov/iced.git"
+git = "https://github.com/iced-rs/iced.git"
 rev = "1296490"
 features = ["wgpu"]
-# path = "../../iced/widget"
 
 [dependencies.iced_winit]
-git = "https://github.com/ibaryshnikov/iced.git"
+git = "https://github.com/iced-rs/iced.git"
 rev = "1296490"
-# path = "../../iced/winit"
 default-features = false
 
 [dependencies.iced_wgpu]
-git = "https://github.com/ibaryshnikov/iced.git"
+git = "https://github.com/iced-rs/iced.git"
 rev = "1296490"
-# path = "../../iced/wgpu"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm-bindgen = { version = "0.2" }

@@ -27,7 +27,6 @@ fn main() -> iced::Result {
     #[cfg(not(feature = "gui"))]
     {
         eprintln!("Must enable `gui` feature.");
-        process::exit(1);
     }
     #[cfg(feature = "gui")]
     {
@@ -43,6 +42,6 @@ fn main() -> iced::Result {
                 println!("還未支援！");
             }
         }
-        Ok(())
     }
+    return Ok(());
 }

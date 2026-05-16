@@ -32,14 +32,15 @@ pmj_gamemodes = { workspace = true }
 rand = { workspace = true }
 serde = { workspace = true }
 tungstenite = { workspace = true }
-iced = { workspace = true }
 image = {workspace = true}
+# --- desktop ---
+iced = { optional = true, git = "https://github.com/iced-rs/iced.git", rev = "1296490", default-features = false, features = ["wgpu", "tiny-skia", "thread-pool", "debug"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 getrandom = { version = "0.2.17", features = ["js"] }
 
 [features]
-gui=[]
+gui = ["dep:iced"]
 
 [[bin]]
 name = "pmj_server"
