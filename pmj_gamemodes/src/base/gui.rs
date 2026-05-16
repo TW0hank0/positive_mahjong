@@ -58,7 +58,7 @@ pub fn main() -> iced::Result {
     app_settings.id = Some(String::from(PROJECT_NAME));
     app_settings.default_text_size = iced::Pixels::from(24);
     app_settings.default_font = FONT_NOTO_SANS_REG;
-    iced::application(ServerGUI::new, ServerGUI::update, ServerGUI::view).run()
+    iced::application(ServerGUI::new, ServerGUI::update, ServerGUI::view).title(ServerGUI::title).run()
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -134,7 +134,15 @@ impl ServerGUI {
                     button_style
                 })*/;
             layout = layout.push(start_button);
+        } else {
+            layout = layout.push(
+                text("遊戲已開始！")
+            )
         }
         return layout;
+    }
+
+    pub fn title(&self) -> String {
+        String::from(PROJECT_NAME)
     }
 }

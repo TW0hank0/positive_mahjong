@@ -1,6 +1,5 @@
 // From: [android-iced-example](https://github.com/ibaryshnikov/android-iced-example)
 // Author: [ibaryshnikov](https://github.com/ibaryshnikov/)
-// LICENSE: [MIT-license](https://github.com/ibaryshnikov/android-iced-example/blob/master/LICENSE)
 
 use jni::objects::{JObject, JString, JValue};
 
