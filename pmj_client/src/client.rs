@@ -118,6 +118,7 @@ impl Client {
                 let mut title_bar = Row::new().align_y(alignment::Vertical::Center);
                 title_bar = title_bar
                     .push(text(format!("{}", shared::PROJECT_NAME,)).size(Pixels::from(26)));
+                title_bar = title_bar.spacing(25);
                 title_bar = title_bar
                     .push(text(format!("v{}", shared::PROJECT_VERSION)).size(Pixels::from(22)));
                 layout = layout.push(title_bar).spacing(16);

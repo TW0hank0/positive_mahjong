@@ -22,6 +22,7 @@ android-activity = { version = "0.6", features = ["game-activity"], optional=tru
 ndk-context = {version ="0.1", optional=true}
 jni = { version = "0.21", features = ["invocation"], optional=true }
 winit = { version = "0.30", optional = true }
+futures = { version = "^0.3", optional = true }
 # ndk-sys = "0.6.0"
 # ndk = "0.9.0"
 # --- wasm ---
@@ -58,7 +59,7 @@ console_error_panic_hook = "0.1.5"
 [features]
 default = []
 desktop = ["dep:iced"]
-android = ["dep:android_logger", "dep:android-activity", "dep:ndk-context", "dep:jni", "dep:winit"]
+android = ["dep:android_logger", "dep:android-activity", "dep:ndk-context", "dep:jni", "dep:winit", "dep:futures"]
 wasm = ["dep:wasm-bindgen", "dep:console_error_panic_hook"]
 
 [[bin]]
