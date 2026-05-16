@@ -68,6 +68,7 @@ pages:
     - cargo install cargo-about
     - cargo install mdbook
     - curl -LsSf https://astral.sh/uv/install.sh | sh
+    - source $HOME/.local/bin/env
     - uv python install cpython-3.14
   script:
     - uv run scripts/build_license.py
