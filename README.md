@@ -8,7 +8,7 @@
 
 ### 特色
 
-使用Rust和Iced製作，支援Linux及Windows系統。
+使用Rust和Iced製作，支援Linux、Android及Windows系統。
 
 ### 連結
 

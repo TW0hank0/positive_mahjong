@@ -64,7 +64,6 @@ fn handle_client(
     'connection: loop {
         // 讀取訊息
         let msg: Result<Message, Error> = ws.write().unwrap().read();
-
         match msg {
             Ok(message) => {
                 match message {
@@ -80,8 +79,7 @@ fn handle_client(
                                     );
                                 } else {
                                     let mut guard = backend.write().unwrap();
-                                    let result_player_id =
-                                        guard.add_player(client_ip, sync::Arc::clone(&ws));
+                                    let result_player_id = guard.add_player(client_ip, ws.clone());
                                     let resp = if result_player_id.is_none() {
                                         shared::ServerConnectResponceType {
                                             gamemode: shared::GameModes::Base,
@@ -98,7 +96,7 @@ fn handle_client(
                                     let resp_msg = serde_json::to_string(&resp).unwrap();
                                     let _wrist_result =
                                         write_reply(resp_msg, sync::Arc::clone(&ws));
-                                    thread::sleep(std::time::Duration::from_secs(30));
+                                    thread::sleep(std::time::Duration::from_secs(1));
                                 }
                             }
                             Err(e) => {
@@ -176,7 +174,10 @@ fn handle_server_base(
 ) {
     // 建立 TCP Listener
     let listener: TcpListener = match TcpListener::bind(addr) {
-        Ok(l) => l,
+        Ok(i) => {
+            println!("已綁定：{}", addr.clone());
+            i
+        }
         Err(e) => {
             eprintln!("無法綁定Port：{}", e);
             return;
@@ -404,17 +405,22 @@ impl PositiveMahjong {
                         .get_mut(current_turn_player_id as usize)
                         .unwrap();
                     {
-                        let card = self.unused_card.choose(&mut rng).unwrap();
-                        let mut index = 0;
-                        'find_index: for i in self.unused_card.iter() {
-                            if i == card {
-                                break 'find_index;
-                            } else {
-                                index += 1;
+                        'choose_card: loop {
+                            let card = self.unused_card.choose(&mut rng).unwrap();
+                            if card.card_type != PMJCardType::Flower {
+                                let mut index = 0;
+                                'find_index: for i in self.unused_card.iter() {
+                                    if i == card {
+                                        break 'find_index;
+                                    } else {
+                                        index += 1;
+                                    }
+                                }
+                                let player_card = self.unused_card.remove(index);
+                                player.player_hand_cards.push(player_card);
+                                break 'choose_card;
                             }
                         }
-                        let player_card = self.unused_card.remove(index);
-                        player.player_hand_cards.push(player_card);
                     }
                     let client_msg = serde_json::to_string(&shared_base::ServerMessageType {
                         msg_type: shared_base::ServerMessageTypeKinds::HandCardChange,
@@ -439,9 +445,40 @@ impl PositiveMahjong {
                                 serde_json::from_str(&text).unwrap();
                             match msg.msg_type {
                                 base::shared::ClientMessageTypeKinds::GameAction => {
-                                    let player_action = msg.info_game_action.unwrap();
-                                    match player_action {
-                                        GameTurnTypes::ThrowCard => {}
+                                    match msg.info_game_action.unwrap() {
+                                        GameTurnTypes::ThrowCard => {
+                                            if player
+                                                .player_hand_cards
+                                                .contains(&msg.info_throw_card.clone().unwrap())
+                                            {
+                                                let mut card_index: usize = 0;
+                                                'find_index: loop {
+                                                    if &msg.info_throw_card.clone().unwrap()
+                                                        == player
+                                                            .player_hand_cards
+                                                            .get(card_index.clone())
+                                                            .unwrap()
+                                                    {
+                                                        break 'find_index;
+                                                    } else {
+                                                        card_index += 1;
+                                                    }
+                                                }
+                                                player.player_hand_cards.remove(card_index);
+                                                let client_msg = serde_json::to_string(&shared_base::ServerMessageType {
+                                                    msg_type: shared_base::ServerMessageTypeKinds::HandCardChange,
+                                                    info_hand_card_change: Some(player.player_hand_cards.clone()),
+                                                    ..Default::default()
+                                                })
+                                                .unwrap();
+                                                let _write_result = write_reply(
+                                                    client_msg,
+                                                    player.player_ws.clone(),
+                                                );
+                                                current_turn_player_id += 1;
+                                                current_action = GameTurnTypes::GetCard;
+                                            }
+                                        }
                                         _ => {
                                             eprintln!("錯誤：客戶端錯誤訊息");
                                             todo!("錯誤處理");
