@@ -1,55 +1,63 @@
 [package]
-name = "pmj_client"
-version = { workspace = true }
-edition = { workspace = true }
-repository = { workspace = true }
-license = { workspace = true }
 authors = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+name = "pmj_client"
+repository = { workspace = true }
 rust-version.workspace = true
+version = { workspace = true }
 
 [dependencies]
 # --- shared ---
-log = { workspace = true }
 image = { workspace = true }
-serde_json = { workspace = true }
+log = { workspace = true }
 pmj_shared = { workspace = true }
+serde_json = { workspace = true }
 tungstenite = { workspace = true }
 # --- desktop ---
-iced = { optional = true, git = "https://github.com/iced-rs/iced.git", rev = "1296490", default-features = false, features = ["wgpu", "tiny-skia", "thread-pool", "debug", "time-travel"] }
+iced = { optional = true, git = "https://github.com/iced-rs/iced.git", rev = "1296490", default-features = false, features = [
+  "debug",
+  "thread-pool",
+  "time-travel",
+  "tiny-skia",
+  "wgpu",
+] }
 # --- android ---
-android_logger = {version ="0.14.1", optional=true}
-android-activity = { version = "0.6", features = ["game-activity"], optional=true }
-ndk-context = {version ="0.1", optional=true}
-jni = { version = "0.21", features = ["invocation"], optional=true }
-winit = { version = "0.30", optional = true }
+android-activity = { version = "0.6", features = [
+  "game-activity",
+], optional = true }
+android_logger = { version = "0.14.1", optional = true }
 futures = { version = "^0.3", optional = true }
+jni = { version = "0.21", features = ["invocation"], optional = true }
+ndk-context = { version = "0.1", optional = true }
+winit = { version = "0.30", optional = true }
 # ndk-sys = "0.6.0"
 # ndk = "0.9.0"
 # --- wasm ---
-wasm-bindgen = { version = "0.2", optional=true }
-console_error_panic_hook = { version = "0.1.5", optional=true }
+console_error_panic_hook = { version = "0.1.5", optional = true }
+wasm-bindgen = { version = "0.2", optional = true }
 
 [dependencies.iced_core]
 git = "https://github.com/iced-rs/iced.git"
 rev = "1296490"
 
 [dependencies.iced_widget]
+features = ["wgpu"]
 git = "https://github.com/iced-rs/iced.git"
 rev = "1296490"
-features = ["wgpu"]
 
 [dependencies.iced_winit]
+default-features = false
 git = "https://github.com/iced-rs/iced.git"
 rev = "1296490"
-default-features = false
 
 [dependencies.iced_wgpu]
 git = "https://github.com/iced-rs/iced.git"
 rev = "1296490"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-wasm-bindgen = { version = "0.2" }
 console_error_panic_hook = "0.1.5"
+wasm-bindgen = { version = "0.2" }
 
 # [target.'cfg(target_os = "android")'.dependencies]
 # android_logger = "0.14.1"
@@ -57,37 +65,44 @@ console_error_panic_hook = "0.1.5"
 # ndk-context = "0.1"
 
 [features]
+android = [
+  "dep:android-activity",
+  "dep:android_logger",
+  "dep:futures",
+  "dep:jni",
+  "dep:ndk-context",
+  "dep:winit",
+]
 default = []
 desktop = ["dep:iced"]
-android = ["dep:android_logger", "dep:android-activity", "dep:ndk-context", "dep:jni", "dep:winit", "dep:futures"]
-wasm = ["dep:wasm-bindgen", "dep:console_error_panic_hook"]
+wasm = ["dep:console_error_panic_hook", "dep:wasm-bindgen"]
 
 [[bin]]
 name = "pmj_client"
 path = "src/main.rs"
 
 [lib]
-crate-type = ["lib", "cdylib"]
+crate-type = ["cdylib", "lib"]
 name = "pmj_client_lib"
 
 [package.metadata.android]
-package = "io.github.tw0hank0.positive_mahjong"
 apk_name = "pmj_client"
-resources = "../res"
 build_targets = ["aarch64-linux-android"]
+package = "io.github.tw0hank0.positive_mahjong"
+resources = "../res"
 
 [package.metadata.android.application]
-label = "pmj_client"
 icon = "@mipmap/icon"
+label = "pmj_client"
 # See https://developer.android.com/guide/topics/manifest/application-element#theme
 #
 # Example shows setting the theme of an application to fullscreen.
 theme = "@android:style/Theme.DeviceDefault.NoActionBar.Fullscreen"
 
 [package.metadata.android.sdk]
+max_sdk_version = 36
 min_sdk_version = 23
 target_sdk_version = 35
-max_sdk_version = 36
 
 [[package.metadata.android.uses_permission]]
 name = "android.permission.INTERNET"
@@ -102,12 +117,12 @@ required = true
 version = 1
 
 [[package.metadata.android.uses_permission]]
-name = "android.permission.WRITE_EXTERNAL_STORAGE"
 max_sdk_version = 18
+name = "android.permission.WRITE_EXTERNAL_STORAGE"
 
 [[package.metadata.android.uses_permission]]
-name = "android.permission.READ_EXTERNAL_STORAGE"
 max_sdk_version = 18
+name = "android.permission.READ_EXTERNAL_STORAGE"
 
 [[package.metadata.android.uses_permission]]
 name = "android.permission.ACCESS_WIFI_STATE"

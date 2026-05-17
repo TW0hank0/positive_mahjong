@@ -67,3 +67,8 @@
 **2026-5-16**
 
 - fix ci
+
+**2026-5-17**
+
+- remove unneed slint dep
+- 使用taplo格式化toml檔案

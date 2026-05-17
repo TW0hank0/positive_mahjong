@@ -8,19 +8,17 @@
 
 ### 特色
 
-使用Rust製作
-
-伺服器使用Iced框架，客戶端使用Slint框架
-
-![MadeWithSlint-logo](./assets/MadeWithSlint-logo-light.png)
+使用Rust和Iced製作，支援Linux及Windows系統。
 
 ### 連結
 
 [Gitlab 主儲存庫](https://gitlab.com/TW0hank0/positive_mahjong)
 
-[Github 鏡像儲存庫](https://github.com/TW0hank0/positive_mahjong)
+[Github CI儲存庫](https://github.com/TW0hank0/positive_mahjong)
 
-[Codeberg 儲存庫](https://codeberg.org/TW0hank0/positive_mahjong)
+[Codeberg 境像儲存庫](https://codeberg.org/TW0hank0/positive_mahjong)
+
+[Gitlab-pages 專案文檔](https://tw0hank0.gitlab.io/positive_mahjong/)
 
 [Github-pages 專案文檔](https://tw0hank0.github.io/positive_mahjong)
 
@@ -28,7 +26,7 @@
 
 ### 安裝
 
-詳見：[專案文檔](https://tw0hank0.github.io/positive_mahjong)
+詳見：[專案文檔](https://tw0hank0.gitlab.io/positive_mahjong)
 
 #### Desktop
 
@@ -54,17 +52,7 @@
 
 #### 第三方靜態專案聲明
 
-**Slint Logo**
-
-本專案使用的 `Slint Logo` 依據 [CC BY-ND 4.0](./assets/CC-BY-ND-4.0.txt) 授權。作者為 [Slint 開發團隊]。本專案未對該 Logo 檔案進行任何修改。
-
-> 檔案路徑：`assets/MadeWithSlint-logo-light.png`
-
-**Material Design 3 component set for Slint**
-
-本專案使用的 `Material Design 3 component set for Slint` 依據 [MIT License](pmj_client/material/LICENSE.md) 授權。作者為 [Slint 開發團隊]。
-
-> 資料夾路徑：`pmj_client/material/`
+[詳見專案文檔](https://tw0hank0.gitlab.io/positive_mahjong/)
 
 **Noto Sans TC**
 
@@ -77,3 +65,9 @@
 本專案使用的 `Material Symbols` 依據 [Apache License Version 2.0](assets/material_symbols/LICENSE) 授權。作者為 [Google]。
 
 > 資料夾路徑：`assets/material_symbols`
+
+**android-iced-example**
+
+`pmj_client` 包含 [ibaryshnikov/android-iced-example](https://github.com/ibaryshnikov/android-iced-example) 的程式碼，原始作者為 [[ibaryshnikov](https://github.com/ibaryshnikov/)]。
+
+> 資料夾路徑：`pmj_client/android/`

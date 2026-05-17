@@ -14,49 +14,49 @@
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 [package]
-name = "pmj_client"
-version = { workspace = true }
-edition = { workspace = true }
-repository = { workspace = true }
 authors = { workspace = true }
 default-run = "pmj_client"
+edition = { workspace = true }
 license = { workspace = true }
+name = "pmj_client"
+repository = { workspace = true }
 rust-version.workspace = true
+version = { workspace = true }
 
 [[bin]]
 name = "pmj_client"
 path = "src/main.rs"
 
 [lib]
-crate-type = ["lib", "cdylib"]
+crate-type = ["cdylib", "lib"]
 name = "pmj_client_lib"
 
 [dependencies]
-reqwest = { workspace = true, features = ["blocking"] }
-pmj_shared = { workspace = true }
+log = { workspace = true }
 pmj_gamemodes = { workspace = true }
-slint = { workspace = true }
-serde_json = { workspace = true }
+pmj_shared = { workspace = true }
+reqwest = { workspace = true, features = ["blocking"] }
 serde = { workspace = true }
+serde_json = { workspace = true }
+slint = { workspace = true }
 tungstenite = { workspace = true }
-log = {workspace=true}
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-wasm-bindgen = { version = "0.2" }
 console_error_panic_hook = "0.1.5"
+wasm-bindgen = { version = "0.2" }
 
 [build-dependencies]
 slint-build = "1.15.1"
 
 [package.metadata.android]
-package = "io.github.tw0hank0.positive_mahjong"
 apk_name = "pmj_client"
-resources = "../res"
 build_targets = ["aarch64-linux-android"]
+package = "io.github.tw0hank0.positive_mahjong"
+resources = "../res"
 
 [package.metadata.android.application]
-label = "pmj_client"
 icon = "@mipmap/icon"
+label = "pmj_client"
 # 無效欄位
 #is_game = true
 # 無效欄位
@@ -67,9 +67,9 @@ icon = "@mipmap/icon"
 theme = "@android:style/Theme.DeviceDefault.NoActionBar.Fullscreen"
 
 [package.metadata.android.sdk]
+max_sdk_version = 36
 min_sdk_version = 23
 target_sdk_version = 35
-max_sdk_version = 36
 
 [[package.metadata.android.uses_permission]]
 name = "android.permission.INTERNET"
@@ -84,12 +84,12 @@ required = true
 version = 1
 
 [[package.metadata.android.uses_permission]]
-name = "android.permission.WRITE_EXTERNAL_STORAGE"
 max_sdk_version = 18
+name = "android.permission.WRITE_EXTERNAL_STORAGE"
 
 [[package.metadata.android.uses_permission]]
-name = "android.permission.READ_EXTERNAL_STORAGE"
 max_sdk_version = 18
+name = "android.permission.READ_EXTERNAL_STORAGE"
 
 [[package.metadata.android.uses_permission]]
 name = "android.permission.ACCESS_WIFI_STATE"

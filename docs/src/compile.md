@@ -2,31 +2,52 @@
 
 ## 電腦
 
-第一次編譯的準備：
+編譯需求：
 
-- Android sdk+ndk (需在Path)
-- Keystore
-  > PATH: `CARGO_APK_RELEASE_KEYSTORE` 和 `CARGO_APK_RELEASE_KEYSTORE_PASSWORD`
+- Rust toolchain
+- uv
 
-```
-python scripts/build_license.py
+第一次編譯需要產生第三方授權聲明：
+
+```bash
+uv run scripts/build_license.py
 ```
 
 使用編譯腳本：
 
 ```bash
-python scripts/build_computer.py
+uv run scripts/build_computer.py
 ```
 
 ## Android 手機
 
+編譯需求：
+
+- Rust toolchain
+- uv
+- Rustup android target： `aarch64-linux-android`
+- Android sdk+ndk (需在Path)
+- Keystore
+- (ENV) `CARGO_APK_RELEASE_KEYSTORE` ：Keystore檔案路徑
+- (ENV) `CARGO_APK_RELEASE_KEYSTORE_PASSWORD` ：Keystore檔案密碼
+
+第一次編譯需要產生第三方授權聲明：
+
 ```bash
-python scripts/build_android.py
+uv run scripts/build_license.py
+```
+
+使用編譯腳本：
+
+```bash
+uv run  scripts/build_android.py
 ```
 
 ## wasm-web
 
 **開發中，未完成**
+
+使用編譯腳本：
 
 ```bash
 python scripts/build_wasm.py

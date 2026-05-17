@@ -14,7 +14,7 @@
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 [book]
-title = "positive_mahjong documents"
 authors = ["TW0hank0 <public.email.hank@gmail.com>"]
-language = "zh-TW"
 description = "positive_mahjong's documents"
+language = "zh-TW"
+title = "positive_mahjong documents"
