@@ -43,7 +43,7 @@ def main():
             secret_ks_path = os.path.abspath(
                 os.path.join(
                     os.path.dirname(os.path.dirname(__file__)),
-                    "secret",
+                    ".secret",
                     "TW0hank0.keystore",
                 )
             )
@@ -53,7 +53,9 @@ def main():
                 stderr=sys.stderr,
                 stdin=sys.stdin,
                 stdout=sys.stdout,
-                env={"CARGO_APK_RELEASE_KEYSTORE": secret_ks_path}.update(os.environ),
+                env=os.environ.copy().update(
+                    {"CARGO_APK_RELEASE_KEYSTORE": secret_ks_path}
+                ),
             )
         else:
             subprocess.run(

@@ -14,16 +14,16 @@
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 [package]
-name = "pmj_shared"
-version.workspace = true
-edition.workspace = true
-repository.workspace = true
 authors.workspace = true
+edition.workspace = true
 license = { workspace = true }
+name = "pmj_shared"
+repository.workspace = true
 rust-version.workspace = true
+version.workspace = true
 
 [dependencies]
-serde = { workspace = true }
-serde_json = {workspace=true}
-tungstenite = { workspace = true}
 image = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tungstenite = { workspace = true }

@@ -14,22 +14,22 @@
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 accepted = [
-    "Apache-2.0",
-    "MIT",
-    "AGPL-3.0-only",
-    "BSD-2-Clause",
-    "BSD-3-Clause",
-    "Zlib",
-    "BSL-1.0",
-    "MPL-2.0",
-    "CC0-1.0",
-    "NCSA",
-    "ISC",
-    "0BSD",
-    "Unicode-3.0",
-    "OpenSSL",
-    "CDLA-Permissive-2.0",
-    "GPL-3.0-only",
+  "0BSD",
+  "AGPL-3.0-only",
+  "Apache-2.0",
+  "BSD-2-Clause",
+  "BSD-3-Clause",
+  "BSL-1.0",
+  "CC0-1.0",
+  "CDLA-Permissive-2.0",
+  "GPL-3.0-only",
+  "ISC",
+  "MIT",
+  "MPL-2.0",
+  "NCSA",
+  "OpenSSL",
+  "Unicode-3.0",
+  "Zlib",
 ]
 
 ignore-build-dependencies = false
@@ -39,22 +39,22 @@ ignore-dev-dependencies = false
 license = "Apache-2.0"
 
 [[codespan.clarify.git]]
-path = "LICENSE"
 checksum = "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+path = "LICENSE"
 
 [codespan-reporting.clarify]
 license = "Apache-2.0"
 
 [[codespan-reporting.clarify.git]]
-path = "LICENSE"
 checksum = "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+path = "LICENSE"
 
 [failure_derive.clarify]
 license = "Apache-2.0 OR MIT"
 
 [[failure_derive.clarify.git]]
-path = "LICENSE"
 checksum = "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+path = "LICENSE"
 
 [ring]
 accepted = ["OpenSSL"]
