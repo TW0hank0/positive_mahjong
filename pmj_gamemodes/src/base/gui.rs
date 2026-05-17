@@ -60,6 +60,7 @@ pub fn main() -> iced::Result {
     app_settings.default_font = FONT_NOTO_SANS_REG;
     iced::application(ServerGUI::new, ServerGUI::update, ServerGUI::view)
         .title(ServerGUI::title)
+        .theme(ServerGUI::theme)
         .run()
 }
 
@@ -85,6 +86,7 @@ impl ServerGUI {
         let ipv6_address = local_ip_address::local_ipv6().unwrap();
         println!("ipv4: {}", ipv4_address.to_string());
         println!("ipv6: {}", ipv6_address.to_string());
+        println!("port: {}", pmj_shared::shared::SERVER_PORT);
         let backend = base::mode::main_base(true).unwrap();
         Self {
             backend: backend,
@@ -96,7 +98,7 @@ impl ServerGUI {
         }
     }
 
-    fn update(&mut self, msg: GUIMessages) {
+    fn update(&mut self, msg: GUIMessages) -> iced::Task<GUIMessages> {
         match msg {
             GUIMessages::StartGame => {
                 self.is_start = true;
@@ -109,11 +111,19 @@ impl ServerGUI {
                         todo!("TODO: error handle")
                     }
                 });
+                return iced::task::Task::done(GUIMessages::FetchPlayerInfo);
             }
-            GUIMessages::FetchPlayerInfo => {
-                self.players = self.backend.read().unwrap().get_players_info();
-            }
+            GUIMessages::FetchPlayerInfo => match self.backend.read() {
+                Ok(backend) => {
+                    self.players = backend.get_players_info();
+                }
+                Err(e) => {
+                    eprintln!("FetchPlayerInfo error: {}", e);
+                    return iced::task::Task::done(GUIMessages::FetchPlayerInfo);
+                }
+            },
         }
+        iced::Task::none()
     }
 
     fn view(&self) -> iced::widget::Column<'_, GUIMessages> {
@@ -149,12 +159,13 @@ impl ServerGUI {
         }
         layout = layout.spacing(50);
         //
-        layout = layout.push(button("Refresh").on_press(GUIMessages::FetchPlayerInfo));
+        layout =
+            layout.push(button(text("Refresh").size(18)).on_press(GUIMessages::FetchPlayerInfo));
         let mut player_info = Column::new();
         for player in self.players.iter() {
             let mut info_bar = Row::new();
-            info_bar = info_bar.push(text(player.player_id)).spacing(70);
-            info_bar = info_bar.push(text(player.player_ip_addr.to_string()));
+            info_bar = info_bar.push(text(player.player_id).size(16)).spacing(50);
+            info_bar = info_bar.push(text(player.player_ip_addr.to_string()).size(16));
             player_info = player_info.push(container(info_bar).style(|theme: &iced::Theme| {
                 let ex_palette = theme.extended_palette();
                 container::Style::default()
@@ -162,19 +173,36 @@ impl ServerGUI {
                     .background(ex_palette.secondary.weak.color)
             }));
         }
-        layout = layout.push(scrollable(container(player_info).style(
-            |theme: &iced::Theme| {
+        layout = layout.push(
+            container(scrollable(player_info)).style(|theme: &iced::Theme| {
                 let ex_palette = theme.extended_palette();
                 container::Style::default()
                     .border(iced::border::Border::default().rounded(12))
                     .background(ex_palette.primary.weak.color)
-            },
-        )));
+            }),
+        );
+        layout = layout.push(
+            container(scrollable(
+                text(self.msg.clone())
+                    .size(14)
+                    .wrapping(text::Wrapping::WordOrGlyph),
+            ))
+            .style(|theme: &iced::Theme| {
+                let ex_palette = theme.extended_palette();
+                container::Style::default()
+                    .background(ex_palette.background.weak.color)
+                    .border(iced::border::Border::default().rounded(12))
+            }),
+        );
         //
         return layout;
     }
 
     pub fn title(&self) -> String {
         String::from(PROJECT_NAME)
+    }
+
+    pub fn theme(&self) -> iced::Theme {
+        iced::Theme::TokyoNight
     }
 }

@@ -1,0 +1,53 @@
+# 檔案結構
+
+project_root
+
+- `.github/`
+  - `workflows/`： Github CI
+  - `ISSUE_TEMPLATE/`： Github Issue模板
+- `.gitlab/`
+  - `issue_templates/`： Gitlab Issue模板
+- `.zed/`
+  - `settings.json`： Zed 編輯器設定
+- `assets`
+  - `material_symbols/`： Material Symbols 字體
+  - `Noto_Sans_TC/`： Noto Sans 繁體中文CJK
+  - `icon.kra`： Krita 格式的 Icon
+  - `icon.png`： Png 通用格式的 Icon
+- `auto_generated/`
+  - `ThirdPartyLicense-Rust.html`： Html 格式的第三方專案授權聲明
+  - `ThirdPartyLicense-Rust.json`： Json 格式的第三方專案授權聲明
+  - `ThirdPartyLicense-Rust.md`： Markdown 格式的第三方專案授權聲明
+- `docs/`： 專案文檔
+  - `src/`
+    - `license/`：
+      - `license_assets.md`： 第三方專案靜態檔案授權聲明
+      - `ThirdPartyLicense-Rust.md`： 同`auto_generated/ThirdPartyLicense-Rust.md`
+    - `compile.md`： 編譯說明
+    - `file_struct.md`： 檔案結構
+    - `index.md`： 文檔目錄
+    - `install.md`： 安裝說明
+    - `intro.md`： 專案介紹
+    - `license.md`： 第三方授權聲明，指向`docs/src/license/`
+    - `SUMMARY.md`： mdbook
+  - `.gitignore`： 忽略`docs/book/`
+  - `book.toml`： mdbook設定
+- `pmj_client/`： 客戶端
+- `pmj_gamemodes/`： 玩法
+- `pmj_server/`： 伺服器
+- `pmj_shared/`： 共用資料
+- `READMEs/`： 多語言README
+- `res/`： Android需要的內容，源自`assets/`
+- `scripts/`： 腳本
+- `templates/`： 模板
+- `web/`： wasm用
+- `.gitattributes`： 忽略編譯產生的檔案
+- `.gitignore`： 忽略不該上傳的檔案
+- `.gitlab-ci.yml`： Gitlab CI 設定
+- `about.toml`： Cargo-about 設定
+- `Cargo.lock`： Cargo 依賴鎖
+- `Cargo.toml`： Cargo manifest
+- `CHANGELOG.md`： 更改日記
+- `LICENSE`： AGPL-3.0-only
+- `README.md`： 說明檔
+- `taplo.toml`： Taplo 設定
