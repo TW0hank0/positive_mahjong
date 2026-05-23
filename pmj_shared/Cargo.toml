@@ -27,3 +27,26 @@ image = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tungstenite = { workspace = true }
+lyon_algorithms = { workspace = true }
+
+[dependencies.iced_core]
+git = "https://github.com/iced-rs/iced.git"
+rev = "1296490"
+
+[dependencies.iced_widget]
+features = ["wgpu", "canvas"]
+git = "https://github.com/iced-rs/iced.git"
+rev = "1296490"
+
+[dependencies.iced_winit]
+default-features = false
+git = "https://github.com/iced-rs/iced.git"
+rev = "1296490"
+
+[dependencies.iced_wgpu]
+git = "https://github.com/iced-rs/iced.git"
+rev = "1296490"
+
+[dependencies.iced_graphics]
+git = "https://github.com/iced-rs/iced.git"
+rev = "1296490"

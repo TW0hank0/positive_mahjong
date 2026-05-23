@@ -35,8 +35,18 @@ fn write_reply(
     text: String,
     websocket: sync::Arc<sync::RwLock<WebSocket<TcpStream>>>,
 ) -> Result<(), Error> {
+    // TODO: log::info!("準備回覆客戶端...");
+    println!("準備回覆客戶端...");
     let reply: Message = Message::Text(text.into());
     let write_result: Result<(), Error> = websocket.write().unwrap().write(reply);
+    match write_result {
+        Ok(_) => {
+            println!("成功回覆客戶端。")
+        }
+        Err(_) => {
+            eprintln!("回覆客戶端失敗！")
+        }
+    }
     write_result
 }
 
@@ -46,7 +56,7 @@ fn handle_client(
     backend: sync::Arc<sync::RwLock<crate::base::mode::PositiveMahjong>>,
 ) {
     let client_ip = stream.peer_addr().unwrap().ip();
-    println!("建立連線：{}", client_ip.clone());
+    println!("建立連線：{}", client_ip.to_string());
     // 進行 WebSocket 握手，建立 WebSocket 物件
     let websocket: WebSocket<TcpStream> = match accept(stream) {
         Ok(ws) => ws,
@@ -58,75 +68,95 @@ fn handle_client(
     let ws: sync::Arc<sync::RwLock<WebSocket<TcpStream>>> =
         sync::Arc::new(sync::RwLock::new(websocket));
 
-    println!("客戶端連線成功");
+    println!("客戶端Websocket 連線成功。");
 
     // 進入訊息接收迴圈
     'connection: loop {
         // 讀取訊息
-        let msg: Result<Message, Error> = ws.write().unwrap().read();
-        match msg {
-            Ok(message) => {
-                match message {
-                    Message::Text(text) => {
-                        let value: Result<shared::ClientConnectRequestType, serde_json::Error> =
-                            serde_json::from_str(&text);
-                        match value {
-                            Ok(req) => {
-                                if req.app_name != String::from("positive_mahjong") {
-                                    let _reply_result = write_reply(
-                                        format!("這是 `positive_mahjong` 的伺服器端！"),
-                                        sync::Arc::clone(&ws),
-                                    );
-                                } else {
-                                    let mut guard = backend.write().unwrap();
-                                    let result_player_id = guard.add_player(client_ip, ws.clone());
-                                    let resp = if result_player_id.is_none() {
-                                        shared::ServerConnectResponceType {
-                                            gamemode: shared::GameModes::Base,
-                                            player_id: None,
-                                            too_many_player: true,
+        match ws.try_write() {
+            Ok(mut guard) => {
+                match guard.read() {
+                    Ok(message) => {
+                        match message {
+                            Message::Text(text) => {
+                                let value: Result<
+                                    shared::ClientConnectRequestType,
+                                    serde_json::Error,
+                                > = serde_json::from_str(&text);
+                                match value {
+                                    Ok(req) => {
+                                        if req.app_name != String::from("positive_mahjong") {
+                                            let _reply_result = write_reply(
+                                                format!("這是 `positive_mahjong` 的伺服器端！"),
+                                                sync::Arc::clone(&ws),
+                                            );
+                                        } else {
+                                            match backend.try_write() {
+                                                Ok(mut guard) => {
+                                                    let result_player_id =
+                                                        guard.add_player(client_ip, ws.clone());
+                                                    let resp = if result_player_id.is_none() {
+                                                        shared::ServerConnectResponceType {
+                                                            gamemode: shared::GameModes::Base,
+                                                            player_id: None,
+                                                            too_many_player: true,
+                                                        }
+                                                    } else {
+                                                        shared::ServerConnectResponceType {
+                                                            gamemode: shared::GameModes::Base,
+                                                            player_id: result_player_id,
+                                                            too_many_player: false,
+                                                        }
+                                                    };
+                                                    let resp_msg =
+                                                        serde_json::to_string(&resp).unwrap();
+                                                    let _wrist_result =
+                                                        write_reply(resp_msg, ws.clone());
+                                                    thread::sleep(
+                                                        std::time::Duration::from_millis(10),
+                                                    );
+                                                }
+                                                Err(e) => {
+                                                    eprintln!("backend.try_write() Err: {}", e);
+                                                }
+                                            }
                                         }
-                                    } else {
-                                        shared::ServerConnectResponceType {
-                                            gamemode: shared::GameModes::Base,
-                                            player_id: result_player_id,
-                                            too_many_player: false,
-                                        }
-                                    };
-                                    let resp_msg = serde_json::to_string(&resp).unwrap();
-                                    let _wrist_result =
-                                        write_reply(resp_msg, sync::Arc::clone(&ws));
-                                    thread::sleep(std::time::Duration::from_secs(1));
+                                    }
+                                    Err(e) => {
+                                        let _reply_result = write_reply(
+                                            format!("json錯誤：{}", e),
+                                            sync::Arc::clone(&ws),
+                                        );
+                                    }
                                 }
                             }
-                            Err(e) => {
-                                let _reply_result =
-                                    write_reply(format!("json錯誤：{}", e), sync::Arc::clone(&ws));
+                            Message::Binary(_data) => {
+                                // TODO: msgpack
+                                println!("跳過Binary Message!");
+                            }
+                            Message::Ping(_) => {
+                                // 函式庫通常會自動處理 Pong，亦可手動處理
+                            }
+                            Message::Pong(_) => {
+                                // 忽略 Pong
+                            }
+                            Message::Close(_) => {
+                                println!("客戶端請求關閉連線");
+                                break 'connection;
+                            }
+                            Message::Frame(_) => {
+                                // 忽略原始帧
                             }
                         }
                     }
-                    Message::Binary(_data) => {
-                        // TODO: msgpack
-                        println!("跳過Binary Message!");
-                    }
-                    Message::Ping(_) => {
-                        // 函式庫通常會自動處理 Pong，亦可手動處理
-                    }
-                    Message::Pong(_) => {
-                        // 忽略 Pong
-                    }
-                    Message::Close(_) => {
-                        println!("客戶端請求關閉連線");
-                        break 'connection;
-                    }
-                    Message::Frame(_) => {
-                        // 忽略原始帧
+                    Err(e) => {
+                        eprintln!("讀取錯誤：{}", e);
+                        break;
                     }
                 }
             }
             Err(e) => {
-                eprintln!("讀取錯誤：{}", e);
-                break;
+                eprintln!("Failed to get guard! detail: {}", e)
             }
         }
         thread::sleep(std::time::Duration::from_secs(1));
@@ -183,19 +213,27 @@ fn handle_server_base(
             return;
         }
     };
+    let mut thread_handles = Vec::new();
     for stream_result in listener.incoming() {
         match stream_result {
             Ok(stream) => {
                 // 為每個連線啟動新執行緒
                 // 使用 move 將 stream 所有權移轉至執行緒
                 let thread_backend = sync::Arc::clone(&backend);
-                let _handle = std::thread::spawn(move || {
+                let handle = std::thread::spawn(move || {
                     handle_client(stream, thread_backend);
                 });
+                thread_handles.push(handle);
             }
             Err(e) => {
                 eprintln!("連線失敗：{}", e);
             }
+        }
+    }
+    let sleep_dur = std::time::Duration::from_millis(700);
+    for handle in thread_handles {
+        if !handle.is_finished() {
+            thread::sleep(sleep_dur);
         }
     }
 }
@@ -319,6 +357,8 @@ impl PositiveMahjong {
     }
 
     /// 返回player_id或是 None(人數已滿)
+    ///
+    /// TODO: 用Result 替換Option
     pub fn add_player(
         &mut self,
         player_ip_addr: net::IpAddr,
@@ -475,7 +515,11 @@ impl PositiveMahjong {
                                                     client_msg,
                                                     player.player_ws.clone(),
                                                 );
-                                                current_turn_player_id += 1;
+                                                if current_turn_player_id >= players_count {
+                                                    current_turn_player_id = 1;
+                                                } else {
+                                                    current_turn_player_id += 1;
+                                                }
                                                 current_action = GameTurnTypes::GetCard;
                                             }
                                         }

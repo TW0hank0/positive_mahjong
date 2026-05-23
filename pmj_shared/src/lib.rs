@@ -15,4 +15,6 @@
 
 //! pmj_shared
 
+pub mod circular;
+pub mod easing;
 pub mod shared;

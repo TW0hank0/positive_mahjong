@@ -16,8 +16,6 @@
 #[cfg(feature = "gui")]
 use iced;
 
-use std::process;
-
 #[cfg(feature = "gui")]
 use pmj_gamemodes;
 #[cfg(feature = "gui")]
