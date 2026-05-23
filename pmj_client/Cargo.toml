@@ -16,23 +16,26 @@ serde_json = { workspace = true }
 tungstenite = { workspace = true }
 # --- desktop ---
 iced = { optional = true, git = "https://github.com/iced-rs/iced.git", rev = "1296490", default-features = false, features = [
-  "debug",
-  "thread-pool",
-  "time-travel",
-  "tiny-skia",
-  "wgpu",
+    "crisp",
+    "debug",
+    "linux-theme-detection",
+    "thread-pool",
+    "time-travel",
+    "tiny-skia",
+    "wayland",
+    "web-colors",
+    "wgpu",
+    "x11",
 ] }
 # --- android ---
 android-activity = { version = "0.6", features = [
-  "game-activity",
+    "game-activity",
 ], optional = true }
 android_logger = { version = "0.14.1", optional = true }
-futures = { version = "^0.3", optional = true }
+futures = { version = "0.3", optional = true }
 jni = { version = "0.21", features = ["invocation"], optional = true }
 ndk-context = { version = "0.1", optional = true }
 winit = { version = "0.30", optional = true }
-# ndk-sys = "0.6.0"
-# ndk = "0.9.0"
 # --- wasm ---
 console_error_panic_hook = { version = "0.1.5", optional = true }
 wasm-bindgen = { version = "0.2", optional = true }
@@ -66,12 +69,12 @@ wasm-bindgen = { version = "0.2" }
 
 [features]
 android = [
-  "dep:android-activity",
-  "dep:android_logger",
-  "dep:futures",
-  "dep:jni",
-  "dep:ndk-context",
-  "dep:winit",
+    "dep:android-activity",
+    "dep:android_logger",
+    "dep:futures",
+    "dep:jni",
+    "dep:ndk-context",
+    "dep:winit",
 ]
 default = []
 desktop = ["dep:iced"]
@@ -88,7 +91,7 @@ name = "pmj_client_lib"
 [package.metadata.android]
 apk_name = "pmj_client"
 build_targets = ["aarch64-linux-android"]
-package = "io.github.tw0hank0.positive_mahjong"
+package = "io.gitlab.tw0hank0.pmj_client"
 resources = "../res"
 
 [package.metadata.android.application]

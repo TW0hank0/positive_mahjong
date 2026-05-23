@@ -21,7 +21,7 @@ use std::{
 };
 
 use iced::{
-    self,
+    self, Border, Theme,
     widget::{self, Column, Row, button, container, scrollable, text},
 };
 
@@ -61,6 +61,7 @@ pub fn main() -> iced::Result {
     iced::application(ServerGUI::new, ServerGUI::update, ServerGUI::view)
         .title(ServerGUI::title)
         .theme(ServerGUI::theme)
+        .subscription(ServerGUI::subscription)
         .run()
 }
 
@@ -129,30 +130,62 @@ impl ServerGUI {
     fn view(&self) -> iced::widget::Column<'_, GUIMessages> {
         let mut layout: iced::widget::Column<'_, GUIMessages> = Column::new().spacing(20);
         //
-        let mut ip_bar_layout = Row::new().spacing(30);
+        let mut ip_bar_layout = Column::new().spacing(30);
         ip_bar_layout =
             ip_bar_layout.push(text(format!("Ipv4: {}", self.local_ipv4_address)).size(28));
         ip_bar_layout = ip_bar_layout.spacing(40);
         ip_bar_layout = ip_bar_layout
-            .push(text(format!("Ipv6: {}", self.local_ipv6_address)).size(iced::Pixels::from(28)))
+            .push(
+                text(format!("Ipv6: {}", self.local_ipv6_address))
+                    .size(iced::Pixels::from(28))
+                    .style(|theme: &iced::Theme| {
+                        let ex_palette = theme.extended_palette();
+                        let mut style = text::Style::default();
+                        style.color = Some(ex_palette.secondary.base.text);
+                        style
+                    }),
+            )
             .spacing(20);
-        let ip_bar_container = container(ip_bar_layout).style(|_theme| {
-            iced::widget::container::Style::default()
-                .background(iced::Background::Color(iced::Color::from_rgb8(99, 99, 99)))
-                .border(iced::border::Border::default().rounded(iced::border::radius(10.0)))
+        let ip_bar_container = container(ip_bar_layout).style(|theme: &iced::Theme| {
+            let ex_palette = theme.extended_palette();
+            let mut style = iced::widget::container::Style::default();
+            style = style
+                .background(ex_palette.secondary.base.color)
+                .border(iced::border::Border::default().rounded(iced::border::radius(10.0)));
+            style
         });
         layout = layout.push(ip_bar_container).spacing(80);
         //
         if !self.is_start {
             let start_button = widget::button(widget::text("Start").size(34))
                 .on_press(GUIMessages::StartGame)
-                /* .style(|_theme, _status| {
-                    let mut button_style = widget::button::Style::default();
-                    button_style.border = iced::border::rounded(iced::border::radius(12.0));
-                    button_style.background =
-                        Some(iced::Background::Color(iced::Color::from_rgb8(99, 99, 99)));
-                    button_style
-                })*/;
+                .style(|theme: &Theme, status: button::Status| {
+                    let ex_palette = theme.extended_palette();
+                    let mut style = button::Style::default();
+                    match status {
+                        button::Status::Active => {
+                            style = style.with_background(ex_palette.primary.base.color);
+                            style.text_color = ex_palette.primary.base.text;
+                        }
+                        button::Status::Disabled => {
+                            style = style.with_background(ex_palette.background.weak.color);
+                            style.text_color = ex_palette.background.weak.text;
+                        }
+                        button::Status::Hovered => {
+                            style = style.with_background(ex_palette.primary.weak.color);
+                            style.text_color = ex_palette.primary.weak.text;
+                        }
+                        button::Status::Pressed => {
+                            style = style.with_background(ex_palette.primary.strong.color);
+                            style.text_color = ex_palette.primary.strong.text;
+                        }
+                    }
+                    style.border = Border::default()
+                        .width(5)
+                        .color(ex_palette.primary.strong.color)
+                        .rounded(10);
+                    style
+                });
             layout = layout.push(start_button);
         } else {
             layout = layout.push(text("遊戲已開始！"))
@@ -160,17 +193,28 @@ impl ServerGUI {
         layout = layout.spacing(50);
         //
         layout =
-            layout.push(button(text("Refresh").size(18)).on_press(GUIMessages::FetchPlayerInfo));
+            layout.push(button(text("重新整理").size(34)).on_press(GUIMessages::FetchPlayerInfo));
         let mut player_info = Column::new();
         for player in self.players.iter() {
             let mut info_bar = Row::new();
-            info_bar = info_bar.push(text(player.player_id).size(16)).spacing(50);
-            info_bar = info_bar.push(text(player.player_ip_addr.to_string()).size(16));
+            info_bar = info_bar
+                .push(
+                    text(player.player_id)
+                        .size(20)
+                        .style(|theme: &iced::Theme| {
+                            let ex_palette = theme.extended_palette();
+                            let mut style = text::Style::default();
+                            style.color = Some(ex_palette.primary.base.text);
+                            style
+                        }),
+                )
+                .spacing(50);
+            info_bar = info_bar.push(text(player.player_ip_addr.to_string()).size(20));
             player_info = player_info.push(container(info_bar).style(|theme: &iced::Theme| {
                 let ex_palette = theme.extended_palette();
                 container::Style::default()
-                    .border(iced::Border::default().rounded(12))
-                    .background(ex_palette.secondary.weak.color)
+                    .border(iced::Border::default().rounded(8))
+                    .background(ex_palette.primary.base.color)
             }));
         }
         layout = layout.push(
@@ -204,5 +248,21 @@ impl ServerGUI {
 
     pub fn theme(&self) -> iced::Theme {
         iced::Theme::TokyoNight
+    }
+
+    pub fn subscription(&self) -> iced::Subscription<GUIMessages> {
+        iced::event::listen_with(|event, _status, _id| match event {
+            iced::Event::Window(window_event) => match window_event {
+                iced::window::Event::RedrawRequested(_) => {
+                    return Some(GUIMessages::FetchPlayerInfo);
+                }
+                _ => {
+                    return None;
+                }
+            },
+            _ => {
+                return None;
+            }
+        })
     }
 }

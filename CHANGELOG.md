@@ -72,3 +72,7 @@
 
 - remove unneed slint dep
 - 使用taplo格式化toml檔案
+
+**2026-5-23**
+
+- 修復：過時的英文版README

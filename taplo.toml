@@ -6,9 +6,12 @@ exclude = [
   "web/**",
 ]
 
+include = ["Cargo.toml", "**/Cargo.toml", "**/*.toml"]
+
 [formatting]
 align_comments = true
 align_entries = false
 array_trailing_comma = true
 reorder_arrays = true
 reorder_keys = true
+indent_string = "    "

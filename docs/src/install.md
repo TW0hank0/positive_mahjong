@@ -6,4 +6,4 @@
 
 ## 手機客戶端
 
-從 <https://github.com/TW0hank0/positive_mahjong/release/latest/> 的 assets/artifacts 下載 `pmj_client.apk` 並安裝。
+請從 Release page 下載 `pmj_client.apk` 並安裝。

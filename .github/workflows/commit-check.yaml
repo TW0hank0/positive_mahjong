@@ -19,7 +19,7 @@ on:
   push:
 
 jobs:
-  check:
+  cargo_check:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -91,3 +91,23 @@ jobs:
         run: |
           echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
           uv run scripts/license_check.py
+
+  taplo_lint:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install Dep
+        uses: ./.github/workflows/instdep
+
+      - name: Install taplo
+        run: cargo install taplo-cli
+
+      - name: Lint toml file
+        run: taplo lint
