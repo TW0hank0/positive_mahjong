@@ -104,17 +104,19 @@ impl ServerGUI {
             GUIMessages::StartGame => {
                 self.is_start = true;
                 let thread_backend = sync::Arc::clone(&self.backend);
-                let _ = thread::spawn(move || match thread_backend.write() {
+                match thread_backend.try_write() {
                     Ok(mut guard) => {
                         guard.start_game();
                     }
-                    Err(_err) => {
-                        todo!("TODO: error handle")
+                    Err(e) => {
+                        eprintln!("Fail to start game:{}", e);
+                        return iced::task::Task::done(GUIMessages::StartGame);
+                        //TODO: error handle
                     }
-                });
+                };
                 return iced::task::Task::done(GUIMessages::FetchPlayerInfo);
             }
-            GUIMessages::FetchPlayerInfo => match self.backend.read() {
+            GUIMessages::FetchPlayerInfo => match self.backend.try_read() {
                 Ok(backend) => {
                     self.players = backend.get_players_info();
                 }
@@ -128,11 +130,19 @@ impl ServerGUI {
     }
 
     fn view(&self) -> iced::widget::Column<'_, GUIMessages> {
-        let mut layout: iced::widget::Column<'_, GUIMessages> = Column::new().spacing(20);
+        let mut layout: iced::widget::Column<'_, GUIMessages> = Column::new().spacing(30);
         //
         let mut ip_bar_layout = Column::new().spacing(30);
-        ip_bar_layout =
-            ip_bar_layout.push(text(format!("Ipv4: {}", self.local_ipv4_address)).size(28));
+        ip_bar_layout = ip_bar_layout.push(
+            text(format!("Ipv4: {}", self.local_ipv4_address))
+                .size(28)
+                .style(|theme: &iced::Theme| {
+                    let ex_palette = theme.extended_palette();
+                    let mut style = text::Style::default();
+                    style.color = Some(ex_palette.secondary.base.text);
+                    style
+                }),
+        );
         ip_bar_layout = ip_bar_layout.spacing(40);
         ip_bar_layout = ip_bar_layout
             .push(
@@ -157,7 +167,7 @@ impl ServerGUI {
         layout = layout.push(ip_bar_container).spacing(80);
         //
         if !self.is_start {
-            let start_button = widget::button(widget::text("Start").size(34))
+            let start_button = widget::button(text("開始").size(30))
                 .on_press(GUIMessages::StartGame)
                 .style(|theme: &Theme, status: button::Status| {
                     let ex_palette = theme.extended_palette();
@@ -188,41 +198,70 @@ impl ServerGUI {
                 });
             layout = layout.push(start_button);
         } else {
-            layout = layout.push(text("遊戲已開始！"))
+            layout = layout.push(text("遊戲已開始！").size(30).style(|theme: &iced::Theme| {
+                let ex_palette = theme.extended_palette();
+                let mut style = text::Style::default();
+                style.color = Some(ex_palette.background.strong.text);
+                style
+            }))
         }
         layout = layout.spacing(50);
         //
         layout =
-            layout.push(button(text("重新整理").size(34)).on_press(GUIMessages::FetchPlayerInfo));
+            layout.push(button(text("重新整理").size(30)).on_press(GUIMessages::FetchPlayerInfo));
         let mut player_info = Column::new();
-        for player in self.players.iter() {
-            let mut info_bar = Row::new();
-            info_bar = info_bar
-                .push(
-                    text(player.player_id)
-                        .size(20)
-                        .style(|theme: &iced::Theme| {
-                            let ex_palette = theme.extended_palette();
-                            let mut style = text::Style::default();
-                            style.color = Some(ex_palette.primary.base.text);
-                            style
-                        }),
-                )
-                .spacing(50);
-            info_bar = info_bar.push(text(player.player_ip_addr.to_string()).size(20));
-            player_info = player_info.push(container(info_bar).style(|theme: &iced::Theme| {
-                let ex_palette = theme.extended_palette();
-                container::Style::default()
-                    .border(iced::Border::default().rounded(8))
-                    .background(ex_palette.primary.base.color)
-            }));
+        if self.players.len() > 0 {
+            for player in self.players.iter() {
+                let mut info_bar = Row::new();
+                info_bar = info_bar
+                    .push(
+                        text(player.player_id)
+                            .size(20)
+                            .style(|theme: &iced::Theme| {
+                                let ex_palette = theme.extended_palette();
+                                let mut style = text::Style::default();
+                                style.color = Some(ex_palette.primary.base.text);
+                                style
+                            }),
+                    )
+                    .spacing(50);
+                info_bar = info_bar.push(text(player.player_ip_addr.to_string()).size(20).style(
+                    |theme: &iced::Theme| {
+                        let ex_palette = theme.extended_palette();
+                        let mut style = text::Style::default();
+                        style.color = Some(ex_palette.primary.weak.text);
+                        style
+                    },
+                ));
+                player_info = player_info.push(container(info_bar).style(|theme: &iced::Theme| {
+                    let ex_palette = theme.extended_palette();
+                    container::Style::default()
+                        .border(iced::Border::default().rounded(8))
+                        .background(ex_palette.primary.base.color)
+                }));
+            }
+        } else {
+            player_info = player_info.push(
+                container(text("無人連線").size(22).style(|theme: &iced::Theme| {
+                    let ex_palette = theme.extended_palette();
+                    let mut style = text::Style::default();
+                    style.color = Some(ex_palette.primary.base.text);
+                    style
+                }))
+                .style(|theme: &iced::Theme| {
+                    let ex_palette = theme.extended_palette();
+                    container::Style::default()
+                        .border(iced::Border::default().rounded(8))
+                        .background(ex_palette.primary.base.color)
+                }),
+            );
         }
         layout = layout.push(
             container(scrollable(player_info)).style(|theme: &iced::Theme| {
                 let ex_palette = theme.extended_palette();
                 container::Style::default()
                     .border(iced::border::Border::default().rounded(12))
-                    .background(ex_palette.primary.weak.color)
+                    .background(ex_palette.background.strong.color)
             }),
         );
         layout = layout.push(
