@@ -141,8 +141,37 @@ impl Client {
                             .line_height(text::LineHeight::Relative(1.5)),
                     )
                     .spacing(15);
-                server_ip_input_bar = server_ip_input_bar
-                    .push(button("connect").on_press(UIMessage::Home(HomeMessage::ConnectServer)));
+                server_ip_input_bar = server_ip_input_bar.push(
+                    button("連線")
+                        .on_press(UIMessage::Home(HomeMessage::ConnectServer))
+                        .style(|theme: &Theme, status: button::Status| {
+                            let ex_palette = theme.extended_palette();
+                            let mut style = button::Style::default();
+                            match status {
+                                button::Status::Active => {
+                                    style = style.with_background(ex_palette.primary.base.color);
+                                    style.text_color = ex_palette.primary.base.text;
+                                }
+                                button::Status::Disabled => {
+                                    style = style.with_background(ex_palette.background.weak.color);
+                                    style.text_color = ex_palette.background.weak.text;
+                                }
+                                button::Status::Hovered => {
+                                    style = style.with_background(ex_palette.primary.weak.color);
+                                    style.text_color = ex_palette.primary.weak.text;
+                                }
+                                button::Status::Pressed => {
+                                    style = style.with_background(ex_palette.primary.strong.color);
+                                    style.text_color = ex_palette.primary.strong.text;
+                                }
+                            }
+                            style.border = Border::default()
+                                .width(5)
+                                .color(ex_palette.primary.strong.color)
+                                .rounded(10);
+                            style
+                        }),
+                );
                 layout = layout.push(server_ip_input_bar).spacing(35);
                 let mut vsoft_keyboard = Grid::new()
                     .height(grid::Sizing::EvenlyDistribute(Length::Shrink))
@@ -171,61 +200,51 @@ impl Client {
     fn home_create_vsoft_key<'a>(
         &self,
         key: String,
-    ) -> Container<'a, UIMessage, iced_core::Theme, Renderer> {
-        container(
-            button(
-                if key == String::from("backspace") || key == String::from("\u{e14a}") {
-                    text(format!("\u{e14a}")).font(MATERIAL_SYMBOLS_OUTLINED)
-                } else {
-                    text(format!("{}", key)).font(FONT_NOTO_SANS_REG)
-                }
-                .size(Pixels::from(28))
-                .height(Length::Fill)
-                .width(Length::Fill)
-                .align_x(text::Alignment::Center)
-                .align_y(alignment::Vertical::Center),
-            )
-            .height(Length::Shrink)
-            .width(Length::Shrink)
-            .on_press(UIMessage::Home(HomeMessage::VSoftKeyBoardInput(format!(
-                "{}",
-                key
-            ))))
-            .style(|theme: &Theme, status: button::Status| {
-                let ex_palette = theme.extended_palette();
-                let mut style = button::Style::default();
-                match status {
-                    button::Status::Active => {
-                        style.with_background(ex_palette.primary.base.color);
-                    }
-                    button::Status::Disabled => {
-                        style.with_background(ex_palette.primary.base.color);
-                    }
-                    button::Status::Hovered => {
-                        style.with_background(ex_palette.primary.weak.color);
-                    }
-                    button::Status::Pressed => {
-                        style.with_background(ex_palette.primary.strong.color);
-                    }
-                }
-                style.border = Border::default().width(0);
-                style
-            })
-            .padding(Padding::from(5)),
+    ) -> button::Button<'a, UIMessage, iced_core::Theme, Renderer> {
+        button(
+            if key == String::from("backspace") || key == String::from("\u{e14a}") {
+                text(format!("\u{e14a}")).font(MATERIAL_SYMBOLS_OUTLINED)
+            } else {
+                text(format!("{}", key)).font(FONT_NOTO_SANS_REG)
+            }
+            .size(Pixels::from(28))
+            .height(Length::Fill)
+            .width(Length::Fill)
+            .align_x(text::Alignment::Center)
+            .align_y(alignment::Vertical::Center),
         )
-        .padding(Padding::new(7.0))
-        .width(Length::Shrink)
         .height(Length::Shrink)
-        .style(|theme: &Theme| {
+        .width(Length::Shrink)
+        .on_press(UIMessage::Home(HomeMessage::VSoftKeyBoardInput(format!(
+            "{}",
+            key
+        ))))
+        .style(|theme: &Theme, status: button::Status| {
             let ex_palette = theme.extended_palette();
-            container::Style::default()
-                .border(
-                    Border::default()
-                        .rounded(Radius::new(Pixels::from(12)))
-                        .color(ex_palette.primary.strong.color)
-                        .width(Pixels::from(7)),
-                )
-                .background(ex_palette.primary.weak.color)
+            let mut style = button::Style::default();
+            match status {
+                button::Status::Active => {
+                    style = style.with_background(ex_palette.primary.base.color);
+                    style.text_color = ex_palette.primary.base.text;
+                }
+                button::Status::Disabled => {
+                    style = style.with_background(ex_palette.background.weak.color);
+                    style.text_color = ex_palette.background.weak.text;
+                }
+                button::Status::Hovered => {
+                    style = style.with_background(ex_palette.primary.weak.color);
+                    style.text_color = ex_palette.primary.weak.text;
+                }
+                button::Status::Pressed => {
+                    style = style.with_background(ex_palette.primary.strong.color);
+                    style.text_color = ex_palette.primary.strong.text;
+                }
+            }
+            style.border = Border::default()
+                .width(5)
+                .color(ex_palette.primary.strong.color)
+                .rounded(10);
+            style
         })
     }
 

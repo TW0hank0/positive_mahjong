@@ -40,6 +40,7 @@ def main():
         ]
         print("Run Command: " + " ".join(command))
         if "--ci" in sys.argv:
+            print("Found `--ci` arg.")
             secret_ks_path = os.path.abspath(
                 os.path.join(
                     os.path.dirname(os.path.dirname(__file__)),
@@ -47,15 +48,17 @@ def main():
                     "TW0hank0.keystore",
                 )
             )
+            if os.path.exists(secret_ks_path) is False:
+                print("Keystore file is not exists!")
+            ci_env = os.environ.copy()
+            ci_env["CARGO_APK_RELEASE_KEYSTORE"] = secret_ks_path
             subprocess.run(
                 command,
                 check=True,
                 stderr=sys.stderr,
                 stdin=sys.stdin,
                 stdout=sys.stdout,
-                env=os.environ.copy().update(
-                    {"CARGO_APK_RELEASE_KEYSTORE": secret_ks_path}
-                ),
+                env=ci_env,
             )
         else:
             subprocess.run(

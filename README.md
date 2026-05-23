@@ -2,7 +2,7 @@
 
 ![icon](./assets/icon.png)
 
-**繁體中文** | [English(Outdated)](READMEs/README_en.md)
+**繁體中文** | [English](READMEs/README_en.md)
 
 **仍在開發中，未完成**
 
@@ -16,17 +16,17 @@
 
 [Github CI儲存庫](https://github.com/TW0hank0/positive_mahjong)
 
-[Codeberg 境像儲存庫](https://codeberg.org/TW0hank0/positive_mahjong)
+[Codeberg 鏡像儲存庫](https://codeberg.org/TW0hank0/positive_mahjong)
 
-[Gitlab-pages 專案文檔](https://tw0hank0.gitlab.io/positive_mahjong/)
+[Gitlab-pages 專案文件](https://tw0hank0.gitlab.io/positive_mahjong/)
 
-[Github-pages 專案文檔](https://tw0hank0.github.io/positive_mahjong)
+[Github-pages 專案文件](https://tw0hank0.github.io/positive_mahjong)
 
 [KeepAndroidOpen 網站](https://keepandroidopen.org/)
 
 ### 安裝
 
-詳見：[專案文檔](https://tw0hank0.gitlab.io/positive_mahjong)
+詳見：[專案文件](https://tw0hank0.gitlab.io/positive_mahjong)
 
 #### Desktop
 
@@ -36,7 +36,7 @@
 
 目前只有pmj_client可在Android使用，在Release下載pmj_client.apk並安裝。
 
-> 之後會嘗試server在android的可行性
+Ps: 之後會嘗試server在android的可行性
 
 ### 授權與聲明
 
@@ -52,7 +52,7 @@
 
 #### 第三方靜態專案聲明
 
-[詳見專案文檔](https://tw0hank0.gitlab.io/positive_mahjong/)
+詳見：[專案文檔](https://tw0hank0.gitlab.io/positive_mahjong/)
 
 **Noto Sans TC**
 
