@@ -1,0 +1,110 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# 著作權所有 (C) 2026 TW0hank0
+#
+# 本檔案屬於 positive_mahjong 專案的一部分。
+# 專案儲存庫：https://github.com/TW0hank0/positive_mahjong
+#
+# 本程式為自由軟體：您可以根據自由軟體基金會發佈的 GNU Affero 通用公共授權條款
+# 第 3 版（僅此版本）重新發佈及/或修改本程式。
+#
+# 本程式的發佈是希望它能發揮功用，但不提供任何擔保；
+# 甚至沒有隱含的適銷性或特定目的適用性擔保。詳見 GNU Affero 通用公共授權條款。
+#
+# 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
+# 如果沒有，請參見 <https://www.gnu.org/licenses/>。
+
+[package]
+authors = { workspace = true }
+default-run = "pmj_client"
+edition = { workspace = true }
+license = { workspace = true }
+name = "pmj_client"
+repository = { workspace = true }
+rust-version.workspace = true
+version = { workspace = true }
+
+[[bin]]
+name = "pmj_client"
+path = "src/main.rs"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "pmj_client_lib"
+
+[dependencies]
+log = { workspace = true }
+pmj_gamemodes = { workspace = true }
+pmj_shared = { workspace = true }
+reqwest = { workspace = true, features = ["blocking"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
+slint = { workspace = true }
+tungstenite = { workspace = true }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+console_error_panic_hook = "0.1.5"
+wasm-bindgen = { version = "0.2" }
+
+[build-dependencies]
+slint-build = "1.15.1"
+
+[package.metadata.android]
+apk_name = "pmj_client"
+build_targets = ["aarch64-linux-android"]
+package = "io.github.tw0hank0.positive_mahjong"
+resources = "../res"
+
+[package.metadata.android.application]
+icon = "@mipmap/icon"
+label = "pmj_client"
+# 無效欄位
+#is_game = true
+# 無效欄位
+#app_category = "game"
+# See https://developer.android.com/guide/topics/manifest/application-element#theme
+#
+# Example shows setting the theme of an application to fullscreen.
+theme = "@android:style/Theme.DeviceDefault.NoActionBar.Fullscreen"
+
+[package.metadata.android.sdk]
+max_sdk_version = 36
+min_sdk_version = 23
+target_sdk_version = 35
+
+[[package.metadata.android.uses_permission]]
+name = "android.permission.INTERNET"
+required = true
+
+# See https://developer.android.com/guide/topics/manifest/uses-feature-element
+#
+# Note: there can be multiple .uses_feature entries.
+[[package.metadata.android.uses_feature]]
+name = "android.hardware.vulkan.level"
+required = true
+version = 1
+
+[[package.metadata.android.uses_permission]]
+max_sdk_version = 18
+name = "android.permission.WRITE_EXTERNAL_STORAGE"
+
+[[package.metadata.android.uses_permission]]
+max_sdk_version = 18
+name = "android.permission.READ_EXTERNAL_STORAGE"
+
+[[package.metadata.android.uses_permission]]
+name = "android.permission.ACCESS_WIFI_STATE"
+
+[[package.metadata.android.uses_permission]]
+name = "android.permission.ACCESS_NETWORK_SATEGE"
+
+[[package.metadata.android.uses_permission]]
+name = "android.permission.FOREGROUND_SERVICE"
+
+[[package.metadata.android.uses_permission]]
+name = "android.permission.WAKE_LOCK"
+
+[package.metadata.android.application.activity]
+# See https://developer.android.com/guide/topics/manifest/activity-element#screen
+#
+# Defaults to "unspecified".
+orientation = "landscape"

@@ -24,8 +24,8 @@ version = "0.1.0"
 
 [workspace.dependencies]
 # --- local ---
-pmj_gamemodes = { path = "pmj_gamemodes" }
-pmj_shared = { path = "pmj_shared" }
+pmj_gamemodes = { path = "crates/pmj_gamemodes" }
+pmj_shared = { path = "crates/pmj_shared" }
 positive_mahjong = { path = "." }
 # --- shared ---
 #iced = { version = "0.15.0", default-features = false, features = ["tiny-skia", "x11", "wayland", "image", "svg", "lazy", "debug", "thread-pool", "linux-theme-detection"] }
@@ -51,7 +51,7 @@ lyon_algorithms = "1.0"
 
 
 [workspace]
-members = ["pmj_client", "pmj_gamemodes", "pmj_server", "pmj_shared"]
+members = ["crates/pmj_client_desktop", "crates/pmj_client_cross/rust", "crates/pmj_gamemodes", "crates/pmj_server", "crates/pmj_shared"]
 resolver = "3"
 
 [profile.release]
