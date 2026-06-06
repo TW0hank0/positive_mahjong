@@ -4,23 +4,31 @@
 
 **繁體中文** | [English](READMEs/README_en.md)
 
+![GitLab Stars](https://img.shields.io/gitlab/stars/TW0hank0%2Fpositive_mahjong?style=for-the-badge&color=green)
+![Deps.rs Repository Dependencies](https://img.shields.io/deps-rs/repo/gitlab/TW0hank0/positive_mahjong?style=for-the-badge&color=green)
+![Gitlab Pipeline Status](https://img.shields.io/gitlab/pipeline-status/TW0hank0%2Fpositive_mahjong?branch=master&style=for-the-badge&color=green)
+![GitLab License](https://img.shields.io/gitlab/license/TW0hank0%2Fpositive_mahjong?style=for-the-badge&color=green)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/TW0hank0/positive_mahjong/commit-build.yaml?branch=master&style=for-the-badge&color=green)
+
 **仍在開發中，未完成**
 
 ### 特色
 
-使用Rust和Iced製作，支援Linux、Android及Windows系統。
+使用Rust和Iced製作，支援Linux及Windows系統。
+
+Edit: 待 `pmj_client_cross` 開發完成將支援Android。
 
 ### 連結
 
 [Gitlab 主儲存庫](https://gitlab.com/TW0hank0/positive_mahjong)
 
-[Github CI儲存庫](https://github.com/TW0hank0/positive_mahjong)
-
 [Codeberg 鏡像儲存庫](https://codeberg.org/TW0hank0/positive_mahjong)
 
-[Gitlab-pages 專案文件](https://tw0hank0.gitlab.io/positive_mahjong/)
+[Github CI儲存庫](https://github.com/TW0hank0/positive_mahjong)
 
-[Github-pages 專案文件](https://tw0hank0.github.io/positive_mahjong)
+[Gitlab-pages 專案說明文件](https://tw0hank0.gitlab.io/positive_mahjong/)
+
+[Github-pages 專案說明文件](https://tw0hank0.github.io/positive_mahjong)
 
 [KeepAndroidOpen 網站](https://keepandroidopen.org/)
 
