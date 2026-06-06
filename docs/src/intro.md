@@ -1,12 +1,15 @@
 # 簡介
 
-`positive_mahjong` 使用Rust和Iced製作，支援Linux、Android及Windows系統。
+`positive_mahjong` 使用Rust、Iced、Godot製作，支援Linux及Windows系統。
 
-專案包含客戶端及伺服器，Workspace分為四個Packages：
+Edit: 待 `pmj_client_cross` 開發完成將支援Android。
 
-- `pmj_client`
+專案分為客戶端、伺服器、共用資料，共5個成員：
+
+- `pmj_client_desktop`
+- `pmj_client_cross`
 - `pmj_server`
 - `pmj_shared`
 - `pmj_gamemodes`
 
-客戶端連線時請注意，格式為：「ws://{伺服器Ip}:{端口號(預設為6060)}」。
+伺服器預設使用6666端口。

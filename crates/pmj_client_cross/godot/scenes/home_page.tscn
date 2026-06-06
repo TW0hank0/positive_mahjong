@@ -1,0 +1,30 @@
+[gd_scene format=3 uid="uid://d04qt2155k2cc"]
+
+[ext_resource type="FontVariation" uid="uid://kkjv4q2mymm0" path="res://fonts/main_font.tres" id="1_2e0ks"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_j31nu"]
+font = ExtResource("1_2e0ks")
+font_size = 40
+font_color = Color(0.5746992, 0.8311122, 0.8644515, 1)
+outline_size = 3
+outline_color = Color(0.21952647, 0.35906467, 0.26638252, 1)
+
+[node name="home_page" type="Control" unique_id=1472817196]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1152.0
+offset_bottom = -648.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="main_layout" type="VBoxContainer" parent="." unique_id=1987602094]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="title_text" type="Label" parent="main_layout" unique_id=1469943397]
+layout_mode = 2
+text = "pmj_client"
+label_settings = SubResource("LabelSettings_j31nu")

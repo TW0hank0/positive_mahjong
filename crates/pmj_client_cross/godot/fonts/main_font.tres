@@ -1,0 +1,6 @@
+[gd_resource type="FontVariation" format=3 uid="uid://kkjv4q2mymm0"]
+
+[ext_resource type="FontFile" uid="uid://df7dgxhhejxh" path="res://fonts/NotoSansTC-VariableFont_wght.ttf" id="1_qjet6"]
+
+[resource]
+base_font = ExtResource("1_qjet6")

@@ -140,12 +140,9 @@ jobs:
       - name: Install Dep
         uses: ./.github/workflows/instdep
 
-      # - name: Install uv
-      #   uses: astral-sh/setup-uv@v7
-
       - name: Prepare CI Venv
         run: |
-          uv venv --python cpython-3.13
+          uv venv --python cpython-3.14
 
       - name: Download all artifacts
         uses: actions/download-artifact@v8
@@ -188,7 +185,7 @@ jobs:
             --repo="${{ github.repository }}"
           echo '----Get Upload Url----'
           upload_url_base=$(gh api \
-            repos/{owner}/{repo}/releases/tags/ci-pre-v${{ steps.get_version.outputs.version }}-${{ github.sha }} \
+            repos/${{ github.repository }}/releases/tags/ci-pre-v${{ steps.get_version.outputs.version }}-${{ github.sha }} \
             --jq '.upload_url')
           echo 'upload_url_base=$upload_url_base'
           echo '----upload----'

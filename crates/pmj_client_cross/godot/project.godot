@@ -1,0 +1,35 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[accessibility]
+
+general/updates_per_second=30
+
+[application]
+
+config/name="pmj_client_cross"
+run/main_scene="uid://d04qt2155k2cc"
+config/features=PackedStringArray("4.6", "GL Compatibility")
+run/max_fps=60
+config/icon="uid://dov0i5hbespvv"
+
+[gui]
+
+theme/custom_font="uid://4n2cimc8tu1d"
+
+[physics]
+
+3d/physics_engine="Jolt Physics"
+
+[rendering]
+
+rendering_device/driver.windows="d3d12"
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"

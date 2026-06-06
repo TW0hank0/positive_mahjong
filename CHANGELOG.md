@@ -24,56 +24,67 @@
 
 ## [未發布]
 
-\>\> !第一版! <<
+=== 第一版! ^\_^ ===
 
-#### 紀錄
+#### 開發紀錄
 
 **2026-4-12 - 客戶端UI優化**
 
-- 開始此紀錄
-- 新增引用：material-symbols
-- 新增zed 專案設定
-- pmj_client：homepage UI 優化
-- 移除V1Simple 玩法引用
+- 新增：開始此紀錄
+- 新增：引用material-symbols
+- 新增：zed 專案設定
+- 更改：pmj_client 的homepage UI 優化
+- 移除：V1Simple 玩法引用
 
 **2026-4-18 - 文件docs**
 
-- 新增英文版Readme: `READMEs/README_en.md`
-- 新增readme 字體授權聲明
-- 新增mdbook
-- 協議模板移除無效欄位
+- 新增：英文版Readme: `READMEs/README_en.md`
+- 新增：Readme 字體授權聲明
+- 新增：Mdbook Docs
+- 移除：協議模板無效欄位
 
 **2026-4-25 - Android-Ks不再寫死**
 
-- Android KeyStore 使用env動態讀取
-- 客戶端Cargo.toml 移除無效Android設定
-- 更新README
-- 修復檔案Header
+- 更改：Android KeyStore 使用env動態讀取
+- 更改：客戶端Cargo.toml 移除無效Android設定
+- 更改：更新README
+- 修復：檔案Header
 
 **2026-4-26**
 
-- 修復CI
-- 刪除`pmj_test_connection` (將整合`pmj_client`)
-- 玩法獨立
+- 修復：CI
+- 移除：`pmj_test_connection` (將整合`pmj_client`)
+- 更改：玩法獨立
 
 **2026-5-2 - Gitlab**
 
-- 主Repo 移至Gitlab
+- 更改：主Repo 移至Gitlab
 
 **2026-5-3**
 
-- 客戶端改用iced框架
+- 更改：客戶端改用iced框架
 
 **2026-5-16**
 
-- fix ci
+- 修復：fix ci
 
 **2026-5-17**
 
-- remove unneed slint dep
-- 使用taplo格式化toml檔案
+- 移除：unneed slint dep
+- 新增：使用taplo格式化toml檔案
 
 **2026-5-23**
 
 - 修復：過時的英文版README
 - 修復：Github CI
+
+**2026-5-24**
+
+- 新增：連接動畫（實驗性功能）
+
+**2026-6-6**
+
+- 更改：所有工作區成員移至 `crates` 資料夾
+- 更改：原 `pmj_client` 改名 `pmj_client_desktop`
+- 移除：現 `pmj_client_desktop` 對Android 的支援
+- 新增：跨平臺專用 `pmj_client_cross`

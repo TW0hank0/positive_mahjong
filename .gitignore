@@ -1,18 +1,14 @@
+# --- Rust ---
 /target
 
-# Python
+# --- Python ---
 **/.venv/**
 **/__pycache__/**
 **/__pypy_cache__/**
 
-# build script generated
-# format: positive_{project_name[1:]}_v{version}_{platform).zip
+# --- Other ---
 positive_*_v*_*.zip
-
-# krita bakeup
 *.kra~
-
-# config
 pmj_server_config.json
 
 # secrets
