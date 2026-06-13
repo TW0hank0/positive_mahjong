@@ -16,7 +16,7 @@
 use std::{
     self,
     net::{IpAddr, TcpStream},
-    sync,
+    sync, thread,
 };
 
 use iced::{
@@ -27,8 +27,7 @@ use iced::{
     },
 };
 
-use tungstenite::WebSocket;
-use tungstenite::{Message, connect};
+use tungstenite::{Message, WebSocket, connect};
 
 use pmj_shared::shared::{self, FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES, FONT_NOTO_SANS_REG_BYTES};
 
@@ -51,6 +50,7 @@ pub struct Client {
     ws: Option<sync::Arc<sync::RwLock<WebSocket<tungstenite::stream::MaybeTlsStream<TcpStream>>>>>,
     player_id: Option<u8>,
     theme: iced::theme::Theme,
+    process_threads: Vec<thread::JoinHandle<ThreadResult>>,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -73,8 +73,8 @@ pub struct PlayBaseStatus {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum UIMessage {
-    NotThing,
     Home(HomeMessage),
+    FetchThreadsStatus,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -82,13 +82,42 @@ pub enum HomeMessage {
     InputServerIpChanged(String),
     VSoftKeyBoardInput(String),
     ConnectServer,
-    FirstMsg,
+    SendFirstMsg,
+    ReadFirstMsgResp,
 }
 
 pub const ALPHABET: [char; 26] = [
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
     'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
 ];
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub struct ThreadResult {
+    pub is_error: bool,
+    pub process_type: ThreadProcessTypes,
+    pub result_read_first_msg_resp: Option<ThreadProcessResultReadFirstMsgResp>,
+}
+
+impl Default for ThreadResult {
+    fn default() -> Self {
+        Self {
+            is_error: true,
+            process_type: ThreadProcessTypes::DoNotThing,
+            result_read_first_msg_resp: None,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub struct ThreadProcessResultReadFirstMsgResp {
+    pub player_id: u8,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum ThreadProcessTypes {
+    ReadFirstMsgResp,
+    DoNotThing,
+}
 
 impl Client {
     pub fn new() -> Self {
@@ -105,11 +134,61 @@ impl Client {
             ws: None,
             player_id: None,
             theme: iced::theme::Theme::TokyoNight,
+            process_threads: Vec::new(),
         }
     }
     pub fn update(&mut self, message: UIMessage) -> task::Task<UIMessage> {
         match message {
-            UIMessage::NotThing => {}
+            UIMessage::FetchThreadsStatus => {
+                let mut rp_index = 0;
+                loop {
+                    if rp_index > self.process_threads.len() {
+                        break;
+                    } else {
+                        let rpthread = self.process_threads.get(rp_index).unwrap();
+                        if rpthread.is_finished() {
+                            let pthread = self.process_threads.remove(rp_index);
+                            match pthread.join() {
+                                Ok(thread_result) => {
+                                    if thread_result.is_error {
+                                        self.status_home
+                                            .msgs
+                                            .push(String::from("process_thread ran into error!"));
+                                        match thread_result.process_type {
+                                            ThreadProcessTypes::DoNotThing => {}
+                                            ThreadProcessTypes::ReadFirstMsgResp => {
+                                                return task::Task::done(UIMessage::Home(
+                                                    HomeMessage::ReadFirstMsgResp,
+                                                ));
+                                            }
+                                        }
+                                        continue;
+                                    } else {
+                                        match thread_result.process_type {
+                                            ThreadProcessTypes::ReadFirstMsgResp => {
+                                                self.player_id = Some(
+                                                    thread_result
+                                                        .result_read_first_msg_resp
+                                                        .unwrap()
+                                                        .player_id,
+                                                );
+                                            }
+                                            ThreadProcessTypes::DoNotThing => {}
+                                        }
+                                        break;
+                                    }
+                                }
+                                Err(e) => {
+                                    eprintln!("thread: {:?}", e);
+                                    self.status_home.msgs.push(format!("thread: {:?}", e));
+                                }
+                            }
+                        } else {
+                            rp_index += 1;
+                        }
+                    }
+                }
+            }
             UIMessage::Home(home_message) => match home_message {
                 HomeMessage::InputServerIpChanged(server_ip) => {
                     self.status_home.server_ip = server_ip;
@@ -126,19 +205,23 @@ impl Client {
                         self.status_home
                             .msgs
                             .push(String::from("未輸入伺服器地址！"));
+                    } else if self.status_home.try_connecting_server {
+                        self.status_home
+                            .msgs
+                            .push(String::from("已有正在嘗試連接的伺服器！"));
                     } else {
                         self.status_home.try_connecting_server = true;
                         let value = self.home_connect_server();
                         return value;
                     }
                 }
-                HomeMessage::FirstMsg => {
-                    self.status_home.try_connecting_server = true;
-                    let value = self.home_first_msg();
-                    if !(self.ws.is_some() && self.player_id.is_some()) {
-                        self.status_home.try_connecting_server = false;
-                    }
+                HomeMessage::SendFirstMsg => {
+                    let value = self.home_send_first_msg();
                     return value;
+                }
+                HomeMessage::ReadFirstMsgResp => {
+                    self.process_threads.push(self.home_read_first_msg_resp());
+                    return task::Task::done(UIMessage::FetchThreadsStatus);
                 }
             },
         };
@@ -156,11 +239,17 @@ impl Client {
                 // 標題欄
                 {
                     let mut title_bar = Row::new().align_y(alignment::Vertical::Center);
-                    title_bar = title_bar
-                        .push(text(format!("{}", shared::PROJECT_NAME)).size(Pixels::from(26)));
+                    title_bar = title_bar.push(
+                        text(format!("{}", shared::PROJECT_NAME))
+                            .height(Length::Shrink)
+                            .size(Pixels::from(26)),
+                    );
                     title_bar = title_bar.spacing(25);
-                    title_bar = title_bar
-                        .push(text(format!("v{}", shared::PROJECT_VERSION)).size(Pixels::from(22)));
+                    title_bar = title_bar.push(
+                        text(format!("v{}", shared::PROJECT_VERSION))
+                            .height(Length::Shrink)
+                            .size(Pixels::from(22)),
+                    );
                     layout_home = layout_home.push(title_bar);
                 }
                 layout_home = layout_home.push(space().height(5));
@@ -323,14 +412,23 @@ impl Client {
                     .align_y(alignment::Alignment::Center)
                     .style(move |_theme| {
                         let mut style = container::Style::default();
-                        style = style.background(iced::Background::Color(Color::TRANSPARENT));
+                        style = style.background(iced::Background::Color(Color {
+                            r: 0.0,
+                            g: 0.0,
+                            b: 0.0,
+                            a: 0.4,
+                        }));
                         style = style.border(Border::default().width(0));
                         style
                     });
                     layout_home =
-                        widget::column([stack([layout_home.into(), content.into()]).into()]);
+                        widget::column([
+                            stack([scrollable(layout_home).into(), content.into()]).into()
+                        ]);
+                    layout = layout.push(layout_home);
+                } else {
+                    layout = layout.push(scrollable(layout_home));
                 }
-                layout = layout.push(scrollable(layout_home));
             }
             ClientScenes::PlayBase => {
                 let mut layout_play_base = Column::new();
@@ -410,7 +508,7 @@ impl Client {
     }
 
     pub fn title(&self) -> String {
-        String::from("pmj_client")
+        String::from("pmj_client_desktop")
     }
 
     pub fn theme(&self) -> iced::theme::Theme {
@@ -425,14 +523,17 @@ impl Client {
                 > = sync::Arc::new(sync::RwLock::new(row_ws));
                 self.ws = Some(ws.clone());
                 println!("Websocket 連線成功。");
+                return task::Task::done(UIMessage::Home(HomeMessage::SendFirstMsg));
             }
             Err(e) => {
-                eprintln!("ws connect err: {}", e);
+                eprintln!("{}", e);
+                self.status_home.msgs.push(e.to_string());
+                self.status_home.try_connecting_server = false;
             }
         }
         return task::Task::none();
     }
-    fn home_first_msg(&mut self) -> task::Task<UIMessage> {
+    fn home_send_first_msg(&mut self) -> task::Task<UIMessage> {
         //TODO: log::info!("正在嘗試傳送初連接訊息");
         println!("正在嘗試傳送初連接訊息");
         let req_text = serde_json::to_string(&shared::ClientConnectRequestType {
@@ -442,46 +543,19 @@ impl Client {
         .unwrap();
         match self.ws.clone() {
             Some(ws) => match ws.try_write() {
-                Ok(mut guard) => {
-                    match guard.send(Message::Text(req_text.into())) {
-                        Ok(_) => {
-                            match guard.read() {
-                                Ok(raw_msg) => {
-                                    match raw_msg {
-                                        Message::Text(text) => {
-                                            let msg: shared::ServerFirstConnectType =
-                                                serde_json::from_str(&text).unwrap();
-                                            if msg.player_id.is_some() {
-                                                self.player_id = msg.player_id;
-                                                println!(
-                                                    "成功取得玩家識別碼：{}",
-                                                    self.player_id.unwrap()
-                                                );
-                                            } else {
-                                                eprintln!("error: msg.player_id is None");
-                                                //TODO
-                                            }
-                                        }
-                                        _ => { /* TODO:BIN-MsgPack */ }
-                                    }
-                                }
-                                Err(e) => {
-                                    eprintln!("error:{}", e);
-                                    return task::Task::done(UIMessage::Home(
-                                        HomeMessage::FirstMsg,
-                                    ));
-                                }
-                            }
-                        }
-                        Err(e) => {
-                            eprintln!("error:{}", e);
-                            return task::Task::done(UIMessage::Home(HomeMessage::FirstMsg));
-                        }
+                Ok(mut guard) => match guard.send(Message::Text(req_text.into())) {
+                    Ok(_) => {
+                        println!("已傳送初連結訊息，等待伺服器回應...");
                     }
-                }
+                    Err(e) => {
+                        eprintln!("error: {}", e);
+                        self.status_home.try_connecting_server = false;
+                        return task::Task::none();
+                    }
+                },
                 Err(e) => {
                     eprintln!("First msg: get guard error: {}", e);
-                    return task::Task::done(UIMessage::Home(HomeMessage::FirstMsg));
+                    return task::Task::done(UIMessage::Home(HomeMessage::SendFirstMsg));
                 }
             },
             None => {
@@ -489,5 +563,103 @@ impl Client {
             }
         }
         return task::Task::none();
+    }
+
+    fn home_read_first_msg_resp(&self) -> thread::JoinHandle<ThreadResult> {
+        let ws = self.ws.clone().unwrap();
+        thread::spawn(move || match ws.try_write() {
+            Ok(mut guard) => {
+                if !guard.can_read() {
+                    eprintln!("guard.can_read() => false!");
+                    ThreadResult {
+                        is_error: true,
+                        process_type: ThreadProcessTypes::ReadFirstMsgResp,
+                        result_read_first_msg_resp: None,
+                    }
+                } else {
+                    match guard.read() {
+                        Ok(raw_msg) => {
+                            match raw_msg {
+                                Message::Text(text) => {
+                                    let msg: shared::ServerFirstConnectType =
+                                        serde_json::from_str(&text).unwrap();
+                                    if msg.player_id.is_some() {
+                                        println!("成功取得玩家識別碼：{}", msg.player_id.unwrap());
+                                        ThreadResult {
+                                            is_error: false,
+                                            process_type: ThreadProcessTypes::ReadFirstMsgResp,
+                                            result_read_first_msg_resp: Some(
+                                                ThreadProcessResultReadFirstMsgResp {
+                                                    player_id: msg.player_id.unwrap(),
+                                                },
+                                            ),
+                                        }
+                                    } else {
+                                        eprintln!("error: msg.player_id is None");
+                                        ThreadResult {
+                                            is_error: true,
+                                            process_type: ThreadProcessTypes::ReadFirstMsgResp,
+                                            result_read_first_msg_resp: None,
+                                        }
+                                    }
+                                }
+                                _ => {
+                                    ThreadResult {
+                                        is_error: true,
+                                        process_type: ThreadProcessTypes::ReadFirstMsgResp,
+                                        result_read_first_msg_resp: None,
+                                    }
+                                    /* TODO:BIN-MsgPack */
+                                }
+                            }
+                        }
+                        Err(_e) => ThreadResult {
+                            is_error: true,
+                            process_type: ThreadProcessTypes::ReadFirstMsgResp,
+                            result_read_first_msg_resp: None,
+                        },
+                    }
+                }
+            }
+            Err(_e) => ThreadResult {
+                is_error: true,
+                process_type: ThreadProcessTypes::ReadFirstMsgResp,
+                result_read_first_msg_resp: None,
+            },
+        })
+        /*match self.ws.clone().unwrap().try_write() {
+            Ok(mut guard) => {
+                if !guard.can_read() {
+                    eprintln!("error: guard.can_read() => flase");
+                }
+                match guard.read() {
+                    Ok(raw_msg) => {
+                        match raw_msg {
+                            Message::Text(text) => {
+                                let msg: shared::ServerFirstConnectType =
+                                    serde_json::from_str(&text).unwrap();
+                                if msg.player_id.is_some() {
+                                    self.player_id = msg.player_id;
+                                    println!("成功取得玩家識別碼：{}", self.player_id.unwrap());
+                                } else {
+                                    eprintln!("error: msg.player_id is None");
+                                    //TODO
+                                }
+                            }
+                            _ => { /* TODO:BIN-MsgPack */ }
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("error: {}", e);
+                        self.status_home.try_connecting_server = false;
+                        return task::Task::none();
+                    }
+                }
+            }
+            Err(e) => {
+                eprintln!("(try-again) error: {}", e);
+                return task::Task::done(UIMessage::Home(HomeMessage::ReadFirstMsgResp));
+            }
+        }*/
     }
 }

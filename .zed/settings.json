@@ -1,16 +1,13 @@
 {
-  "project_name": "positive_mahjong",
-  "lsp": {
-    "rust-analyzer": {
-      "initialization_options": {
-        "cargo": {
-          "features": ["gui"],
+    "tab_size": 4,
+    "lsp": {
+        "rust-analyzer": {
+            "initialization_options": {
+                "cargo": {
+                    "features": ["desktop"],
+                },
+            },
         },
-      },
     },
-  },
-
-  // Zed 全域設定建議
-  "format_on_save": "on",
-  "ensure_final_newline_on_save": true,
+    "ensure_final_newline_on_save": true,
 }

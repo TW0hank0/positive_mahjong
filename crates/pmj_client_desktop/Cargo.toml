@@ -29,7 +29,7 @@ pmj_shared = { workspace = true }
 serde_json = { workspace = true }
 tungstenite = { workspace = true }
 lyon_algorithms = { workspace = true }
-iced = { optional = true, version = "0.14", default-features = false, features = [
+iced = { optional = true, version = "0.14", default-features = true, features = [
     "crisp",
     "canvas",
     "debug",
@@ -49,7 +49,7 @@ default = ["desktop"]
 desktop = ["dep:iced"]
 
 [[bin]]
-name = "pmj_client"
+name = "pmj_client_desktop"
 path = "src/main.rs"
 
 # [lib]

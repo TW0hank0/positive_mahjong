@@ -22,7 +22,7 @@ use std::{
 
 use rand::{self, prelude::SliceRandom, seq::IndexedRandom};
 
-use tungstenite::{Error, Message, WebSocket, accept};
+use tungstenite::{Message, WebSocket, accept_with_config};
 
 use crate::base::shared as shared_base;
 use crate::base::{
@@ -34,11 +34,12 @@ use pmj_shared::shared;
 fn write_reply(
     text: String,
     websocket: sync::Arc<sync::RwLock<WebSocket<TcpStream>>>,
-) -> Result<(), Error> {
+) -> Result<(), tungstenite::error::Error> {
     // TODO: log::info!("準備回覆客戶端...");
     println!("準備回覆客戶端...");
     let reply: Message = Message::Text(text.into());
-    let write_result: Result<(), Error> = websocket.write().unwrap().write(reply);
+    let write_result: Result<(), tungstenite::error::Error> =
+        websocket.write().unwrap().write(reply);
     match write_result {
         Ok(_) => {
             println!("成功回覆客戶端。")
@@ -58,7 +59,10 @@ fn handle_client(
     let client_ip = stream.peer_addr().unwrap().ip();
     println!("建立連線：{}", client_ip.to_string());
     // 進行 WebSocket 握手，建立 WebSocket 物件
-    let websocket: WebSocket<TcpStream> = match accept(stream) {
+    let websocket: WebSocket<TcpStream> = match accept_with_config(
+        stream,
+        Some(tungstenite::protocol::WebSocketConfig::default()),
+    ) {
         Ok(ws) => ws,
         Err(e) => {
             eprintln!("握手失敗：{}", e);
@@ -75,6 +79,9 @@ fn handle_client(
         // 讀取訊息
         match ws.try_write() {
             Ok(mut guard) => {
+                if !guard.can_read() {
+                    eprintln!("error: guard.can_read = false");
+                }
                 match guard.read() {
                     Ok(message) => {
                         match message {
@@ -159,11 +166,11 @@ fn handle_client(
                 eprintln!("Failed to get guard! detail: {}", e)
             }
         }
-        thread::sleep(std::time::Duration::from_secs(1));
+        thread::sleep(std::time::Duration::from_millis(512)); //0.5sec
     }
 
     // 關閉連線
-    let _close_result: Result<(), Error> = ws.write().unwrap().close(None);
+    let _close_result: Result<(), tungstenite::error::Error> = ws.write().unwrap().close(None);
     //println!("連線已終止");
 }
 

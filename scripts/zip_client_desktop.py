@@ -13,16 +13,15 @@
 # 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-import tomllib
-import zipfile
 import os
 import platform
+import zipfile
+
+import tomllib
 
 
 def main():
-    info_file = os.path.join(
-        os.path.dirname(os.path.dirname(__file__)), "Cargo.toml"
-    )
+    info_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Cargo.toml")
     with open(info_file, "rb") as f:
         project_info = tomllib.load(f)
     version = project_info["workspace"]["package"]["version"]
@@ -42,9 +41,7 @@ def main():
                     if len(file.split(".")) == 1:
                         include_files.append(full_file_path)
                 case "Windows":
-                    if (file.split(".")[1] == "exe") and (
-                        len(file.split(".")) > 1
-                    ):
+                    if (file.split(".")[1] == "exe") and (len(file.split(".")) > 1):
                         include_files.append(full_file_path)
     #
     # launcher_path = os.path.abspath(

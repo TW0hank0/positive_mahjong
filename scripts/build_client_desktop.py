@@ -17,8 +17,6 @@ import subprocess
 import sys
 import time
 
-import zip_files
-
 
 def main():
     start_time = time.time()
@@ -30,7 +28,6 @@ def main():
             "--package=pmj_client_dektop",
             "--release",
             "--locked",
-            "--features=gui",
             "--features=desktop",
         ],
         check=True,
@@ -38,8 +35,6 @@ def main():
         stdin=sys.stdin,
         stderr=sys.stderr,
     )
-    print("-" * 10, "zip-files", "-" * 10)
-    zip_files.main()
     print("finish in", time.time() - start_time)
 
 
