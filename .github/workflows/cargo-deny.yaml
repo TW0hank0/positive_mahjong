@@ -13,30 +13,28 @@
 # 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-name: 錯誤回報（Bug report）
-description: 回報非預期行為
-title: "[Bug] "
-labels:
-    - bug
+name: cargo-deny
 
-body:
-    - type: markdown
-      attributes:
-          value: |
-              填寫此issue前，請確認沒有重复的issue。
+on:
+  push:
+    branches:
+      - master
 
-    - type: textarea
-      attributes:
-          label: 目前行為
-          description: |
-              目前行為
-      validations:
-          required: true
+jobs:
+  audit:
+    runs-on: ubuntu-latest
 
-    - type: textarea
-      attributes:
-          label: 正常行為
-          description: |
-              正常行為
-      validations:
-          required: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install Dep
+        uses: ./.github/workflows/instdep
+
+      - name: install cargo-deny
+        run: |
+          cargo install cargo-deny
+
+      - name: run cargo-deny
+        run: |
+          cargo deny check

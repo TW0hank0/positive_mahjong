@@ -33,9 +33,9 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 tiny_http = { workspace = true }
 tungstenite = { workspace = true }
-# --- desktop ---
-iced = { optional = true, git = "https://github.com/iced-rs/iced.git", rev = "1296490", default-features = false, features = [
+iced = { version = "0.14", default-features = true, features = [
     "crisp",
+    "canvas",
     "debug",
     "linux-theme-detection",
     "thread-pool",
@@ -45,13 +45,11 @@ iced = { optional = true, git = "https://github.com/iced-rs/iced.git", rev = "12
     "web-colors",
     "wgpu",
     "x11",
+    "advanced",
 ] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 getrandom = { version = "0.2.17", features = ["js"] }
-
-[features]
-gui = ["dep:iced"]
 
 [[bin]]
 name = "pmj_server"
@@ -59,4 +57,4 @@ path = "src/main.rs"
 
 [[bin]]
 name = "pmj_server_gui"
-path = "src/gui_main.rs"
+path = "src/gui/gui_main.rs"

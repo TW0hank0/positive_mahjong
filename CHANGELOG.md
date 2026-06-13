@@ -88,3 +88,10 @@
 - 更改：原 `pmj_client` 改名 `pmj_client_desktop`
 - 移除：現 `pmj_client_desktop` 對Android 的支援
 - 新增：跨平臺專用 `pmj_client_cross`
+
+**2026-6-13**
+
+- 新增：cargo-deny設定檔
+- 修復：說明文件無法正常使用
+- 移除：Gitlab issue 模板中的無用內容
+- 修復：gdextension設定

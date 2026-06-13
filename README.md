@@ -6,9 +6,9 @@
 
 ![GitLab Stars](https://img.shields.io/gitlab/stars/TW0hank0%2Fpositive_mahjong?style=for-the-badge&color=green)
 ![Deps.rs Repository Dependencies](https://img.shields.io/deps-rs/repo/gitlab/TW0hank0/positive_mahjong?style=for-the-badge&color=green)
-![Gitlab Pipeline Status](https://img.shields.io/gitlab/pipeline-status/TW0hank0%2Fpositive_mahjong?branch=master&style=for-the-badge&color=green)
+![Gitlab Pipeline Status](https://img.shields.io/gitlab/pipeline-status/TW0hank0%2Fpositive_mahjong?branch=master&style=for-the-badge&label=Gitlab%20Pipeline&color=green)
 ![GitLab License](https://img.shields.io/gitlab/license/TW0hank0%2Fpositive_mahjong?style=for-the-badge&color=green)
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/TW0hank0/positive_mahjong/commit-build.yaml?branch=master&style=for-the-badge&color=green)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/TW0hank0/positive_mahjong/commit-build.yaml?branch=master&style=for-the-badge&label=Github%20Action&color=green)
 
 **仍在開發中，未完成**
 
@@ -26,6 +26,8 @@ Edit: 待 `pmj_client_cross` 開發完成將支援Android。
 
 [Github CI儲存庫](https://github.com/TW0hank0/positive_mahjong)
 
+> issue 或 merge_request 請到 [Gitlab 主儲存庫](https://gitlab.com/TW0hank0/positive_mahjong)
+
 [Gitlab-pages 專案說明文件](https://tw0hank0.gitlab.io/positive_mahjong/)
 
 [Github-pages 專案說明文件](https://tw0hank0.github.io/positive_mahjong)
@@ -42,25 +44,21 @@ Edit: 待 `pmj_client_cross` 開發完成將支援Android。
 
 #### Android
 
-目前只有pmj_client可在Android使用，在Release下載pmj_client.apk並安裝。
-
-Ps: 之後會嘗試server在android的可行性
+Edit: 待 `pmj_client_cross` 開發完成將支援Android。
 
 ### 授權與聲明
 
 版權所有 (C) 2026 TW0hank0
 
-本程式基於 GNU Affero General Public License v3 授權
+本程式基於 GNU Affero General Public License v3 （僅此版本） 授權
 
-第三方專案授權見：
+#### 第三方模組庫授權
 
-- [ThirdPartyLicense-Rust.html](./auto_generated/ThirdPartyLicense-Rust.html)
-- [ThirdPartyLicense-Rust.md](./auto_generated/ThirdPartyLicense-Rust.md)
-- [ThirdPartyLicense-Rust.json](./auto_generated/ThirdPartyLicense-Rust.json)
+詳見：[ThirdPartyLicense-Rust.md](https://tw0hank0.gitlab.io/positive_mahjong/license/ThirdPartyLicense-Rust.html) 。
 
-#### 第三方靜態專案聲明
+#### 第三方專案聲明
 
-詳見：[專案文檔](https://tw0hank0.gitlab.io/positive_mahjong/)
+詳見：[專案文檔](https://tw0hank0.gitlab.io/positive_mahjong/license/res.html)
 
 **Noto Sans TC**
 
@@ -73,9 +71,3 @@ Ps: 之後會嘗試server在android的可行性
 本專案使用的 `Material Symbols` 依據 [Apache License Version 2.0](assets/material_symbols/LICENSE) 授權。作者為 [Google]。
 
 > 資料夾路徑：`assets/material_symbols`
-
-**android-iced-example**
-
-`pmj_client` 包含 [ibaryshnikov/android-iced-example](https://github.com/ibaryshnikov/android-iced-example) 的程式碼，原始作者為 [[ibaryshnikov](https://github.com/ibaryshnikov/)]。
-
-> 資料夾路徑：`pmj_client/android/`

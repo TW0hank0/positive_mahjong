@@ -1036,11 +1036,6 @@ checksum = "75b325c5dbd37f80359721ad39aca5a29fb04c89279657cffdda8736d0c0b9d2"
 
 [[package]]
 name = "dpi"
-version = "0.1.1"
-source = "git+https://github.com/iced-rs/winit.git?rev=05b8ff17a06562f0a10bb46e6eaacbe2a95cb5ed#05b8ff17a06562f0a10bb46e6eaacbe2a95cb5ed"
-
-[[package]]
-name = "dpi"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d8b14ccef22fc6f5a8f4d7d768562a182c04ce9a3b3157b91390b52ddfdf1a76"
@@ -1787,30 +1782,14 @@ version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "000e01026c93ba643f8357a3db3ada0e6555265a377f6f9291c472f6dd701fb3"
 dependencies = [
- "iced_core 0.14.0",
- "iced_debug 0.14.0",
- "iced_devtools 0.14.0",
- "iced_futures 0.14.0",
- "iced_renderer 0.14.0",
- "iced_runtime 0.14.0",
- "iced_widget 0.14.2",
- "iced_winit 0.14.0",
- "thiserror 2.0.18",
-]
-
-[[package]]
-name = "iced"
-version = "0.15.0-dev"
-source = "git+https://github.com/iced-rs/iced.git?rev=1296490#12964902550c35bd984d7628d646cd8190a92af6"
-dependencies = [
- "iced_core 0.15.0-dev",
- "iced_debug 0.15.0-dev",
- "iced_devtools 0.15.0-dev",
- "iced_futures 0.15.0-dev",
- "iced_renderer 0.15.0-dev",
- "iced_runtime 0.15.0-dev",
- "iced_widget 0.15.0-dev",
- "iced_winit 0.15.0-dev",
+ "iced_core",
+ "iced_debug",
+ "iced_devtools",
+ "iced_futures",
+ "iced_renderer",
+ "iced_runtime",
+ "iced_widget",
+ "iced_winit",
  "thiserror 2.0.18",
 ]
 
@@ -1822,22 +1801,7 @@ checksum = "02a48f970444257a5e8b19def673f14f0d79c159fa851055e2a861683c3f8845"
 dependencies = [
  "bincode",
  "futures",
- "iced_core 0.14.0",
- "log",
- "semver",
- "serde",
- "thiserror 2.0.18",
- "tokio",
-]
-
-[[package]]
-name = "iced_beacon"
-version = "0.15.0-dev"
-source = "git+https://github.com/iced-rs/iced.git?rev=1296490#12964902550c35bd984d7628d646cd8190a92af6"
-dependencies = [
- "bincode",
- "futures",
- "iced_core 0.15.0-dev",
+ "iced_core",
  "log",
  "semver",
  "serde",
@@ -1865,43 +1829,14 @@ dependencies = [
 ]
 
 [[package]]
-name = "iced_core"
-version = "0.15.0-dev"
-source = "git+https://github.com/iced-rs/iced.git?rev=1296490#12964902550c35bd984d7628d646cd8190a92af6"
-dependencies = [
- "bitflags 2.11.0",
- "bytes",
- "glam 0.25.0",
- "lilt",
- "log",
- "num-traits",
- "rustc-hash 2.1.1",
- "serde",
- "smol_str",
- "thiserror 2.0.18",
- "web-time",
-]
-
-[[package]]
 name = "iced_debug"
 version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "25035ab0215a620e53f4103e36fc4e59a1fb2817e4bfc38a30ad27b4202ea0be"
 dependencies = [
- "iced_beacon 0.14.0",
- "iced_core 0.14.0",
- "iced_futures 0.14.0",
- "log",
-]
-
-[[package]]
-name = "iced_debug"
-version = "0.15.0-dev"
-source = "git+https://github.com/iced-rs/iced.git?rev=1296490#12964902550c35bd984d7628d646cd8190a92af6"
-dependencies = [
- "iced_beacon 0.15.0-dev",
- "iced_core 0.15.0-dev",
- "iced_futures 0.15.0-dev",
+ "iced_beacon",
+ "iced_core",
+ "iced_futures",
  "log",
 ]
 
@@ -1911,20 +1846,9 @@ version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "59b8e2a306ac5c583234b02f5404afdb7b7467c8f72a4a44ad3e7be30fc4b339"
 dependencies = [
- "iced_debug 0.14.0",
- "iced_program 0.14.0",
- "iced_widget 0.14.2",
- "log",
-]
-
-[[package]]
-name = "iced_devtools"
-version = "0.15.0-dev"
-source = "git+https://github.com/iced-rs/iced.git?rev=1296490#12964902550c35bd984d7628d646cd8190a92af6"
-dependencies = [
- "iced_debug 0.15.0-dev",
- "iced_program 0.15.0-dev",
- "iced_widget 0.15.0-dev",
+ "iced_debug",
+ "iced_program",
+ "iced_widget",
  "log",
 ]
 
@@ -1935,20 +1859,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8c0c85ccad42dfbec7293c36c018af0ea0dbcc52d137a4a9a0b0f6822a3fdf0a"
 dependencies = [
  "futures",
- "iced_core 0.14.0",
- "log",
- "rustc-hash 2.1.1",
- "wasm-bindgen-futures",
- "wasmtimer",
-]
-
-[[package]]
-name = "iced_futures"
-version = "0.15.0-dev"
-source = "git+https://github.com/iced-rs/iced.git?rev=1296490#12964902550c35bd984d7628d646cd8190a92af6"
-dependencies = [
- "futures",
- "iced_core 0.15.0-dev",
+ "iced_core",
  "log",
  "rustc-hash 2.1.1",
  "wasm-bindgen-futures",
@@ -1965,28 +1876,10 @@ dependencies = [
  "bytemuck",
  "cosmic-text",
  "half",
- "iced_core 0.14.0",
- "iced_futures 0.14.0",
+ "iced_core",
+ "iced_futures",
  "log",
  "lyon_path",
- "raw-window-handle",
- "rustc-hash 2.1.1",
- "thiserror 2.0.18",
- "unicode-segmentation",
-]
-
-[[package]]
-name = "iced_graphics"
-version = "0.15.0-dev"
-source = "git+https://github.com/iced-rs/iced.git?rev=1296490#12964902550c35bd984d7628d646cd8190a92af6"
-dependencies = [
- "bitflags 2.11.0",
- "bytemuck",
- "cosmic-text",
- "half",
- "iced_core 0.15.0-dev",
- "iced_futures 0.15.0-dev",
- "log",
  "raw-window-handle",
  "rustc-hash 2.1.1",
  "thiserror 2.0.18",
@@ -1999,17 +1892,8 @@ version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6dfafec2947cda688d8eb00dac337ba11aa60f9ef6335aed343e189d26e4a673"
 dependencies = [
- "iced_graphics 0.14.0",
- "iced_runtime 0.14.0",
-]
-
-[[package]]
-name = "iced_program"
-version = "0.15.0-dev"
-source = "git+https://github.com/iced-rs/iced.git?rev=1296490#12964902550c35bd984d7628d646cd8190a92af6"
-dependencies = [
- "iced_graphics 0.15.0-dev",
- "iced_runtime 0.15.0-dev",
+ "iced_graphics",
+ "iced_runtime",
 ]
 
 [[package]]
@@ -2018,21 +1902,9 @@ version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "250cc0802408e8c077986ec56c7d07c65f423ee658a4b9fd795a1f2aae5dac05"
 dependencies = [
- "iced_graphics 0.14.0",
- "iced_tiny_skia 0.14.0",
- "iced_wgpu 0.14.0",
- "log",
- "thiserror 2.0.18",
-]
-
-[[package]]
-name = "iced_renderer"
-version = "0.15.0-dev"
-source = "git+https://github.com/iced-rs/iced.git?rev=1296490#12964902550c35bd984d7628d646cd8190a92af6"
-dependencies = [
- "iced_graphics 0.15.0-dev",
- "iced_tiny_skia 0.15.0-dev",
- "iced_wgpu 0.15.0-dev",
+ "iced_graphics",
+ "iced_tiny_skia",
+ "iced_wgpu",
  "log",
  "thiserror 2.0.18",
 ]
@@ -2044,20 +1916,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d1889b819ce4c06674183242e336c8d49465665441396914dc07cc86f44fa8d4"
 dependencies = [
  "bytes",
- "iced_core 0.14.0",
- "iced_futures 0.14.0",
- "raw-window-handle",
- "thiserror 2.0.18",
-]
-
-[[package]]
-name = "iced_runtime"
-version = "0.15.0-dev"
-source = "git+https://github.com/iced-rs/iced.git?rev=1296490#12964902550c35bd984d7628d646cd8190a92af6"
-dependencies = [
- "bytes",
- "iced_core 0.15.0-dev",
- "iced_futures 0.15.0-dev",
+ "iced_core",
+ "iced_futures",
  "raw-window-handle",
  "thiserror 2.0.18",
 ]
@@ -2070,24 +1930,8 @@ checksum = "fe0acf8b75a3bc914aff5f2329fdffc1b36eeaea29dda0e4bd232f1c62e9cc3d"
 dependencies = [
  "bytemuck",
  "cosmic-text",
- "iced_debug 0.14.0",
- "iced_graphics 0.14.0",
- "kurbo",
- "log",
- "rustc-hash 2.1.1",
- "softbuffer",
- "tiny-skia",
-]
-
-[[package]]
-name = "iced_tiny_skia"
-version = "0.15.0-dev"
-source = "git+https://github.com/iced-rs/iced.git?rev=1296490#12964902550c35bd984d7628d646cd8190a92af6"
-dependencies = [
- "bytemuck",
- "cosmic-text",
- "iced_debug 0.15.0-dev",
- "iced_graphics 0.15.0-dev",
+ "iced_debug",
+ "iced_graphics",
  "kurbo",
  "log",
  "rustc-hash 2.1.1",
@@ -2107,29 +1951,10 @@ dependencies = [
  "futures",
  "glam 0.25.0",
  "guillotiere",
- "iced_debug 0.14.0",
- "iced_graphics 0.14.0",
+ "iced_debug",
+ "iced_graphics",
  "log",
  "lyon",
- "rustc-hash 2.1.1",
- "thiserror 2.0.18",
- "wgpu",
-]
-
-[[package]]
-name = "iced_wgpu"
-version = "0.15.0-dev"
-source = "git+https://github.com/iced-rs/iced.git?rev=1296490#12964902550c35bd984d7628d646cd8190a92af6"
-dependencies = [
- "bitflags 2.11.0",
- "bytemuck",
- "cryoglyph",
- "futures",
- "glam 0.25.0",
- "guillotiere",
- "iced_debug 0.15.0-dev",
- "iced_graphics 0.15.0-dev",
- "log",
  "rustc-hash 2.1.1",
  "thiserror 2.0.18",
  "wgpu",
@@ -2141,20 +1966,7 @@ version = "0.14.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b1596afa0d3109c2618e8bc12bae6c11d3064df8f95c42dfce570397dbe957ab"
 dependencies = [
- "iced_renderer 0.14.0",
- "log",
- "num-traits",
- "rustc-hash 2.1.1",
- "thiserror 2.0.18",
- "unicode-segmentation",
-]
-
-[[package]]
-name = "iced_widget"
-version = "0.15.0-dev"
-source = "git+https://github.com/iced-rs/iced.git?rev=1296490#12964902550c35bd984d7628d646cd8190a92af6"
-dependencies = [
- "iced_renderer 0.15.0-dev",
+ "iced_renderer",
  "log",
  "num-traits",
  "rustc-hash 2.1.1",
@@ -2168,8 +1980,8 @@ version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8b7dbedc47562d1de3b9707d939f678b88c382004b7ab5a18f7a7dd723162d75"
 dependencies = [
- "iced_debug 0.14.0",
- "iced_program 0.14.0",
+ "iced_debug",
+ "iced_program",
  "log",
  "mundy",
  "rustc-hash 2.1.1",
@@ -2178,25 +1990,7 @@ dependencies = [
  "wasm-bindgen-futures",
  "web-sys",
  "window_clipboard",
- "winit 0.30.13",
-]
-
-[[package]]
-name = "iced_winit"
-version = "0.15.0-dev"
-source = "git+https://github.com/iced-rs/iced.git?rev=1296490#12964902550c35bd984d7628d646cd8190a92af6"
-dependencies = [
- "iced_debug 0.15.0-dev",
- "iced_program 0.15.0-dev",
- "log",
- "mundy",
- "rustc-hash 2.1.1",
- "thiserror 2.0.18",
- "tracing",
- "wasm-bindgen-futures",
- "web-sys",
- "window_clipboard",
- "winit 0.30.8",
+ "winit",
 ]
 
 [[package]]
@@ -3428,7 +3222,7 @@ dependencies = [
 name = "pmj_client_desktop"
 version = "0.1.0"
 dependencies = [
- "iced 0.14.0",
+ "iced",
  "image",
  "log",
  "lyon_algorithms",
@@ -3442,7 +3236,6 @@ name = "pmj_gamemodes"
 version = "0.1.0"
 dependencies = [
  "getrandom 0.2.17",
- "iced 0.15.0-dev",
  "image",
  "local-ip-address",
  "pmj_shared",
@@ -3457,7 +3250,7 @@ name = "pmj_server"
 version = "0.1.0"
 dependencies = [
  "getrandom 0.2.17",
- "iced 0.15.0-dev",
+ "iced",
  "image",
  "local-ip-address",
  "pmj_gamemodes",
@@ -5724,57 +5517,6 @@ checksum = "d6bbff5f0aada427a1e5a6da5f1f98158182f26556f345ac9e04d36d0ebed650"
 
 [[package]]
 name = "winit"
-version = "0.30.8"
-source = "git+https://github.com/iced-rs/winit.git?rev=05b8ff17a06562f0a10bb46e6eaacbe2a95cb5ed#05b8ff17a06562f0a10bb46e6eaacbe2a95cb5ed"
-dependencies = [
- "ahash",
- "android-activity",
- "atomic-waker",
- "bitflags 2.11.0",
- "block2 0.5.1",
- "bytemuck",
- "calloop 0.13.0",
- "cfg_aliases",
- "concurrent-queue",
- "core-foundation 0.9.4",
- "core-graphics",
- "cursor-icon",
- "dpi 0.1.1",
- "js-sys",
- "libc",
- "memmap2",
- "ndk",
- "objc2 0.5.2",
- "objc2-app-kit 0.2.2",
- "objc2-foundation 0.2.2",
- "objc2-ui-kit",
- "orbclient",
- "percent-encoding",
- "pin-project",
- "raw-window-handle",
- "redox_syscall 0.4.1",
- "rustix 0.38.44",
- "sctk-adwaita",
- "smithay-client-toolkit 0.19.2",
- "smol_str",
- "tracing",
- "unicode-segmentation",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "wayland-backend",
- "wayland-client",
- "wayland-protocols",
- "wayland-protocols-plasma",
- "web-sys",
- "web-time",
- "windows-sys 0.52.0",
- "x11-dl",
- "x11rb",
- "xkbcommon-dl",
-]
-
-[[package]]
-name = "winit"
 version = "0.30.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a6755fa58a9f8350bd1e472d4c3fcc25f824ec358933bba33306d0b63df5978d"
@@ -5791,7 +5533,7 @@ dependencies = [
  "core-foundation 0.9.4",
  "core-graphics",
  "cursor-icon",
- "dpi 0.1.2",
+ "dpi",
  "js-sys",
  "libc",
  "memmap2",

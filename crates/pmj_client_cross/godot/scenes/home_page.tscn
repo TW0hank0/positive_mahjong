@@ -9,6 +9,11 @@ font_color = Color(0.5746992, 0.8311122, 0.8644515, 1)
 outline_size = 3
 outline_color = Color(0.21952647, 0.35906467, 0.26638252, 1)
 
+[sub_resource type="LabelSettings" id="LabelSettings_2e0ks"]
+font = ExtResource("1_2e0ks")
+font_size = 26
+font_color = Color(0.9642603, 0.9611818, 0.9436892, 1)
+
 [node name="home_page" type="Control" unique_id=1472817196]
 layout_mode = 3
 anchors_preset = 15
@@ -28,3 +33,14 @@ offset_bottom = 40.0
 layout_mode = 2
 text = "pmj_client"
 label_settings = SubResource("LabelSettings_j31nu")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="main_layout" unique_id=1583048539]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="main_layout/HBoxContainer" unique_id=1784572905]
+layout_mode = 2
+text = "伺服器地址："
+label_settings = SubResource("LabelSettings_2e0ks")
+
+[node name="LineEdit" type="LineEdit" parent="main_layout/HBoxContainer" unique_id=367507207]
+layout_mode = 2

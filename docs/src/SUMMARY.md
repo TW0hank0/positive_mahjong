@@ -6,5 +6,5 @@
 - [編譯](compile.md)
 - [安裝](install.md)
 - [授權與聲明](license/index.md)
-  - [ThirdPartyLicense-Rust.md](license/ThirdPartyLicense-Rust.md)
-  - [license_assets](license/res.md)
+  - [模組庫授權與聲明](license/ThirdPartyLicense-Rust.md)
+  - [第一方與第三方專案授權聲明](license/res.md)

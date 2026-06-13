@@ -13,25 +13,24 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-#[cfg(feature = "gui")]
 use iced;
 
-#[cfg(feature = "gui")]
 use pmj_gamemodes;
-#[cfg(feature = "gui")]
 use pmj_shared;
 
+mod base;
+
 fn main() -> iced::Result {
-    #[cfg(not(feature = "gui"))]
+    /* #[cfg(not(feature = "gui"))]
     {
         eprintln!("Must enable `gui` feature.");
-    }
-    #[cfg(feature = "gui")]
+    } */
+    //#[cfg(feature = "gui")]
     {
         let config = pmj_shared::shared::read_server_config();
         match config.gamemode {
             pmj_shared::shared::GameModes::Base => {
-                pmj_gamemodes::base::gui::main()?;
+                base::main()?;
             }
             pmj_shared::shared::GameModes::V1Simple => {
                 println!("還未支援！");

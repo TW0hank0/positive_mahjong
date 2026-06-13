@@ -1,3 +1,4 @@
 auto_generated/** linguist-generated
 pmj_client/old_slint_client/** linguist-vendored
+pmj_client/old_pmj_client/** linguist-vendored
 # docs/book/** linguist-documentation

@@ -21,7 +21,6 @@ repository = "https://github.com/TW0hank0/positive_mahjong"
 rust-version = "1.94"
 version = "0.1.0"
 
-
 [workspace.dependencies]
 # --- local ---
 pmj_gamemodes = { path = "crates/pmj_gamemodes" }

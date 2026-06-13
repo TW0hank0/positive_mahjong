@@ -16,36 +16,36 @@
 name: commit-check
 
 on:
-  push:
+    push:
 
 jobs:
-  check:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
+    check:
+        runs-on: ${{ matrix.os }}
+        strategy:
+            fail-fast: false
+            matrix:
+                os: [ubuntu-latest, windows-latest]
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v6
 
-      - name: Install Dep
-        uses: ./.github/workflows/instdep
+            - name: Install Dep
+              uses: ./.github/workflows/instdep
 
-      - name: debug check
-        run: cargo check --workspace --features desktop --features gui
+            - name: debug check
+              run: cargo check --workspace --features desktop
 
-      - name: release check
-        run: cargo check --release --workspace --features desktop --features gui
+            - name: release check
+              run: cargo check --release --workspace --features desktop
 
-      - name: Run License Check
-        run: |
-          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
-          uv run scripts/license_check.py
+            - name: Run License Check
+              run: |
+                  echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+                  uv run scripts/license_check.py
 
-      - name: Install taplo
-        run: cargo install taplo-cli
+            - name: Install taplo
+              run: cargo install taplo-cli
 
-      - name: Lint toml file
-        run: taplo lint
+            - name: Lint toml file
+              run: taplo lint

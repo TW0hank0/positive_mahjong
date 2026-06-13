@@ -43,7 +43,7 @@
 - `READMEs/`： 多語言README
 - `scripts/`： 腳本
 - `templates/`： 模板
-- `.gitattributes`： Github 語言統計忽略編譯產生的檔案
+- `.gitattributes`： 在Github 語言統計忽略編譯產生的檔案
 - `.gitignore`： 忽略不該上傳的檔案
 - `.gitlab-ci.yml`： Gitlab CI 設定
 - `about.toml`： cargo-about 設定

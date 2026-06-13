@@ -4,15 +4,15 @@ compatibility_minimum = 4.1
 reloadable = true
 
 [libraries]
-linux.debug.x86_64 =     "res://../rust/target/debug/libpmj_client_cross_lib.so"
-linux.release.x86_64 =   "res://../rust/target/release/libpmj_client_cross_lib.so"
-windows.debug.x86_64 =   "res://../rust/target/debug/libpmj_client_cross_lib.dll"
-windows.release.x86_64 = "res://../rust/target/release/libpmj_client_cross_lib.dll"
+linux.debug.x86_64 =     "res://../../../target/debug/libpmj_client_cross_lib.so"
+linux.release.x86_64 =   "res://../../../target/release/libpmj_client_cross_lib.so"
+windows.debug.x86_64 =   "res://../../../target/debug/libpmj_client_cross_lib.dll"
+windows.release.x86_64 = "res://../target/release/libpmj_client_cross_lib.dll"
 ; macos.debug =            "res://../rust/target/debug/libpmj_client_cross_lib.dylib"
 ; macos.release =          "res://../rust/target/release/libpmj_client_cross_lib.dylib"
 ; macos.debug.arm64 =      "res://../rust/target/debug/libpmj_client_cross_lib.dylib"
 ; macos.release.arm64 =    "res://../rust/target/release/libpmj_client_cross_lib.dylib"
-android.debug.arm64 = "res://../rust/target/target/debug/libpmj_client_cross_lib.so"
-android.release.arm64 = "res://../rust/target/release/libpmj_client_cross_lib.so"
-web.debug = "res://../rust/debug/wasm32-unknown-unknown/pmj_client_cross_lib.wasm"
-web.release = "res://../rust/release/wasm32-unknown-unknown/pmj_client_cross_lib.wasm"
+android.debug.arm64 = "res://../../../target/target/debug/libpmj_client_cross_lib.so"
+android.release.arm64 = "res://../../../target/release/libpmj_client_cross_lib.so"
+web.debug = "res://../../../target/debug/wasm32-unknown-unknown/pmj_client_cross_lib.wasm"
+web.release = "res://../../../target/release/wasm32-unknown-unknown/pmj_client_cross_lib.wasm"
