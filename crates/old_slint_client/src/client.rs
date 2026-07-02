@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-// 著作權所有 (C) 2026 TW0hank0
+// 著作權所有 (C) {{.Year}} TW0hank0
 //
 // 本檔案屬於 positive_mahjong 專案的一部分。
-// 專案儲存庫：https://github.com/TW0hank0/positive_mahjong
+// 專案儲存庫：https://gitlab.com/TW0hank0/positive_mahjong
 //
 // 本程式為自由軟體：您可以根據自由軟體基金會發佈的 GNU Affero 通用公共授權條款
 // 第 3 版（僅此版本）重新發佈及/或修改本程式。
@@ -19,10 +19,10 @@ use reqwest;
 use std::{sync, thread};
 
 use log;
-use tungstenite::{Message, connect};
+use tungstenite::{connect, Message};
 
-use pmj_shared::shared;
 use pmj_gamemodes::base;
+use pmj_shared::shared;
 
 // 引入 Slint 模組
 slint::include_modules!();

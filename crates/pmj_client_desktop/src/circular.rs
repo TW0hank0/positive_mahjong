@@ -1,8 +1,8 @@
 //! Show a circular progress indicator.
 //!
-//! Orig Author: [iced team](https://github.com/iced-rs/)
+//! Author: [iced team](https://github.com/iced-rs/)
 //!
-//! Orig Project: [iced](https://github.com/iced-rs/iced/)
+//! This file is from project [iced](https://github.com/iced-rs/iced/).
 use iced::advanced::layout;
 use iced::advanced::renderer;
 use iced::advanced::widget::tree::{self, Tree};

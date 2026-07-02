@@ -1,6 +1,6 @@
-//! Orig Author: [iced team](https://github.com/iced-rs/)
+//! Author: [iced team](https://github.com/iced-rs/)
 //!
-//! Orig Project: [iced](https://github.com/iced-rs/iced/)
+//! This file is from project [iced](https://github.com/iced-rs/iced/).
 
 use iced::Point;
 

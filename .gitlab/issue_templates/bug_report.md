@@ -1,22 +1,21 @@
 錯誤回報(Bug report)：
 
-目前的行為：
+目前的錯誤行為：
 
 ```text
 type something here
 ```
 
-預期的行為：
+預期的正確行為：
 
 ```text
 type something here
 ```
 
-觸發步驟：
+錯誤行為觸發步驟：
 
 ```text
 type something here
 ```
 
-Label：
 /label ~"Bug"

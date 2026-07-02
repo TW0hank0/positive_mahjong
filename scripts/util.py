@@ -13,17 +13,24 @@
 # 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-name: 功能請求（Feature request）
-description: 為這個專案提供建議
-title: "[Feature] "
-labels:
-    - enhancement
+import subprocess
 
-body:
-    - type: textarea
-      attributes:
-          label: 你想要什么新功能？
-          description: |
-              你想要什麼新功能？
-      validations:
-          required: true
+
+def run_cmd(command: list[str]):
+    print(f"===> Running command: {' '.join(command)}")
+    process = subprocess.run(
+        command,
+        timeout=60 * 40,
+        stderr=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        text=True,
+    )
+    if process.returncode == 0:
+        print("=====> Process fnished sucessful.")
+    else:
+        print(f"=====> Process exited with non-zero code ({process.returncode})!")
+        print("--- process stdout ---")
+        print(process.stdout)
+        print("--- process stderr ---")
+        print(process.stderr)
+        print("--- end-of output ---")

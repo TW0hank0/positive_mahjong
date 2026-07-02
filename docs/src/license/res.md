@@ -1,4 +1,4 @@
-# license_assets
+# res
 
 第一方與第三方專案授權聲明。
 

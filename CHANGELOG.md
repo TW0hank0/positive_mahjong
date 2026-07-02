@@ -95,3 +95,15 @@
 - 修復：說明文件無法正常使用
 - 移除：Gitlab issue 模板中的無用內容
 - 修復：gdextension設定
+
+**2026-6-19**
+
+- 新增：［pmj_client_cross］跨平臺客戶端編譯腳本
+- 移除：［ci］Github 的儲存庫同步
+
+**2026-7-2**
+
+- 修復：舊的檔案 header 指向 github，現已指向 gitlab
+- 新增：開始開發網頁
+- 修復：［pmj_server］ `try_lock failed because the operation would block`
+- 棄用：Github issue templates

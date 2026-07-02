@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-// 著作權所有 (C) 2026 TW0hank0
+// 著作權所有 (C) {{.Year}} TW0hank0
 //
 // 本檔案屬於 positive_mahjong 專案的一部分。
-// 專案儲存庫：https://github.com/TW0hank0/positive_mahjong
+// 專案儲存庫：https://gitlab.com/TW0hank0/positive_mahjong
 //
 // 本程式為自由軟體：您可以根據自由軟體基金會發佈的 GNU Affero 通用公共授權條款
 // 第 3 版（僅此版本）重新發佈及/或修改本程式。
@@ -19,20 +19,20 @@ use std::{
     sync,
 };
 
-use iced_core::{Border, Padding, border::Radius, theme};
+use iced_core::{border::Radius, theme, Border, Padding};
 use iced_wgpu::Renderer;
 use iced_widget::{
-    self, Column, Grid, Row, button, center, column, container, grid, scrollable, space, stack,
-    text, text_input,
+    self, button, center, column, container, grid, scrollable, space, stack, text, text_input,
+    Column, Grid, Row,
 };
 use iced_winit::{
-    core::{Color, Element, Length, Pixels, Theme, alignment},
+    core::{alignment, Color, Element, Length, Pixels, Theme},
     runtime::{self, task},
 };
 //use iced_winit::winit::event_loop::EventLoopProxy;
 
 use tungstenite::WebSocket;
-use tungstenite::{Message, connect};
+use tungstenite::{connect, Message};
 
 use pmj_shared::shared::{self, FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES, FONT_NOTO_SANS_REG_BYTES};
 

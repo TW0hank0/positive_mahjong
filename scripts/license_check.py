@@ -2,7 +2,7 @@
 # 著作權所有 (C) 2026 TW0hank0
 #
 # 本檔案屬於 positive_mahjong 專案的一部分。
-# 專案儲存庫：https://github.com/TW0hank0/positive_mahjong
+# 專案儲存庫：https://gitlab.com/TW0hank0/positive_mahjong
 #
 # 本程式為自由軟體：您可以根據自由軟體基金會發佈的 GNU Affero 通用公共授權條款
 # 第 3 版（僅此版本）重新發佈及/或修改本程式。
@@ -34,17 +34,24 @@ def main():
         "**/*.otf",
         "assets/**",
         "**/*.json",
-        "ThirdPartyLicense-Rust.*",
-        "ThirdPartyLicense-Python.*",
+        # auto generated license info
+        "**/ThirdPartyLicense-Rust.*",
+        "**/ThirdPartyLicense-Python.*",
         "auto_generated/**",
         "**/*.icon",
         "**/*.ico",
-        "**/*.sh",
-        "**/*.bat",
-        # `pmj_client` 包含第三方程式碼
+        # for ci
+        "**/rust-init.sh",
+        # `old_pmj_client` 包含第三方程式碼
         # [android-iced-example](https://github.com/ibaryshnikov/android-iced-example)
-        "pmj_client/src/android/**",
+        "crates/old_pmj_client/src/android/**",
         "docs/book/**",
+        # Author: [iced team](https://github.com/iced-rs/)
+        # This file is from project [iced](https://github.com/iced-rs/iced/).
+        "crates/pmj_client_desktop/src/easing.rs",
+        # Author: [iced team](https://github.com/iced-rs/)
+        # This file is from project [iced](https://github.com/iced-rs/iced/).
+        "crates/pmj_client_desktop/src/circular.rs",
     ]
     ignored = []
     for dir in ignore_dir:
