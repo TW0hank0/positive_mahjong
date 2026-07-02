@@ -2,7 +2,7 @@
 # 著作權所有 (C) 2026 TW0hank0
 #
 # 本檔案屬於 positive_mahjong 專案的一部分。
-# 專案儲存庫：https://github.com/TW0hank0/positive_mahjong
+# 專案儲存庫：https://gitlab.com/TW0hank0/positive_mahjong
 #
 # 本程式為自由軟體：您可以根據自由軟體基金會發佈的 GNU Affero 通用公共授權條款
 # 第 3 版（僅此版本）重新發佈及/或修改本程式。
@@ -20,14 +20,9 @@ labels:
     - bug
 
 body:
-    - type: markdown
-      attributes:
-          value: |
-              填寫此issue前，請確認沒有重复的issue。
-
     - type: textarea
       attributes:
-          label: 目前行為
+          label: 目前的錯誤行為
           description: |
               目前行為
       validations:
@@ -35,8 +30,8 @@ body:
 
     - type: textarea
       attributes:
-          label: 正常行為
+          label: 預期的正確行為
           description: |
-              正常行為
+              正確行為
       validations:
           required: true

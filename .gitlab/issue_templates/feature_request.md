@@ -6,5 +6,4 @@
 describe feature here
 ```
 
-Label：
 /label ~"enhancement"

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-// 著作權所有 (C) 2026 TW0hank0
+// 著作權所有 (C) {{.Year}} TW0hank0
 //
 // 本檔案屬於 positive_mahjong 專案的一部分。
-// 專案儲存庫：https://github.com/TW0hank0/positive_mahjong
+// 專案儲存庫：https://gitlab.com/TW0hank0/positive_mahjong
 //
 // 本程式為自由軟體：您可以根據自由軟體基金會發佈的 GNU Affero 通用公共授權條款
 // 第 3 版（僅此版本）重新發佈及/或修改本程式。
@@ -141,52 +141,55 @@ impl Client {
         match message {
             UIMessage::FetchThreadsStatus => {
                 let mut rp_index = 0;
-                loop {
-                    if rp_index > self.process_threads.len() {
-                        break;
-                    } else {
-                        let rpthread = self.process_threads.get(rp_index).unwrap();
-                        if rpthread.is_finished() {
-                            let pthread = self.process_threads.remove(rp_index);
-                            match pthread.join() {
-                                Ok(thread_result) => {
-                                    if thread_result.is_error {
-                                        self.status_home
-                                            .msgs
-                                            .push(String::from("process_thread ran into error!"));
-                                        match thread_result.process_type {
-                                            ThreadProcessTypes::DoNotThing => {}
-                                            ThreadProcessTypes::ReadFirstMsgResp => {
-                                                return task::Task::done(UIMessage::Home(
-                                                    HomeMessage::ReadFirstMsgResp,
-                                                ));
+                'loop_else: {
+                    loop {
+                        if rp_index > self.process_threads.len() {
+                            break;
+                        } else {
+                            let rpthread = self.process_threads.get(rp_index).unwrap();
+                            if rpthread.is_finished() {
+                                let pthread = self.process_threads.remove(rp_index);
+                                match pthread.join() {
+                                    Ok(thread_result) => {
+                                        if thread_result.is_error {
+                                            self.status_home.msgs.push(String::from(
+                                                "process_thread ran into error!",
+                                            ));
+                                            match thread_result.process_type {
+                                                ThreadProcessTypes::DoNotThing => {}
+                                                ThreadProcessTypes::ReadFirstMsgResp => {
+                                                    return task::Task::done(UIMessage::Home(
+                                                        HomeMessage::ReadFirstMsgResp,
+                                                    ));
+                                                }
                                             }
-                                        }
-                                        continue;
-                                    } else {
-                                        match thread_result.process_type {
-                                            ThreadProcessTypes::ReadFirstMsgResp => {
-                                                self.player_id = Some(
-                                                    thread_result
-                                                        .result_read_first_msg_resp
-                                                        .unwrap()
-                                                        .player_id,
-                                                );
+                                            continue;
+                                        } else {
+                                            match thread_result.process_type {
+                                                ThreadProcessTypes::ReadFirstMsgResp => {
+                                                    self.player_id = Some(
+                                                        thread_result
+                                                            .result_read_first_msg_resp
+                                                            .unwrap()
+                                                            .player_id,
+                                                    );
+                                                }
+                                                ThreadProcessTypes::DoNotThing => {}
                                             }
-                                            ThreadProcessTypes::DoNotThing => {}
+                                            break 'loop_else;
                                         }
-                                        break;
+                                    }
+                                    Err(e) => {
+                                        eprintln!("thread: {:?}", e);
+                                        self.status_home.msgs.push(format!("thread: {:?}", e));
                                     }
                                 }
-                                Err(e) => {
-                                    eprintln!("thread: {:?}", e);
-                                    self.status_home.msgs.push(format!("thread: {:?}", e));
-                                }
+                            } else {
+                                rp_index += 1;
                             }
-                        } else {
-                            rp_index += 1;
                         }
                     }
+                    return iced::task::Task::done(UIMessage::FetchThreadsStatus);
                 }
             }
             UIMessage::Home(home_message) => match home_message {
@@ -295,17 +298,21 @@ impl Client {
                                         style =
                                             style.with_background(ex_palette.primary.weak.color);
                                         style.text_color = ex_palette.primary.weak.text;
+                                        style.border = Border::default()
+                                            .width(5)
+                                            .color(ex_palette.primary.strong.color)
+                                            .rounded(5);
                                     }
                                     button::Status::Pressed => {
                                         style =
                                             style.with_background(ex_palette.primary.strong.color);
                                         style.text_color = ex_palette.primary.strong.text;
+                                        style.border = Border::default()
+                                            .width(5)
+                                            .color(ex_palette.secondary.strong.color)
+                                            .rounded(15);
                                     }
                                 }
-                                style.border = Border::default()
-                                    .width(5)
-                                    .color(ex_palette.primary.strong.color)
-                                    .rounded(10);
                                 style
                             }),
                     );
@@ -486,23 +493,24 @@ impl Client {
                 button::Status::Disabled => {
                     style = style.with_background(ex_palette.background.weak.color);
                     style.text_color = ex_palette.primary.base.text;
-                    //style.text_color = ex_palette.background.weak.text;
                 }
                 button::Status::Hovered => {
                     style = style.with_background(ex_palette.primary.weak.color);
                     style.text_color = ex_palette.primary.base.text;
-                    //style.text_color = ex_palette.primary.weak.text;
+                    style.border = Border::default()
+                        .width(5)
+                        .color(ex_palette.primary.strong.color)
+                        .rounded(5);
                 }
                 button::Status::Pressed => {
                     style = style.with_background(ex_palette.primary.strong.color);
                     style.text_color = ex_palette.primary.base.text;
-                    //style.text_color = ex_palette.primary.strong.text;
+                    style.border = Border::default()
+                        .width(5)
+                        .color(ex_palette.secondary.strong.color)
+                        .rounded(15);
                 }
             }
-            style.border = Border::default()
-                .width(5)
-                .color(ex_palette.primary.strong.color)
-                .rounded(10);
             style
         })
     }

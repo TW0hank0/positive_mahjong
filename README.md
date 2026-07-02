@@ -20,17 +20,17 @@ Edit: 待 `pmj_client_cross` 開發完成將支援Android。
 
 ### 連結
 
-[Gitlab 主儲存庫](https://gitlab.com/TW0hank0/positive_mahjong)
+[Gitlab 主儲存庫](https://gitlab.com/TW0hank0/positive_mahjong/)
 
-[Codeberg 鏡像儲存庫](https://codeberg.org/TW0hank0/positive_mahjong)
+[Codeberg 鏡像儲存庫](https://codeberg.org/TW0hank0/positive_mahjong/)
 
-[Github CI儲存庫](https://github.com/TW0hank0/positive_mahjong)
+[Github CI儲存庫](https://github.com/TW0hank0/positive_mahjong/)
 
-> issue 或 merge_request 請到 [Gitlab 主儲存庫](https://gitlab.com/TW0hank0/positive_mahjong)
+> issue 或 merge_request 請到 [Gitlab 主儲存庫](https://gitlab.com/TW0hank0/positive_mahjong/)
 
 [Gitlab-pages 專案說明文件](https://tw0hank0.gitlab.io/positive_mahjong/)
 
-[Github-pages 專案說明文件](https://tw0hank0.github.io/positive_mahjong)
+[Github-pages 專案說明文件](https://tw0hank0.github.io/positive_mahjong/)
 
 [KeepAndroidOpen 網站](https://keepandroidopen.org/)
 
