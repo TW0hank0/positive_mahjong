@@ -10,7 +10,6 @@
 positive_*_v*_*.zip
 *.kra~
 pmj_server_config.json
-cargo-deny-result.txt
 
 # secrets
 secret/**

@@ -66,10 +66,10 @@ pages:
     image: alpine:latest
     pages:
         # The folder that contains the files to be exposed at the Page URL
-        publish: docs/book
+        publish: website/
     artifacts:
         paths:
-            - docs/book
+            - website/
     rules:
         # This ensures that only pushes to the default branch will trigger
         # a pages deploy
@@ -87,4 +87,4 @@ pages:
         - uv python install cpython-3.14
     script:
         - uv run scripts/build_license.py
-        - cd docs && mdbook build && cd ..
+        - uv run scripts/build_website.py
