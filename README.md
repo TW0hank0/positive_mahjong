@@ -26,17 +26,21 @@ Edit: 待 `pmj_client_cross` 開發完成將支援Android。
 
 [Github CI儲存庫](https://github.com/TW0hank0/positive_mahjong/)
 
-> issue 或 merge_request 請到 [Gitlab 主儲存庫](https://gitlab.com/TW0hank0/positive_mahjong/)
+> Github 不接受 issue 或 merge_request，請到 [Gitlab 主儲存庫](https://gitlab.com/TW0hank0/positive_mahjong/)
 
-[Gitlab-pages 專案說明文件](https://tw0hank0.gitlab.io/positive_mahjong/)
+[Gitlab-pages 專案網站](https://tw0hank0.gitlab.io/positive_mahjong/)
 
-[Github-pages 專案說明文件](https://tw0hank0.github.io/positive_mahjong/)
+[Gitlab-pages 專案說明文件](https://tw0hank0.gitlab.io/positive_mahjong/docs/)
+
+[Github-pages 專案網站](https://tw0hank0.github.io/positive_mahjong/)
+
+[Github-pages 專案說明文件](https://tw0hank0.github.io/positive_mahjong/docs/)
 
 [KeepAndroidOpen 網站](https://keepandroidopen.org/)
 
 ### 安裝
 
-詳見：[專案文件](https://tw0hank0.gitlab.io/positive_mahjong)
+詳見：[專案說明文件](https://tw0hank0.gitlab.io/positive_mahjong/docs)
 
 #### Desktop
 
@@ -52,13 +56,15 @@ Edit: 待 `pmj_client_cross` 開發完成將支援Android。
 
 本程式基於 GNU Affero General Public License v3 （僅此版本） 授權
 
+完整全文請見 [LICENSE](./LICENSE) 檔案
+
 #### 第三方模組庫授權
 
-詳見：[ThirdPartyLicense-Rust.md](https://tw0hank0.gitlab.io/positive_mahjong/license/ThirdPartyLicense-Rust.html) 。
+詳見：[ThirdPartyLicense-Rust.md](https://tw0hank0.gitlab.io/positive_mahjong/docs/license/ThirdPartyLicense-Rust.html) 。
 
 #### 第三方專案聲明
 
-詳見：[專案文檔](https://tw0hank0.gitlab.io/positive_mahjong/license/res.html)
+詳見：[專案文檔](https://tw0hank0.gitlab.io/positive_mahjong/docs/license/res.html)
 
 **Noto Sans TC**
 

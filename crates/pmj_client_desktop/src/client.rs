@@ -570,7 +570,7 @@ impl Client {
                 return task::Task::done(UIMessage::Home(HomeMessage::ConnectServer));
             }
         }
-        return task::Task::none();
+        return task::Task::done(UIMessage::Home(HomeMessage::ReadFirstMsgResp));
     }
 
     fn home_read_first_msg_resp(&self) -> thread::JoinHandle<ThreadResult> {
