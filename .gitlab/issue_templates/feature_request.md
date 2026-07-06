@@ -1,9 +1,7 @@
-功能建議（Fuature request）：
+功能建議（Fuature Request）：
 
 功能描述：
 
-```plaintext
-describe feature here
-```
+type something here.
 
 /label ~"enhancement"
