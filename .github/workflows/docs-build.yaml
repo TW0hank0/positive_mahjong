@@ -40,16 +40,14 @@ jobs:
               run: |
                   uv run scripts/build_license.py
 
-            - name: build doc
+            - name: build doc and website
               run: |
-                  cd docs
-                  mdbook build
-                  cd ..
+                  uv run scripts/build_website.py
 
             - name: Upload artifact
               uses: actions/upload-pages-artifact@v5
               with:
-                  path: ./docs/book
+                  path: ./website/
 
             - name: Deploy to GitHub Pages
               uses: actions/deploy-pages@v4

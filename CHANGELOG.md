@@ -107,3 +107,8 @@
 - 新增：開始開發網頁
 - 修復：［pmj_server］ `try_lock failed because the operation would block`
 - 棄用：Github issue templates
+
+**2026-7-6**
+
+- 更改：［CI］使用新的 `website/` 網頁
+- 更改：［CI］使用 `mold` 作為 Linux 系統的 linker

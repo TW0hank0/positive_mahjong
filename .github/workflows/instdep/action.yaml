@@ -100,3 +100,8 @@ runs:
     - name: install cargo-msrv
       shell: pwsh
       run: cargo install cargo-msrv
+
+    - name: install mold linker
+      if: runner.os == 'Linux'
+      shell: pwsh
+      run: apt install mold -y
