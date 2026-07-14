@@ -119,3 +119,4 @@
 - 更改：workspace 級 `iced`
 - 開發：README 英文版
 - 修復：［pmj_server］初訊息未傳送
+- 修復：網頁部署

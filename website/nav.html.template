@@ -1,8 +1,12 @@
+<div class="title-bar">
 <h2 class="project_name">positive_mahjong</h2>
 <div class="nav">
     <a class="nav_item" href="{{$VAR_ROOT_DIR$}}/index.html">首頁</a>
     <a class="nav_item" href="{{$VAR_ROOT_DIR$}}/download.html"
         >下載</a
+    >
+    <a class="nav_item" href="{{$VAR_ROOT_DIR$}}/play-web.html"
+        >線上玩</a
     >
     <a
         class="nav_item"
@@ -10,14 +14,23 @@
         target="_blank"
         >說明文件</a
     >
-    <a class="nav_item" href="{{$VAR_ROOT_DIR$}}/play-web.html"
-        >線上玩</a
-    >
     <a
         href="https://gitlab.com/TW0hank0/positive_mahjong"
         class="nav_item"
         target="_blank"
         >Gitlab</a
+    >
+    <a
+        href="https://keepandroidopen.org"
+        class="nav_item nav-keepandroidopen"
+        target="_blank"
+        >KeepAndoridOpen</a
+    >
+    <a
+        href="https://killscd.gitlab.io/website/"
+        class="nav_item"
+        target="_blank"
+        >KillSubCultureDiscrimination</a
     >
 </div>
 <div class="badge">
@@ -41,4 +54,5 @@
         alt="GitHub Actions Workflow Status"
         src="https://img.shields.io/github/actions/workflow/status/TW0hank0/positive_mahjong/commit-build.yaml?branch=master&style=for-the-badge&label=Github%20Action&color=green"
     />
+</div>
 </div>

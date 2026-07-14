@@ -65,6 +65,14 @@
         transition-duration: 200ms;
     }
 }
+.title-bar {
+    background-color: var(--color-gray);
+    margin: var(--normal-margin);
+    padding: 8px;
+    padding-top: 5px;
+    border-radius: var(--normal-radius);
+    font-size: var(--text-size);
+}
 
 .badge {
     background-color: var(--secondary-color);
@@ -81,7 +89,7 @@
 .content {
     background-color: var(--color-gray);
     margin: var(--normal-margin);
-    padding: var(--normal-padding);
+    padding: 14px;
     border-radius: var(--normal-radius);
     font-size: var(--text-size);
 }
@@ -98,5 +106,9 @@ img {
 code {
     background-color: var(--code-color);
     border-radius: var(--code-radius);
-    font-family: "Courier New", Courier, monospace;
+    font-family:Courier, monospace;
+}
+
+.logo-text {
+    vertical-align:middle;
 }
