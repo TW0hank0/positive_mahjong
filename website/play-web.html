@@ -23,35 +23,22 @@
             name="viewport"
             content="width=device-width, initial-scale=1.0"
         />
-        <title>positive_mahjong —— 導航列</title>
+        <title>positive_mahjong —— 線上玩</title>
         <link rel="stylesheet" href="style.css" />
-        <base target="_parent" />
+        <link rel="icon" href="icon.svg" />
+        <link rel="shortcut icon" href="icon.png" />
     </head>
     <body>
         <header>
-            <h2 class="project_name">positive_mahjong</h2>
-            <div class="nav">
-                <a href="index.html" class="nav_item"
-                    >首頁</a
-                >
-                <a
-                    href="download.html"
-                    class="nav_item"
-                    >下載</a
-                >
-                <a
-                    href="docs/index.html"
-                    class="nav_item"
-                    >說明文件</a
-                >
-                <span class="nav_item">線上玩</span>
-                <a
-                    href="https://gitlab.com/TW0hank0/positive_mahjong"
-                    class="nav_item"
-                    target="_blank"
-                    >Gitlab</a
-                >
-            </b>
+            <nav>
+                {{$VAR_NAV$}}
+                <!--<iframe src="nav.html" class="nav-iframe"
+                    >這是個 iframe</iframe
+                >-->
+            </nav>
         </header>
+        <section class="content">
+            <p><code>pmj_client_cross</code> 還在開發中</p>
+        </section>
     </body>
 </html>

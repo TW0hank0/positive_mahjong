@@ -1,0 +1,44 @@
+<h2 class="project_name">positive_mahjong</h2>
+<div class="nav">
+    <a class="nav_item" href="{{$VAR_ROOT_DIR$}}/index.html">首頁</a>
+    <a class="nav_item" href="{{$VAR_ROOT_DIR$}}/download.html"
+        >下載</a
+    >
+    <a
+        class="nav_item"
+        href="{{$VAR_ROOT_DIR$}}/docs/index.html"
+        target="_blank"
+        >說明文件</a
+    >
+    <a class="nav_item" href="{{$VAR_ROOT_DIR$}}/play-web.html"
+        >線上玩</a
+    >
+    <a
+        href="https://gitlab.com/TW0hank0/positive_mahjong"
+        class="nav_item"
+        target="_blank"
+        >Gitlab</a
+    >
+</div>
+<div class="badge">
+    <img
+        alt="GitLab Stars"
+        src="https://img.shields.io/gitlab/stars/TW0hank0%2Fpositive_mahjong?style=for-the-badge&color=green"
+    />
+    <img
+        alt="Deps.rs Repository Dependencies"
+        src="https://img.shields.io/deps-rs/repo/gitlab/TW0hank0/positive_mahjong?style=for-the-badge&color=green"
+    />
+    <img
+        alt="Gitlab Pipeline Status"
+        src="https://img.shields.io/gitlab/pipeline-status/TW0hank0%2Fpositive_mahjong?branch=master&style=for-the-badge&label=Gitlab%20Pipeline&color=green"
+    />
+    <img
+        alt="GitLab License"
+        src="https://img.shields.io/gitlab/license/TW0hank0%2Fpositive_mahjong?style=for-the-badge&color=green"
+    />
+    <img
+        alt="GitHub Actions Workflow Status"
+        src="https://img.shields.io/github/actions/workflow/status/TW0hank0/positive_mahjong/commit-build.yaml?branch=master&style=for-the-badge&label=Github%20Action&color=green"
+    />
+</div>

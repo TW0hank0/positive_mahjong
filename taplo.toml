@@ -18,7 +18,8 @@ exclude = [
   "auto_generated/**",
   "docs/book/**",
   "target/**",
-  "web/**",
+  "website/**",
+  "website_build/**",
 ]
 
 include = ["Cargo.toml", "**/Cargo.toml", "**/*.toml"]

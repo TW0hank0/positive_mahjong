@@ -14,7 +14,7 @@
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 [workspace.package]
-authors = ["TW0hank0 <public.email.hank@gmail.com>"]
+authors = ["TW0hank0 <public.email.hank@tutamail.com>"]
 edition = "2024"
 license = "AGPL-3.0-only"
 repository = "https://github.com/TW0hank0/positive_mahjong"
@@ -27,7 +27,7 @@ pmj_gamemodes = { path = "crates/pmj_gamemodes" }
 pmj_shared = { path = "crates/pmj_shared" }
 positive_mahjong = { path = "." }
 # --- shared ---
-#iced = { version = "0.15.0", default-features = false, features = ["tiny-skia", "x11", "wayland", "image", "svg", "lazy", "debug", "thread-pool", "linux-theme-detection"] }
+iced = { version = "0.14.0", features = ["wgpu", "tiny-skia", "x11", "wayland", "image", "svg", "lazy", "debug", "thread-pool", "linux-theme-detection", "advanced", "canvas"] }
 image = "0.25.10"
 local-ip-address = "0.6.10"
 log = "0.4.29"

@@ -16,38 +16,40 @@
 name: docs-build
 
 on:
-    push:
-        branches:
-            - master
+  push:
+    branches:
+      - master
 
 permissions:
-    contents: read
-    pages: write
-    id-token: write
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v6
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
 
-            - name: Install Dep
-              uses: ./.github/workflows/instdep/
+      - name: Install Dep
+        uses: ./.github/workflows/instdep/
 
-            - name: build license
-              run: |
-                  uv run scripts/build_license.py
+      - name: build license
+        run: uv run scripts/build_license.py
 
-            - name: build doc and website
-              run: |
-                  uv run scripts/build_website.py
+      - name: copy webiste dep
+        run: uv run scripts/copy_website_dep.py
 
-            - name: Upload artifact
-              uses: actions/upload-pages-artifact@v5
-              with:
-                  path: ./website/
+      - name: build doc and website
+        run: |
+          uv run scripts/build_website.py
 
-            - name: Deploy to GitHub Pages
-              uses: actions/deploy-pages@v4
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: ./website/
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4

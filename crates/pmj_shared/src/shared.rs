@@ -25,7 +25,9 @@ use serde;
 pub const PROJECT_NAME: &str = "positive_mahjong";
 pub const PROJECT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
-pub const ICON_PNG_BYTES: &[u8] = include_bytes!("../../../assets/icon.png");
+pub const ICON_PNG_BYTES: &[u8] = include_bytes!("../../../assets/icon/icon.png");
+pub const ICON_SVG_BYTES: &[u8] = include_bytes!("../../../assets/icon/icon.svg");
+
 pub const FONT_NOTO_SANS_REG_BYTES: &[u8] =
     include_bytes!("../../../assets/Noto_Sans_TC/static/NotoSansTC-Regular.ttf");
 pub const FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES: &[u8] = include_bytes!(

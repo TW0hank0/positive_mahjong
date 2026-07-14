@@ -43,20 +43,22 @@ fn write_reply(
         match websocket.try_write() {
             Ok(mut guard) => {
                 write_result = guard.write(reply.clone());
-                match write_result {
-                    Ok(_) => {
-                        println!("成功回覆客戶端。")
-                    }
-                    Err(_) => {
-                        eprintln!("回覆客戶端失敗！")
-                    }
-                }
+                let _ = guard.flush();
+                drop(guard);
                 break;
             }
             Err(e) => {
-                eprintln!("base/mode.rs:57 -> error: {}", e);
+                eprintln!("base/mode.rs:50 -> error: {}", e);
             }
         };
+    }
+    match write_result {
+        Ok(_) => {
+            println!("成功回覆客戶端。")
+        }
+        Err(_) => {
+            eprintln!("回覆客戶端失敗！")
+        }
     }
     write_result
 }
@@ -501,8 +503,27 @@ impl PositiveMahjong {
                         .get_mut(current_turn_player_id as usize)
                         .unwrap();
                     let player_ws = player.player_ws.clone();
-                    let mut guard = player_ws.write().unwrap();
-                    let ws_msg = guard.read().unwrap();
+                    let ws_msg: Message;
+                    'guard_read: loop {
+                        match player_ws.try_write() {
+                            Ok(mut guard) => {
+                                match guard.read() {
+                                    Ok(i) => {
+                                        ws_msg = i;
+                                    }
+                                    Err(e) => {
+                                        eprintln!("err: {}", e);
+                                        continue 'guard_read;
+                                    }
+                                }
+                                break 'guard_read;
+                            }
+                            Err(e) => {
+                                eprintln!("err: {}", e);
+                                continue 'guard_read;
+                            }
+                        }
+                    }
                     match ws_msg {
                         Message::Text(text) => {
                             let msg: base::shared::ClientMessageType =
@@ -552,10 +573,7 @@ impl PositiveMahjong {
                                             todo!("錯誤處理");
                                         }
                                     }
-                                } /* _ => {
-                                      eprintln!("錯誤：客戶端錯誤訊息");
-                                      todo!("錯誤處理");
-                                  } */
+                                }
                             }
                         }
                         _ => {

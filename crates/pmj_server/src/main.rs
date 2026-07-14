@@ -14,7 +14,6 @@
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 use local_ip_address;
-use std;
 
 use pmj_shared::shared;
 

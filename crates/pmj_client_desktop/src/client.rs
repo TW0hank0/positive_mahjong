@@ -13,11 +13,7 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-use std::{
-    self,
-    net::{IpAddr, TcpStream},
-    sync, thread,
-};
+use std::{self, net::TcpStream, sync, thread, time};
 
 use iced::{
     self, Border, Color, Element, Length, Pixels, alignment, task,
@@ -50,7 +46,14 @@ pub struct Client {
     ws: Option<sync::Arc<sync::RwLock<WebSocket<tungstenite::stream::MaybeTlsStream<TcpStream>>>>>,
     player_id: Option<u8>,
     theme: iced::theme::Theme,
-    process_threads: Vec<thread::JoinHandle<ThreadResult>>,
+    process_threads: Vec<ProThread>,
+}
+
+#[derive(Debug)]
+pub struct ProThread {
+    pub handle: thread::JoinHandle<ThreadResult>,
+    pub start_time: time::Instant,
+    pub process_type: ThreadProcessTypes,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -64,11 +67,13 @@ pub struct HomeStatus {
     server_ip: String,
     try_connecting_server: bool,
     msgs: Vec<String>,
+    connect_msg: Option<String>,
 }
 
 #[derive(Debug)]
 pub struct PlayBaseStatus {
-    server_ip: Option<IpAddr>,
+    server_ip: Option<String>,
+    is_start: Option<bool>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -94,7 +99,6 @@ pub const ALPHABET: [char; 26] = [
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ThreadResult {
     pub is_error: bool,
-    pub process_type: ThreadProcessTypes,
     pub result_read_first_msg_resp: Option<ThreadProcessResultReadFirstMsgResp>,
 }
 
@@ -102,7 +106,6 @@ impl Default for ThreadResult {
     fn default() -> Self {
         Self {
             is_error: true,
-            process_type: ThreadProcessTypes::DoNotThing,
             result_read_first_msg_resp: None,
         }
     }
@@ -116,7 +119,6 @@ pub struct ThreadProcessResultReadFirstMsgResp {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ThreadProcessTypes {
     ReadFirstMsgResp,
-    DoNotThing,
 }
 
 impl Client {
@@ -129,8 +131,12 @@ impl Client {
                 server_ip: String::new(),
                 try_connecting_server: false,
                 msgs: Vec::new(),
+                connect_msg: None,
             },
-            status_play_base: PlayBaseStatus { server_ip: None },
+            status_play_base: PlayBaseStatus {
+                server_ip: None,
+                is_start: None,
+            },
             ws: None,
             player_id: None,
             theme: iced::theme::Theme::TokyoNight,
@@ -140,67 +146,101 @@ impl Client {
     pub fn update(&mut self, message: UIMessage) -> task::Task<UIMessage> {
         match message {
             UIMessage::FetchThreadsStatus => {
-                let mut rp_index = 0;
-                'loop_else: {
-                    loop {
-                        if rp_index > self.process_threads.len() {
-                            break;
-                        } else {
-                            let rpthread = self.process_threads.get(rp_index).unwrap();
-                            if rpthread.is_finished() {
-                                let pthread = self.process_threads.remove(rp_index);
-                                match pthread.join() {
-                                    Ok(thread_result) => {
-                                        if thread_result.is_error {
-                                            self.status_home.msgs.push(String::from(
-                                                "process_thread ran into error!",
-                                            ));
-                                            match thread_result.process_type {
-                                                ThreadProcessTypes::DoNotThing => {}
-                                                ThreadProcessTypes::ReadFirstMsgResp => {
-                                                    return task::Task::done(UIMessage::Home(
-                                                        HomeMessage::ReadFirstMsgResp,
-                                                    ));
+                if self.process_threads.len() > 0 {
+                    println!("Start fetch thread status...");
+                    let mut rp_index = 0;
+                    'loop_else: {
+                        loop {
+                            if rp_index >= self.process_threads.len() {
+                                break;
+                            } else {
+                                println!("rp_index={}", rp_index.clone());
+                                let rpthread = self.process_threads.get(rp_index).unwrap();
+                                if rpthread.handle.is_finished() {
+                                    let _ = rpthread;
+                                    let pthread = self.process_threads.remove(rp_index);
+                                    match pthread.handle.join() {
+                                        Ok(thread_result) => {
+                                            if thread_result.is_error {
+                                                eprintln!("process_thread ran into error!");
+                                                self.status_home.msgs.push(String::from(
+                                                    "process_thread ran into error!",
+                                                ));
+                                                match pthread.process_type {
+                                                    ThreadProcessTypes::ReadFirstMsgResp => {
+                                                        return task::Task::done(UIMessage::Home(
+                                                            HomeMessage::ReadFirstMsgResp,
+                                                        ));
+                                                    }
                                                 }
-                                            }
-                                            continue;
-                                        } else {
-                                            match thread_result.process_type {
-                                                ThreadProcessTypes::ReadFirstMsgResp => {
-                                                    self.player_id = Some(
-                                                        thread_result
-                                                            .result_read_first_msg_resp
-                                                            .unwrap()
-                                                            .player_id,
-                                                    );
+                                                continue;
+                                            } else {
+                                                println!("process_thread finish sucessful.");
+                                                match pthread.process_type {
+                                                    ThreadProcessTypes::ReadFirstMsgResp => {
+                                                        self.player_id = Some(
+                                                            thread_result
+                                                                .result_read_first_msg_resp
+                                                                .unwrap()
+                                                                .player_id,
+                                                        );
+                                                        println!(
+                                                            "ThreadProcessTypes::ReadFirstMsgResp => player_id -> {}",
+                                                            self.player_id.clone().unwrap()
+                                                        );
+                                                        self.status_play_base.is_start =
+                                                            Some(false);
+                                                        self.current_scene = ClientScenes::PlayBase;
+                                                    }
                                                 }
-                                                ThreadProcessTypes::DoNotThing => {}
+                                                break 'loop_else;
                                             }
-                                            break 'loop_else;
+                                        }
+                                        Err(e) => {
+                                            eprintln!("thread: {:?}", e);
+                                            self.status_home.msgs.push(format!("thread: {:?}", e));
                                         }
                                     }
-                                    Err(e) => {
-                                        eprintln!("thread: {:?}", e);
-                                        self.status_home.msgs.push(format!("thread: {:?}", e));
+                                } else {
+                                    if rpthread.start_time.elapsed() > time::Duration::from_secs(60)
+                                    {
+                                        let _pthread = self.process_threads.remove(rp_index);
+                                        return task::Task::done(UIMessage::Home(
+                                            HomeMessage::ReadFirstMsgResp,
+                                        ));
                                     }
+                                    println!("thread is not finish, rp_index={}", rp_index.clone());
+                                    rp_index += 1;
                                 }
-                            } else {
-                                rp_index += 1;
                             }
                         }
+                        return iced::task::Task::done(UIMessage::FetchThreadsStatus);
                     }
-                    return iced::task::Task::done(UIMessage::FetchThreadsStatus);
+                } else {
+                    println!("process_threads.len() = {}", self.process_threads.len());
                 }
             }
             UIMessage::Home(home_message) => match home_message {
                 HomeMessage::InputServerIpChanged(server_ip) => {
-                    self.status_home.server_ip = server_ip;
+                    if self.status_home.try_connecting_server {
+                        self.status_home
+                            .msgs
+                            .push(String::from("已有正在嘗試連接的伺服器！"));
+                    } else {
+                        self.status_home.server_ip = server_ip;
+                    }
                 }
                 HomeMessage::VSoftKeyBoardInput(key) => {
-                    if key == String::from("backspace") || key == String::from("\u{e14a}") {
-                        self.status_home.server_ip.pop();
+                    if self.status_home.try_connecting_server {
+                        self.status_home
+                            .msgs
+                            .push(String::from("已有正在嘗試連接的伺服器！"));
                     } else {
-                        self.status_home.server_ip.push_str(&key);
+                        if key == String::from("backspace") || key == String::from("\u{e14a}") {
+                            self.status_home.server_ip.pop();
+                        } else {
+                            self.status_home.server_ip.push_str(&key);
+                        }
                     }
                 }
                 HomeMessage::ConnectServer => {
@@ -214,15 +254,19 @@ impl Client {
                             .push(String::from("已有正在嘗試連接的伺服器！"));
                     } else {
                         self.status_home.try_connecting_server = true;
+                        self.status_play_base.server_ip = Some(self.status_home.server_ip.clone());
                         let value = self.home_connect_server();
                         return value;
                     }
                 }
                 HomeMessage::SendFirstMsg => {
+                    self.status_home.connect_msg = Some(String::from("正在傳送初連接訊息.."));
                     let value = self.home_send_first_msg();
+                    self.status_home.connect_msg = Some(String::from("已傳送初連接訊息。"));
                     return value;
                 }
                 HomeMessage::ReadFirstMsgResp => {
+                    self.status_home.connect_msg = Some(String::from("正在讀取初連接回覆.."));
                     self.process_threads.push(self.home_read_first_msg_resp());
                     return task::Task::done(UIMessage::FetchThreadsStatus);
                 }
@@ -389,15 +433,30 @@ impl Client {
                             .size(54.0),
                     );
                     content_column = content_column
-                        .push(text("連線中...").size(28).style(
-                            move |theme: &iced::theme::Theme| {
-                                let ex_palette = theme.extended_palette();
-                                text::Style {
-                                    color: Some(ex_palette.secondary.base.text),
-                                }
-                            },
-                        ))
+                        .push(
+                            text("連線中...")
+                                .size(28)
+                                .style(move |theme: &iced::theme::Theme| {
+                                    let ex_palette = theme.extended_palette();
+                                    text::Style {
+                                        color: Some(ex_palette.secondary.base.text),
+                                    }
+                                })
+                                .align_x(alignment::Horizontal::Center),
+                        )
                         .spacing(2);
+                    content_column = content_column.push(
+                        text(
+                            self.status_home
+                                .connect_msg
+                                .clone()
+                                .unwrap_or(String::from("none")),
+                        )
+                        .style(|_t: &iced::Theme| text::Style {
+                            color: Some(iced::Color::from_rgb8(56, 56, 56)),
+                        })
+                        .size(22),
+                    );
                     let content = container(container(content_column).style(
                         move |theme: &iced::theme::Theme| {
                             let ex_palette = theme.extended_palette();
@@ -440,12 +499,27 @@ impl Client {
             ClientScenes::PlayBase => {
                 let mut layout_play_base = Column::new();
                 {
-                    let mut info_bar = Row::new();
+                    let mut info_bar = Row::new().padding(iced::Padding::new(8.0));
                     info_bar = info_bar.push(text(format!(
                         "伺服器地址：{}",
-                        self.status_play_base.server_ip.unwrap().to_string(),
+                        self.status_play_base.server_ip.clone().unwrap(),
                     )));
+                    info_bar = info_bar.push(space().width(Length::from(14)));
+                    info_bar =
+                        info_bar.push(text(format!("玩家識別碼：{}", self.player_id.unwrap())));
                     layout_play_base = layout_play_base.push(info_bar)
+                }
+                if !self.status_play_base.is_start.unwrap() {
+                    let mut status_bar = Column::new();
+                    status_bar = status_bar.push(
+                        text("等待遊戲開始")
+                            .size(30)
+                            .align_x(alignment::Horizontal::Center)
+                            .align_y(alignment::Vertical::Center)
+                            .height(Length::Fill)
+                            .width(Length::Fill),
+                    );
+                    layout_play_base = layout_play_base.push(status_bar);
                 }
                 layout = layout.push(layout_play_base);
                 /* TODO: PlayScene */
@@ -525,7 +599,8 @@ impl Client {
 
     fn home_connect_server(&mut self) -> task::Task<UIMessage> {
         match connect(self.status_home.server_ip.clone()) {
-            Ok((row_ws, _resp)) => {
+            Ok((row_ws, resp)) => {
+                println!("resp={:?}", resp);
                 let ws: sync::Arc<
                     sync::RwLock<WebSocket<tungstenite::stream::MaybeTlsStream<TcpStream>>>,
                 > = sync::Arc::new(sync::RwLock::new(row_ws));
@@ -554,6 +629,7 @@ impl Client {
                 Ok(mut guard) => match guard.send(Message::Text(req_text.into())) {
                     Ok(_) => {
                         println!("已傳送初連結訊息，等待伺服器回應...");
+                        return task::Task::done(UIMessage::Home(HomeMessage::ReadFirstMsgResp));
                     }
                     Err(e) => {
                         eprintln!("error: {}", e);
@@ -570,104 +646,83 @@ impl Client {
                 return task::Task::done(UIMessage::Home(HomeMessage::ConnectServer));
             }
         }
-        return task::Task::done(UIMessage::Home(HomeMessage::ReadFirstMsgResp));
     }
 
-    fn home_read_first_msg_resp(&self) -> thread::JoinHandle<ThreadResult> {
+    fn home_read_first_msg_resp(&self) -> ProThread {
         let ws = self.ws.clone().unwrap();
-        thread::spawn(move || match ws.try_write() {
-            Ok(mut guard) => {
-                if !guard.can_read() {
-                    eprintln!("guard.can_read() => false!");
-                    ThreadResult {
-                        is_error: true,
-                        process_type: ThreadProcessTypes::ReadFirstMsgResp,
-                        result_read_first_msg_resp: None,
-                    }
-                } else {
-                    match guard.read() {
-                        Ok(raw_msg) => {
-                            match raw_msg {
-                                Message::Text(text) => {
-                                    let msg: shared::ServerFirstConnectType =
-                                        serde_json::from_str(&text).unwrap();
-                                    if msg.player_id.is_some() {
-                                        println!("成功取得玩家識別碼：{}", msg.player_id.unwrap());
-                                        ThreadResult {
-                                            is_error: false,
-                                            process_type: ThreadProcessTypes::ReadFirstMsgResp,
-                                            result_read_first_msg_resp: Some(
-                                                ThreadProcessResultReadFirstMsgResp {
-                                                    player_id: msg.player_id.unwrap(),
-                                                },
-                                            ),
-                                        }
-                                    } else {
-                                        eprintln!("error: msg.player_id is None");
-                                        ThreadResult {
-                                            is_error: true,
-                                            process_type: ThreadProcessTypes::ReadFirstMsgResp,
-                                            result_read_first_msg_resp: None,
-                                        }
-                                    }
-                                }
-                                _ => {
-                                    ThreadResult {
-                                        is_error: true,
-                                        process_type: ThreadProcessTypes::ReadFirstMsgResp,
-                                        result_read_first_msg_resp: None,
-                                    }
-                                    /* TODO:BIN-MsgPack */
-                                }
-                            }
-                        }
-                        Err(_e) => ThreadResult {
-                            is_error: true,
-                            process_type: ThreadProcessTypes::ReadFirstMsgResp,
-                            result_read_first_msg_resp: None,
-                        },
-                    }
-                }
-            }
-            Err(_e) => ThreadResult {
-                is_error: true,
-                process_type: ThreadProcessTypes::ReadFirstMsgResp,
-                result_read_first_msg_resp: None,
-            },
-        })
-        /*match self.ws.clone().unwrap().try_write() {
-            Ok(mut guard) => {
-                if !guard.can_read() {
-                    eprintln!("error: guard.can_read() => flase");
-                }
-                match guard.read() {
-                    Ok(raw_msg) => {
-                        match raw_msg {
-                            Message::Text(text) => {
-                                let msg: shared::ServerFirstConnectType =
-                                    serde_json::from_str(&text).unwrap();
-                                if msg.player_id.is_some() {
-                                    self.player_id = msg.player_id;
-                                    println!("成功取得玩家識別碼：{}", self.player_id.unwrap());
-                                } else {
-                                    eprintln!("error: msg.player_id is None");
-                                    //TODO
-                                }
-                            }
-                            _ => { /* TODO:BIN-MsgPack */ }
+        let handle = thread::spawn(move || {
+            let msg_result: tungstenite::Result<Message>;
+            'guard: {
+                match ws.try_write() {
+                    Ok(mut guard) => {
+                        if !guard.can_read() {
+                            eprintln!("guard.can_read() => false!");
+                            return ThreadResult {
+                                is_error: true,
+                                result_read_first_msg_resp: None,
+                            };
+                        } else {
+                            print!("Reading first-msg resp...");
+                            msg_result = guard.read();
+                            println!("Finish");
+                            break 'guard;
                         }
                     }
                     Err(e) => {
-                        eprintln!("error: {}", e);
-                        self.status_home.try_connecting_server = false;
-                        return task::Task::none();
+                        eprintln!("process_thread: err: {}", e);
+                        return ThreadResult {
+                            is_error: true,
+                            result_read_first_msg_resp: None,
+                        };
                     }
                 }
             }
-            Err(e) => {
-                eprintln!("(try-again) error: {}", e);
-                return task::Task::done(UIMessage::Home(HomeMessage::ReadFirstMsgResp));
+            match msg_result {
+                Ok(raw_msg) => {
+                    match raw_msg {
+                        Message::Text(text) => {
+                            let msg: shared::ServerConnectResponceType =
+                                serde_json::from_str(&text).unwrap();
+                            if msg.player_id.is_some() {
+                                println!("成功取得玩家識別碼：{}", msg.player_id.unwrap());
+                                return ThreadResult {
+                                    is_error: false,
+                                    result_read_first_msg_resp: Some(
+                                        ThreadProcessResultReadFirstMsgResp {
+                                            player_id: msg.player_id.unwrap(),
+                                        },
+                                    ),
+                                };
+                            } else {
+                                eprintln!("error: msg.player_id is None");
+                                return ThreadResult {
+                                    is_error: true,
+                                    result_read_first_msg_resp: None,
+                                };
+                            }
+                        }
+                        _ => {
+                            return ThreadResult {
+                                is_error: true,
+                                result_read_first_msg_resp: None,
+                            };
+                            /* TODO:BIN-MsgPack */
+                        }
+                    }
+                }
+                Err(e) => {
+                    eprintln!("raw_msg => Err: {}", e);
+                    return ThreadResult {
+                        is_error: true,
+                        result_read_first_msg_resp: None,
+                    };
+                }
             }
-        }*/
+        });
+        ProThread {
+            handle: handle,
+            start_time: std::time::Instant::now(),
+            process_type: ThreadProcessTypes::ReadFirstMsgResp,
+        }
     }
 }
