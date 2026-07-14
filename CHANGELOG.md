@@ -14,7 +14,7 @@
 #### 紀錄
 
 {每日開發：
-**{日期} - {當日開發重點}**
+**{日期}**
 {開發/更改 內容}
 }
 }
@@ -24,7 +24,7 @@
 
 ## [未發布]
 
-=== 第一版! ^\_^ ===
+=== 第一版! \^_\^ ===
 
 #### 開發紀錄
 
@@ -105,10 +105,17 @@
 
 - 修復：舊的檔案 header 指向 github，現已指向 gitlab
 - 新增：開始開發網頁
-- 修復：［pmj_server］ `try_lock failed because the operation would block`
+- 修復：［pmj_server］初訊息 `try_lock failed because the operation would block` 錯誤
 - 棄用：Github issue templates
 
 **2026-7-6**
 
 - 更改：［CI］使用新的 `website/` 網頁
 - 更改：［CI］使用 `mold` 作為 Linux 系統的 linker
+- 移除：［website］不再使用 iframe nav
+
+**2026-7-14**
+
+- 更改：workspace 級 `iced`
+- 開發：README 英文版
+- 修復：［pmj_server］初訊息未傳送

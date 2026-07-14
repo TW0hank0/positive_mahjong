@@ -23,20 +23,31 @@
             name="viewport"
             content="width=device-width, initial-scale=1.0"
         />
+        <meta
+            name="description"
+            content="positive_mahjong&#x27;s website"
+        />
         <title>positive_mahjong —— 首頁</title>
         <link rel="stylesheet" href="style.css" />
+        <link rel="icon" href="icon.svg" />
+        <link rel="shortcut icon" href="icon.png" />
     </head>
     <body>
         <header>
             <nav>
-                <iframe src="nav.html" class="nav-iframe"
-                    >這應該是個 iframe</iframe
-                >
+                {{$VAR_NAV$}}
+                <!-- <iframe src="nav.html" class="nav-iframe"
+                    >這是個 iframe</iframe
+                > -->
             </nav>
         </header>
         <section class="content">
             <p>網頁還在開發中...</p>
-            <img src="icon.png" class="project_icon" />
+            <img
+                src="icon.png"
+                class="project-icon"
+                style="height: 128px; width: 128px"
+            />
         </section>
     </body>
 </html>

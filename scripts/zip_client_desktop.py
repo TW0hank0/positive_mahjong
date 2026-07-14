@@ -13,18 +13,24 @@
 # 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
+import json
 import os
 import platform
+import subprocess
 import zipfile
-
-import tomllib
 
 
 def main():
-    info_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Cargo.toml")
-    with open(info_file, "rb") as f:
-        project_info = tomllib.load(f)
-    version = project_info["workspace"]["package"]["version"]
+    process = subprocess.run(
+        ["cargo", "metadata", "--format-version", "1", "--no-deps"], capture_output=True
+    )
+    metadata = json.loads(process.stdout)
+    for pkg in metadata["packages"]:
+        if pkg["name"] == "pmj_client_desktop":
+            version = pkg["version"]
+            break
+    else:
+        raise RuntimeError("no version found.")
     #
     include_files = []
     target_path = os.path.join(

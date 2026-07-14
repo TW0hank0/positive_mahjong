@@ -29,24 +29,25 @@ pmj_shared = { workspace = true }
 serde_json = { workspace = true }
 tungstenite = { workspace = true }
 lyon_algorithms = { workspace = true }
-iced = { optional = true, version = "0.14", default-features = true, features = [
-    "crisp",
-    "canvas",
-    "debug",
-    "linux-theme-detection",
-    "thread-pool",
-    "time-travel",
-    "tiny-skia",
-    "wayland",
-    "web-colors",
-    "wgpu",
-    "x11",
-    "advanced",
-] }
+iced = { workspace = true}
+# iced = { optional = true, version = "0.14", default-features = true, features = [
+#     "crisp",
+#     "canvas",
+#     "debug",
+#     "linux-theme-detection",
+#     "thread-pool",
+#     "time-travel",
+#     "tiny-skia",
+#     "wayland",
+#     "web-colors",
+#     "wgpu",
+#     "x11",
+#     "advanced",
+# ] }
 
 [features]
 default = ["desktop"]
-desktop = ["dep:iced"]
+desktop = []
 
 [[bin]]
 name = "pmj_client_desktop"

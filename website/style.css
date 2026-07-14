@@ -1,24 +1,28 @@
 :root {
     line-height: 1;
     font-family: sans-serif;
-    /*--primary-color: lightblue;*/
+    background-color: var(--background);
+    color: var(--text-color);
+    /* 變數 */
     --primary-color: cornflowerblue;
     --primary-text-color: steelblue;
     --secondary-color: lightgreen;
     --secondary-text-color: green;
     --background: black;
     --text-color: white;
+    --text-size: 22px;
+    --normal-margin: 10px;
+    --normal-radius: 12px;
+    --normal-padding: 10px;
+    --image-radius: 6px;
+    --code-radius: 3px;
+    --code-color: gray;
+    --color-gray: rgb(56, 56, 56);
     --dark-mode: true;
-    background-color: var(--background);
-    color: var(--text-color);
 }
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --primary-color: cornflowerblue;
-        --primary-text-color: steelblue;
-        --secondary-color: lightgreen;
-        --secondary-text-color: green;
         --background: black;
         --text-color: white;
         --dark-mode: true;
@@ -27,10 +31,6 @@
 
 @media (prefers-color-scheme: light) {
     :root {
-        --primary-color: cornflowerblue;
-        --primary-text-color: steelblue;
-        --secondary-color: lightgreen;
-        --secondary-text-color: green;
         --background: white;
         --text-color: black;
         --dark-mode: false;
@@ -44,10 +44,11 @@
 .nav {
     background-color: var(--primary-color);
     line-height: 1.6;
-    padding: 10px;
-    border-radius: 12px;
+    padding: var(--normal-padding);
+    border-radius: var(--normal-radius);
     justify-content: left;
     text-align: left;
+    margin: var(--normal-margin);
     .nav_item {
         margin: 7px;
         /*color: var(--primary-text-color);*/
@@ -65,19 +66,37 @@
     }
 }
 
-.project_icon {
-    width: 256px;
-    height: 256px;
-    border-radius: 8px;
+.badge {
+    background-color: var(--secondary-color);
+    border-radius: var(--normal-radius);
+    margin: var(--normal-margin);
+    padding: var(--normal-padding);
+    img {
+        max-width: 2048px;
+        max-height: 2048px;
+        border-radius: var(--image-radius);
+    }
 }
 
 .content {
-    padding: 10px;
-    background-color: inherit;
+    background-color: var(--color-gray);
+    margin: var(--normal-margin);
+    padding: var(--normal-padding);
+    border-radius: var(--normal-radius);
+    font-size: var(--text-size);
 }
 
-.nav-iframe {
-    width: 100%;
-    outline: none;
-    border: none;
+.project-icon {
+    max-width: 4096px;
+    max-height: 4096px;
+}
+
+img {
+    border-radius: var(--image-radius);
+}
+
+code {
+    background-color: var(--code-color);
+    border-radius: var(--code-radius);
+    font-family: "Courier New", Courier, monospace;
 }

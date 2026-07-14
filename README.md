@@ -1,6 +1,6 @@
 # positive_mahjong
 
-![icon](./assets/icon.png)
+![icon](./assets/icon/icon.png)
 
 **繁體中文** | [English](READMEs/README_en.md)
 
@@ -26,29 +26,25 @@ Edit: 待 `pmj_client_cross` 開發完成將支援Android。
 
 [Github CI儲存庫](https://github.com/TW0hank0/positive_mahjong/)
 
-> Github 不接受 issue 或 merge_request，請到 [Gitlab 主儲存庫](https://gitlab.com/TW0hank0/positive_mahjong/)
+> Github 不接受 issue 或 pull_request，請到 [Gitlab 主儲存庫](https://gitlab.com/TW0hank0/positive_mahjong/)。
 
 [Gitlab-pages 專案網站](https://tw0hank0.gitlab.io/positive_mahjong/)
 
-[Gitlab-pages 專案說明文件](https://tw0hank0.gitlab.io/positive_mahjong/docs/)
-
 [Github-pages 專案網站](https://tw0hank0.github.io/positive_mahjong/)
 
-[Github-pages 專案說明文件](https://tw0hank0.github.io/positive_mahjong/docs/)
+[KeepAndroidOpen](https://keepandroidopen.org/)
+> 你的手機即將不再屬於你。
+>
+> 從 2026 年 9 月起，Google 將在未經使用者同意的情況下，悄悄推送一項更新，封鎖所有未向 Google 登記、未簽署其合約、未繳費，且未提交政府核發身分證明文件的 Android 應用程式。
 
-[KeepAndroidOpen 網站](https://keepandroidopen.org/)
+[KillSubCultureDiscrimination](https://killscd.gitlab.io/website/)
+> 興趣不分貴賤，愛好不是犯罪。
 
 ### 安裝
 
-詳見：[專案說明文件](https://tw0hank0.gitlab.io/positive_mahjong/docs)
+尚未完成...
 
-#### Desktop
-
-安裝程式開發中...
-
-#### Android
-
-Edit: 待 `pmj_client_cross` 開發完成將支援Android。
+見：[專案說明文件](https://tw0hank0.gitlab.io/positive_mahjong/docs/)
 
 ### 授權與聲明
 
@@ -60,7 +56,7 @@ Edit: 待 `pmj_client_cross` 開發完成將支援Android。
 
 #### 第三方模組庫授權
 
-詳見：[ThirdPartyLicense-Rust.md](https://tw0hank0.gitlab.io/positive_mahjong/docs/license/ThirdPartyLicense-Rust.html) 。
+[ThirdPartyLicense-Rust.md](https://tw0hank0.gitlab.io/positive_mahjong/docs/license/ThirdPartyLicense-Rust.md) 
 
 #### 第三方專案聲明
 

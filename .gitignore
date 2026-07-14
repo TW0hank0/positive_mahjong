@@ -6,6 +6,9 @@
 **/__pycache__/**
 **/__pypy_cache__/**
 
+# --- Website ---
+website_build/**
+
 # --- Other ---
 positive_*_v*_*.zip
 *.kra~

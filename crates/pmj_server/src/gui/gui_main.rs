@@ -15,17 +15,11 @@
 
 use iced;
 
-use pmj_gamemodes;
 use pmj_shared;
 
 mod base;
 
 fn main() -> iced::Result {
-    /* #[cfg(not(feature = "gui"))]
-    {
-        eprintln!("Must enable `gui` feature.");
-    } */
-    //#[cfg(feature = "gui")]
     {
         let config = pmj_shared::shared::read_server_config();
         match config.gamemode {

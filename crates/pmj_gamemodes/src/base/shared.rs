@@ -13,12 +13,8 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-use std::fmt::Display;
-use std::net::TcpStream;
-use std::sync;
+use std::{fmt::Display, net::TcpStream, sync};
 use tungstenite::WebSocket;
-
-//use serde;
 
 pub const MAX_PLAYER_COUNT: u8 = 4;
 

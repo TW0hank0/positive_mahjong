@@ -10,7 +10,7 @@
 
 ---
 
-第三方程式聲明：
+授權聲明：
 
 - [模組庫授權與聲明](license/ThirdPartyLicense-Rust.md)
-- [第一方與第三方專案授權聲明](license/res.md)
+- [資源/資料授權聲明](license/res.md)

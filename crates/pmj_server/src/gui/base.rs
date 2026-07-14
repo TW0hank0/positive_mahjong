@@ -15,10 +15,7 @@
 
 //! Base玩法的GUI
 
-use std::{
-    sync::{self, Arc, RwLock},
-    thread,
-};
+use std::sync::{self, Arc, RwLock};
 
 use iced::{
     self, Border, Theme,

@@ -65,7 +65,7 @@ runs:
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update
-        sudo apt-get install libfontconfig1-dev pkg-config -y
+        sudo apt-get install libfontconfig1-dev pkg-config mold gcc -y
 
     - name: Install Go-lang
       uses: actions/setup-go@v6
@@ -80,14 +80,6 @@ runs:
       shell: pwsh
       run: cargo install cargo-audit
 
-    - name: Install cargo-apk
-      shell: pwsh
-      run: cargo install cargo-apk
-
-    - name: check cargo-apk
-      shell: pwsh
-      run: cargo apk version
-
     - name: install java
       uses: actions/setup-java@v5
       with:
@@ -101,7 +93,6 @@ runs:
       shell: pwsh
       run: cargo install cargo-msrv
 
-    - name: install mold linker
-      if: runner.os == 'Linux'
+    - name: install cargo-deny
       shell: pwsh
-      run: apt install mold -y
+      run: cargo install caargo-deny

@@ -40,12 +40,15 @@ def main():
         "auto_generated/**",
         "**/*.icon",
         "**/*.ico",
+        "docs/book/**",
         # for ci
         "**/rust-init.sh",
+        # website
+        "website/docs/**",
+        "website_build/**",
         # `old_pmj_client` 包含第三方程式碼
         # [android-iced-example](https://github.com/ibaryshnikov/android-iced-example)
         "crates/old_pmj_client/src/android/**",
-        "docs/book/**",
         # Author: [iced team](https://github.com/iced-rs/)
         # This file is from project [iced](https://github.com/iced-rs/iced/).
         "crates/pmj_client_desktop/src/easing.rs",
