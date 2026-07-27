@@ -14,20 +14,22 @@
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 exclude = [
-  "**/.venv/**",
-  "auto_generated/**",
-  "docs/book/**",
-  "target/**",
-  "website/**",
-  "website_build/**",
+    "**/.venv/**",
+    "auto_generated/**",
+    "docs/book/**",
+    "target/**",
+    "website/**",
+    "website_build/**",
+    "crates/old_pmj_client/**",
+    "crates/old_slint_client/**",
 ]
 
-include = ["Cargo.toml", "**/Cargo.toml", "**/*.toml"]
+include = ["**/*.toml", "**/Cargo.toml", "Cargo.toml"]
 
 [formatting]
 align_comments = true
 align_entries = false
 array_trailing_comma = true
+indent_string = "    "
 reorder_arrays = true
 reorder_keys = true
-indent_string = "    "

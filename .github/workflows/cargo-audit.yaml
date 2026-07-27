@@ -16,21 +16,21 @@
 name: cargo-audit
 
 on:
-    push:
-        branches:
-            - master
+  push:
+    branches:
+      - master
 
 jobs:
-    audit:
-        runs-on: ubuntu-latest
+  audit:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v6
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
 
-            - name: Install Dep
-              uses: ./.github/workflows/instdep
+      - name: Install Dep
+        uses: ./.github/workflows/instdep
 
-            - name: Run cargo-audit
-              run: |
-                  cargo audit
+      - name: Run cargo-audit
+        run: |
+          cargo audit

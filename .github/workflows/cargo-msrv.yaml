@@ -26,35 +26,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+
       - name: Install Dep
         uses: ./.github/workflows/instdep
-      - run: uv run scripts/ci/cargo_msrv.py
-  # verify:
-  #   runs-on: ubuntu-latest
 
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v6
-
-  #     - name: Install Dep
-  #       uses: ./.github/workflows/instdep
-
-  #     - name: Run cargo-msrv
-  #       run: |
-  #         cargo msrv verify -- --workspace
-
-  # find:
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v6
-
-  #     - name: Install Dep
-  #       uses: ./.github/workflows/instdep
-
-  #     - name: Run cargo-msrv
-  #       run: |
-  #         cd pmj_client
-  #         cargo msrv find
-  #         cd ..
+      - name: run cargo-msrv script
+        run: uv run scripts/cargo_msrv.py

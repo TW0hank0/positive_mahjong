@@ -23,11 +23,12 @@ use iced::{
     },
 };
 
+use serde_json;
 use tungstenite::{Message, WebSocket, connect};
 
-use pmj_shared::shared::{self, FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES, FONT_NOTO_SANS_REG_BYTES};
-
 use crate::{circular, easing};
+use pmj_gamemodes;
+use pmj_shared::shared::{self, FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES, FONT_NOTO_SANS_REG_BYTES};
 
 pub const FONT_NOTO_SANS_REG: iced::font::Font = iced::font::Font::with_name("Noto Sans TC");
 pub const MATERIAL_SYMBOLS_OUTLINED: iced::font::Font =
@@ -74,11 +75,21 @@ pub struct HomeStatus {
 pub struct PlayBaseStatus {
     server_ip: Option<String>,
     is_start: Option<bool>,
+    hand_cards: Vec<pmj_gamemodes::base::shared::PMJCard>,
+    game_msgs: Vec<String>,
+    game_controller: PlayBaseController,
+}
+
+#[derive(Debug)]
+pub enum PlayBaseController {
+    NoCtrl,
+    ThrowCard,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum UIMessage {
     Home(HomeMessage),
+    PlayBase(PlayBaseMessage),
     FetchThreadsStatus,
 }
 
@@ -91,15 +102,21 @@ pub enum HomeMessage {
     ReadFirstMsgResp,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PlayBaseMessage {
+    ReadWebsocketMsg,
+}
+
 pub const ALPHABET: [char; 26] = [
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
     'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
 ];
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ThreadResult {
     pub is_error: bool,
     pub result_read_first_msg_resp: Option<ThreadProcessResultReadFirstMsgResp>,
+    pub result_play_base_read_websocket: Option<String>,
 }
 
 impl Default for ThreadResult {
@@ -107,6 +124,7 @@ impl Default for ThreadResult {
         Self {
             is_error: true,
             result_read_first_msg_resp: None,
+            result_play_base_read_websocket: None,
         }
     }
 }
@@ -119,6 +137,7 @@ pub struct ThreadProcessResultReadFirstMsgResp {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ThreadProcessTypes {
     ReadFirstMsgResp,
+    PlayBaseReadWebsocket,
 }
 
 impl Client {
@@ -136,6 +155,9 @@ impl Client {
             status_play_base: PlayBaseStatus {
                 server_ip: None,
                 is_start: None,
+                hand_cards: Vec::new(),
+                game_controller: PlayBaseController::NoCtrl,
+                game_msgs: Vec::new(),
             },
             ws: None,
             player_id: None,
@@ -172,8 +194,14 @@ impl Client {
                                                             HomeMessage::ReadFirstMsgResp,
                                                         ));
                                                     }
+                                                    ThreadProcessTypes::PlayBaseReadWebsocket => {
+                                                        return task::Task::done(
+                                                            UIMessage::PlayBase(
+                                                                PlayBaseMessage::ReadWebsocketMsg,
+                                                            ),
+                                                        );
+                                                    }
                                                 }
-                                                continue;
                                             } else {
                                                 println!("process_thread finish sucessful.");
                                                 match pthread.process_type {
@@ -191,6 +219,23 @@ impl Client {
                                                         self.status_play_base.is_start =
                                                             Some(false);
                                                         self.current_scene = ClientScenes::PlayBase;
+                                                        return iced::task::Task::done(
+                                                            UIMessage::PlayBase(
+                                                                PlayBaseMessage::ReadWebsocketMsg,
+                                                            ),
+                                                        );
+                                                    }
+                                                    ThreadProcessTypes::PlayBaseReadWebsocket => {
+                                                        let msg_text = thread_result
+                                                            .result_play_base_read_websocket
+                                                            .unwrap();
+                                                        let msg = serde_json::from_str::<pmj_gamemodes::base::shared::ServerMessageType>(
+                                                            &msg_text
+                                                        ).unwrap();
+                                                        self.status_play_base.game_msgs.push(
+                                                            serde_json::to_string_pretty(&msg)
+                                                                .unwrap(),
+                                                        );
                                                     }
                                                 }
                                                 break 'loop_else;
@@ -270,6 +315,9 @@ impl Client {
                     self.process_threads.push(self.home_read_first_msg_resp());
                     return task::Task::done(UIMessage::FetchThreadsStatus);
                 }
+            },
+            UIMessage::PlayBase(play_base_message) => match play_base_message {
+                PlayBaseMessage::ReadWebsocketMsg => {}
             },
         };
         return task::Task::none();
@@ -520,6 +568,24 @@ impl Client {
                             .width(Length::Fill),
                     );
                     layout_play_base = layout_play_base.push(status_bar);
+                } else {
+                    let mut ctr_bar = Row::new();
+                    let mut msg_bar = Column::new();
+                    let mut msg_num: u16 = 1;
+                    for msg in self.status_play_base.game_msgs.iter() {
+                        msg_bar = msg_bar
+                            .push(text(msg_num.to_string()).size(14).style(|t: &iced::Theme| {
+                                let p = t.extended_palette();
+                                text::Style {
+                                    color: Some(p.primary.base.text),
+                                }
+                            }))
+                            .push(space().width(15))
+                            .push(text(msg.clone()).size(14));
+                        msg_num += 1;
+                    }
+                    ctr_bar = ctr_bar.push(scrollable(msg_bar));
+                    layout = layout.push(ctr_bar)
                 }
                 layout = layout.push(layout_play_base);
                 /* TODO: PlayScene */
@@ -660,6 +726,7 @@ impl Client {
                             return ThreadResult {
                                 is_error: true,
                                 result_read_first_msg_resp: None,
+                                ..Default::default()
                             };
                         } else {
                             print!("Reading first-msg resp...");
@@ -673,6 +740,7 @@ impl Client {
                         return ThreadResult {
                             is_error: true,
                             result_read_first_msg_resp: None,
+                            ..Default::default()
                         };
                     }
                 }
@@ -692,12 +760,14 @@ impl Client {
                                             player_id: msg.player_id.unwrap(),
                                         },
                                     ),
+                                    ..Default::default()
                                 };
                             } else {
                                 eprintln!("error: msg.player_id is None");
                                 return ThreadResult {
                                     is_error: true,
                                     result_read_first_msg_resp: None,
+                                    ..Default::default()
                                 };
                             }
                         }
@@ -705,6 +775,7 @@ impl Client {
                             return ThreadResult {
                                 is_error: true,
                                 result_read_first_msg_resp: None,
+                                ..Default::default()
                             };
                             /* TODO:BIN-MsgPack */
                         }
@@ -715,6 +786,7 @@ impl Client {
                     return ThreadResult {
                         is_error: true,
                         result_read_first_msg_resp: None,
+                        ..Default::default()
                     };
                 }
             }
@@ -723,6 +795,49 @@ impl Client {
             handle: handle,
             start_time: std::time::Instant::now(),
             process_type: ThreadProcessTypes::ReadFirstMsgResp,
+        }
+    }
+
+    fn play_base_read_websocket(&self) -> ProThread {
+        let ws = self.ws.clone().unwrap();
+        let handle = thread::spawn(move || match ws.try_write() {
+            Ok(mut guard) => match guard.read() {
+                Ok(msg) => match msg {
+                    Message::Text(t) => {
+                        return ThreadResult {
+                            is_error: false,
+                            result_play_base_read_websocket: Some(t.to_string()),
+                            ..Default::default()
+                        };
+                    }
+                    _ => {
+                        eprintln!("err msg type!");
+                        ThreadResult {
+                            is_error: true,
+                            ..Default::default()
+                        }
+                    }
+                },
+                Err(e) => {
+                    eprintln!("err:{:?}", e);
+                    return ThreadResult {
+                        is_error: true,
+                        ..Default::default()
+                    };
+                }
+            },
+            Err(e) => {
+                eprintln!("err:{:?}", e);
+                return ThreadResult {
+                    is_error: true,
+                    ..Default::default()
+                };
+            }
+        });
+        ProThread {
+            handle: handle,
+            start_time: std::time::Instant::now(),
+            process_type: ThreadProcessTypes::PlayBaseReadWebsocket,
         }
     }
 }

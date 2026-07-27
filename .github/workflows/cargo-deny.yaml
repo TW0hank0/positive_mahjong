@@ -31,10 +31,6 @@ jobs:
       - name: Install Dep
         uses: ./.github/workflows/instdep
 
-      - name: install cargo-deny
-        run: |
-          cargo install cargo-deny
-
       - name: run cargo-deny
         run: |
           cargo deny check

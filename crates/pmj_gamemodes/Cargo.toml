@@ -31,21 +31,6 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 tungstenite = { workspace = true }
 
-[target.'cfg(target_arch = "wasm32")'.dependencies]
-getrandom = { version = "0.2.17", features = ["js"] }
-
 [lib]
 name = "pmj_gamemodes"
 path = "src/lib.rs"
-
-# [[bin]]
-# name = "pmj_server" #tui (cli)
-# path = "src/main.rs" # for computer
-
-# [[bin]]
-# name = "pmj_server_gui" # gui
-# path = "src/gui_main.rs" # for computer
-
-# [lib]
-# name = "pmj_server_lib"
-# path = "src/lib.rs"

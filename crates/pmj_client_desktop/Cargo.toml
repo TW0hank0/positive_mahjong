@@ -23,27 +23,14 @@ rust-version.workspace = true
 version = { workspace = true }
 
 [dependencies]
+iced = { workspace = true }
 image = { workspace = true }
 log = { workspace = true }
+lyon_algorithms = { workspace = true }
+pmj_gamemodes = { workspace = true }
 pmj_shared = { workspace = true }
 serde_json = { workspace = true }
 tungstenite = { workspace = true }
-lyon_algorithms = { workspace = true }
-iced = { workspace = true}
-# iced = { optional = true, version = "0.14", default-features = true, features = [
-#     "crisp",
-#     "canvas",
-#     "debug",
-#     "linux-theme-detection",
-#     "thread-pool",
-#     "time-travel",
-#     "tiny-skia",
-#     "wayland",
-#     "web-colors",
-#     "wgpu",
-#     "x11",
-#     "advanced",
-# ] }
 
 [features]
 default = ["desktop"]
@@ -52,7 +39,3 @@ desktop = []
 [[bin]]
 name = "pmj_client_desktop"
 path = "src/main.rs"
-
-# [lib]
-# crate-type = ["lib","cdylib"]
-# name = "pmj_client_lib"

@@ -99,19 +99,24 @@ impl ServerGUI {
     fn update(&mut self, msg: GUIMessages) -> iced::Task<GUIMessages> {
         match msg {
             GUIMessages::StartGame => {
-                self.is_start = true;
-                let thread_backend = sync::Arc::clone(&self.backend);
-                match thread_backend.try_write() {
-                    Ok(mut guard) => {
-                        guard.start_game();
-                    }
-                    Err(e) => {
-                        eprintln!("Fail to start game:{}", e);
-                        return iced::task::Task::done(GUIMessages::StartGame);
-                        //TODO: error handle
-                    }
-                };
-                return iced::task::Task::done(GUIMessages::FetchPlayerInfo);
+                if self.players.len() < 1 {
+                    println!("玩家人數過低！");
+                    self.msg.push_str("玩家人數過低！");
+                } else {
+                    self.is_start = true;
+                    let thread_backend = sync::Arc::clone(&self.backend);
+                    match thread_backend.try_write() {
+                        Ok(mut guard) => {
+                            guard.start_game();
+                        }
+                        Err(e) => {
+                            eprintln!("Fail to start game:{}", e);
+                            return iced::task::Task::done(GUIMessages::StartGame);
+                            //TODO: error handle
+                        }
+                    };
+                    return iced::task::Task::done(GUIMessages::FetchPlayerInfo);
+                }
             }
             GUIMessages::FetchPlayerInfo => match self.backend.try_read() {
                 Ok(backend) => {

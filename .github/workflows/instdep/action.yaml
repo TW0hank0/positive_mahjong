@@ -15,7 +15,7 @@
 
 name: Install Dep
 
-description: Install workflow needed dep
+description: Install dep that workflows need
 
 runs:
   using: composite
@@ -28,7 +28,7 @@ runs:
       run: |
         uv self version
 
-    - name: install rustup (Windows)
+    - name: install rustup on Windows
       if: runner.os == 'Windows'
       shell: pwsh
       run: |
@@ -36,7 +36,7 @@ runs:
         ls
         .\rustup-init.exe -y --profile minimal
 
-    - name: install rustup (Linux)
+    - name: install rustup on Linux
       shell: pwsh
       if: runner.os == 'Linux'
       run: |
@@ -47,38 +47,45 @@ runs:
     - name: check rust Install
       shell: pwsh
       run: |
+        rustup --version
         rustc --version
         cargo --version
 
-    - name: install caego-about
-      shell: pwsh
-      run: |
-        cargo install cargo-about --features="cli" --locked
-
-    - name: install mdbook
-      shell: pwsh
-      run: |
-        cargo install mdbook --version "^0.5"
-
-    - name: Install Linux Dep
+    - name: install Linux build needed dep
       shell: pwsh
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update
         sudo apt-get install libfontconfig1-dev pkg-config mold gcc -y
 
-    - name: Install Go-lang
+    - name: install go
       uses: actions/setup-go@v6
       with:
         go-version: "stable"
 
-    - name: Install addlicense
+    - name: use go to install addlicense tool
       shell: pwsh
-      run: go install github.com/google/addlicense@latest
+      run: |
+        go install github.com/google/addlicense@latest
+        echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
-    - name: Install Cargo-audit
+    - name: use cargo to install tools
       shell: pwsh
-      run: cargo install cargo-audit
+      run: |
+        cargo install cargo-audit cargo-msrv cargo-deny taplo-cli --locked
+        cargo install mdbook --locked
+        cargo install cargo-about --features="cli" --locked
+
+    - name: check tools installion
+      shell: pwsh
+      run: |
+        cargo about --version
+        cargo audit --version
+        cargo msrv --version
+        cargo deny --verison
+        taplo --version
+        mdbook --version
+        addlicense --version
 
     - name: install java
       uses: actions/setup-java@v5
@@ -88,11 +95,3 @@ runs:
 
     - name: Setup Android
       uses: android-actions/setup-android@v4
-
-    - name: install cargo-msrv
-      shell: pwsh
-      run: cargo install cargo-msrv
-
-    - name: install cargo-deny
-      shell: pwsh
-      run: cargo install caargo-deny

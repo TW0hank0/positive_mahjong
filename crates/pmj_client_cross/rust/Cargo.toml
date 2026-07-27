@@ -24,28 +24,21 @@ version = { workspace = true }
 
 [dependencies]
 # --- shared ---
+godot = { workspace = true }
 image = { workspace = true }
 log = { workspace = true }
+lyon_algorithms = { workspace = true }
 pmj_shared = { workspace = true }
 serde_json = { workspace = true }
 tungstenite = { workspace = true }
-lyon_algorithms = { workspace = true }
 # --- android ---
-android_logger = { version = "0.14.1", optional = true }
+android_logger = { workspace = true, optional = true }
 # --- wasm ---
-console_error_panic_hook = { version = "0.1.5", optional = true }
-wasm-bindgen = { version = "0.2", optional = true }
-godot = { version = "0.5.3", features = ["api-4-6"]}
-
-# [target.'cfg(target_arch = "wasm32")'.dependencies]
-# console_error_panic_hook = "0.1.5"
-# wasm-bindgen = { version = "0.2" }
-
+console_error_panic_hook = { workspace = true, optional = true }
+wasm-bindgen = { workspace = true, optional = true }
 
 [features]
-android = [
-    "dep:android_logger",
-]
+android = ["dep:android_logger"]
 default = []
 wasm = ["dep:console_error_panic_hook", "dep:wasm-bindgen"]
 
