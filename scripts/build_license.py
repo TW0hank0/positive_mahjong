@@ -22,6 +22,8 @@ import sys
 
 def main():
     print("-" * 10, "cargo-about", "-" * 10)
+    if os.path.exists("auto_generated") is False:
+        os.mkdir("auto_generated")
     #
     all_commands = [
         [
