@@ -26,15 +26,11 @@ Edit: 待 `pmj_client_cross` 開發完成將支援Android。
 
 [Github CI儲存庫](https://github.com/TW0hank0/positive_mahjong/)
 
-> Github 不接受 issue 或 pull_request，請到 [Gitlab 主儲存庫](https://gitlab.com/TW0hank0/positive_mahjong/)。
-
 [Gitlab-pages 專案網站](https://tw0hank0.gitlab.io/positive_mahjong/)
 
 [Github-pages 專案網站](https://tw0hank0.github.io/positive_mahjong/)
 
 [KeepAndroidOpen](https://keepandroidopen.org/)
-> 你的手機即將不再屬於你。
->
 > 從 2026 年 9 月起，Google 將在未經使用者同意的情況下，悄悄推送一項更新，封鎖所有未向 Google 登記、未簽署其合約、未繳費，且未提交政府核發身分證明文件的 Android 應用程式。
 
 [KillSubCultureDiscrimination](https://killscd.gitlab.io/website/)
@@ -56,11 +52,11 @@ Edit: 待 `pmj_client_cross` 開發完成將支援Android。
 
 #### 第三方模組庫授權
 
-[ThirdPartyLicense-Rust.md](https://tw0hank0.gitlab.io/positive_mahjong/docs/license/ThirdPartyLicense-Rust.md) 
+見：[ThirdPartyLicense-Rust.md](https://tw0hank0.gitlab.io/positive_mahjong/docs/license/ThirdPartyLicense-Rust.md) 
 
 #### 第三方專案聲明
 
-詳見：[專案文檔](https://tw0hank0.gitlab.io/positive_mahjong/docs/license/res.html)
+見：[專案文檔](https://tw0hank0.gitlab.io/positive_mahjong/docs/license/res.html)
 
 **Noto Sans TC**
 

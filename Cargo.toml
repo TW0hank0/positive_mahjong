@@ -27,30 +27,60 @@ pmj_gamemodes = { path = "crates/pmj_gamemodes" }
 pmj_shared = { path = "crates/pmj_shared" }
 positive_mahjong = { path = "." }
 # --- shared ---
-iced = { version = "0.14.0", features = ["wgpu", "tiny-skia", "x11", "wayland", "image", "svg", "lazy", "debug", "thread-pool", "linux-theme-detection", "advanced", "canvas"] }
-image = "0.25.10"
+godot = { version = "0.5.3", features = ["api-4-6"] }
+iced = { version = "0.14.0", features = [
+    "advanced",
+    "canvas",
+    "debug",
+    "image",
+    "lazy",
+    "linux-theme-detection",
+    "svg",
+    "thread-pool",
+    "tiny-skia",
+    "wayland",
+    "wgpu",
+    "x11",
+] }
+image = { version = "0.25.10", features = [
+    "bmp",
+    "exr",
+    "ff",
+    "gif",
+    "hdr",
+    "ico",
+    "jpeg",
+    "png",
+    "pnm",
+    "qoi",
+    "tga",
+    "tiff",
+    "webp",
+] }
 local-ip-address = "0.6.10"
 log = "0.4.29"
-rand = "0.10.0"
-reqwest = { version = "0.13.2", features = [
-  "blocking",
-  "charset",
-  "http2",
-  "rustls",
-  "system-proxy",
-] }
+lyon_algorithms = "1.0"
+rand = "0.10.2"
 serde = { version = "1.0.228", features = ["serde_derive"] }
 serde_json = "1.0.149"
-tiny_http = { version = "0.12.0", features = ["ssl-rustls"] }
 tungstenite = { version = "0.29.0", features = [
-  "rustls",
-  "rustls-native-certs",
+    "rustls",
+    "rustls-native-certs",
 ] }
-lyon_algorithms = "1.0"
-
+# --- wasm ---
+console_error_panic_hook = { version = "0.1.5" }
+wasm-bindgen = { version = "0.2" }
+# --- android ---
+android_logger = { version = "0.14.1" }
 
 [workspace]
-members = ["crates/pmj_client_desktop", "crates/pmj_client_cross/rust", "crates/pmj_gamemodes", "crates/pmj_server", "crates/pmj_shared"]
+members = [
+    "crates/pmj_client_cross/rust",
+    "crates/pmj_client_desktop",
+    "crates/pmj_gamemodes",
+    "crates/pmj_server",
+    "crates/pmj_shared",
+]
 resolver = "3"
 
 [profile.release]

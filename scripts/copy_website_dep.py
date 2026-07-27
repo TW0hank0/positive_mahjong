@@ -19,6 +19,10 @@ def main():
         os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "icon", "icon.svg"),
         os.path.join(os.path.dirname(os.path.dirname(__file__)), "website", "icon.svg"),
     )
+    shutil.copy2(
+        os.path.join(os.path.dirname(os.path.dirname(__file__)), "LICENSE"),
+        os.path.join(os.path.dirname(os.path.dirname(__file__)), "website", "LICENSE"),
+    )
 
 
 if __name__ == "__main__":

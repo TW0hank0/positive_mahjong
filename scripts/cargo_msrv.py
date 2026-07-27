@@ -14,23 +14,31 @@
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 import os
-import sys
+import subprocess
+
+import util
 
 
 def main():
-    apk_path = os.path.abspath(
-        os.path.join(
-            os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-            "target",
-            "release",
-            "apk",
+    packages = [
+        "pmj_client",
+        "pmj_server",
+        "pmj_shared",
+        "pmj_gamemodes",
+    ]
+    for pkg in packages:
+        util.run_cmd(
+            ["cargo", "msrv", "find"],
+            cwd=os.path.join(
+                os.path.dirname(os.path.dirname(os.path.dirname(__file__))), pkg
+            ),
         )
-    )
-    orig_name = os.path.join(apk_path, "pmj_client.apk")
-    new_name = os.path.join(apk_path, f"pmj_client_{sys.argv[1]}.apk")
-    print(f"Rename `{orig_name}` to `{new_name}`")
-    os.rename(orig_name, new_name)
+        util.run_cmd(
+            ["cargo", "msrv", "verify"],
+            cwd=os.path.join(
+                os.path.dirname(os.path.dirname(os.path.dirname(__file__))), pkg
+            ),
+        )
 
 
-if __name__ == "__main__":
-    main()
+main()

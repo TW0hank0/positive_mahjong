@@ -26,10 +26,10 @@ version = { workspace = true }
 # --- shared ---
 image = { workspace = true }
 log = { workspace = true }
+lyon_algorithms = { workspace = true }
 pmj_shared = { workspace = true }
 serde_json = { workspace = true }
 tungstenite = { workspace = true }
-lyon_algorithms = { workspace = true }
 # --- desktop ---
 iced = { optional = true, git = "https://github.com/iced-rs/iced.git", rev = "1296490", default-features = false, features = [
     "crisp",
@@ -61,7 +61,7 @@ git = "https://github.com/iced-rs/iced.git"
 rev = "1296490"
 
 [dependencies.iced_widget]
-features = ["wgpu", "canvas"]
+features = ["canvas", "wgpu"]
 git = "https://github.com/iced-rs/iced.git"
 rev = "1296490"
 
@@ -105,7 +105,7 @@ name = "pmj_client"
 path = "src/main.rs"
 
 [lib]
-crate-type = ["lib","cdylib"]
+crate-type = ["cdylib", "lib"]
 name = "pmj_client_lib"
 
 [package.metadata.android]

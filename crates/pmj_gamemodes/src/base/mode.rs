@@ -48,7 +48,7 @@ fn write_reply(
                 break;
             }
             Err(e) => {
-                eprintln!("base/mode.rs:50 -> error: {}", e);
+                eprintln!("base/mode.rs:write_reply -> error: {}", e);
             }
         };
     }
@@ -97,7 +97,6 @@ fn handle_client(
                         eprintln!("error: guard.can_read = false");
                     } else {
                         println!("info: guard.can_read() -> true");
-
                         match guard.read() {
                             Ok(msg) => {
                                 message = msg;
@@ -111,7 +110,8 @@ fn handle_client(
                     }
                 }
                 Err(e) => {
-                    eprintln!("Failed to get guard! detail: {}", e)
+                    eprintln!("Failed to get guard! detail: {}", e);
+                    thread::sleep(std::time::Duration::from_millis(1024)); // 1sec
                 }
             }
         }
@@ -185,7 +185,7 @@ fn handle_client(
                 // 忽略原始帧
             }
         }
-        thread::sleep(std::time::Duration::from_millis(512)); //0.5sec
+        thread::sleep(std::time::Duration::from_millis(1536)); //1.5sec
     }
 
     // 關閉連線
@@ -243,8 +243,6 @@ fn handle_server_base(
     for stream_result in listener.incoming() {
         match stream_result {
             Ok(stream) => {
-                // 為每個連線啟動新執行緒
-                // 使用 move 將 stream 所有權移轉至執行緒
                 let thread_backend = sync::Arc::clone(&backend);
                 let handle = std::thread::spawn(move || {
                     handle_client(stream, thread_backend);
@@ -391,7 +389,7 @@ impl PositiveMahjong {
         player_ws: sync::Arc<sync::RwLock<WebSocket<TcpStream>>>,
     ) -> Option<u8> {
         let current_player_count = self.players.len();
-        if current_player_count < 4 {
+        if (current_player_count as u8) < shared_base::MAX_PLAYER_COUNT {
             let player_id: u8 = (current_player_count + 1) as u8;
             self.players.push(PMJPlayer {
                 player_ip_addr,
@@ -414,7 +412,13 @@ impl PositiveMahjong {
             ..Default::default()
         })
         .unwrap();
+        println!("start_game -> 通知遊戲開始");
         for player in self.players.iter() {
+            println!(
+                "  -> {}. {}",
+                player.player_id,
+                player.player_ip_addr.to_string()
+            );
             let _write_result =
                 write_reply(game_start_msg.clone(), sync::Arc::clone(&player.player_ws));
         }
@@ -441,7 +445,14 @@ impl PositiveMahjong {
             }
         }
         // 通知手牌變動
+        println!("start_game -> 通知手牌變動");
         for player in self.players.iter() {
+            println!(
+                "  -> {}. {}, cards: {:?}",
+                player.player_id,
+                player.player_ip_addr.to_string(),
+                player.player_hand_cards.clone()
+            );
             let hand_card_msg = serde_json::to_string(&shared_base::ServerMessageType {
                 msg_type: shared_base::ServerMessageTypeKinds::HandCardChange,
                 info_hand_card_change: Some(player.player_hand_cards.clone()),
@@ -468,7 +479,7 @@ impl PositiveMahjong {
                 GameTurnTypes::GetCard => {
                     let player = self
                         .players
-                        .get_mut(current_turn_player_id as usize)
+                        .get_mut((current_turn_player_id - 1) as usize) // `-1` to match index
                         .unwrap();
                     {
                         'choose_card: loop {
@@ -560,6 +571,19 @@ impl PositiveMahjong {
                                                     client_msg,
                                                     player.player_ws.clone(),
                                                 );
+                                                let msg_to_else_player = serde_json::to_string(&shared_base::ServerMessageType{
+                                                    msg_type:shared_base::ServerMessageTypeKinds::PlayerAction,
+                                                    info_player_action:Some((current_turn_player_id, GameTurnTypes::ThrowCard)),
+                                                    ..Default::default()
+                                                }).unwrap();
+                                                for p in self.players.iter() {
+                                                    if p.player_id != current_turn_player_id {
+                                                        let _ = write_reply(
+                                                            msg_to_else_player.clone(),
+                                                            p.player_ws.clone(),
+                                                        );
+                                                    }
+                                                }
                                                 if current_turn_player_id >= players_count {
                                                     current_turn_player_id = 1;
                                                 } else {

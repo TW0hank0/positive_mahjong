@@ -120,3 +120,14 @@
 - 開發：README 英文版
 - 修復：［pmj_server］初訊息未傳送
 - 修復：網頁部署
+
+**2026-7-15**
+
+- 新增：［website］KAO 與 KSCD 的提示/說明
+
+**2026-7-24**
+
+- 移除：無用依賴
+- 移除：儲存庫的 `auto_generated/`，請至說明文件 <https://tw0hank0.gitlab.io/positive_mahjong/docs/license/>
+- 棄用：`.github/workflows/{commit-build.yaml, commit-check.yaml}`，移至 `.github/workflows/commit-ci.yaml`
+- 更改：`.github/workflows/docs-build.yaml` 改名 `.github/workflows/pages-deploy.yaml`

@@ -6,14 +6,13 @@
 **/__pycache__/**
 **/__pypy_cache__/**
 
-# --- Website ---
-website_build/**
-
 # --- Other ---
 positive_*_v*_*.zip
 *.kra~
 pmj_server_config.json
-
-# secrets
+auto_generated/**
 secret/**
 .secrets/**
+secure_files/**
+.secure_files/**
+website_build/**

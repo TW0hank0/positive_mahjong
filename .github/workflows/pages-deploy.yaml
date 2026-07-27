@@ -36,13 +36,13 @@ jobs:
       - name: Install Dep
         uses: ./.github/workflows/instdep/
 
-      - name: build license
+      - name: Build license
         run: uv run scripts/build_license.py
 
-      - name: copy webiste dep
+      - name: Copy webiste dep
         run: uv run scripts/copy_website_dep.py
 
-      - name: build doc and website
+      - name: Build doc and website
         run: |
           uv run scripts/build_website.py
 
