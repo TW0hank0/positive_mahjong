@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-// 著作權所有 (C) {{.Year}} TW0hank0
+// 著作權所有 (C) 2026 TW0hank0
 //
 // 本檔案屬於 positive_mahjong 專案的一部分。
 // 專案儲存庫：https://gitlab.com/TW0hank0/positive_mahjong
@@ -17,10 +17,11 @@ use std::{
     self,
     net::{self, TcpListener, TcpStream},
     sync::{self, Arc, RwLock},
-    thread,
+    thread, time,
 };
 
 use rand::{self, prelude::SliceRandom, seq::IndexedRandom};
+use tracing::{debug, error, info, trace, warn};
 use tungstenite::{Message, WebSocket, accept_with_config};
 
 use pmj_shared::shared;
@@ -35,8 +36,8 @@ fn write_reply(
     text: String,
     websocket: sync::Arc<sync::RwLock<WebSocket<TcpStream>>>,
 ) -> Result<(), tungstenite::error::Error> {
-    // TODO: log::info!("準備回覆客戶端...");
-    println!("準備回覆客戶端...");
+    trace!(type= "enter_func", arg_text = ?text);
+    debug!("準備回覆客戶端...");
     let reply: Message = Message::Text(text.into());
     let write_result: tungstenite::Result<()>;
     loop {
@@ -48,16 +49,17 @@ fn write_reply(
                 break;
             }
             Err(e) => {
-                eprintln!("base/mode.rs:write_reply -> error: {}", e);
+                warn!("ws.try_write() Err: {}", e);
             }
         };
+        thread::sleep(time::Duration::from_millis(500));
     }
     match write_result {
         Ok(_) => {
-            println!("成功回覆客戶端。")
+            info!("成功回覆客戶端。")
         }
         Err(_) => {
-            eprintln!("回覆客戶端失敗！")
+            warn!("回覆客戶端失敗！")
         }
     }
     write_result
@@ -68,23 +70,28 @@ fn handle_client(
     stream: TcpStream,
     backend: sync::Arc<sync::RwLock<crate::base::mode::PositiveMahjong>>,
 ) {
+    stream
+        .set_read_timeout(Some(time::Duration::from_secs(3)))
+        .ok();
+    stream
+        .set_write_timeout(Some(time::Duration::from_secs(5)))
+        .ok();
     let client_ip = stream.peer_addr().unwrap().ip();
-    println!("建立連線：{}", client_ip.to_string());
-    // 進行 WebSocket 握手，建立 WebSocket 物件
+    info!("建立連線：{}", client_ip.to_string());
     let websocket: WebSocket<TcpStream> = match accept_with_config(
         stream,
         Some(tungstenite::protocol::WebSocketConfig::default()),
     ) {
         Ok(ws) => ws,
         Err(e) => {
-            eprintln!("握手失敗：{}", e);
+            warn!("握手失敗：{}", e);
             return;
         }
     };
     let ws: sync::Arc<sync::RwLock<WebSocket<TcpStream>>> =
         sync::Arc::new(sync::RwLock::new(websocket));
 
-    println!("客戶端 Websocket 連線成功。");
+    info!("客戶端 Websocket 連線成功。");
 
     // 進入訊息接收迴圈
     'connection: loop {
@@ -94,29 +101,33 @@ fn handle_client(
             match ws.try_write() {
                 Ok(mut guard) => {
                     if !guard.can_read() {
-                        eprintln!("error: guard.can_read = false");
+                        warn!("guard.can_read() = false");
                     } else {
-                        println!("info: guard.can_read() -> true");
+                        debug!("guard.can_read() -> true");
+                        guard.get_mut().set_nonblocking(true).ok();
                         match guard.read() {
                             Ok(msg) => {
                                 message = msg;
+                                guard.get_mut().set_nonblocking(false).ok();
                                 break 'read_msg;
                             }
                             Err(e) => {
-                                eprintln!("讀取錯誤：{}", e);
-                                continue 'read_msg;
+                                warn!("讀取錯誤：{}", e);
+                                guard.get_mut().set_nonblocking(false).ok();
                             }
                         }
                     }
+                    drop(guard);
                 }
                 Err(e) => {
-                    eprintln!("Failed to get guard! detail: {}", e);
-                    thread::sleep(std::time::Duration::from_millis(1024)); // 1sec
+                    warn!("ws.try_write() Err: {}", e);
                 }
             }
+            thread::sleep(std::time::Duration::from_millis(1024)); // 1sec
         }
         match message {
             Message::Text(text) => {
+                trace!("message -> Message::Text => {}", text);
                 let value: Result<shared::ClientConnectRequestType, serde_json::Error> =
                     serde_json::from_str(&text);
                 match value {
@@ -127,7 +138,6 @@ fn handle_client(
                                 sync::Arc::clone(&ws),
                             );
                         } else {
-                            println!("base/mode.rs -> prepare: backend.try_write()");
                             let result_player_id: Option<u8>;
                             'get_player_id: loop {
                                 match backend.try_write() {
@@ -136,7 +146,7 @@ fn handle_client(
                                         break 'get_player_id;
                                     }
                                     Err(e) => {
-                                        eprintln!("backend.try_write() Err: {}", e);
+                                        warn!("backend.try_write() Err: {}", e);
                                         continue 'get_player_id;
                                     }
                                 }
@@ -148,7 +158,7 @@ fn handle_client(
                                     too_many_player: true,
                                 }
                             } else {
-                                println!("後端已返回玩家識別碼：{:?}", result_player_id.clone());
+                                debug!("後端已返回玩家識別碼：{:?}", result_player_id.clone());
                                 shared::ServerConnectResponceType {
                                     gamemode: shared::GameModes::Base,
                                     player_id: result_player_id,
@@ -157,19 +167,20 @@ fn handle_client(
                             };
                             let resp_msg = serde_json::to_string(&resp).unwrap();
                             let _wrist_result = write_reply(resp_msg, ws.clone());
-                            println!("已回復客戶端初訊息。");
+                            info!("已回復客戶端初訊息。");
                             thread::sleep(std::time::Duration::from_millis(10));
                         }
                     }
                     Err(e) => {
-                        let _reply_result =
-                            write_reply(format!("json錯誤：{}", e), sync::Arc::clone(&ws));
+                        let msg = format!("客戶端請求格式（json）錯誤：{}", e);
+                        debug!("{}", msg.clone());
+                        let _reply_result = write_reply(msg, sync::Arc::clone(&ws));
                     }
                 }
             }
             Message::Binary(_data) => {
                 // TODO: msgpack
-                println!("跳過Binary Message!");
+                debug!("跳過Binary Message!");
             }
             Message::Ping(_) => {
                 // 函式庫通常會自動處理 Pong，亦可手動處理
@@ -178,7 +189,7 @@ fn handle_client(
                 // 忽略 Pong
             }
             Message::Close(_) => {
-                println!("客戶端請求關閉連線");
+                info!("客戶端請求關閉連線");
                 break 'connection;
             }
             Message::Frame(_) => {
@@ -190,7 +201,7 @@ fn handle_client(
 
     // 關閉連線
     let _close_result: Result<(), tungstenite::error::Error> = ws.write().unwrap().close(None);
-    //println!("連線已終止");
+    debug!("連線已終止");
 }
 
 pub fn main_base(gui_mode: bool) -> Option<Arc<RwLock<crate::base::mode::PositiveMahjong>>> {
@@ -231,11 +242,11 @@ fn handle_server_base(
     // 建立 TCP Listener
     let listener: TcpListener = match TcpListener::bind(addr) {
         Ok(i) => {
-            println!("已綁定：{}", addr.clone());
+            info!("已綁定：{}", addr.clone());
             i
         }
         Err(e) => {
-            eprintln!("無法綁定Port：{}", e);
+            warn!("無法綁定Port：{}", e);
             return;
         }
     };
@@ -250,7 +261,7 @@ fn handle_server_base(
                 thread_handles.push(handle);
             }
             Err(e) => {
-                eprintln!("連線失敗：{}", e);
+                warn!("連線失敗：{}", e);
             }
         }
     }
@@ -412,15 +423,13 @@ impl PositiveMahjong {
             ..Default::default()
         })
         .unwrap();
-        println!("start_game -> 通知遊戲開始");
         for player in self.players.iter() {
-            println!(
-                "  -> {}. {}",
+            info!(
+                "start_game -> 通知遊戲開始：{}. {}",
                 player.player_id,
                 player.player_ip_addr.to_string()
             );
-            let _write_result =
-                write_reply(game_start_msg.clone(), sync::Arc::clone(&player.player_ws));
+            let _write_result = write_reply(game_start_msg.clone(), player.player_ws.clone());
         }
         // rng init
         let mut rng = rand::rng();
@@ -445,10 +454,9 @@ impl PositiveMahjong {
             }
         }
         // 通知手牌變動
-        println!("start_game -> 通知手牌變動");
         for player in self.players.iter() {
-            println!(
-                "  -> {}. {}, cards: {:?}",
+            info!(
+                "start_game -> 通知手牌變動： {}. {}, 卡牌：{:?}",
                 player.player_id,
                 player.player_ip_addr.to_string(),
                 player.player_hand_cards.clone()
@@ -459,7 +467,7 @@ impl PositiveMahjong {
                 ..Default::default()
             })
             .unwrap();
-            let _write_result = write_reply(hand_card_msg, sync::Arc::clone(&player.player_ws));
+            let _write_result = write_reply(hand_card_msg, player.player_ws.clone());
         }
         //
         self.game_loop();
@@ -475,6 +483,17 @@ impl PositiveMahjong {
         self.unused_card.shuffle(&mut rng);
         // main loop
         'game: loop {
+            {
+                let msg = serde_json::to_string(&shared_base::ServerMessageType {
+                    msg_type: shared_base::ServerMessageTypeKinds::ChangedTurn,
+                    info_change_turn: Some(current_turn_player_id.clone()),
+                    ..Default::default()
+                })
+                .unwrap();
+                for player in self.players.iter() {
+                    write_reply(msg.clone(), player.player_ws.clone()).ok();
+                }
+            }
             match current_action {
                 GameTurnTypes::GetCard => {
                     let player = self
@@ -483,35 +502,37 @@ impl PositiveMahjong {
                         .unwrap();
                     {
                         'choose_card: loop {
-                            let card = self.unused_card.choose(&mut rng).unwrap();
-                            if card.card_type != PMJCardType::Flower {
+                            let got_card = self.unused_card.choose(&mut rng).unwrap();
+                            if got_card.card_type != PMJCardType::Flower {
                                 let mut index = 0;
                                 'find_index: for i in self.unused_card.iter() {
-                                    if i == card {
+                                    if i == got_card {
                                         break 'find_index;
                                     } else {
                                         index += 1;
                                     }
                                 }
                                 let player_card = self.unused_card.remove(index);
-                                player.player_hand_cards.push(player_card);
+                                player.player_hand_cards.push(player_card.clone());
+                                let client_msg =
+                                    serde_json::to_string(&shared_base::ServerMessageType {
+                                        msg_type: shared_base::ServerMessageTypeKinds::GetCard,
+                                        info_get_card: Some(player_card),
+                                        ..Default::default()
+                                    })
+                                    .unwrap();
+                                write_reply(client_msg, player.player_ws.clone()).ok();
                                 break 'choose_card;
                             }
                         }
                     }
-                    let client_msg = serde_json::to_string(&shared_base::ServerMessageType {
-                        msg_type: shared_base::ServerMessageTypeKinds::HandCardChange,
-                        info_hand_card_change: Some(player.player_hand_cards.clone()),
-                        ..Default::default()
-                    })
-                    .unwrap();
-                    let _write_result = write_reply(client_msg, player.player_ws.clone());
+
                     current_action = GameTurnTypes::ThrowCard;
                 }
                 GameTurnTypes::ThrowCard => {
                     let player = self
                         .players
-                        .get_mut(current_turn_player_id as usize)
+                        .get_mut((current_turn_player_id - 1) as usize)
                         .unwrap();
                     let player_ws = player.player_ws.clone();
                     let ws_msg: Message;
@@ -523,17 +544,16 @@ impl PositiveMahjong {
                                         ws_msg = i;
                                     }
                                     Err(e) => {
-                                        eprintln!("err: {}", e);
-                                        continue 'guard_read;
+                                        warn!("guard.read(): {}", e);
                                     }
                                 }
                                 break 'guard_read;
                             }
                             Err(e) => {
-                                eprintln!("err: {}", e);
-                                continue 'guard_read;
+                                error!("err: {}", e);
                             }
                         }
+                        thread::sleep(time::Duration::from_millis(500));
                     }
                     match ws_msg {
                         Message::Text(text) => {
@@ -593,7 +613,7 @@ impl PositiveMahjong {
                                             }
                                         }
                                         _ => {
-                                            eprintln!("錯誤：客戶端錯誤訊息");
+                                            error!("錯誤：客戶端錯誤訊息");
                                             todo!("錯誤處理");
                                         }
                                     }
@@ -601,13 +621,13 @@ impl PositiveMahjong {
                             }
                         }
                         _ => {
-                            eprintln!("錯誤：客戶端錯誤訊息");
+                            error!("錯誤：客戶端錯誤訊息");
                             todo!("錯誤處理");
                         }
                     }
                 }
                 _ => {
-                    eprintln!("不支援的動作！Action：{:?}", current_action)
+                    error!("不支援的動作！Action：{:?}", current_action)
                 }
             }
         }

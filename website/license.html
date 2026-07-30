@@ -27,7 +27,7 @@
             name="description"
             content="positive_mahjong&#x27;s website"
         />
-        <title>positive_mahjong —— 首頁</title>
+        <title>positive_mahjong —— 協議</title>
         <link rel="stylesheet" href="style.css" />
         <link rel="icon" href="icon.svg" />
         <link rel="shortcut icon" href="icon.png" />
@@ -36,14 +36,7 @@
         <header>
             <nav>{{$VAR_NAV$}}</nav>
         </header>
-        <section class="content">
-            <p style="font-weight: bold">仍在開發中，未完成</p>
-            <span class="logo-text"
-                >positive_mahjong ——
-                使用Rust和Iced製作，支援Linux及Windows系統。</span
-            >
-        </section>
-        <section class="content">
+        <section class="content content-block-top">
             <h4>授權與聲明</h4>
             <p>版權所有 (C) 2026 TW0hank0</p>
             <p>
@@ -51,6 +44,15 @@
                 （僅此版本） 授權
             </p>
             <p>完整全文請見 <a href="./LICENSE">LICENSE</a> 檔案</p>
+        </section>
+        <section class="content content-block-bottom">
+            <p class="text-block">{{$VAR_LICENSE$}}</p>
+        </section>
+        <section class="content content-block-top">
+            <p>模組庫授權聲明</p>
+        </section>
+        <section class="content content-block-bottom">
+            <div class="text-block">{{$VAR_THIRD_PARTY_LICENSE_RUST_MD_TO_HTML$}}</div>
         </section>
     </body>
 </html>

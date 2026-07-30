@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-// 著作權所有 (C) {{.Year}} TW0hank0
+// 著作權所有 (C) 2026 TW0hank0
 //
 // 本檔案屬於 positive_mahjong 專案的一部分。
 // 專案儲存庫：https://gitlab.com/TW0hank0/positive_mahjong
@@ -22,11 +22,12 @@ use iced::{
         text_input,
     },
 };
-
 use serde_json;
+use tracing::{debug, error, info, trace, warn};
 use tungstenite::{Message, WebSocket, connect};
 
 use crate::{circular, easing};
+
 use pmj_gamemodes;
 use pmj_shared::shared::{self, FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES, FONT_NOTO_SANS_REG_BYTES};
 
@@ -169,14 +170,14 @@ impl Client {
         match message {
             UIMessage::FetchThreadsStatus => {
                 if self.process_threads.len() > 0 {
-                    println!("Start fetch thread status...");
+                    trace!("Start fetch thread status...");
                     let mut rp_index = 0;
                     'loop_else: {
                         loop {
                             if rp_index >= self.process_threads.len() {
                                 break;
                             } else {
-                                println!("rp_index={}", rp_index.clone());
+                                debug!("rp_index={}", rp_index.clone());
                                 let rpthread = self.process_threads.get(rp_index).unwrap();
                                 if rpthread.handle.is_finished() {
                                     let _ = rpthread;
@@ -184,7 +185,7 @@ impl Client {
                                     match pthread.handle.join() {
                                         Ok(thread_result) => {
                                             if thread_result.is_error {
-                                                eprintln!("process_thread ran into error!");
+                                                error!("process_thread ran into error!");
                                                 self.status_home.msgs.push(String::from(
                                                     "process_thread ran into error!",
                                                 ));
@@ -203,7 +204,7 @@ impl Client {
                                                     }
                                                 }
                                             } else {
-                                                println!("process_thread finish sucessful.");
+                                                trace!("process_thread finish sucessful.");
                                                 match pthread.process_type {
                                                     ThreadProcessTypes::ReadFirstMsgResp => {
                                                         self.player_id = Some(
@@ -212,7 +213,7 @@ impl Client {
                                                                 .unwrap()
                                                                 .player_id,
                                                         );
-                                                        println!(
+                                                        debug!(
                                                             "ThreadProcessTypes::ReadFirstMsgResp => player_id -> {}",
                                                             self.player_id.clone().unwrap()
                                                         );
@@ -236,13 +237,31 @@ impl Client {
                                                             serde_json::to_string_pretty(&msg)
                                                                 .unwrap(),
                                                         );
+                                                        match msg.msg_type {
+                                                            pmj_gamemodes::base::shared::ServerMessageTypeKinds::GameStart => {
+                                                                info!("收到伺服器遊戲開始訊息。");
+                                                                self.status_play_base.is_start = Some(true);
+                                                            }
+                                                            pmj_gamemodes::base::shared::ServerMessageTypeKinds::GetCard => {
+                                                                let got_card = msg.info_get_card.unwrap();
+                                                                info!("取得卡牌：{:?}", got_card);
+                                                                self.status_play_base.game_msgs.push(format!("取得卡牌：{:?}", got_card));
+                                                                self.status_play_base.game_controller=PlayBaseController::ThrowCard;
+                                                            }
+                                                            pmj_gamemodes::base::shared::ServerMessageTypeKinds::HandCardChange => {
+                                                                self.status_play_base.hand_cards = msg.info_hand_card_change.unwrap();
+                                                            }
+                                                            _ => {
+                                                                todo!("need to do.");
+                                                            }
+                                                        }
                                                     }
                                                 }
                                                 break 'loop_else;
                                             }
                                         }
                                         Err(e) => {
-                                            eprintln!("thread: {:?}", e);
+                                            error!("thread: {:?}", e);
                                             self.status_home.msgs.push(format!("thread: {:?}", e));
                                         }
                                     }
@@ -254,7 +273,7 @@ impl Client {
                                             HomeMessage::ReadFirstMsgResp,
                                         ));
                                     }
-                                    println!("thread is not finish, rp_index={}", rp_index.clone());
+                                    trace!("thread is not finish, rp_index={}", rp_index.clone());
                                     rp_index += 1;
                                 }
                             }
@@ -262,7 +281,7 @@ impl Client {
                         return iced::task::Task::done(UIMessage::FetchThreadsStatus);
                     }
                 } else {
-                    println!("process_threads.len() = {}", self.process_threads.len());
+                    debug!("process_threads.len() = {}", self.process_threads.len());
                 }
             }
             UIMessage::Home(home_message) => match home_message {
@@ -317,7 +336,10 @@ impl Client {
                 }
             },
             UIMessage::PlayBase(play_base_message) => match play_base_message {
-                PlayBaseMessage::ReadWebsocketMsg => {}
+                PlayBaseMessage::ReadWebsocketMsg => {
+                    self.process_threads.push(self.play_base_read_websocket());
+                    return iced::task::Task::done(UIMessage::FetchThreadsStatus);
+                }
             },
         };
         return task::Task::none();

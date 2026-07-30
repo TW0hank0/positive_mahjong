@@ -51,6 +51,11 @@ runs:
         rustc --version
         cargo --version
 
+    - name: install rust nightly
+      shell: pwsh
+      run: |
+        rustup component add rustc-codegen-cranelift-preview --toolchain nightly
+
     - name: install Linux build needed dep
       shell: pwsh
       if: runner.os == 'Linux'
@@ -82,7 +87,7 @@ runs:
         cargo about --version
         cargo audit --version
         cargo msrv --version
-        cargo deny --verison
+        cargo deny --version
         taplo --version
         mdbook --version
         addlicense --version

@@ -25,16 +25,16 @@ version = { workspace = true }
 [dependencies]
 iced = { workspace = true }
 image = { workspace = true }
-log = { workspace = true }
 lyon_algorithms = { workspace = true }
 pmj_gamemodes = { workspace = true }
 pmj_shared = { workspace = true }
 serde_json = { workspace = true }
 tungstenite = { workspace = true }
+positive_tool_rs = { workspace = true }
+tracing = { workspace = true }
 
 [features]
-default = ["desktop"]
-desktop = []
+default = []
 
 [[bin]]
 name = "pmj_client_desktop"

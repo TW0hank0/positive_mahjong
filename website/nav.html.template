@@ -10,6 +10,7 @@
         <a class="nav_item" href="{{$VAR_ROOT_DIR$}}/play-web.html"
             >線上玩</a
         >
+        <a class="nav_item" href="{{$VAR_ROOT_DIR$}}/license.html">協議</a>
         <a
             class="nav_item"
             href="{{$VAR_ROOT_DIR$}}/docs/index.html"
@@ -33,7 +34,7 @@
                 >KeepAndoridOpen</a
             >
             <span class="tooltiptext"
-                >從 2026 年 9 月起，Google 將在未經使用者同意的情況下，封鎖所有未向 Google 登記、未簽署其合約、未繳費，且未提交政府核發身分證明文件的 Android 應用程式。</span
+                >2026 年 9 月起，Google 將在未經使用者同意的情況下，封鎖所有未向其登記、未簽署其合約、未繳費，且未提交政府核發身分證明文件的 Android 應用程式。</span
             >
         </div>
         <div class="tooltip">

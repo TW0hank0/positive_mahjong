@@ -131,3 +131,11 @@
 - 移除：儲存庫的 `auto_generated/`，請至說明文件 <https://tw0hank0.gitlab.io/positive_mahjong/docs/license/>
 - 棄用：`.github/workflows/{commit-build.yaml, commit-check.yaml}`，移至 `.github/workflows/commit-ci.yaml`
 - 更改：`.github/workflows/docs-build.yaml` 改名 `.github/workflows/pages-deploy.yaml`
+
+**2026-7-28**
+
+- 更改：從 `log` 改為 `tracing`
+
+**2026-7-29**
+
+- 新增：［website］協議聲明

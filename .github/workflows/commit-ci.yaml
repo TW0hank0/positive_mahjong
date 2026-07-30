@@ -36,7 +36,7 @@ jobs:
         uses: ./.github/workflows/instdep
 
       - name: Run debug check
-        run: cargo check --workspace
+        run: cargo +nightly check --workspace
 
       - name: Run release check
         run: cargo check --release --workspace
