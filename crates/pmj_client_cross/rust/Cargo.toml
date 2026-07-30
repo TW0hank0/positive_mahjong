@@ -26,7 +26,6 @@ version = { workspace = true }
 # --- shared ---
 godot = { workspace = true }
 image = { workspace = true }
-log = { workspace = true }
 lyon_algorithms = { workspace = true }
 pmj_shared = { workspace = true }
 serde_json = { workspace = true }

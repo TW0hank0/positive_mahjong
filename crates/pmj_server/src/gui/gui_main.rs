@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-// 著作權所有 (C) {{.Year}} TW0hank0
+// 著作權所有 (C) 2026 TW0hank0
 //
 // 本檔案屬於 positive_mahjong 專案的一部分。
 // 專案儲存庫：https://gitlab.com/TW0hank0/positive_mahjong
@@ -13,7 +13,11 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
+use std::{env, fs};
+
 use iced;
+use positive_tool_rs;
+use tracing::{info, warn};
 
 use pmj_shared;
 
@@ -21,16 +25,43 @@ mod base;
 
 fn main() -> iced::Result {
     {
+        if !fs::exists(
+            env::current_exe()
+                .unwrap()
+                .parent()
+                .unwrap()
+                .join("pmj_logs"),
+        )
+        .unwrap_or(false)
+        {
+            fs::create_dir(
+                env::current_exe()
+                    .unwrap()
+                    .parent()
+                    .unwrap()
+                    .join("pmj_logs"),
+            )
+            .ok();
+        }
+        let _guard = positive_tool_rs::pt::init_tracing(
+            env::current_exe()
+                .unwrap()
+                .parent()
+                .unwrap()
+                .join("pmj_logs"),
+            Some(String::from("pmj_server")),
+        );
         let config = pmj_shared::shared::read_server_config();
         match config.gamemode {
             pmj_shared::shared::GameModes::Base => {
+                info!("config.gamemode = GameModes::Base");
                 base::main()?;
             }
             pmj_shared::shared::GameModes::V1Simple => {
-                println!("還未支援！");
+                warn!("還未支援！");
             }
             pmj_shared::shared::GameModes::V2Better => {
-                println!("還未支援！");
+                warn!("還未支援！");
             }
         }
     }

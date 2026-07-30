@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-// 著作權所有 (C) {{.Year}} TW0hank0
+// 著作權所有 (C) 2026 TW0hank0
 //
 // 本檔案屬於 positive_mahjong 專案的一部分。
 // 專案儲存庫：https://gitlab.com/TW0hank0/positive_mahjong
@@ -19,14 +19,14 @@ use std::sync::{self, Arc, RwLock};
 
 use iced::{
     self, Border, Theme,
-    widget::{self, Column, Row, button, container, scrollable, text},
+    advanced::Widget,
+    widget::{self, Column, Row, button, container, scrollable, space, text},
 };
-
 use image;
 use local_ip_address;
+use tracing::{debug, error, info, trace, warn};
 
 use pmj_gamemodes::base;
-
 use pmj_shared::shared::{FONT_NOTO_SANS_REG_BYTES, ICON_PNG_BYTES, PROJECT_NAME};
 
 pub const FONT_NOTO_SANS_REG: iced::font::Font = iced::font::Font::with_name("Noto Sans TC");
@@ -66,6 +66,7 @@ pub fn main() -> iced::Result {
 enum GUIMessages {
     StartGame,
     FetchPlayerInfo,
+    CopyIp,
 }
 
 #[derive(Debug)]
@@ -82,9 +83,9 @@ impl ServerGUI {
     fn new() -> Self {
         let ipv4_address = local_ip_address::local_ip().unwrap();
         let ipv6_address = local_ip_address::local_ipv6().unwrap();
-        println!("ipv4: {}", ipv4_address.to_string());
-        println!("ipv6: {}", ipv6_address.to_string());
-        println!("port: {}", pmj_shared::shared::SERVER_PORT);
+        info!("第四代網路地址：{}", ipv4_address.to_string());
+        info!("第六代網路地址：{}", ipv6_address.to_string());
+        info!("端口：{}", pmj_shared::shared::SERVER_PORT);
         let backend = base::mode::main_base(true).unwrap();
         Self {
             backend: backend,
@@ -99,9 +100,18 @@ impl ServerGUI {
     fn update(&mut self, msg: GUIMessages) -> iced::Task<GUIMessages> {
         match msg {
             GUIMessages::StartGame => {
+                match self.backend.try_read() {
+                    Ok(backend) => {
+                        self.players = backend.get_players_info();
+                    }
+                    Err(e) => {
+                        warn!("FetchPlayerInfo error: {}", e);
+                        return iced::task::Task::done(GUIMessages::StartGame);
+                    }
+                }
                 if self.players.len() < 1 {
-                    println!("玩家人數過低！");
-                    self.msg.push_str("玩家人數過低！");
+                    warn!("至少需要一位玩家！");
+                    self.msg.push_str("至少需要一位玩家！");
                 } else {
                     self.is_start = true;
                     let thread_backend = sync::Arc::clone(&self.backend);
@@ -110,7 +120,7 @@ impl ServerGUI {
                             guard.start_game();
                         }
                         Err(e) => {
-                            eprintln!("Fail to start game:{}", e);
+                            error!("Fail to start game:{}", e);
                             return iced::task::Task::done(GUIMessages::StartGame);
                             //TODO: error handle
                         }
@@ -123,51 +133,87 @@ impl ServerGUI {
                     self.players = backend.get_players_info();
                 }
                 Err(e) => {
-                    eprintln!("FetchPlayerInfo error: {}", e);
+                    warn!("FetchPlayerInfo error: {}", e);
                     return iced::task::Task::done(GUIMessages::FetchPlayerInfo);
                 }
             },
+            GUIMessages::CopyIp => {
+                // TODO: handle task
+                return iced::clipboard::write::<GUIMessages>(self.local_ipv6_address.to_string());
+            }
         }
         iced::Task::none()
     }
 
     fn view(&self) -> iced::widget::Column<'_, GUIMessages> {
         let mut layout: iced::widget::Column<'_, GUIMessages> = Column::new().spacing(30);
-        //
-        let mut ip_bar_layout = Column::new().spacing(30);
-        ip_bar_layout = ip_bar_layout.push(
-            text(format!("Ipv4: {}", self.local_ipv4_address))
-                .size(28)
-                .style(|theme: &iced::Theme| {
-                    let ex_palette = theme.extended_palette();
-                    let mut style = text::Style::default();
-                    style.color = Some(ex_palette.secondary.base.text);
-                    style
-                }),
-        );
-        ip_bar_layout = ip_bar_layout.spacing(40);
-        ip_bar_layout = ip_bar_layout
-            .push(
-                text(format!("Ipv6: {}", self.local_ipv6_address))
-                    .size(iced::Pixels::from(28))
+        {
+            let mut ip_bar_layout = Column::new().spacing(30);
+            ip_bar_layout = ip_bar_layout.push(
+                text(format!("Ipv4: {}", self.local_ipv4_address))
+                    .size(28)
                     .style(|theme: &iced::Theme| {
                         let ex_palette = theme.extended_palette();
                         let mut style = text::Style::default();
                         style.color = Some(ex_palette.secondary.base.text);
                         style
                     }),
-            )
-            .spacing(20);
-        let ip_bar_container = container(ip_bar_layout).style(|theme: &iced::Theme| {
-            let ex_palette = theme.extended_palette();
-            let mut style = iced::widget::container::Style::default();
-            style = style
-                .background(ex_palette.secondary.base.color)
-                .border(iced::border::Border::default().rounded(iced::border::radius(10.0)));
-            style
-        });
-        layout = layout.push(ip_bar_container).spacing(80);
-        //
+            );
+            ip_bar_layout = ip_bar_layout.spacing(40);
+            ip_bar_layout = ip_bar_layout.push(
+                Row::new()
+                    .push(
+                        text(format!("Ipv6: {}", self.local_ipv6_address))
+                            .size(iced::Pixels::from(28))
+                            .style(|theme: &iced::Theme| {
+                                let ex_palette = theme.extended_palette();
+                                let mut style = text::Style::default();
+                                style.color = Some(ex_palette.secondary.base.text);
+                                style
+                            }),
+                    )
+                    .push(space().width(10))
+                    .push(button("複製").on_press(GUIMessages::CopyIp).style(
+                        |t: &iced::theme::Theme, s: button::Status| {
+                            let p = t.extended_palette();
+                            let mut style = button::Style::default();
+                            style.border = Border {
+                                color: p.background.strong.color,
+                                width: 2.0,
+                                radius: iced::border::radius(10),
+                            };
+                            style.text_color = p.primary.base.text;
+                            match s {
+                                button::Status::Active => {
+                                    style.background = None;
+                                }
+                                button::Status::Hovered => {
+                                    style.background = Some(iced::Background::Color(
+                                        iced::Color::from_rgba(1.0, 1.0, 1.0, 0.6),
+                                    ));
+                                }
+                                button::Status::Disabled => {
+                                    style.text_color = p.primary.weak.text;
+                                }
+                                button::Status::Pressed => {
+                                    style.background =
+                                        Some(iced::Background::Color(p.primary.weak.color));
+                                }
+                            }
+                            style
+                        },
+                    )),
+            );
+            let ip_bar_container = container(ip_bar_layout).style(|theme: &iced::Theme| {
+                let ex_palette = theme.extended_palette();
+                let mut style = iced::widget::container::Style::default();
+                style = style
+                    .background(ex_palette.secondary.base.color)
+                    .border(iced::border::Border::default().rounded(iced::border::radius(10.0)));
+                style
+            });
+            layout = layout.push(ip_bar_container).spacing(80);
+        }
         if !self.is_start {
             let start_button = widget::button(text("開始").size(30))
                 .on_press(GUIMessages::StartGame)

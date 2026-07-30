@@ -1,5 +1,5 @@
 :root {
-    line-height: 1;
+    line-height: 10px;
     font-family: sans-serif;
     background-color: var(--background);
     color: var(--text-color);
@@ -11,9 +11,12 @@
     --background: black;
     --text-color: white;
     --text-size: 22px;
-    --normal-margin: 10px;
-    --normal-radius: 12px;
+    --large-margin: 18px;
+    --normal-margin: 12px;
+    --normal-radius: 16px;
     --normal-padding: 10px;
+    --small-radius: 6px;
+    --small-margin: 6px;
     --image-radius: 6px;
     --code-radius: 3px;
     --code-color: gray;
@@ -21,19 +24,23 @@
     --dark-mode: true;
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --background: black;
-        --text-color: white;
-        --dark-mode: true;
-    }
-}
-
 @media (prefers-color-scheme: light) {
     :root {
         --background: white;
         --text-color: black;
         --dark-mode: false;
+    }
+}
+
+@media (width >= 2160px) {
+    :root {
+        --text-size: 26px;
+    }
+}
+
+@media (width < 1080px) {
+    :root {
+        --text-size: 20px;
     }
 }
 
@@ -68,8 +75,10 @@
 }
 .title-bar {
     background-color: var(--color-gray);
-    margin: var(--normal-margin);
-    margin-top: 20px;
+    margin-left: var(--normal-margin);
+    margin-right: var(--normal-margin);
+    margin-top: calc(var(--large-margin) + 6px);
+    margin-bottom: var(--large-margin);
     padding: 8px;
     padding-top: 5px;
     border-radius: var(--normal-radius);
@@ -90,10 +99,28 @@
 
 .content {
     background-color: var(--color-gray);
-    margin: var(--normal-margin);
+    margin-top: var(--large-margin);
+    margin-bottom: var(--large-margin);
+    margin-left: var(--normal-margin);
+    margin-right: var(--normal-margin);
     padding: 14px;
     border-radius: var(--normal-radius);
     font-size: var(--text-size);
+    a {
+        text-decoration-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+}
+.content-block-top {
+    border-radius: var(--normal-radius) var(--normal-radius)
+        var(--small-radius) var(--small-radius);
+    margin-bottom: var(--small-margin);
+}
+
+.content-block-bottom {
+    border-radius: var(--small-radius) var(--small-radius)
+        var(--normal-radius) var(--normal-radius);
+    margin-top: var(--small-margin);
 }
 
 .project-icon {
@@ -108,7 +135,7 @@ img {
 code {
     background-color: var(--code-color);
     border-radius: var(--code-radius);
-    font-family:monospace;
+    font-family: monospace;
 }
 
 .logo-text {
@@ -120,7 +147,6 @@ code {
     position: relative;
     display: inline-block;
     /* border-bottom: 1px dotted black;  Add dots under the hoverable text */
-
 }
 
 /* Tooltip text */
@@ -146,4 +172,12 @@ code {
 /* Show the tooltip text on hover */
 .tooltip:hover .tooltiptext {
     visibility: visible;
+}
+
+.text-block {
+    max-height: max(40dvh, 550px);
+    min-height: 600px;
+    line-height: 30px;
+    overflow-y: scroll;
+    white-space: pre;
 }

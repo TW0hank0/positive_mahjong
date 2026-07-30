@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-// 著作權所有 (C) {{.Year}} TW0hank0
+// 著作權所有 (C) 2026 TW0hank0
 //
 // 本檔案屬於 positive_mahjong 專案的一部分。
 // 專案儲存庫：https://gitlab.com/TW0hank0/positive_mahjong
@@ -41,6 +41,8 @@ pub struct ServerMessageType {
     pub info_error: Option<String>,
     /// Option<(玩家Id, 動作)>
     pub info_player_action: Option<(u8, GameTurnTypes)>,
+    pub info_get_card: Option<PMJCard>,
+    pub info_change_turn: Option<u8>,
 }
 
 impl Default for ServerMessageType {
@@ -50,6 +52,8 @@ impl Default for ServerMessageType {
             info_player_action: None,
             info_hand_card_change: None,
             info_error: Some(String::from("Default `info_error` value.")),
+            info_change_turn: None,
+            info_get_card: None,
         }
     }
 }
@@ -64,6 +68,7 @@ pub enum ServerMessageTypeKinds {
     Error,
     /// 玩家動作
     PlayerAction,
+    GetCard,
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]

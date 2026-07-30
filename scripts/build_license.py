@@ -19,11 +19,16 @@ import shutil
 import subprocess
 import sys
 
+import util
+
 
 def main():
     print("-" * 10, "cargo-about", "-" * 10)
-    if os.path.exists("auto_generated") is False:
-        os.mkdir("auto_generated")
+    autogen_path = os.path.join(
+        os.path.dirname(os.path.dirname(__file__)), "auto_generated"
+    )
+    if os.path.exists(autogen_path) is False:
+        os.mkdir(autogen_path)
     #
     all_commands = [
         [
@@ -31,7 +36,7 @@ def main():
             "about",
             "generate",
             "--output-file",
-            "auto_generated/ThirdPartyLicense-Rust.html",
+            os.path.join(autogen_path, "ThirdPartyLicense-Rust.html"),
             "--threshold",
             "1.0",
             "templates/about_html.hbs",
@@ -43,7 +48,7 @@ def main():
             "--threshold",
             "1.0",
             "--output-file",
-            "auto_generated/ThirdPartyLicense-Rust.json",
+            os.path.join(autogen_path, "ThirdPartyLicense-Rust.json"),
             "templates/about_json.hbs",
         ],
         [
@@ -51,7 +56,7 @@ def main():
             "about",
             "generate",
             "--output-file",
-            "auto_generated/ThirdPartyLicense-Rust.md",
+            os.path.join(autogen_path, "ThirdPartyLicense-Rust.md"),
             "--threshold",
             "1.0",
             "templates/about_markdown.hbs",
@@ -59,14 +64,7 @@ def main():
     ]
     #
     for command in all_commands:
-        print(f"Run Command: {' '.join(command)}")
-        subprocess.run(
-            command,
-            check=True,
-            stdout=sys.stdout,
-            stdin=sys.stdin,
-            stderr=sys.stderr,
-        )
+        util.run_cmd(command)
     #
     print("Indenting json file...", end="")
     json_file_path = os.path.abspath(

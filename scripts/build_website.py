@@ -1,5 +1,11 @@
+# /// script
+# dependencies = [
+#     "mistune==3.3.4"
+# ]
+# ///
 import os
 import shutil
+import mistune
 
 
 def main():
@@ -72,6 +78,13 @@ def replace_var(
     html_vars: dict[str, str] = {}
     # print(f"new_template={new_template}")
     html_vars["VAR_NAV"] = new_template
+    with open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "LICENSE"), "r", encoding="utf-8") as f:
+        html_vars["VAR_LICENSE"] = f.read()
+    with open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "auto_generated", "ThirdPartyLicense-Rust.md"), "r", encoding="utf-8") as f:
+        t=f.read()
+        html_vars["VAR_THIRD_PARTY_LICENSE_RUST_MD"] = t
+        html_vars["VAR_THIRD_PARTY_LICENSE_RUST_MD_TO_HTML"] = str(mistune.html(t))
+    #
     with open(replace_html_path, "r", encoding="utf-8") as f:
         new_html_content = f.read()
     for key in list(html_vars.keys()):

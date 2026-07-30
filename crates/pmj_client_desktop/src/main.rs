@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-// 著作權所有 (C) {{.Year}} TW0hank0
+// 著作權所有 (C) 2026 TW0hank0
 //
 // 本檔案屬於 positive_mahjong 專案的一部分。
 // 專案儲存庫：https://gitlab.com/TW0hank0/positive_mahjong
@@ -13,27 +13,20 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-#[cfg(feature = "desktop")]
+use std::{env, fs};
+
 use iced;
+use image;
+use positive_tool_rs;
 
-#[cfg(feature = "desktop")]
-mod client;
-
-#[cfg(feature = "desktop")]
 mod circular;
-#[cfg(feature = "desktop")]
+mod client;
 mod easing;
 
-#[cfg(feature = "desktop")]
-use image;
-
-#[cfg(feature = "desktop")]
 use pmj_shared::shared::{self, ICON_PNG_BYTES, PROJECT_NAME};
 
-#[cfg(feature = "desktop")]
 pub const FONT_NOTO_SANS_REG: iced::font::Font = iced::font::Font::with_name("Noto Sans TC");
 
-#[cfg(feature = "desktop")]
 pub fn icon_init() -> Option<iced::window::Icon> {
     let img = image::load_from_memory_with_format(ICON_PNG_BYTES, image::ImageFormat::Png)
         .unwrap()
@@ -44,34 +37,53 @@ pub fn icon_init() -> Option<iced::window::Icon> {
 }
 
 fn main() {
-    #[cfg(feature = "desktop")]
+    if !fs::exists(
+        env::current_exe()
+            .unwrap()
+            .parent()
+            .unwrap()
+            .join("pmj_logs"),
+    )
+    .unwrap_or(false)
     {
-        let icon = icon_init();
-        let mut window_settings = iced::window::Settings::default();
-        window_settings.maximized = true;
-        window_settings.icon = icon;
-        window_settings.min_size = Some(iced::Size::new(1080.0, 720.0));
-        window_settings.position = iced::window::Position::Centered;
-        //
-        let mut app_settings = iced::Settings::default();
-        app_settings.id = Some(String::from(PROJECT_NAME));
-        app_settings.default_text_size = iced::Pixels::from(22);
-        app_settings.default_font = FONT_NOTO_SANS_REG;
-        //
-        let _ = iced::application(
-            client::Client::new,
-            client::Client::update,
-            client::Client::view,
+        fs::create_dir(
+            env::current_exe()
+                .unwrap()
+                .parent()
+                .unwrap()
+                .join("pmj_logs"),
         )
-        .window(window_settings)
-        .settings(app_settings)
-        .default_font(FONT_NOTO_SANS_REG)
-        .title(client::Client::title)
-        .theme(client::Client::theme)
-        .run();
+        .ok();
     }
-    #[cfg(not(feature = "desktop"))]
-    {
-        panic!("Must enable `desktop` feature on desktop platform (main.rs)!");
-    }
+    let _guard = positive_tool_rs::pt::init_tracing(
+        env::current_exe()
+            .unwrap()
+            .parent()
+            .unwrap()
+            .join("pmj_logs"),
+        Some(String::from("pmj_client_desktop")),
+    );
+    let icon = icon_init();
+    let mut window_settings = iced::window::Settings::default();
+    window_settings.maximized = true;
+    window_settings.icon = icon;
+    window_settings.min_size = Some(iced::Size::new(1080.0, 720.0));
+    window_settings.position = iced::window::Position::Centered;
+    //
+    let mut app_settings = iced::Settings::default();
+    app_settings.id = Some(String::from(PROJECT_NAME));
+    app_settings.default_text_size = iced::Pixels::from(22);
+    app_settings.default_font = FONT_NOTO_SANS_REG;
+    //
+    let _ = iced::application(
+        client::Client::new,
+        client::Client::update,
+        client::Client::view,
+    )
+    .window(window_settings)
+    .settings(app_settings)
+    .default_font(FONT_NOTO_SANS_REG)
+    .title(client::Client::title)
+    .theme(client::Client::theme)
+    .run();
 }
