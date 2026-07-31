@@ -13,18 +13,29 @@
 # 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-# [unstable]
-# codegen-backend = true
+[unstable]
+profile-rustflags = true
+codegen-backend = true
 
-# [profile.dev]
+[profile.dev]
 # codegen-backend = "cranelift"
-# [profile.dev.build-override]
-# codegen-backend = "llvm"
-# [profile.dev.package."*"]
-# codegen-backend = "llvm"
+codegen-backend = "llvm"
+[profile.dev.build-override]
+codegen-backend = "llvm"
+[profile.dev.package."*"]
+codegen-backend = "llvm"
 
-[build]
-rustflags = []
+# [build]
+# rustflags = [
+#     "--remap-path-prefix",
+#     "=/project"
+# ]
+
+[profile.release]
+rustflags = [
+    "--remap-path-prefix",
+    "=/project"
+]
 
 [target.x86_64-pc-windows-msvc]
 linker = "lld-link"

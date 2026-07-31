@@ -77,8 +77,7 @@ runs:
     - name: use cargo to install tools
       shell: pwsh
       run: |
-        cargo install cargo-audit cargo-msrv cargo-deny taplo-cli --locked
-        cargo install mdbook --locked
+        cargo install cargo-audit cargo-msrv cargo-deny taplo-cli mdbook --locked
         cargo install cargo-about --features="cli" --locked
 
     - name: check tools installion
@@ -90,7 +89,6 @@ runs:
         cargo deny --version
         taplo --version
         mdbook --version
-        addlicense --version
 
     - name: install java
       uses: actions/setup-java@v5

@@ -79,6 +79,7 @@ pub struct PlayBaseStatus {
     hand_cards: Vec<pmj_gamemodes::base::shared::PMJCard>,
     game_msgs: Vec<String>,
     game_controller: PlayBaseController,
+    current_turn: Option<u8>,
 }
 
 #[derive(Debug)]
@@ -106,6 +107,7 @@ pub enum HomeMessage {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PlayBaseMessage {
     ReadWebsocketMsg,
+    ThrowCard(pmj_gamemodes::base::shared::PMJCard),
 }
 
 pub const ALPHABET: [char; 26] = [
@@ -159,6 +161,7 @@ impl Client {
                 hand_cards: Vec::new(),
                 game_controller: PlayBaseController::NoCtrl,
                 game_msgs: Vec::new(),
+                current_turn: None,
             },
             ws: None,
             player_id: None,
@@ -251,13 +254,23 @@ impl Client {
                                                             pmj_gamemodes::base::shared::ServerMessageTypeKinds::HandCardChange => {
                                                                 self.status_play_base.hand_cards = msg.info_hand_card_change.unwrap();
                                                             }
+                                                            pmj_gamemodes::base::shared::ServerMessageTypeKinds::ChangedTurn => {
+                                                                self.status_play_base.current_turn = msg.info_change_turn;
+                                                            }
+                                                            pmj_gamemodes::base::shared::ServerMessageTypeKinds::Error => {
+                                                                error!("ServerMessageTypeKinds::Error => {:?}", msg.info_error);
+                                                            }
                                                             _ => {
                                                                 todo!("need to do.");
                                                             }
                                                         }
+                                                        return iced::Task::done(
+                                                            UIMessage::PlayBase(
+                                                                PlayBaseMessage::ReadWebsocketMsg,
+                                                            ),
+                                                        );
                                                     }
                                                 }
-                                                break 'loop_else;
                                             }
                                         }
                                         Err(e) => {
@@ -340,6 +353,25 @@ impl Client {
                     self.process_threads.push(self.play_base_read_websocket());
                     return iced::task::Task::done(UIMessage::FetchThreadsStatus);
                 }
+                PlayBaseMessage::ThrowCard(card) => {
+                    let msg =
+                        serde_json::to_string(&pmj_gamemodes::base::shared::ClientMessageType {
+                            msg_type:
+                                pmj_gamemodes::base::shared::ClientMessageTypeKinds::GameAction,
+                            info_game_action: Some(
+                                pmj_gamemodes::base::shared::GameTurnTypes::ThrowCard,
+                            ),
+                            info_throw_card: Some(card),
+                            ..Default::default()
+                        })
+                        .unwrap();
+                    match write_reply(msg, self.ws.clone().unwrap()) {
+                        Ok(_) => {}
+                        Err(e) => {
+                            error!("回覆失敗：{:?}", e);
+                        }
+                    }
+                }
             },
         };
         return task::Task::none();
@@ -380,55 +412,13 @@ impl Client {
                                     UIMessage::Home(HomeMessage::InputServerIpChanged(content))
                                 })
                                 .size(Pixels::from(24))
-                                .style(|theme: &iced::theme::Theme, status: text_input::Status| {
-                                    let style = text_input::default(theme, status);
-                                    style
-                                        .border
-                                        .rounded(iced::border::Radius::new(Pixels::from(12)))
-                                        .width(Pixels::from(10));
-                                    style
-                                })
                                 .line_height(text::LineHeight::Relative(1.5)),
                         )
                         .spacing(15);
                     server_ip_input_bar = server_ip_input_bar.push(
                         button(text("連線").size(24))
                             .on_press(UIMessage::Home(HomeMessage::ConnectServer))
-                            .style(|theme: &iced::Theme, status: button::Status| {
-                                let ex_palette = theme.extended_palette();
-                                let mut style = button::Style::default();
-                                match status {
-                                    button::Status::Active => {
-                                        style =
-                                            style.with_background(ex_palette.primary.base.color);
-                                        style.text_color = ex_palette.primary.base.text;
-                                    }
-                                    button::Status::Disabled => {
-                                        style =
-                                            style.with_background(ex_palette.background.weak.color);
-                                        style.text_color = ex_palette.background.weak.text;
-                                    }
-                                    button::Status::Hovered => {
-                                        style =
-                                            style.with_background(ex_palette.primary.weak.color);
-                                        style.text_color = ex_palette.primary.weak.text;
-                                        style.border = Border::default()
-                                            .width(5)
-                                            .color(ex_palette.primary.strong.color)
-                                            .rounded(5);
-                                    }
-                                    button::Status::Pressed => {
-                                        style =
-                                            style.with_background(ex_palette.primary.strong.color);
-                                        style.text_color = ex_palette.primary.strong.text;
-                                        style.border = Border::default()
-                                            .width(5)
-                                            .color(ex_palette.secondary.strong.color)
-                                            .rounded(15);
-                                    }
-                                }
-                                style
-                            }),
+                            .style(rounded_primary_button),
                     );
                     layout_home = layout_home.push(server_ip_input_bar).spacing(35);
                 }
@@ -577,6 +567,16 @@ impl Client {
                     info_bar = info_bar.push(space().width(Length::from(14)));
                     info_bar =
                         info_bar.push(text(format!("玩家識別碼：{}", self.player_id.unwrap())));
+                    if self.status_play_base.is_start.unwrap_or(false) {
+                        info_bar = info_bar.push(space().width(10)).push(text(format!(
+                            "目前回合：{}",
+                            if self.status_play_base.current_turn.is_some() {
+                                format!("{}", self.status_play_base.current_turn.unwrap())
+                            } else {
+                                format!("{:?}", self.status_play_base.current_turn)
+                            }
+                        )));
+                    }
                     layout_play_base = layout_play_base.push(info_bar)
                 }
                 if !self.status_play_base.is_start.unwrap() {
@@ -591,26 +591,62 @@ impl Client {
                     );
                     layout_play_base = layout_play_base.push(status_bar);
                 } else {
-                    let mut ctr_bar = Row::new();
-                    let mut msg_bar = Column::new();
-                    let mut msg_num: u16 = 1;
-                    for msg in self.status_play_base.game_msgs.iter() {
-                        msg_bar = msg_bar
-                            .push(text(msg_num.to_string()).size(14).style(|t: &iced::Theme| {
-                                let p = t.extended_palette();
-                                text::Style {
-                                    color: Some(p.primary.base.text),
-                                }
-                            }))
-                            .push(space().width(15))
-                            .push(text(msg.clone()).size(14));
-                        msg_num += 1;
+                    {
+                        let mut ctr_bar = Row::new();
+                        let mut msg_bar = Column::new();
+                        let mut msg_num: u16 = 1;
+                        for msg in self.status_play_base.game_msgs.iter() {
+                            msg_bar = msg_bar
+                                .push(text(msg_num.to_string()).size(14).style(
+                                    |t: &iced::Theme| {
+                                        let p = t.extended_palette();
+                                        text::Style {
+                                            color: Some(p.primary.base.text),
+                                        }
+                                    },
+                                ))
+                                .push(space().width(15))
+                                .push(text(msg.clone()).size(14));
+                            msg_num += 1;
+                        }
+                        ctr_bar = ctr_bar.push(scrollable(msg_bar));
+                        let mut card_bar = Column::new();
+                        for card in self.status_play_base.hand_cards.iter() {
+                            card_bar = card_bar.push(space().height(5)).push(
+                                container(text(format!("{:?}", card)))
+                                    .style(container::bordered_box),
+                            );
+                        }
+                        ctr_bar = ctr_bar.push(scrollable(card_bar));
+                        layout_play_base = layout_play_base.push(ctr_bar)
                     }
-                    ctr_bar = ctr_bar.push(scrollable(msg_bar));
-                    layout = layout.push(ctr_bar)
+                    {
+                        let mut controller_bar = Column::new();
+                        match self.status_play_base.game_controller {
+                            PlayBaseController::NoCtrl => {}
+                            PlayBaseController::ThrowCard => {
+                                controller_bar = controller_bar.push(text("選擇一張你要丟的牌"));
+                                let mut card_bar = Row::new();
+                                for card in self.status_play_base.hand_cards.iter() {
+                                    card_bar = card_bar.push(space().width(7)).push(
+                                        button(
+                                            container(text(format!("{:?}", card)))
+                                                .style(container::bordered_box),
+                                        )
+                                        .on_press(
+                                            UIMessage::PlayBase(PlayBaseMessage::ThrowCard(
+                                                card.clone(),
+                                            )),
+                                        ),
+                                    );
+                                }
+                                controller_bar = controller_bar.push(card_bar);
+                            }
+                        }
+                        layout_play_base = layout_play_base.push(controller_bar);
+                    }
                 }
-                layout = layout.push(layout_play_base);
-                /* TODO: PlayScene */
+                layout = layout.push(scrollable(layout_play_base));
             }
         }
         return layout.into();
@@ -644,37 +680,7 @@ impl Client {
             "{}",
             key
         ))))
-        .style(|theme: &iced::theme::Theme, status: button::Status| {
-            let ex_palette = theme.extended_palette();
-            let mut style = button::Style::default();
-            match status {
-                button::Status::Active => {
-                    style = style.with_background(ex_palette.primary.base.color);
-                    style.text_color = ex_palette.primary.base.text;
-                }
-                button::Status::Disabled => {
-                    style = style.with_background(ex_palette.background.weak.color);
-                    style.text_color = ex_palette.primary.base.text;
-                }
-                button::Status::Hovered => {
-                    style = style.with_background(ex_palette.primary.weak.color);
-                    style.text_color = ex_palette.primary.base.text;
-                    style.border = Border::default()
-                        .width(5)
-                        .color(ex_palette.primary.strong.color)
-                        .rounded(5);
-                }
-                button::Status::Pressed => {
-                    style = style.with_background(ex_palette.primary.strong.color);
-                    style.text_color = ex_palette.primary.base.text;
-                    style.border = Border::default()
-                        .width(5)
-                        .color(ex_palette.secondary.strong.color)
-                        .rounded(15);
-                }
-            }
-            style
-        })
+        .style(rounded_primary_button)
     }
 
     pub fn title(&self) -> String {
@@ -688,16 +694,16 @@ impl Client {
     fn home_connect_server(&mut self) -> task::Task<UIMessage> {
         match connect(self.status_home.server_ip.clone()) {
             Ok((row_ws, resp)) => {
-                println!("resp={:?}", resp);
+                trace!("resp={:?}", resp);
                 let ws: sync::Arc<
                     sync::RwLock<WebSocket<tungstenite::stream::MaybeTlsStream<TcpStream>>>,
                 > = sync::Arc::new(sync::RwLock::new(row_ws));
                 self.ws = Some(ws.clone());
-                println!("Websocket 連線成功。");
+                debug!("Websocket 連線成功。");
                 return task::Task::done(UIMessage::Home(HomeMessage::SendFirstMsg));
             }
             Err(e) => {
-                eprintln!("{}", e);
+                warn!("ws connect error: {}", e);
                 self.status_home.msgs.push(e.to_string());
                 self.status_home.try_connecting_server = false;
             }
@@ -706,7 +712,7 @@ impl Client {
     }
     fn home_send_first_msg(&mut self) -> task::Task<UIMessage> {
         //TODO: log::info!("正在嘗試傳送初連接訊息");
-        println!("正在嘗試傳送初連接訊息");
+        trace!("正在嘗試傳送初連接訊息");
         let req_text = serde_json::to_string(&shared::ClientConnectRequestType {
             app_name: String::from("positive_mahjong"),
             client: String::from("pmj_client"),
@@ -716,17 +722,17 @@ impl Client {
             Some(ws) => match ws.try_write() {
                 Ok(mut guard) => match guard.send(Message::Text(req_text.into())) {
                     Ok(_) => {
-                        println!("已傳送初連結訊息，等待伺服器回應...");
+                        debug!("已傳送初連結訊息，等待伺服器回應...");
                         return task::Task::done(UIMessage::Home(HomeMessage::ReadFirstMsgResp));
                     }
                     Err(e) => {
-                        eprintln!("error: {}", e);
+                        warn!("error: {}", e);
                         self.status_home.try_connecting_server = false;
                         return task::Task::none();
                     }
                 },
                 Err(e) => {
-                    eprintln!("First msg: get guard error: {}", e);
+                    warn!("First msg: get guard error: {}", e);
                     return task::Task::done(UIMessage::Home(HomeMessage::SendFirstMsg));
                 }
             },
@@ -744,21 +750,21 @@ impl Client {
                 match ws.try_write() {
                     Ok(mut guard) => {
                         if !guard.can_read() {
-                            eprintln!("guard.can_read() => false!");
+                            warn!("guard.can_read() => false!");
                             return ThreadResult {
                                 is_error: true,
                                 result_read_first_msg_resp: None,
                                 ..Default::default()
                             };
                         } else {
-                            print!("Reading first-msg resp...");
+                            trace!("Reading first-msg resp...");
                             msg_result = guard.read();
-                            println!("Finish");
+                            debug!("First-msg read Finish");
                             break 'guard;
                         }
                     }
                     Err(e) => {
-                        eprintln!("process_thread: err: {}", e);
+                        warn!("process_thread: err: {}", e);
                         return ThreadResult {
                             is_error: true,
                             result_read_first_msg_resp: None,
@@ -774,7 +780,7 @@ impl Client {
                             let msg: shared::ServerConnectResponceType =
                                 serde_json::from_str(&text).unwrap();
                             if msg.player_id.is_some() {
-                                println!("成功取得玩家識別碼：{}", msg.player_id.unwrap());
+                                info!("成功取得玩家識別碼：{}", msg.player_id.unwrap());
                                 return ThreadResult {
                                     is_error: false,
                                     result_read_first_msg_resp: Some(
@@ -785,7 +791,7 @@ impl Client {
                                     ..Default::default()
                                 };
                             } else {
-                                eprintln!("error: msg.player_id is None");
+                                error!("error: msg.player_id is None");
                                 return ThreadResult {
                                     is_error: true,
                                     result_read_first_msg_resp: None,
@@ -804,7 +810,7 @@ impl Client {
                     }
                 }
                 Err(e) => {
-                    eprintln!("raw_msg => Err: {}", e);
+                    error!("raw_msg => Err: {}", e);
                     return ThreadResult {
                         is_error: true,
                         result_read_first_msg_resp: None,
@@ -833,7 +839,7 @@ impl Client {
                         };
                     }
                     _ => {
-                        eprintln!("err msg type!");
+                        error!("err msg type!");
                         ThreadResult {
                             is_error: true,
                             ..Default::default()
@@ -841,7 +847,7 @@ impl Client {
                     }
                 },
                 Err(e) => {
-                    eprintln!("err:{:?}", e);
+                    error!("err:{:?}", e);
                     return ThreadResult {
                         is_error: true,
                         ..Default::default()
@@ -849,7 +855,7 @@ impl Client {
                 }
             },
             Err(e) => {
-                eprintln!("err:{:?}", e);
+                error!("err:{:?}", e);
                 return ThreadResult {
                     is_error: true,
                     ..Default::default()
@@ -862,4 +868,88 @@ impl Client {
             process_type: ThreadProcessTypes::PlayBaseReadWebsocket,
         }
     }
+}
+
+fn transparent_button(t: &iced::Theme, s: button::Status) -> button::Style {
+    let p = t.extended_palette();
+    let mut style = button::Style::default();
+    style.border = Border {
+        color: p.background.strong.color,
+        width: 2.0,
+        radius: iced::border::radius(10),
+    };
+    style.text_color = p.primary.base.text;
+    match s {
+        button::Status::Active => {
+            style.background = None;
+        }
+        button::Status::Hovered => {
+            style.background = Some(iced::Background::Color(iced::Color::from_rgba(
+                1.0, 1.0, 1.0, 0.6,
+            )));
+        }
+        button::Status::Disabled => {
+            style.background = Some(iced::Background::Color(p.background.weak.color));
+        }
+        button::Status::Pressed => {
+            style.text_color = p.secondary.base.color;
+        }
+    }
+    style
+}
+
+fn rounded_primary_button(t: &iced::Theme, s: button::Status) -> button::Style {
+    let p = t.extended_palette();
+    let mut style = button::Style::default();
+    style.background = Some(iced::Background::Color(p.primary.base.color));
+    style.text_color = p.primary.base.text;
+    let mut border = iced::Border::default().rounded(14).width(2);
+    match s {
+        button::Status::Active => {
+            border = border.color(iced::Color::TRANSPARENT);
+        }
+        button::Status::Disabled => {
+            style.background = Some(iced::Background::Color(p.background.weak.color));
+        }
+        button::Status::Hovered => {
+            border = border.color(p.primary.strong.color);
+        }
+        button::Status::Pressed => {
+            style.text_color = p.secondary.base.color;
+        }
+    }
+    style.border = border;
+    style
+}
+
+fn write_reply(
+    text: String,
+    websocket: sync::Arc<sync::RwLock<WebSocket<tungstenite::stream::MaybeTlsStream<TcpStream>>>>,
+) -> Result<(), tungstenite::error::Error> {
+    trace!(type= "enter_func", arg_text = ?text);
+    let reply: Message = Message::Text(text.into());
+    let write_result: tungstenite::Result<()>;
+    loop {
+        match websocket.try_write() {
+            Ok(mut guard) => {
+                write_result = guard.write(reply.clone());
+                let _ = guard.flush();
+                drop(guard);
+                break;
+            }
+            Err(e) => {
+                warn!("ws.try_write() Err: {}", e);
+            }
+        };
+        thread::sleep(time::Duration::from_millis(500));
+    }
+    match write_result {
+        Ok(_) => {
+            info!("成功回覆。")
+        }
+        Err(_) => {
+            warn!("回覆失敗！")
+        }
+    }
+    write_result
 }

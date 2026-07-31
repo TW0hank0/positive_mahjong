@@ -17,53 +17,61 @@ use std::{env, fs};
 
 use iced;
 use positive_tool_rs;
-use tracing::{info, warn};
+use tracing::{debug, error, info, warn};
 
 use pmj_shared;
 
 mod base;
 
-fn main() -> iced::Result {
+fn main() {
+    if !fs::exists(
+        env::current_exe()
+            .unwrap()
+            .parent()
+            .unwrap()
+            .join("pmj_logs"),
+    )
+    .unwrap_or(false)
     {
-        if !fs::exists(
+        fs::create_dir(
             env::current_exe()
                 .unwrap()
                 .parent()
                 .unwrap()
                 .join("pmj_logs"),
         )
-        .unwrap_or(false)
-        {
-            fs::create_dir(
-                env::current_exe()
-                    .unwrap()
-                    .parent()
-                    .unwrap()
-                    .join("pmj_logs"),
-            )
-            .ok();
+        .ok();
+    }
+    let _guard = positive_tool_rs::pt::init_tracing(
+        env::current_exe()
+            .unwrap()
+            .parent()
+            .unwrap()
+            .join("pmj_logs"),
+        Some(String::from("pmj_server")),
+    );
+    let config = pmj_shared::shared::read_server_config();
+    let iced_result: iced::Result;
+    match config.gamemode {
+        pmj_shared::shared::GameModes::Base => {
+            info!("config.gamemode = GameModes::Base");
+            iced_result = base::main();
         }
-        let _guard = positive_tool_rs::pt::init_tracing(
-            env::current_exe()
-                .unwrap()
-                .parent()
-                .unwrap()
-                .join("pmj_logs"),
-            Some(String::from("pmj_server")),
-        );
-        let config = pmj_shared::shared::read_server_config();
-        match config.gamemode {
-            pmj_shared::shared::GameModes::Base => {
-                info!("config.gamemode = GameModes::Base");
-                base::main()?;
-            }
-            pmj_shared::shared::GameModes::V1Simple => {
-                warn!("還未支援！");
-            }
-            pmj_shared::shared::GameModes::V2Better => {
-                warn!("還未支援！");
-            }
+        pmj_shared::shared::GameModes::V1Simple => {
+            warn!("還未支援！");
+            std::process::exit(1);
+        }
+        pmj_shared::shared::GameModes::V2Better => {
+            warn!("還未支援！");
+            std::process::exit(1);
         }
     }
-    return Ok(());
+    match iced_result {
+        Ok(_) => {
+            debug!("iced::Result::Ok");
+        }
+        Err(e) => {
+            error!("iced::Result::Err => {}", e);
+        }
+    }
 }

@@ -173,36 +173,11 @@ impl ServerGUI {
                             }),
                     )
                     .push(space().width(10))
-                    .push(button("複製").on_press(GUIMessages::CopyIp).style(
-                        |t: &iced::theme::Theme, s: button::Status| {
-                            let p = t.extended_palette();
-                            let mut style = button::Style::default();
-                            style.border = Border {
-                                color: p.background.strong.color,
-                                width: 2.0,
-                                radius: iced::border::radius(10),
-                            };
-                            style.text_color = p.primary.base.text;
-                            match s {
-                                button::Status::Active => {
-                                    style.background = None;
-                                }
-                                button::Status::Hovered => {
-                                    style.background = Some(iced::Background::Color(
-                                        iced::Color::from_rgba(1.0, 1.0, 1.0, 0.6),
-                                    ));
-                                }
-                                button::Status::Disabled => {
-                                    style.text_color = p.primary.weak.text;
-                                }
-                                button::Status::Pressed => {
-                                    style.background =
-                                        Some(iced::Background::Color(p.primary.weak.color));
-                                }
-                            }
-                            style
-                        },
-                    )),
+                    .push(
+                        button("複製")
+                            .on_press(GUIMessages::CopyIp)
+                            .style(transparent_button),
+                    ),
             );
             let ip_bar_container = container(ip_bar_layout).style(|theme: &iced::Theme| {
                 let ex_palette = theme.extended_palette();
@@ -215,35 +190,9 @@ impl ServerGUI {
             layout = layout.push(ip_bar_container).spacing(80);
         }
         if !self.is_start {
-            let start_button = widget::button(text("開始").size(30))
+            let start_button = button(text("開始").size(30))
                 .on_press(GUIMessages::StartGame)
-                .style(|theme: &Theme, status: button::Status| {
-                    let ex_palette = theme.extended_palette();
-                    let mut style = button::Style::default();
-                    match status {
-                        button::Status::Active => {
-                            style = style.with_background(ex_palette.primary.base.color);
-                            style.text_color = ex_palette.primary.base.text;
-                        }
-                        button::Status::Disabled => {
-                            style = style.with_background(ex_palette.background.weak.color);
-                            style.text_color = ex_palette.background.weak.text;
-                        }
-                        button::Status::Hovered => {
-                            style = style.with_background(ex_palette.primary.weak.color);
-                            style.text_color = ex_palette.primary.weak.text;
-                        }
-                        button::Status::Pressed => {
-                            style = style.with_background(ex_palette.primary.strong.color);
-                            style.text_color = ex_palette.primary.strong.text;
-                        }
-                    }
-                    style.border = Border::default()
-                        .width(5)
-                        .color(ex_palette.primary.strong.color)
-                        .rounded(10);
-                    style
-                });
+                .style(rounded_primary_button);
             layout = layout.push(start_button);
         } else {
             layout = layout.push(text("遊戲已開始！").size(30).style(|theme: &iced::Theme| {
@@ -255,8 +204,11 @@ impl ServerGUI {
         }
         layout = layout.spacing(50);
         //
-        layout =
-            layout.push(button(text("重新整理").size(30)).on_press(GUIMessages::FetchPlayerInfo));
+        layout = layout.push(
+            button(text("重新整理").size(30))
+                .on_press(GUIMessages::FetchPlayerInfo)
+                .style(rounded_primary_button),
+        );
         let mut player_info = Column::new();
         if self.players.len() > 0 {
             for player in self.players.iter() {
@@ -352,4 +304,56 @@ impl ServerGUI {
             }
         })
     }
+}
+
+fn transparent_button(t: &iced::Theme, s: button::Status) -> button::Style {
+    let p = t.extended_palette();
+    let mut style = button::Style::default();
+    style.border = Border {
+        color: p.background.strong.color,
+        width: 2.0,
+        radius: iced::border::radius(10),
+    };
+    style.text_color = p.primary.base.text;
+    match s {
+        button::Status::Active => {
+            style.background = None;
+        }
+        button::Status::Hovered => {
+            style.background = Some(iced::Background::Color(iced::Color::from_rgba(
+                1.0, 1.0, 1.0, 0.6,
+            )));
+        }
+        button::Status::Disabled => {
+            style.background = Some(iced::Background::Color(p.background.weak.color));
+        }
+        button::Status::Pressed => {
+            style.text_color = p.secondary.base.color;
+        }
+    }
+    style
+}
+
+fn rounded_primary_button(t: &iced::Theme, s: button::Status) -> button::Style {
+    let p = t.extended_palette();
+    let mut style = button::Style::default();
+    style.background = Some(iced::Background::Color(p.primary.base.color));
+    style.text_color = p.primary.base.text;
+    let mut border = iced::Border::default().rounded(14).width(2);
+    match s {
+        button::Status::Active => {
+            border = border.color(iced::Color::TRANSPARENT);
+        }
+        button::Status::Disabled => {
+            style.background = Some(iced::Background::Color(p.background.weak.color));
+        }
+        button::Status::Hovered => {
+            border = border.color(p.primary.strong.color);
+        }
+        button::Status::Pressed => {
+            style.text_color = p.secondary.base.color;
+        }
+    }
+    style.border = border;
+    style
 }
