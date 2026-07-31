@@ -25,6 +25,7 @@ def main():
         [
             "cargo",
             "build",
+            "+nightly",
             "--package=pmj_client_dektop",
             "--release",
             "--locked",

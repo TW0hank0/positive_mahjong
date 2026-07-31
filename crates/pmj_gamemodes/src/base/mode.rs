@@ -114,16 +114,17 @@ fn handle_client(
                             Err(e) => {
                                 warn!("讀取錯誤：{}", e);
                                 guard.get_mut().set_nonblocking(false).ok();
+                                drop(guard);
+                                thread::sleep(std::time::Duration::from_millis(2569)); // 2sec
                             }
                         }
                     }
-                    drop(guard);
                 }
                 Err(e) => {
                     warn!("ws.try_write() Err: {}", e);
+                    thread::sleep(std::time::Duration::from_secs(1)); // 2sec
                 }
             }
-            thread::sleep(std::time::Duration::from_millis(1024)); // 1sec
         }
         match message {
             Message::Text(text) => {
@@ -168,7 +169,10 @@ fn handle_client(
                             let resp_msg = serde_json::to_string(&resp).unwrap();
                             let _wrist_result = write_reply(resp_msg, ws.clone());
                             info!("已回復客戶端初訊息。");
-                            thread::sleep(std::time::Duration::from_millis(10));
+                            loop {
+                                trace!("因為已連結並回覆初訊息，所以停止此線程。");
+                                thread::sleep(time::Duration::from_secs(10));
+                            }
                         }
                     }
                     Err(e) => {
@@ -535,20 +539,18 @@ impl PositiveMahjong {
                         .get_mut((current_turn_player_id - 1) as usize)
                         .unwrap();
                     let player_ws = player.player_ws.clone();
-                    let ws_msg: Message;
+                    let ws_msg: tungstenite::Message;
                     'guard_read: loop {
                         match player_ws.try_write() {
-                            Ok(mut guard) => {
-                                match guard.read() {
-                                    Ok(i) => {
-                                        ws_msg = i;
-                                    }
-                                    Err(e) => {
-                                        warn!("guard.read(): {}", e);
-                                    }
+                            Ok(mut guard) => match guard.read() {
+                                Ok(i) => {
+                                    ws_msg = i;
+                                    break 'guard_read;
                                 }
-                                break 'guard_read;
-                            }
+                                Err(e) => {
+                                    warn!("guard.read(): {}", e);
+                                }
+                            },
                             Err(e) => {
                                 error!("err: {}", e);
                             }

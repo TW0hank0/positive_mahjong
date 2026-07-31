@@ -39,7 +39,7 @@ jobs:
         run: cargo +nightly check --workspace
 
       - name: Run release check
-        run: cargo check --release --workspace
+        run: cargo +nightly check --release --workspace
 
       - name: Run License Check
         run: |

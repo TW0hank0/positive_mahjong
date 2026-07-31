@@ -10,6 +10,7 @@
             "initialization_options": {
                 "cargo": {
                     "features": [],
+                    "extraArgs": [],
                 },
             },
         },

@@ -18,6 +18,7 @@ use std::{env, fs};
 use iced;
 use image;
 use positive_tool_rs;
+use tracing::{debug, error, info, trace, warn};
 
 mod circular;
 mod client;
@@ -75,7 +76,7 @@ fn main() {
     app_settings.default_text_size = iced::Pixels::from(22);
     app_settings.default_font = FONT_NOTO_SANS_REG;
     //
-    let _ = iced::application(
+    let iced_result = iced::application(
         client::Client::new,
         client::Client::update,
         client::Client::view,
@@ -86,4 +87,12 @@ fn main() {
     .title(client::Client::title)
     .theme(client::Client::theme)
     .run();
+    match iced_result {
+        Ok(_) => {
+            debug!("iced::Result::Ok");
+        }
+        Err(e) => {
+            error!("iced::Result::Err => {}", e);
+        }
+    }
 }
