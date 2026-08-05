@@ -15,12 +15,13 @@
 
 //! 通用資料
 
-use std::fmt::Display;
+use std::{env, fmt::Display, fs};
 
-use serde_json;
-use std::fs;
-
+use positive_tool_rs;
 use serde;
+use serde_json;
+use tracing::{debug, error, info, trace, warn};
+use tracing_appender;
 
 pub const PROJECT_NAME: &str = "positive_mahjong";
 pub const PROJECT_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -322,4 +323,15 @@ pub fn read_server_config() -> PMJServerConfig {
         .ok();
         default_config
     }
+}
+
+pub fn init_tracing_fmt(member_name: String) -> tracing_appender::non_blocking::WorkerGuard {
+    let log_dir_path = dirs::data_local_dir()
+        .unwrap_or(env::current_dir().unwrap())
+        .join("positive_mahjong")
+        .join(member_name.clone());
+    if !fs::exists(&log_dir_path).unwrap_or(false) {
+        fs::create_dir_all(&log_dir_path).ok();
+    }
+    positive_tool_rs::pt::init_tracing(log_dir_path, Some(member_name))
 }

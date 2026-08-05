@@ -252,7 +252,10 @@ impl Client {
                                                                 self.status_play_base.game_controller=PlayBaseController::ThrowCard;
                                                             }
                                                             pmj_gamemodes::base::shared::ServerMessageTypeKinds::HandCardChange => {
-                                                                self.status_play_base.hand_cards = msg.info_hand_card_change.unwrap();
+                                                                let handcard = msg.info_hand_card_change.unwrap();
+                                                                self.status_play_base.hand_cards = handcard.clone();
+                                                                debug!("手牌變動：{:#?}", handcard.clone());
+                                                                self.status_play_base.game_msgs.push(format!("手牌變動：{:?}", handcard));
                                                             }
                                                             pmj_gamemodes::base::shared::ServerMessageTypeKinds::ChangedTurn => {
                                                                 self.status_play_base.current_turn = msg.info_change_turn;
@@ -354,6 +357,7 @@ impl Client {
                     return iced::task::Task::done(UIMessage::FetchThreadsStatus);
                 }
                 PlayBaseMessage::ThrowCard(card) => {
+                    // TODO
                     let msg =
                         serde_json::to_string(&pmj_gamemodes::base::shared::ClientMessageType {
                             msg_type:
@@ -411,8 +415,15 @@ impl Client {
                                 .on_input(|content| {
                                     UIMessage::Home(HomeMessage::InputServerIpChanged(content))
                                 })
+                                .on_submit(UIMessage::Home(HomeMessage::ConnectServer))
                                 .size(Pixels::from(24))
-                                .line_height(text::LineHeight::Relative(1.5)),
+                                .line_height(text::LineHeight::Relative(1.5))
+                                .style(|t: &iced::Theme, s: text_input::Status| {
+                                    let p = t.extended_palette();
+                                    let mut style = text_input::default(t, s);
+                                    style.border.radius = iced::border::radius(6);
+                                    style
+                                }),
                         )
                         .spacing(15);
                     server_ip_input_bar = server_ip_input_bar.push(
@@ -593,7 +604,7 @@ impl Client {
                 } else {
                     {
                         let mut ctr_bar = Row::new();
-                        let mut msg_bar = Column::new();
+                        let mut msg_bar = Column::new().width(Length::FillPortion(2));
                         let mut msg_num: u16 = 1;
                         for msg in self.status_play_base.game_msgs.iter() {
                             msg_bar = msg_bar
@@ -609,44 +620,104 @@ impl Client {
                                 .push(text(msg.clone()).size(14));
                             msg_num += 1;
                         }
-                        ctr_bar = ctr_bar.push(scrollable(msg_bar));
-                        let mut card_bar = Column::new();
+                        ctr_bar = ctr_bar.push(msg_bar);
+                        let mut card_bar = Column::new().width(Length::FillPortion(2));
                         for card in self.status_play_base.hand_cards.iter() {
                             card_bar = card_bar.push(space().height(5)).push(
-                                container(text(format!("{:?}", card)))
+                                container(text(format!("{:#?}", card)).size(18))
                                     .style(container::bordered_box),
                             );
                         }
-                        ctr_bar = ctr_bar.push(scrollable(card_bar));
-                        layout_play_base = layout_play_base.push(ctr_bar)
+                        ctr_bar = ctr_bar.push(card_bar);
+                        layout_play_base = layout_play_base
+                            .push(scrollable(ctr_bar).height(Length::FillPortion(2)));
                     }
+                    // 玩家操作
                     {
                         let mut controller_bar = Column::new();
                         match self.status_play_base.game_controller {
                             PlayBaseController::NoCtrl => {}
                             PlayBaseController::ThrowCard => {
                                 controller_bar = controller_bar.push(text("選擇一張你要丟的牌"));
-                                let mut card_bar = Row::new();
+                                let mut card_bar_elements: Vec<iced::Element<'_, UIMessage>> =
+                                    Vec::new();
                                 for card in self.status_play_base.hand_cards.iter() {
-                                    card_bar = card_bar.push(space().width(7)).push(
-                                        button(
-                                            container(text(format!("{:?}", card)))
-                                                .style(container::bordered_box),
-                                        )
-                                        .on_press(
-                                            UIMessage::PlayBase(PlayBaseMessage::ThrowCard(
-                                                card.clone(),
-                                            )),
-                                        ),
+                                    card_bar_elements.push(
+                                        button(text(format!("{:#?}", card)).size(12).width(200))
+                                            .on_press(UIMessage::PlayBase(
+                                                PlayBaseMessage::ThrowCard(card.clone()),
+                                            ))
+                                            .style(|t: &iced::Theme, s: button::Status| {
+                                                let p = t.extended_palette();
+                                                let mut style = button::Style::default();
+                                                style.border.width = 1.2;
+                                                style.border.radius = iced::border::radius(10);
+                                                style.text_color = p.background.base.text;
+                                                match s {
+                                                    button::Status::Active => {
+                                                        style.border.color =
+                                                            p.background.strong.color;
+                                                        style.background = None;
+                                                    }
+                                                    button::Status::Disabled => {
+                                                        style.background =
+                                                            Some(iced::Background::Color(
+                                                                p.background.weak.color,
+                                                            ));
+                                                    }
+                                                    button::Status::Hovered => {
+                                                        style.border.color = p.primary.weak.color;
+                                                        style.border.width = 1.5;
+                                                    }
+                                                    button::Status::Pressed => {
+                                                        style.border.color = p.primary.strong.color;
+                                                        style.border.width = 0.7;
+                                                        style.border.radius =
+                                                            iced::border::radius(6);
+                                                    }
+                                                }
+                                                style
+                                            })
+                                            .into(),
                                     );
                                 }
-                                controller_bar = controller_bar.push(card_bar);
+                                let mut card_bar_y = Column::new().spacing(3).padding(5);
+                                let mut card_bar_x = Row::new().spacing(3).padding(5);
+                                let mut card_bar_count = 1;
+                                for e in card_bar_elements {
+                                    card_bar_x = card_bar_x.push(e);
+                                    card_bar_count += 1;
+                                    if card_bar_count > 6 {
+                                        card_bar_y = card_bar_y.push(card_bar_x);
+                                        card_bar_x = Row::new().spacing(3).padding(5);
+                                        card_bar_count = 1;
+                                    }
+                                }
+                                card_bar_y = card_bar_y.push(card_bar_x);
+                                controller_bar = controller_bar.push(card_bar_y);
                             }
                         }
-                        layout_play_base = layout_play_base.push(controller_bar);
+                        layout_play_base = layout_play_base.push(
+                            scrollable(
+                                container(controller_bar)
+                                    .style(|t: &iced::Theme| {
+                                        let p = t.extended_palette();
+                                        let mut style = container::Style::default();
+                                        style.border = iced::Border {
+                                            color: p.primary.base.color,
+                                            width: 1.0,
+                                            radius: iced::border::Radius::new(4),
+                                        };
+                                        style
+                                    })
+                                    .height(Length::FillPortion(3)),
+                            )
+                            .height(Length::FillPortion(3))
+                            .width(Length::Fill),
+                        );
                     }
                 }
-                layout = layout.push(scrollable(layout_play_base));
+                layout = layout.push(layout_play_base);
             }
         }
         return layout.into();
@@ -764,7 +835,7 @@ impl Client {
                         }
                     }
                     Err(e) => {
-                        warn!("process_thread: err: {}", e);
+                        warn!("process_thread: {}", e);
                         return ThreadResult {
                             is_error: true,
                             result_read_first_msg_resp: None,

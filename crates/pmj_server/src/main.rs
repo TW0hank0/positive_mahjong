@@ -13,41 +13,13 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-use std::{env, fs};
-
 use local_ip_address;
-use positive_tool_rs;
 
 use pmj_gamemodes::{self, base};
 use pmj_shared::shared;
 
 pub fn main() {
-    if !fs::exists(
-        env::current_exe()
-            .unwrap()
-            .parent()
-            .unwrap()
-            .join("pmj_logs"),
-    )
-    .unwrap_or(false)
-    {
-        fs::create_dir(
-            env::current_exe()
-                .unwrap()
-                .parent()
-                .unwrap()
-                .join("pmj_logs"),
-        )
-        .ok();
-    }
-    let _guard = positive_tool_rs::pt::init_tracing(
-        env::current_exe()
-            .unwrap()
-            .parent()
-            .unwrap()
-            .join("pmj_logs"),
-        Some(String::from("pmj_server")),
-    );
+    let _guard = shared::init_tracing_fmt(String::from("pmj_server"));
     //
     println!("ipv4: {}", local_ip_address::local_ip().unwrap());
     println!("ipv6: {}", local_ip_address::local_ipv6().unwrap());

@@ -42,9 +42,9 @@ linker = "lld-link"
 
 [target.x86_64-unknown-linux-gnu]
 linker = "gcc"
-rustflags = ["-C", "-link-arg=-fuse-ld=mold"]
+rustflags = ["-C", "link-arg=-fuse-ld=mold"]
 
-# GUI is not able in musl env.
+# GUI is NOT able in musl env!
 [target.x86_64-unknown-linux--musl]
 linker = "musl-gcc"
-rustflags = ["-C", "-link-arg=-fuse-ld=mold"]
+rustflags = ["-C", "link-arg=-fuse-ld=mold"]

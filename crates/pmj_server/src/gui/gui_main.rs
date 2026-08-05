@@ -13,10 +13,7 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-use std::{env, fs};
-
 use iced;
-use positive_tool_rs;
 use tracing::{debug, error, info, warn};
 
 use pmj_shared;
@@ -24,32 +21,7 @@ use pmj_shared;
 mod base;
 
 fn main() {
-    if !fs::exists(
-        env::current_exe()
-            .unwrap()
-            .parent()
-            .unwrap()
-            .join("pmj_logs"),
-    )
-    .unwrap_or(false)
-    {
-        fs::create_dir(
-            env::current_exe()
-                .unwrap()
-                .parent()
-                .unwrap()
-                .join("pmj_logs"),
-        )
-        .ok();
-    }
-    let _guard = positive_tool_rs::pt::init_tracing(
-        env::current_exe()
-            .unwrap()
-            .parent()
-            .unwrap()
-            .join("pmj_logs"),
-        Some(String::from("pmj_server")),
-    );
+    let _guard = pmj_shared::shared::init_tracing_fmt(String::from("pmj_server_gui"));
     let config = pmj_shared::shared::read_server_config();
     let iced_result: iced::Result;
     match config.gamemode {

@@ -195,7 +195,7 @@ impl ServerGUI {
                 .style(rounded_primary_button);
             layout = layout.push(start_button);
         } else {
-            layout = layout.push(text("遊戲已開始！").size(30).style(|theme: &iced::Theme| {
+            layout = layout.push(text("遊戲已開始").size(30).style(|theme: &iced::Theme| {
                 let ex_palette = theme.extended_palette();
                 let mut style = text::Style::default();
                 style.color = Some(ex_palette.background.strong.text);

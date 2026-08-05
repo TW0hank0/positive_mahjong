@@ -36,7 +36,7 @@ fn write_reply(
     text: String,
     websocket: sync::Arc<sync::RwLock<WebSocket<TcpStream>>>,
 ) -> Result<(), tungstenite::error::Error> {
-    trace!(type= "enter_func", arg_text = ?text);
+    trace!("enter_func {{ text: {} }}", text);
     debug!("準備回覆客戶端...");
     let reply: Message = Message::Text(text.into());
     let write_result: tungstenite::Result<()>;
@@ -170,8 +170,9 @@ fn handle_client(
                             let _wrist_result = write_reply(resp_msg, ws.clone());
                             info!("已回復客戶端初訊息。");
                             loop {
-                                trace!("因為已連結並回覆初訊息，所以停止此線程。");
-                                thread::sleep(time::Duration::from_secs(10));
+                                trace!("因為連接並回覆初訊息，所以在5秒後停止此線程。");
+                                thread::sleep(time::Duration::from_secs(5));
+                                break 'connection;
                             }
                         }
                     }
@@ -202,10 +203,6 @@ fn handle_client(
         }
         thread::sleep(std::time::Duration::from_millis(1536)); //1.5sec
     }
-
-    // 關閉連線
-    let _close_result: Result<(), tungstenite::error::Error> = ws.write().unwrap().close(None);
-    debug!("連線已終止");
 }
 
 pub fn main_base(gui_mode: bool) -> Option<Arc<RwLock<crate::base::mode::PositiveMahjong>>> {
@@ -232,8 +229,33 @@ pub fn main_base(gui_mode: bool) -> Option<Arc<RwLock<crate::base::mode::Positiv
     if gui_mode {
         Some(backend)
     } else {
-        for server in servers {
-            let _thread_result = server.join();
+        loop {
+            info!("按 enter 開始遊戲");
+            std::io::stdin().read_line(&mut String::new()).ok();
+            break;
+        }
+        loop {
+            match backend.try_write() {
+                Ok(mut guard) => {
+                    guard.start_game();
+                    break;
+                }
+                Err(e) => {
+                    warn!("backend.try_write() => {:?}", e);
+                    thread::sleep(time::Duration::from_millis(500));
+                }
+            }
+        }
+        'join_servers: loop {
+            match servers.pop() {
+                Some(server) => {
+                    let thread_result = server.join();
+                    debug!("thread_result: {:?}", thread_result);
+                }
+                None => {
+                    break 'join_servers;
+                }
+            }
         }
         None
     }
@@ -530,7 +552,6 @@ impl PositiveMahjong {
                             }
                         }
                     }
-
                     current_action = GameTurnTypes::ThrowCard;
                 }
                 GameTurnTypes::ThrowCard => {
@@ -542,15 +563,25 @@ impl PositiveMahjong {
                     let ws_msg: tungstenite::Message;
                     'guard_read: loop {
                         match player_ws.try_write() {
-                            Ok(mut guard) => match guard.read() {
-                                Ok(i) => {
-                                    ws_msg = i;
-                                    break 'guard_read;
+                            Ok(mut guard) => {
+                                match guard.get_mut().set_nonblocking(false) {
+                                    Ok(_) => {}
+                                    Err(e) => {
+                                        warn!("guard.get_mut().set_nonblocking() -> {:?}", e);
+                                    }
                                 }
-                                Err(e) => {
-                                    warn!("guard.read(): {}", e);
+                                match guard.read() {
+                                    Ok(i) => {
+                                        ws_msg = i;
+                                        break 'guard_read;
+                                    }
+                                    Err(e) => {
+                                        warn!("guard.read(): {}", e);
+                                        drop(guard);
+                                        thread::sleep(time::Duration::from_millis(500));
+                                    }
                                 }
-                            },
+                            }
                             Err(e) => {
                                 error!("err: {}", e);
                             }
