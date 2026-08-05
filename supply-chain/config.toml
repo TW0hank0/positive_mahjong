@@ -303,10 +303,6 @@ criteria = "safe-to-deploy"
 version = "0.4.0"
 criteria = "safe-to-deploy"
 
-[[exemptions.core_maths]]
-version = "0.1.1"
-criteria = "safe-to-deploy"
-
 [[exemptions.cosmic-text]]
 version = "0.15.0"
 criteria = "safe-to-deploy"
@@ -401,10 +397,6 @@ criteria = "safe-to-deploy"
 
 [[exemptions.dlib]]
 version = "0.5.2"
-criteria = "safe-to-deploy"
-
-[[exemptions.document-features]]
-version = "0.2.12"
 criteria = "safe-to-deploy"
 
 [[exemptions.downcast-rs]]
@@ -1859,20 +1851,12 @@ criteria = "safe-to-deploy"
 version = "27.0.1"
 criteria = "safe-to-deploy"
 
-[[exemptions.wgpu-core]]
-version = "27.0.3"
-criteria = "safe-to-deploy"
-
 [[exemptions.wgpu-core-deps-emscripten]]
 version = "27.0.0"
 criteria = "safe-to-deploy"
 
 [[exemptions.wgpu-hal]]
 version = "27.0.4"
-criteria = "safe-to-deploy"
-
-[[exemptions.wgpu-types]]
-version = "27.0.1"
 criteria = "safe-to-deploy"
 
 [[exemptions.winapi-util]]
@@ -1921,10 +1905,6 @@ criteria = "safe-to-deploy"
 
 [[exemptions.windows-interface]]
 version = "0.59.3"
-criteria = "safe-to-deploy"
-
-[[exemptions.windows-link]]
-version = "0.2.1"
 criteria = "safe-to-deploy"
 
 [[exemptions.windows-numerics]]

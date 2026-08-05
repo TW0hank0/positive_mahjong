@@ -208,7 +208,7 @@ jobs:
   #         name: pmj_client_${{ steps.get_version.outputs.version }}.apk
   #         path: target/release/apk/pmj_client_${{ steps.get_version.outputs.version }}.apk
 
-  release:
+  release-by-tag:
     # needs:
     #   - build_computer
     #   - build_android
@@ -251,4 +251,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          uv run scripts/ci/release.py
+          uv run scripts/ci/release_by_tag.py

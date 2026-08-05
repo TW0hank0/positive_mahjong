@@ -24,8 +24,8 @@ def main():
     subprocess.run(
         [
             "cargo",
-            "build",
             "+nightly",
+            "build",
             "--package=pmj_client_dektop",
             "--release",
             "--locked",
