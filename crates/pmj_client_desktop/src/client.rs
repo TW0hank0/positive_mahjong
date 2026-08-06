@@ -35,11 +35,6 @@ pub const FONT_NOTO_SANS_REG: iced::font::Font = iced::font::Font::with_name("No
 pub const MATERIAL_SYMBOLS_OUTLINED: iced::font::Font =
     iced::font::Font::with_name("Material Symbols Outlined");
 
-/* fn font_init() {
-    let _ = runtime::font::load(FONT_NOTO_SANS_REG_BYTES);
-    let _ = runtime::font::load(FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES);
-} */
-
 #[derive(Debug)]
 pub struct Client {
     current_scene: ClientScenes,
@@ -419,7 +414,7 @@ impl Client {
                                 .size(Pixels::from(24))
                                 .line_height(text::LineHeight::Relative(1.5))
                                 .style(|t: &iced::Theme, s: text_input::Status| {
-                                    let p = t.extended_palette();
+                                    // let p = t.extended_palette();
                                     let mut style = text_input::default(t, s);
                                     style.border.radius = iced::border::radius(6);
                                     style
@@ -623,10 +618,40 @@ impl Client {
                         ctr_bar = ctr_bar.push(msg_bar);
                         let mut card_bar = Column::new().width(Length::FillPortion(2));
                         for card in self.status_play_base.hand_cards.iter() {
-                            card_bar = card_bar.push(space().height(5)).push(
-                                container(text(format!("{:#?}", card)).size(18))
-                                    .style(container::bordered_box),
-                            );
+                            card_bar = card_bar
+                                .push(space().height(5))
+                                .push(container(Row::new().width(Length::Fill).height(80)
+                                    .push(
+                                        text(format!("{}", match card.card_type {
+                                            pmj_gamemodes::base::shared::PMJCardType::Dots => { card.info_dots.clone().unwrap().to_string()}
+                                            pmj_gamemodes::base::shared::PMJCardType::Flower => {card.info_flower.clone().unwrap().to_string()}
+                                            pmj_gamemodes::base::shared::PMJCardType::Line => { card.info_line.clone().unwrap().to_string() }
+                                            pmj_gamemodes::base::shared::PMJCardType::TenThousand => { card.info_ten_thousand.clone().unwrap().to_string()}
+                                            pmj_gamemodes::base::shared::PMJCardType::Words => { card.info_words.clone().unwrap().to_string()}
+                                        })).size(24),
+                                    )
+                                    .push(space().width(5))
+                                    .push(
+                                        text(format!("{}", match card.card_type {
+                                            pmj_gamemodes::base::shared::PMJCardType::Dots => {"筒"}
+                                            pmj_gamemodes::base::shared::PMJCardType::Flower => {"花"}
+                                            pmj_gamemodes::base::shared::PMJCardType::Line => {"條"}
+                                            pmj_gamemodes::base::shared::PMJCardType::TenThousand => {"萬"}
+                                            pmj_gamemodes::base::shared::PMJCardType::Words => {"字"}
+                                        })).size(18)
+                                    )
+                                    .push(
+                                        text(format!("第 {} 張", card.card_id.clone())).width(Length::Fill).size(15).align_x(alignment::Horizontal::Right)
+                                    )).style(|t:&iced::Theme| {
+                                        let p = t.extended_palette();
+                                        let mut style = container::Style::default();
+                                        style.border.radius = iced::border::Radius::new(10);
+                                        style.border.width = 1.2;
+                                        style.border.color = p.background.weak.color;
+                                        style.text_color = Some(p.background.base.text);
+                                        style.background = Some(iced::Background::Color(iced::Color::TRANSPARENT));
+                                        style
+                                    }));
                         }
                         ctr_bar = ctr_bar.push(card_bar);
                         layout_play_base = layout_play_base
@@ -643,42 +668,64 @@ impl Client {
                                     Vec::new();
                                 for card in self.status_play_base.hand_cards.iter() {
                                     card_bar_elements.push(
-                                        button(text(format!("{:#?}", card)).size(12).width(200))
-                                            .on_press(UIMessage::PlayBase(
-                                                PlayBaseMessage::ThrowCard(card.clone()),
-                                            ))
-                                            .style(|t: &iced::Theme, s: button::Status| {
-                                                let p = t.extended_palette();
-                                                let mut style = button::Style::default();
-                                                style.border.width = 1.2;
-                                                style.border.radius = iced::border::radius(10);
-                                                style.text_color = p.background.base.text;
-                                                match s {
-                                                    button::Status::Active => {
-                                                        style.border.color =
-                                                            p.background.strong.color;
-                                                        style.background = None;
-                                                    }
-                                                    button::Status::Disabled => {
-                                                        style.background =
-                                                            Some(iced::Background::Color(
-                                                                p.background.weak.color,
-                                                            ));
-                                                    }
-                                                    button::Status::Hovered => {
-                                                        style.border.color = p.primary.weak.color;
-                                                        style.border.width = 1.5;
-                                                    }
-                                                    button::Status::Pressed => {
-                                                        style.border.color = p.primary.strong.color;
-                                                        style.border.width = 0.7;
-                                                        style.border.radius =
-                                                            iced::border::radius(6);
-                                                    }
+                                        button(
+                                            Column::new().width(120)
+                                            .height(160)
+                                                .push(
+                                                    text(format!("{}", match card.card_type {
+                                                        pmj_gamemodes::base::shared::PMJCardType::Dots => { card.info_dots.clone().unwrap().to_string()}
+                                                        pmj_gamemodes::base::shared::PMJCardType::Flower => {card.info_flower.clone().unwrap().to_string()}
+                                                        pmj_gamemodes::base::shared::PMJCardType::Line => { card.info_line.clone().unwrap().to_string() }
+                                                        pmj_gamemodes::base::shared::PMJCardType::TenThousand => { card.info_ten_thousand.clone().unwrap().to_string()}
+                                                        pmj_gamemodes::base::shared::PMJCardType::Words => { card.info_words.clone().unwrap().to_string()}
+                                                    })).size(24),
+                                                )
+                                                .push(
+                                                    text(format!("{}", match card.card_type {
+                                                        pmj_gamemodes::base::shared::PMJCardType::Dots => {"筒"}
+                                                        pmj_gamemodes::base::shared::PMJCardType::Flower => {"花"}
+                                                        pmj_gamemodes::base::shared::PMJCardType::Line => {"條"}
+                                                        pmj_gamemodes::base::shared::PMJCardType::TenThousand => {"萬"}
+                                                        pmj_gamemodes::base::shared::PMJCardType::Words => {"字"}
+                                                    })).size(18)
+                                                )
+                                                .push(
+                                                    text(format!("第 {} 張", card.card_id.clone())).height(Length::Fill).align_y(alignment::Vertical::Bottom).size(15).align_x(alignment::Horizontal::Right)
+                                                )
+                                        )
+                                        .on_press(UIMessage::PlayBase(PlayBaseMessage::ThrowCard(
+                                            card.clone(),
+                                        )))
+                                        .style(|t: &iced::Theme, s: button::Status| {
+                                            let p = t.extended_palette();
+                                            let mut style = button::Style::default();
+                                            style.border.width = 1.2;
+                                            style.border.radius = iced::border::radius(10);
+                                            style.text_color = p.background.base.text;
+                                            match s {
+                                                button::Status::Active => {
+                                                    style.border.color = p.background.strong.color;
+                                                    style.background = None;
                                                 }
-                                                style
-                                            })
-                                            .into(),
+                                                button::Status::Disabled => {
+                                                    style.background =
+                                                        Some(iced::Background::Color(
+                                                            p.background.weak.color,
+                                                        ));
+                                                }
+                                                button::Status::Hovered => {
+                                                    style.border.color = p.primary.weak.color;
+                                                    style.border.width = 1.5;
+                                                }
+                                                button::Status::Pressed => {
+                                                    style.border.color = p.primary.strong.color;
+                                                    style.border.width = 0.7;
+                                                    style.border.radius = iced::border::radius(6);
+                                                }
+                                            }
+                                            style
+                                        })
+                                        .into(),
                                     );
                                 }
                                 let mut card_bar_y = Column::new().spacing(3).padding(5);
@@ -687,7 +734,7 @@ impl Client {
                                 for e in card_bar_elements {
                                     card_bar_x = card_bar_x.push(e);
                                     card_bar_count += 1;
-                                    if card_bar_count > 6 {
+                                    if card_bar_count > 9 {
                                         card_bar_y = card_bar_y.push(card_bar_x);
                                         card_bar_x = Row::new().spacing(3).padding(5);
                                         card_bar_count = 1;

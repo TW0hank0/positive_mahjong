@@ -14,9 +14,7 @@
 
 ### 特色
 
-使用Rust和Iced製作，支援Linux及Windows系統。
-
-Edit: 待 `pmj_client_cross` 開發完成將支援Android。
+使用 Rust、tungstenite 和 iced 製作，支援 linux 和 windows 系統。
 
 ### 連結
 

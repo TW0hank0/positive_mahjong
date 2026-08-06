@@ -2,6 +2,14 @@
 
 **已過時**
 
+### pmj_client_desktop
+
+在編譯前你需要準備好 rust nightly 工具鏈，使用腳本編譯：
+
+```
+uv run scripts/build_client_desktop.py
+```
+
 ## 電腦
 
 編譯需求：

@@ -4,7 +4,7 @@
 
 Edit: 待 `pmj_client_cross` 開發完成將支援Android。
 
-專案分為客戶端、伺服器、共用資料，共5個成員：
+專案分為客戶端、伺服器、共用資料：
 
 - `pmj_client_desktop`
 - `pmj_client_cross`
@@ -12,4 +12,4 @@ Edit: 待 `pmj_client_cross` 開發完成將支援Android。
 - `pmj_shared`
 - `pmj_gamemodes`
 
-伺服器預設使用6666端口。
+伺服器預設使用 `6060` 端口。
