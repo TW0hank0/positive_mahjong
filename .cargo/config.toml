@@ -18,6 +18,7 @@ profile-rustflags = true
 codegen-backend = true
 
 [profile.dev]
+# GUI is NOT able with cranelift cg-backend currently!
 # codegen-backend = "cranelift"
 codegen-backend = "llvm"
 [profile.dev.build-override]
@@ -25,13 +26,8 @@ codegen-backend = "llvm"
 [profile.dev.package."*"]
 codegen-backend = "llvm"
 
-# [build]
-# rustflags = [
-#     "--remap-path-prefix",
-#     "=/project"
-# ]
-
 [profile.release]
+# use release profile cause by: let rust-analyzer work
 rustflags = [
     "--remap-path-prefix",
     "=/project"
@@ -44,7 +40,7 @@ linker = "lld-link"
 linker = "gcc"
 rustflags = ["-C", "link-arg=-fuse-ld=mold"]
 
-# GUI is NOT able in musl env!
-[target.x86_64-unknown-linux--musl]
+# GUI is NOT able in musl env currently!
+[target.x86_64-unknown-linux-musl]
 linker = "musl-gcc"
 rustflags = ["-C", "link-arg=-fuse-ld=mold"]

@@ -331,10 +331,6 @@ criteria = "safe-to-deploy"
 version = "0.8.21"
 criteria = "safe-to-deploy"
 
-[[exemptions.crunchy]]
-version = "0.2.4"
-criteria = "safe-to-deploy"
-
 [[exemptions.cryoglyph]]
 version = "0.1.0"
 criteria = "safe-to-deploy"
@@ -967,10 +963,6 @@ criteria = "safe-to-deploy"
 version = "0.1.2"
 criteria = "safe-to-deploy"
 
-[[exemptions.naga]]
-version = "27.0.3"
-criteria = "safe-to-deploy"
-
 [[exemptions.nanoserde]]
 version = "0.2.1"
 criteria = "safe-to-deploy"
@@ -1381,10 +1373,6 @@ criteria = "safe-to-deploy"
 
 [[exemptions.roxmltree]]
 version = "0.20.0"
-criteria = "safe-to-deploy"
-
-[[exemptions.rustc_version]]
-version = "0.4.1"
 criteria = "safe-to-deploy"
 
 [[exemptions.rustix]]

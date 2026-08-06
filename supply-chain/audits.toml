@@ -6,10 +6,25 @@ who = "TW0hank0 <public.email.hank@tutamail.com>"
 criteria = "safe-to-deploy"
 delta = "0.1.0 -> 0.1.1"
 
+[[audits.crunchy]]
+who = "TW0hank0 <public.email.hank@tutamail.com>"
+criteria = "safe-to-deploy"
+delta = "0.2.3 -> 0.2.4"
+
 [[audits.document-features]]
 who = "TW0hank0 <public.email.hank@tutamail.com>"
 criteria = "safe-to-deploy"
 delta = "0.2.11 -> 0.2.12"
+
+[[audits.naga]]
+who = "TW0hank0 <public.email.hank@tutamail.com>"
+criteria = "safe-to-deploy"
+delta = "27.0.0 -> 27.0.3"
+
+[[audits.rustc_version]]
+who = "TW0hank0 <public.email.hank@tutamail.com>"
+criteria = "safe-to-deploy"
+delta = "0.4.0 -> 0.4.1"
 
 [[audits.wgpu-core]]
 who = "TW0hank0 <public.email.hank@tutamail.com>"

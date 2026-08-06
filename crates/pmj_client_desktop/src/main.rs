@@ -30,18 +30,19 @@ pub fn icon_init() -> Option<iced::window::Icon> {
         .unwrap()
         .into_rgba8();
     let (img_width, img_height) = img.dimensions();
-    let icon = iced::window::icon::from_rgba(img.into_raw(), img_width, img_height).ok();
-    icon
+    iced::window::icon::from_rgba(img.into_raw(), img_width, img_height).ok()
 }
 
 fn main() {
     let _guard = shared::init_tracing_fmt(String::from("pmj_client_desktop"));
     let icon = icon_init();
-    let mut window_settings = iced::window::Settings::default();
-    window_settings.maximized = true;
-    window_settings.icon = icon;
-    window_settings.min_size = Some(iced::Size::new(1080.0, 720.0));
-    window_settings.position = iced::window::Position::Centered;
+    let window_settings = iced::window::Settings {
+        maximized: true,
+        icon: icon,
+        min_size: Some(iced::Size::new(1080.0, 720.0)),
+        position: iced::window::Position::Centered,
+        ..Default::default()
+    };
     //
     let mut app_settings = iced::Settings::default();
     app_settings.id = Some(String::from(PROJECT_NAME));

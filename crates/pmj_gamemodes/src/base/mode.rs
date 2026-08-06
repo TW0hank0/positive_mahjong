@@ -169,11 +169,9 @@ fn handle_client(
                             let resp_msg = serde_json::to_string(&resp).unwrap();
                             let _wrist_result = write_reply(resp_msg, ws.clone());
                             info!("已回復客戶端初訊息。");
-                            loop {
-                                trace!("因為連接並回覆初訊息，所以在5秒後停止此線程。");
-                                thread::sleep(time::Duration::from_secs(5));
-                                break 'connection;
-                            }
+                            trace!("因為連接並回覆初訊息，所以將在5秒後停止此線程。");
+                            thread::sleep(time::Duration::from_secs(5));
+                            break 'connection;
                         }
                     }
                     Err(e) => {
@@ -229,11 +227,8 @@ pub fn main_base(gui_mode: bool) -> Option<Arc<RwLock<crate::base::mode::Positiv
     if gui_mode {
         Some(backend)
     } else {
-        loop {
-            info!("按 enter 開始遊戲");
-            std::io::stdin().read_line(&mut String::new()).ok();
-            break;
-        }
+        info!("按 enter 開始遊戲");
+        std::io::stdin().read_line(&mut String::new()).ok();
         loop {
             match backend.try_write() {
                 Ok(mut guard) => {
@@ -576,8 +571,8 @@ impl PositiveMahjong {
                                         break 'guard_read;
                                     }
                                     Err(e) => {
-                                        warn!("guard.read(): {}", e);
                                         drop(guard);
+                                        warn!("guard.read(): {}", e);
                                         thread::sleep(time::Duration::from_millis(500));
                                     }
                                 }
