@@ -1,6 +1,6 @@
 # positive_mahjong
 
-![icon](../assets/icon/icon.png)
+![icon](./assets/icon/icon.png)
 
 [繁體中文](../README.md) | **English**
 
@@ -10,39 +10,35 @@
 ![GitLab License](https://img.shields.io/gitlab/license/TW0hank0%2Fpositive_mahjong?style=for-the-badge&color=green)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/TW0hank0/positive_mahjong/commit-build.yaml?branch=master&style=for-the-badge&label=Github%20Action&color=green)
 
-**Still in development, Not finish!**
+**Still in devlopment, not finish!**
 
 ### Futures
 
-Made with rust and iced, support Linux and windows.
+Built with Rust, tungstenite and iced, support linux and windows.
 
 ### Links
 
 [Gitlab Main Repo](https://gitlab.com/TW0hank0/positive_mahjong/)
 
-[Codeberg Minnor Repo](https://codeberg.org/TW0hank0/positive_mahjong/)
+[Codeberg Mirror Repo](https://codeberg.org/TW0hank0/positive_mahjong/)
 
 [Github CI Repo](https://github.com/TW0hank0/positive_mahjong/)
 
-> Github 不接受 issue 或 pull_request，請到 [Gitlab 主儲存庫](https://gitlab.com/TW0hank0/positive_mahjong/)。
-
-[Gitlab-pages Project Website](https://tw0hank0.gitlab.io/positive_mahjong/)
-
-[Github-pages Project Website](https://tw0hank0.github.io/positive_mahjong/)
+[Project Website](https://tw0hank0.gitlab.io/positive_mahjong/)
 
 [KeepAndroidOpen](https://keepandroidopen.org/)
-> 你的手機即將不再屬於你。
->
+
 > 從 2026 年 9 月起，Google 將在未經使用者同意的情況下，悄悄推送一項更新，封鎖所有未向 Google 登記、未簽署其合約、未繳費，且未提交政府核發身分證明文件的 Android 應用程式。
 
 [KillSubCultureDiscrimination](https://killscd.gitlab.io/website/)
+
 > 興趣不分貴賤，愛好不是犯罪。
 
-### Installion
+### Install
 
-Not Finish...
+Not finish yet...
 
-[Project Documents](https://tw0hank0.gitlab.io/positive_mahjong/docs/)
+See: [project documents](https://tw0hank0.gitlab.io/positive_mahjong/docs/)
 
 ### 授權與聲明
 
@@ -54,11 +50,11 @@ Not Finish...
 
 #### 第三方模組庫授權
 
-[ThirdPartyLicense-Rust.md](https://tw0hank0.gitlab.io/positive_mahjong/docs/license/ThirdPartyLicense-Rust.md) 
+見：[ThirdPartyLicense-Rust.md](https://tw0hank0.gitlab.io/positive_mahjong/docs/license/ThirdPartyLicense-Rust.md)
 
 #### 第三方專案聲明
 
-詳見：[專案文檔](https://tw0hank0.gitlab.io/positive_mahjong/docs/license/res.html)
+見：[專案文檔](https://tw0hank0.gitlab.io/positive_mahjong/docs/license/res.html)
 
 **Noto Sans TC**
 

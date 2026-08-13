@@ -24,7 +24,7 @@ use iced::{
 };
 use serde_json;
 use tracing::{debug, error, info, trace, warn};
-use tungstenite::{Message, WebSocket, connect};
+use tungstenite::{Message, WebSocket, connect, stream::NoDelay};
 
 use crate::{circular, easing};
 
@@ -65,6 +65,7 @@ pub struct HomeStatus {
     try_connecting_server: bool,
     msgs: Vec<String>,
     connect_msg: Option<String>,
+    read_first_msg_resp: OnceState,
 }
 
 #[derive(Debug)]
@@ -75,6 +76,14 @@ pub struct PlayBaseStatus {
     game_msgs: Vec<String>,
     game_controller: PlayBaseController,
     current_turn: Option<u8>,
+}
+
+#[derive(Debug)]
+pub enum OnceState {
+    NotYet,
+    Running,
+    Finish,
+    WaitReRun,
 }
 
 #[derive(Debug)]
@@ -115,6 +124,7 @@ pub struct ThreadResult {
     pub is_error: bool,
     pub result_read_first_msg_resp: Option<ThreadProcessResultReadFirstMsgResp>,
     pub result_play_base_read_websocket: Option<String>,
+    pub result_play_base_throw_card: Option<pmj_gamemodes::base::shared::PMJCard>,
 }
 
 impl Default for ThreadResult {
@@ -123,6 +133,7 @@ impl Default for ThreadResult {
             is_error: true,
             result_read_first_msg_resp: None,
             result_play_base_read_websocket: None,
+            result_play_base_throw_card: None,
         }
     }
 }
@@ -136,6 +147,8 @@ pub struct ThreadProcessResultReadFirstMsgResp {
 pub enum ThreadProcessTypes {
     ReadFirstMsgResp,
     PlayBaseReadWebsocket,
+    PlayBaseThrowCard,
+    KeepPingPong,
 }
 
 impl Client {
@@ -149,6 +162,7 @@ impl Client {
                 try_connecting_server: false,
                 msgs: Vec::new(),
                 connect_msg: None,
+                read_first_msg_resp: OnceState::NotYet,
             },
             status_play_base: PlayBaseStatus {
                 server_ip: None,
@@ -170,7 +184,7 @@ impl Client {
                 if self.process_threads.len() > 0 {
                     trace!("Start fetch thread status...");
                     let mut rp_index = 0;
-                    'loop_else: {
+                    {
                         loop {
                             if rp_index >= self.process_threads.len() {
                                 break;
@@ -183,7 +197,10 @@ impl Client {
                                     match pthread.handle.join() {
                                         Ok(thread_result) => {
                                             if thread_result.is_error {
-                                                error!("process_thread ran into error!");
+                                                error!(
+                                                    "process_thread ran into error! pthread.process_type => {:?}",
+                                                    pthread.process_type
+                                                );
                                                 self.status_home.msgs.push(String::from(
                                                     "process_thread ran into error!",
                                                 ));
@@ -194,10 +211,40 @@ impl Client {
                                                         ));
                                                     }
                                                     ThreadProcessTypes::PlayBaseReadWebsocket => {
+                                                        self.status_home.read_first_msg_resp =
+                                                            OnceState::WaitReRun;
                                                         return task::Task::done(
                                                             UIMessage::PlayBase(
                                                                 PlayBaseMessage::ReadWebsocketMsg,
                                                             ),
+                                                        );
+                                                    }
+                                                    ThreadProcessTypes::KeepPingPong => {
+                                                        info!(
+                                                            "ThreadProcessTypes::KeepPingPong => thread_result.is_error"
+                                                        );
+                                                        self.process_threads.push(
+                                                            self.ping_pong_thread(
+                                                                self.ws.clone().unwrap(),
+                                                            ),
+                                                        );
+                                                        return iced::task::Task::done(
+                                                            UIMessage::FetchThreadsStatus,
+                                                        );
+                                                    }
+                                                    ThreadProcessTypes::PlayBaseThrowCard => {
+                                                        warn!(
+                                                            "ThreadProcessTypes::PlayBaseThrowCard => thread_result.is_error"
+                                                        );
+                                                        self.process_threads.push(
+                                                            self.play_base_throw_card(
+                                                                thread_result
+                                                                    .result_play_base_throw_card
+                                                                    .unwrap(),
+                                                            ),
+                                                        );
+                                                        return iced::task::Task::done(
+                                                            UIMessage::FetchThreadsStatus,
                                                         );
                                                     }
                                                 }
@@ -205,6 +252,8 @@ impl Client {
                                                 trace!("process_thread finish sucessful.");
                                                 match pthread.process_type {
                                                     ThreadProcessTypes::ReadFirstMsgResp => {
+                                                        self.status_home.read_first_msg_resp =
+                                                            OnceState::Finish;
                                                         self.player_id = Some(
                                                             thread_result
                                                                 .result_read_first_msg_resp
@@ -243,8 +292,9 @@ impl Client {
                                                             pmj_gamemodes::base::shared::ServerMessageTypeKinds::GetCard => {
                                                                 let got_card = msg.info_get_card.unwrap();
                                                                 info!("取得卡牌：{:?}", got_card);
-                                                                self.status_play_base.game_msgs.push(format!("取得卡牌：{:?}", got_card));
+                                                                self.status_play_base.game_msgs.push(format!("取得卡牌：{:#?}", got_card.clone()));
                                                                 self.status_play_base.game_controller=PlayBaseController::ThrowCard;
+                                                                self.status_play_base.hand_cards.push(got_card);
                                                             }
                                                             pmj_gamemodes::base::shared::ServerMessageTypeKinds::HandCardChange => {
                                                                 let handcard = msg.info_hand_card_change.unwrap();
@@ -266,6 +316,19 @@ impl Client {
                                                             UIMessage::PlayBase(
                                                                 PlayBaseMessage::ReadWebsocketMsg,
                                                             ),
+                                                        );
+                                                    }
+                                                    ThreadProcessTypes::KeepPingPong => {
+                                                        info!(
+                                                            "ThreadProcessTypes::KeepPingPong => thread finish sucessful!"
+                                                        );
+                                                    }
+                                                    ThreadProcessTypes::PlayBaseThrowCard => {
+                                                        info!(
+                                                            "ThreadProcessTypes::PlayBaseThrowCard({:?}) => thread finish sucessful!",
+                                                            thread_result
+                                                                .result_play_base_throw_card
+                                                                .unwrap()
                                                         );
                                                     }
                                                 }
@@ -338,13 +401,23 @@ impl Client {
                     self.status_home.connect_msg = Some(String::from("正在傳送初連接訊息.."));
                     let value = self.home_send_first_msg();
                     self.status_home.connect_msg = Some(String::from("已傳送初連接訊息。"));
+                    self.process_threads
+                        .push(self.ping_pong_thread(self.ws.clone().unwrap()));
                     return value;
                 }
-                HomeMessage::ReadFirstMsgResp => {
-                    self.status_home.connect_msg = Some(String::from("正在讀取初連接回覆.."));
-                    self.process_threads.push(self.home_read_first_msg_resp());
-                    return task::Task::done(UIMessage::FetchThreadsStatus);
-                }
+                HomeMessage::ReadFirstMsgResp => match self.status_home.read_first_msg_resp {
+                    OnceState::NotYet | OnceState::WaitReRun => {
+                        self.status_home.read_first_msg_resp = OnceState::Running;
+                        self.status_home.connect_msg = Some(String::from("正在讀取初連接回覆.."));
+                        self.process_threads.push(self.home_read_first_msg_resp());
+                        return task::Task::done(UIMessage::FetchThreadsStatus);
+                    }
+                    OnceState::Running | OnceState::Finish => {
+                        info!(
+                            "HomeMessage::ReadFirstMsgResp: self.status_home.read_first_msg_resp == (OnceState::Running | OnceState::Finish)"
+                        );
+                    }
+                },
             },
             UIMessage::PlayBase(play_base_message) => match play_base_message {
                 PlayBaseMessage::ReadWebsocketMsg => {
@@ -352,28 +425,12 @@ impl Client {
                     return iced::task::Task::done(UIMessage::FetchThreadsStatus);
                 }
                 PlayBaseMessage::ThrowCard(card) => {
-                    // TODO
-                    let msg =
-                        serde_json::to_string(&pmj_gamemodes::base::shared::ClientMessageType {
-                            msg_type:
-                                pmj_gamemodes::base::shared::ClientMessageTypeKinds::GameAction,
-                            info_game_action: Some(
-                                pmj_gamemodes::base::shared::GameTurnTypes::ThrowCard,
-                            ),
-                            info_throw_card: Some(card),
-                            ..Default::default()
-                        })
-                        .unwrap();
-                    match write_reply(msg, self.ws.clone().unwrap()) {
-                        Ok(_) => {}
-                        Err(e) => {
-                            error!("回覆失敗：{:?}", e);
-                        }
-                    }
+                    self.process_threads.push(self.play_base_throw_card(card));
+                    return iced::task::Task::done(UIMessage::FetchThreadsStatus);
                 }
             },
         };
-        return task::Task::none();
+        iced::task::Task::none()
     }
 
     pub fn view(&self) -> Element<'_, UIMessage, iced::Theme, iced::Renderer> {
@@ -620,7 +677,7 @@ impl Client {
                         for card in self.status_play_base.hand_cards.iter() {
                             card_bar = card_bar
                                 .push(space().height(5))
-                                .push(container(Row::new().width(Length::Fill).height(80)
+                                .push(container(Row::new().padding(10).width(Length::Fill).height(40)
                                     .push(
                                         text(format!("{}", match card.card_type {
                                             pmj_gamemodes::base::shared::PMJCardType::Dots => { card.info_dots.clone().unwrap().to_string()}
@@ -638,7 +695,7 @@ impl Client {
                                             pmj_gamemodes::base::shared::PMJCardType::Line => {"條"}
                                             pmj_gamemodes::base::shared::PMJCardType::TenThousand => {"萬"}
                                             pmj_gamemodes::base::shared::PMJCardType::Words => {"字"}
-                                        })).size(18)
+                                        })).size(18).align_y(alignment::Vertical::Bottom)
                                     )
                                     .push(
                                         text(format!("第 {} 張", card.card_id.clone())).width(Length::Fill).size(15).align_x(alignment::Horizontal::Right)
@@ -809,14 +866,56 @@ impl Client {
         self.theme.clone()
     }
 
+    fn ping_pong_thread(
+        &self,
+        ws: sync::Arc<sync::RwLock<WebSocket<tungstenite::stream::MaybeTlsStream<TcpStream>>>>,
+    ) -> ProThread {
+        let handle = thread::spawn(move || {
+            'ping_thread: loop {
+                match ws.try_write() {
+                    Ok(mut guard) => {
+                        match guard.send(tungstenite::Message::Ping(tungstenite::Bytes::new())) {
+                            Ok(_) => {}
+                            Err(
+                                tungstenite::Error::AlreadyClosed
+                                | tungstenite::Error::ConnectionClosed,
+                            ) => {
+                                break 'ping_thread;
+                            }
+                            Err(e) => {
+                                debug!("ping process err: {:?}", e);
+                                thread::sleep(time::Duration::from_secs(1));
+                            }
+                        }
+                    }
+                    Err(_e) => {
+                        thread::sleep(time::Duration::from_secs(1));
+                    }
+                }
+                trace!("ping process sucessful.");
+                thread::sleep(time::Duration::from_millis(3500));
+            }
+            ThreadResult {
+                is_error: false,
+                ..Default::default()
+            }
+        });
+        ProThread {
+            handle: handle,
+            start_time: time::Instant::now(),
+            process_type: ThreadProcessTypes::KeepPingPong,
+        }
+    }
+
     fn home_connect_server(&mut self) -> task::Task<UIMessage> {
         match connect(self.status_home.server_ip.clone()) {
-            Ok((row_ws, resp)) => {
-                trace!("resp={:?}", resp);
+            Ok((mut row_ws, _resp)) => {
+                debug!("set_nodelay(): {:?}", row_ws.get_mut().set_nodelay(true));
                 let ws: sync::Arc<
                     sync::RwLock<WebSocket<tungstenite::stream::MaybeTlsStream<TcpStream>>>,
                 > = sync::Arc::new(sync::RwLock::new(row_ws));
                 self.ws = Some(ws.clone());
+                ws.write().unwrap().get_mut().set_nodelay(false).ok();
                 debug!("Websocket 連線成功。");
                 return task::Task::done(UIMessage::Home(HomeMessage::SendFirstMsg));
             }
@@ -881,6 +980,14 @@ impl Client {
                             break 'guard;
                         }
                     }
+                    Err(sync::TryLockError::WouldBlock) => {
+                        warn!("websocket鎖 => TryLockError::WouldBlock");
+                        return ThreadResult {
+                            is_error: true,
+                            result_read_first_msg_resp: None,
+                            ..Default::default()
+                        };
+                    }
                     Err(e) => {
                         warn!("process_thread: {}", e);
                         return ThreadResult {
@@ -895,6 +1002,7 @@ impl Client {
                 Ok(raw_msg) => {
                     match raw_msg {
                         Message::Text(text) => {
+                            debug!("Message::Text => {}", text.clone());
                             let msg: shared::ServerConnectResponceType =
                                 serde_json::from_str(&text).unwrap();
                             if msg.player_id.is_some() {
@@ -946,44 +1054,118 @@ impl Client {
 
     fn play_base_read_websocket(&self) -> ProThread {
         let ws = self.ws.clone().unwrap();
-        let handle = thread::spawn(move || match ws.try_write() {
-            Ok(mut guard) => match guard.read() {
-                Ok(msg) => match msg {
-                    Message::Text(t) => {
+        let handle = thread::spawn(move || {
+            loop {
+                match ws.write() {
+                    Ok(mut guard) => match guard.read() {
+                        Ok(msg) => match msg {
+                            Message::Text(t) => {
+                                drop(guard);
+                                return ThreadResult {
+                                    is_error: false,
+                                    result_play_base_read_websocket: Some(t.to_string()),
+                                    ..Default::default()
+                                };
+                            }
+                            Message::Ping(_) => {
+                                continue;
+                            }
+                            Message::Pong(_) => {
+                                continue;
+                            }
+                            _ => {
+                                drop(guard);
+                                error!("err msg type!");
+                                thread::sleep(time::Duration::from_millis(450));
+                                return ThreadResult {
+                                    is_error: true,
+                                    ..Default::default()
+                                };
+                            }
+                        },
+                        Err(e) => {
+                            drop(guard);
+                            error!("err:{:?}", e);
+                            thread::sleep(time::Duration::from_millis(450));
+                            return ThreadResult {
+                                is_error: true,
+                                ..Default::default()
+                            };
+                        }
+                    },
+                    Err(e) => {
+                        error!("err:{:?}", e);
+                        thread::sleep(time::Duration::from_millis(450));
                         return ThreadResult {
-                            is_error: false,
-                            result_play_base_read_websocket: Some(t.to_string()),
+                            is_error: true,
                             ..Default::default()
                         };
                     }
-                    _ => {
-                        error!("err msg type!");
-                        ThreadResult {
-                            is_error: true,
-                            ..Default::default()
-                        }
-                    }
-                },
-                Err(e) => {
-                    error!("err:{:?}", e);
-                    return ThreadResult {
-                        is_error: true,
-                        ..Default::default()
-                    };
                 }
-            },
-            Err(e) => {
-                error!("err:{:?}", e);
-                return ThreadResult {
-                    is_error: true,
-                    ..Default::default()
-                };
             }
         });
         ProThread {
             handle: handle,
             start_time: std::time::Instant::now(),
             process_type: ThreadProcessTypes::PlayBaseReadWebsocket,
+        }
+    }
+
+    fn play_base_throw_card(&self, card: pmj_gamemodes::base::shared::PMJCard) -> ProThread {
+        let ws = self.ws.clone().unwrap();
+        let handle = thread::spawn(move || {
+            let msg = serde_json::to_string(&pmj_gamemodes::base::shared::ClientMessageType {
+                msg_type: pmj_gamemodes::base::shared::ClientMessageTypeKinds::GameAction,
+                info_game_action: Some(pmj_gamemodes::base::shared::GameTurnTypes::ThrowCard),
+                info_throw_card: Some(card.clone()),
+                ..Default::default()
+            })
+            .unwrap();
+            loop {
+                if ws.is_poisoned() {
+                    warn!("ws.is_poisoned() -> true");
+                }
+                match ws.try_write() {
+                    Ok(mut guard) => {
+                        match guard.send(tungstenite::Message::Text(msg.clone().into())) {
+                            Ok(_) => ThreadResult {
+                                is_error: false,
+                                result_play_base_throw_card: Some(card.clone()),
+                                ..Default::default()
+                            },
+                            Err(e) => {
+                                warn!("guard.send() => {:?}", e);
+                                ThreadResult {
+                                    is_error: true,
+                                    result_play_base_throw_card: Some(card.clone()),
+                                    ..Default::default()
+                                }
+                            }
+                        }
+                    }
+                    Err(sync::TryLockError::WouldBlock) => {
+                        warn!("websocket鎖 => TryLockError::WouldBlock");
+                        ThreadResult {
+                            is_error: true,
+                            result_play_base_throw_card: Some(card.clone()),
+                            ..Default::default()
+                        }
+                    }
+                    Err(e) => {
+                        warn!("ws.try_write() => {}", e);
+                        ThreadResult {
+                            is_error: true,
+                            result_play_base_throw_card: Some(card.clone()),
+                            ..Default::default()
+                        }
+                    }
+                };
+            }
+        });
+        ProThread {
+            handle: handle,
+            start_time: time::Instant::now(),
+            process_type: ThreadProcessTypes::PlayBaseThrowCard,
         }
     }
 }
@@ -1055,11 +1237,14 @@ fn write_reply(
                 drop(guard);
                 break;
             }
+            Err(sync::TryLockError::WouldBlock) => {
+                warn!("websocket鎖 => TryLockError::WouldBlock");
+            }
             Err(e) => {
-                warn!("ws.try_write() Err: {}", e);
+                warn!("ws.try_write() => {}", e);
             }
         };
-        thread::sleep(time::Duration::from_millis(500));
+        thread::sleep(time::Duration::from_millis(800));
     }
     match write_result {
         Ok(_) => {

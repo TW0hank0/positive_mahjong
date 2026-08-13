@@ -333,5 +333,7 @@ pub fn init_tracing_fmt(member_name: String) -> tracing_appender::non_blocking::
     if !fs::exists(&log_dir_path).unwrap_or(false) {
         fs::create_dir_all(&log_dir_path).ok();
     }
-    positive_tool_rs::pt::init_tracing(log_dir_path, Some(member_name))
+    let guard = positive_tool_rs::pt::init_tracing(log_dir_path, Some(member_name));
+    debug!("成功初始化日誌。");
+    guard
 }

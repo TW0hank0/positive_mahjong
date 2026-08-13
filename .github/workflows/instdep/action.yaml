@@ -51,10 +51,10 @@ runs:
         rustc --version
         cargo --version
 
-    - name: install rust nightly
+    - name: install rust toolchain
       shell: pwsh
       run: |
-        rustup component add rustc-codegen-cranelift-preview --toolchain nightly
+        rustup update
 
     - name: install Linux build needed dep
       shell: pwsh

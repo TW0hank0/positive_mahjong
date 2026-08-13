@@ -11,6 +11,7 @@
             >線上玩</a
         >
         <a class="nav_item" href="{{$VAR_ROOT_DIR$}}/license.html">協議</a>
+        <a class="nav_item" href="{{$VAR_ROOT_DIR$}}/files/index.html">檔案</a>
         <a
             class="nav_item"
             href="{{$VAR_ROOT_DIR$}}/docs/index.html"

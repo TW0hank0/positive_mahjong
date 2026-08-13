@@ -21,6 +21,11 @@ who = "TW0hank0 <public.email.hank@tutamail.com>"
 criteria = "safe-to-deploy"
 delta = "27.0.0 -> 27.0.3"
 
+[[audits.new_debug_unreachable]]
+who = "TW0hank0 <public.email.hank@tutamail.com>"
+criteria = "safe-to-deploy"
+delta = "1.0.4 -> 1.0.6"
+
 [[audits.rustc_version]]
 who = "TW0hank0 <public.email.hank@tutamail.com>"
 criteria = "safe-to-deploy"

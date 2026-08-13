@@ -18,8 +18,7 @@
 use std::sync::{self, Arc, RwLock};
 
 use iced::{
-    self, Border, Theme,
-    advanced::Widget,
+    self, Border,
     widget::{self, Column, Row, button, container, scrollable, space, text},
 };
 use image;

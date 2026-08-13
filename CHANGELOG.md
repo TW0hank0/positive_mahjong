@@ -144,3 +144,7 @@
 
 - 移除：［ci］commit-msrv.yaml
 - 更改：［pmj_shared］日誌儲存位子
+
+**2026-8-11**
+
+- 新增：［pmj_gamemodes::base && pmj_client_desktop］定期 ping

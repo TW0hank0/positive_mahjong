@@ -1,3 +1,18 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# 著作權所有 (C) 2026 TW0hank0
+#
+# 本檔案屬於 positive_mahjong 專案的一部分。
+# 專案儲存庫：https://gitlab.com/TW0hank0/positive_mahjong
+#
+# 本程式為自由軟體：您可以根據自由軟體基金會發佈的 GNU Affero 通用公共授權條款
+# 第 3 版（僅此版本）重新發佈及/或修改本程式。
+#
+# 本程式的發佈是希望它能發揮功用，但不提供任何擔保；
+# 甚至沒有隱含的適銷性或特定目的適用性擔保。詳見 GNU Affero 通用公共授權條款。
+#
+# 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
+# 如果沒有，請參見 <https://www.gnu.org/licenses/>。
+
 # /// script
 # dependencies = [
 #     "mistune==3.3.4"
@@ -5,6 +20,7 @@
 # ///
 import os
 import shutil
+
 import mistune
 
 
@@ -19,13 +35,72 @@ def main():
     build_root = os.path.join(
         os.path.dirname(os.path.dirname(__file__)), "website_build"
     )
-    shutil.copytree(website_root_path, build_root, dirs_exist_ok=True)
+    if os.path.exists(build_root) is True:
+        remove_dir(build_root)
+    shutil.copytree(website_root_path, build_root)
+    os.makedirs(os.path.join(build_root, "files"), exist_ok=True)
+    build_files_dl(os.path.join(build_root, "files"))
     process_dir(
         dir_path=build_root,
         ignored=ignored,
         nav_template=nav_template_content,
         website_root_path=build_root,
     )
+
+
+def remove_dir(path: str):
+    for dir in os.listdir(path):
+        if os.path.isfile(os.path.join(path, dir)) is True:
+            os.remove(os.path.join(path, dir))
+        else:
+            remove_dir(os.path.join(path, dir))
+    os.rmdir(path)
+
+
+def build_files_dl(dir_path: str):
+    dlable_files = [
+        os.path.join(os.path.dirname(os.path.dirname(__file__)), "LICENSE"),
+        os.path.join(os.path.dirname(os.path.dirname(__file__)), "README.md"),
+    ]
+    files_summary_template = """\
+    <!doctype html>
+    <html lang="zh-TW">
+        <head>
+            <meta charset="UTF-8" />
+            <meta
+                name="viewport"
+                content="width=device-width, initial-scale=1.0"
+            />
+            <meta
+                name="description"
+                content="positive_mahjong&#x27;s website"
+            />
+            <title>positive_mahjong —— 檔案</title>
+            <link rel="stylesheet" href="../style.css" />
+            <link rel="icon" href="../icon.svg" />
+            <link rel="shortcut icon" href="../icon.png" />
+        </head>
+        <body>
+            <header>
+                <nav>{{$VAR_NAV$}}</nav>
+            </header>
+            <section class="content">
+            {{$DY_VAR_FILES_SUMMARY$}}
+            </section>
+        </body>
+    </html>\n"""
+    summary_prepare = ""
+    for dlfile in dlable_files:
+        print(f"{dlfile} -> {os.path.join(dir_path, os.path.basename(dlfile))}")
+        shutil.copy2(dlfile, os.path.join(dir_path, os.path.basename(dlfile)))
+        summary_prepare = f"""{summary_prepare}
+        <a class="dlable-file" href="./{os.path.basename(dlfile)}">{os.path.basename(dlfile)}</a>
+        <div style="height: 10px;"></div>"""
+    files_summary = files_summary_template.replace(
+        "{{$DY_VAR_FILES_SUMMARY$}}", summary_prepare
+    )
+    with open(os.path.join(dir_path, "index.html"), "w", encoding="utf-8") as f:
+        f.write(files_summary)
 
 
 def process_dir(
@@ -66,7 +141,7 @@ def replace_var(
     template_vars: dict[str, str] = {}
     os.chdir(website_root_path)
     rel_path = os.path.relpath(
-        os.path.dirname(replace_html_path), start=website_root_path
+        website_root_path, start=os.path.dirname(replace_html_path)
     )
     template_vars["VAR_ROOT_DIR"] = rel_path
     new_template = nav_template
@@ -78,10 +153,22 @@ def replace_var(
     html_vars: dict[str, str] = {}
     # print(f"new_template={new_template}")
     html_vars["VAR_NAV"] = new_template
-    with open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "LICENSE"), "r", encoding="utf-8") as f:
+    with open(
+        os.path.join(os.path.dirname(os.path.dirname(__file__)), "LICENSE"),
+        "r",
+        encoding="utf-8",
+    ) as f:
         html_vars["VAR_LICENSE"] = f.read()
-    with open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "auto_generated", "ThirdPartyLicense-Rust.md"), "r", encoding="utf-8") as f:
-        t=f.read()
+    with open(
+        os.path.join(
+            os.path.dirname(os.path.dirname(__file__)),
+            "auto_generated",
+            "ThirdPartyLicense-Rust.md",
+        ),
+        "r",
+        encoding="utf-8",
+    ) as f:
+        t = f.read()
         html_vars["VAR_THIRD_PARTY_LICENSE_RUST_MD"] = t
         html_vars["VAR_THIRD_PARTY_LICENSE_RUST_MD_TO_HTML"] = str(mistune.html(t))
     #

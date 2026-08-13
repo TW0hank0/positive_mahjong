@@ -1,9 +1,27 @@
+/**
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * 著作權所有 (C) 2026 TW0hank0
+ *
+ * 本檔案屬於 positive_mahjong 專案的一部分。
+ * 專案儲存庫：https://gitlab.com/TW0hank0/positive_mahjong
+ *
+ * 本程式為自由軟體：您可以根據自由軟體基金會發佈的 GNU Affero 通用公共授權條款
+ * 第 3 版（僅此版本）重新發佈及/或修改本程式。
+ *
+ * 本程式的發佈是希望它能發揮功用，但不提供任何擔保；
+ * 甚至沒有隱含的適銷性或特定目的適用性擔保。詳見 GNU Affero 通用公共授權條款。
+ *
+ * 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
+ * 如果沒有，請參見 <https://www.gnu.org/licenses/>。
+ */
+
 :root {
-    line-height: 10px;
+    line-height: var(--normal-line-height);
     font-family: sans-serif;
     background-color: var(--background);
     color: var(--text-color);
     /* 變數 */
+    --normal-line-height: 10px;
     --primary-color: cornflowerblue;
     --primary-text-color: steelblue;
     --secondary-color: lightgreen;
@@ -41,6 +59,7 @@
 @media (width < 1080px) {
     :root {
         --text-size: 20px;
+        --normal-line-height: 30px;
     }
 }
 
@@ -180,4 +199,17 @@ code {
     line-height: 30px;
     overflow-y: scroll;
     white-space: pre;
+}
+
+.dlable-file {
+    border-color: gray;
+    border-width: 1.5px;
+    border-radius: 16px;
+    border-style: solid;
+    padding: 4px;
+    display: inline-block;
+    height: 35px;
+    text-align: left;
+    width: 100%;
+    vertical-align: middle;
 }
