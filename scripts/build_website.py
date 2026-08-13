@@ -94,8 +94,8 @@ def build_files_dl(dir_path: str):
         print(f"{dlfile} -> {os.path.join(dir_path, os.path.basename(dlfile))}")
         shutil.copy2(dlfile, os.path.join(dir_path, os.path.basename(dlfile)))
         summary_prepare = f"""{summary_prepare}
-        <a class="dlable-file" href="./{os.path.basename(dlfile)}">{os.path.basename(dlfile)}</a>
-        <div style="height: 10px;"></div>"""
+        <div class="dlable-file"><a href="./{os.path.basename(dlfile)}">{os.path.basename(dlfile)}</a></div>
+        <div style="height: 5px;"></div>"""
     files_summary = files_summary_template.replace(
         "{{$DY_VAR_FILES_SUMMARY$}}", summary_prepare
     )

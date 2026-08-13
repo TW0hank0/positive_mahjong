@@ -14,14 +14,13 @@
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 import os
-import subprocess
 
 import util
 
 
 def main():
     packages = [
-        "pmj_client",
+        "pmj_client_desktop",
         "pmj_server",
         "pmj_shared",
         "pmj_gamemodes",

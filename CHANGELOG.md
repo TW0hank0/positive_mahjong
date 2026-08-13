@@ -148,3 +148,7 @@
 **2026-8-11**
 
 - 新增：［pmj_gamemodes::base && pmj_client_desktop］定期 ping
+
+**2026-8-13**
+
+- 新增：［docs::intro］開發時間序
