@@ -1,8 +1,6 @@
 # 簡介
 
-`positive_mahjong` 使用rust、tungstenite、iced製作，支援Linux及Windows系統。
-
-Edit: 待 `pmj_client_cross` 開發完成將支援Android。
+`positive_mahjong` 使用 rust、tungstenite、iced 製作，支援 Linux 及 Windows 系統。
 
 專案分為客戶端、伺服器、共用資料：
 
@@ -13,3 +11,7 @@ Edit: 待 `pmj_client_cross` 開發完成將支援Android。
 - `pmj_gamemodes`
 
 伺服器預設使用 `6060` 端口。
+
+---
+
+`positive_mahjong` 專案自 2026年2月18日 開始開發，曾嘗試使用 `tiny-http` 和 `slint` 實現 V1Simple 玩法，也嘗試用 `iced` 跨平臺 UI，後因開發時間拉長延期，現在改為 `iced` 與 `tungstenite` 制作 Base 玩法。

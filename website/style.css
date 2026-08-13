@@ -80,14 +80,14 @@
         /*color: var(--primary-text-color);*/
         color: var(--text-color);
         text-decoration: none;
-        font-size: 20px;
+        font-size: var(--text-size);
         text-align: center;
     }
 
     .nav_item:hover {
         color: var(--secondary-text-color);
-        margin: 18px;
-        font-size: 21.5px;
+        margin: 14px;
+        font-size: min(calc(var(--text-size) + 7), 17px);
         transition-duration: 200ms;
         cursor: pointer;
     }
@@ -109,9 +109,10 @@
     border-radius: var(--normal-radius);
     margin: var(--normal-margin);
     padding: var(--normal-padding);
+
     img {
         max-width: 2048px;
-        max-height: 2048px;
+        max-height: 540px;
         border-radius: var(--image-radius);
     }
 }
@@ -174,9 +175,11 @@ code {
     visibility: hidden; /* Hidden by default */
     min-width: 200px;
     max-width: 20dvw;
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(0, 0, 0, 0.4);
     color: white;
     text-align: center;
+    overflow-y: scroll;
+    scrollbar-width: none;
     padding: 7px 0;
     padding-left: 3px;
     padding-right: 3px;
@@ -187,7 +190,11 @@ code {
     left: 50%;
     margin-left: -100px; /* Use half of the width (200/2 = 100), to center the tooltip */
 }
-
+@media (width < 1080px) {
+    .tooltiptext {
+        background-color: rgba(0, 0, 0, 0.45);
+    }
+}
 /* Show the tooltip text on hover */
 .tooltip:hover .tooltiptext {
     visibility: visible;
@@ -200,16 +207,31 @@ code {
     overflow-y: scroll;
     white-space: pre;
 }
+@media (width < 1080px) {
+    .text-block {
+        min-height: 250px;
+        max-height: max(30dvh, 400px);
+    }
+}
 
 .dlable-file {
     border-color: gray;
     border-width: 1.5px;
     border-radius: 16px;
     border-style: solid;
-    padding: 4px;
-    display: inline-block;
-    height: 35px;
+    margin-top: var(--normal-margin);
+    margin-bottom: var(--normal-margin);
+    padding-left: 8px;
+    padding-bottom: 4px;
+    padding-top: 4px;
+    max-height: 45px;
+    min-height: 25px;
     text-align: left;
     width: 100%;
-    vertical-align: middle;
+    a {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+        vertical-align: middle;
+    }
 }

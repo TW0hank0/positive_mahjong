@@ -64,12 +64,8 @@
             src="https://img.shields.io/gitlab/pipeline-status/TW0hank0%2Fpositive_mahjong?branch=master&style=for-the-badge&label=Gitlab%20Pipeline&color=green"
         />
         <img
-            alt="GitLab License"
-            src="https://img.shields.io/gitlab/license/TW0hank0%2Fpositive_mahjong?style=for-the-badge&color=green"
-        />
-        <img
             alt="GitHub Actions Workflow Status"
-            src="https://img.shields.io/github/actions/workflow/status/TW0hank0/positive_mahjong/commit-build.yaml?branch=master&style=for-the-badge&label=Github%20Action&color=green"
+            src="https://img.shields.io/github/actions/workflow/status/TW0hank0/positive_mahjong/commit-ci.yaml?branch=master&style=for-the-badge&label=Github%20Action&color=green"
         />
     </div>
 </div>
