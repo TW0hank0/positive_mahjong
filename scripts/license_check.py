@@ -56,7 +56,7 @@ def main():
         # This file is from project [iced](https://github.com/iced-rs/iced/).
         "crates/pmj_client_desktop/src/circular.rs",
         "crates/old_slint_client/**",
-        "supply-chain",
+        "supply-chain/**",
     ]
     ignored = []
     for dir in ignore_dir:

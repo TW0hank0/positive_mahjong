@@ -991,10 +991,6 @@ criteria = "safe-to-deploy"
 version = "0.2.2"
 criteria = "safe-to-deploy"
 
-[[exemptions.new_debug_unreachable]]
-version = "1.0.6"
-criteria = "safe-to-deploy"
-
 [[exemptions.nom]]
 version = "8.0.0"
 criteria = "safe-to-deploy"

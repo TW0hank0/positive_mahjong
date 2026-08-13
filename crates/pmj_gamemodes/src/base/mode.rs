@@ -41,7 +41,7 @@ fn write_reply(
     let reply: Message = Message::Text(text.into());
     let write_result: tungstenite::Result<()>;
     loop {
-        match websocket.try_write() {
+        match websocket.write() {
             Ok(mut guard) => {
                 write_result = guard.write(reply.clone());
                 let _ = guard.flush();
@@ -71,11 +71,12 @@ fn handle_client(
     backend: sync::Arc<sync::RwLock<crate::base::mode::PositiveMahjong>>,
 ) {
     stream
-        .set_read_timeout(Some(time::Duration::from_secs(3)))
+        .set_read_timeout(Some(time::Duration::from_secs(8)))
         .ok();
     stream
-        .set_write_timeout(Some(time::Duration::from_secs(5)))
+        .set_write_timeout(Some(time::Duration::from_secs(10)))
         .ok();
+    stream.set_nodelay(true).ok();
     let client_ip = stream.peer_addr().unwrap().ip();
     info!("建立連線：{}", client_ip.to_string());
     let websocket: WebSocket<TcpStream> = match accept_with_config(
@@ -84,7 +85,7 @@ fn handle_client(
     ) {
         Ok(ws) => ws,
         Err(e) => {
-            warn!("握手失敗：{}", e);
+            warn!("ws握手失敗：{}", e);
             return;
         }
     };
@@ -104,18 +105,19 @@ fn handle_client(
                         warn!("guard.can_read() = false");
                     } else {
                         debug!("guard.can_read() -> true");
-                        guard.get_mut().set_nonblocking(true).ok();
+                        //guard.get_mut().set_nonblocking(true).ok();
                         match guard.read() {
                             Ok(msg) => {
                                 message = msg;
-                                guard.get_mut().set_nonblocking(false).ok();
+                                //guard.get_mut().set_nonblocking(false).ok();
                                 break 'read_msg;
                             }
                             Err(e) => {
                                 warn!("讀取錯誤：{}", e);
-                                guard.get_mut().set_nonblocking(false).ok();
+                                //guard.get_mut().set_nonblocking(false).ok();
                                 drop(guard);
-                                thread::sleep(std::time::Duration::from_millis(2569)); // 2sec
+                                thread::sleep(std::time::Duration::from_millis(2569));
+                                // 2sec
                             }
                         }
                     }
@@ -169,9 +171,34 @@ fn handle_client(
                             let resp_msg = serde_json::to_string(&resp).unwrap();
                             let _wrist_result = write_reply(resp_msg, ws.clone());
                             info!("已回復客戶端初訊息。");
-                            trace!("因為連接並回覆初訊息，所以將在5秒後停止此線程。");
-                            thread::sleep(time::Duration::from_secs(5));
-                            break 'connection;
+                            trace!("因為連接並回覆初訊息，將定期發送 Ping。");
+                            loop {
+                                match ws.try_write() {
+                                    Ok(mut guard) => {
+                                        match guard.send(tungstenite::Message::Ping(
+                                            tungstenite::Bytes::new(),
+                                        )) {
+                                            Ok(_) => {
+                                                trace!("成功發送 Ping。");
+                                            }
+                                            Err(
+                                                tungstenite::Error::AlreadyClosed
+                                                | tungstenite::Error::ConnectionClosed,
+                                            ) => {
+                                                break 'connection;
+                                            }
+                                            Err(e) => {
+                                                trace!("ping process err: {:?}", e);
+                                                thread::sleep(time::Duration::from_secs(1));
+                                            }
+                                        }
+                                    }
+                                    Err(_e) => {
+                                        thread::sleep(time::Duration::from_secs(1));
+                                    }
+                                }
+                                thread::sleep(time::Duration::from_secs(2));
+                            }
                         }
                     }
                     Err(e) => {
@@ -555,102 +582,128 @@ impl PositiveMahjong {
                         .get_mut((current_turn_player_id - 1) as usize)
                         .unwrap();
                     let player_ws = player.player_ws.clone();
-                    let ws_msg: tungstenite::Message;
-                    'guard_read: loop {
-                        match player_ws.try_write() {
-                            Ok(mut guard) => {
-                                match guard.get_mut().set_nonblocking(false) {
-                                    Ok(_) => {}
-                                    Err(e) => {
-                                        warn!("guard.get_mut().set_nonblocking() -> {:?}", e);
-                                    }
-                                }
-                                match guard.read() {
+                    'get_player_throw: loop {
+                        let ws_msg: tungstenite::Message;
+                        'guard_read: loop {
+                            match player_ws.write() {
+                                Ok(mut guard) => match guard.read() {
                                     Ok(i) => {
                                         ws_msg = i;
                                         break 'guard_read;
                                     }
+                                    Err(tungstenite::Error::AlreadyClosed) => {
+                                        drop(guard);
+                                        error!(
+                                            "guard.read() => 連線早已關閉（tungstenite::Error::AlreadyClosed）"
+                                        );
+                                        thread::sleep(time::Duration::from_millis(500));
+                                    }
+                                    Err(tungstenite::Error::ConnectionClosed) => {
+                                        drop(guard);
+                                        error!(
+                                            "guard.read() => 連線已關閉（tungstenite::Error::ConnectionClosed）"
+                                        );
+                                        thread::sleep(time::Duration::from_millis(500));
+                                    }
+                                    Err(tungstenite::Error::Io(io_err)) => match io_err.kind() {
+                                        std::io::ErrorKind::TimedOut => {
+                                            debug!(
+                                                "{:?}",
+                                                guard.send(tungstenite::Message::Ping(
+                                                    tungstenite::Bytes::new()
+                                                ))
+                                            );
+                                        }
+                                        _ => {
+                                            drop(guard);
+                                            warn!("guard.read(): Err::Io => {:?}", io_err.kind());
+                                            thread::sleep(time::Duration::from_millis(500));
+                                        }
+                                    },
                                     Err(e) => {
                                         drop(guard);
                                         warn!("guard.read(): {}", e);
                                         thread::sleep(time::Duration::from_millis(500));
                                     }
+                                },
+                                Err(e) => {
+                                    error!("err: {}", e);
                                 }
                             }
-                            Err(e) => {
-                                error!("err: {}", e);
-                            }
+                            thread::sleep(time::Duration::from_millis(500));
                         }
-                        thread::sleep(time::Duration::from_millis(500));
-                    }
-                    match ws_msg {
-                        Message::Text(text) => {
-                            let msg: base::shared::ClientMessageType =
-                                serde_json::from_str(&text).unwrap();
-                            match msg.msg_type {
-                                base::shared::ClientMessageTypeKinds::GameAction => {
-                                    match msg.info_game_action.unwrap() {
-                                        GameTurnTypes::ThrowCard => {
-                                            if player
-                                                .player_hand_cards
-                                                .contains(&msg.info_throw_card.clone().unwrap())
-                                            {
-                                                let mut card_index: usize = 0;
-                                                'find_index: loop {
-                                                    if &msg.info_throw_card.clone().unwrap()
-                                                        == player
-                                                            .player_hand_cards
-                                                            .get(card_index.clone())
-                                                            .unwrap()
-                                                    {
-                                                        break 'find_index;
-                                                    } else {
-                                                        card_index += 1;
+                        match ws_msg {
+                            Message::Text(text) => {
+                                let msg: base::shared::ClientMessageType =
+                                    serde_json::from_str(&text).unwrap();
+                                match msg.msg_type {
+                                    base::shared::ClientMessageTypeKinds::GameAction => {
+                                        match msg.info_game_action.unwrap() {
+                                            GameTurnTypes::ThrowCard => {
+                                                if player
+                                                    .player_hand_cards
+                                                    .contains(&msg.info_throw_card.clone().unwrap())
+                                                {
+                                                    let mut card_index: usize = 0;
+                                                    'find_index: loop {
+                                                        if &msg.info_throw_card.clone().unwrap()
+                                                            == player
+                                                                .player_hand_cards
+                                                                .get(card_index.clone())
+                                                                .unwrap()
+                                                        {
+                                                            break 'find_index;
+                                                        } else {
+                                                            card_index += 1;
+                                                        }
                                                     }
-                                                }
-                                                player.player_hand_cards.remove(card_index);
-                                                let client_msg = serde_json::to_string(&shared_base::ServerMessageType {
+                                                    player.player_hand_cards.remove(card_index);
+                                                    let client_msg = serde_json::to_string(&shared_base::ServerMessageType {
                                                     msg_type: shared_base::ServerMessageTypeKinds::HandCardChange,
                                                     info_hand_card_change: Some(player.player_hand_cards.clone()),
                                                     ..Default::default()
                                                 })
                                                 .unwrap();
-                                                let _write_result = write_reply(
-                                                    client_msg,
-                                                    player.player_ws.clone(),
-                                                );
-                                                let msg_to_else_player = serde_json::to_string(&shared_base::ServerMessageType{
+                                                    let _write_result = write_reply(
+                                                        client_msg,
+                                                        player.player_ws.clone(),
+                                                    );
+                                                    let msg_to_else_player = serde_json::to_string(&shared_base::ServerMessageType{
                                                     msg_type:shared_base::ServerMessageTypeKinds::PlayerAction,
                                                     info_player_action:Some((current_turn_player_id, GameTurnTypes::ThrowCard)),
                                                     ..Default::default()
                                                 }).unwrap();
-                                                for p in self.players.iter() {
-                                                    if p.player_id != current_turn_player_id {
-                                                        let _ = write_reply(
-                                                            msg_to_else_player.clone(),
-                                                            p.player_ws.clone(),
-                                                        );
+                                                    for p in self.players.iter() {
+                                                        if p.player_id != current_turn_player_id {
+                                                            let _ = write_reply(
+                                                                msg_to_else_player.clone(),
+                                                                p.player_ws.clone(),
+                                                            );
+                                                        }
                                                     }
+                                                    if current_turn_player_id >= players_count {
+                                                        current_turn_player_id = 1;
+                                                    } else {
+                                                        current_turn_player_id += 1;
+                                                    }
+                                                    current_action = GameTurnTypes::GetCard;
+                                                    break 'get_player_throw;
                                                 }
-                                                if current_turn_player_id >= players_count {
-                                                    current_turn_player_id = 1;
-                                                } else {
-                                                    current_turn_player_id += 1;
-                                                }
-                                                current_action = GameTurnTypes::GetCard;
                                             }
-                                        }
-                                        _ => {
-                                            error!("錯誤：客戶端錯誤訊息");
-                                            todo!("錯誤處理");
+                                            _ => {
+                                                error!("錯誤：客戶端錯誤訊息");
+                                                todo!("錯誤處理");
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                        _ => {
-                            error!("錯誤：客戶端錯誤訊息");
-                            todo!("錯誤處理");
+                            Message::Ping(_) => {}
+                            Message::Pong(_) => {}
+                            _ => {
+                                error!("錯誤：客戶端錯誤訊息");
+                                todo!("錯誤處理");
+                            }
                         }
                     }
                 }

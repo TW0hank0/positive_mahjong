@@ -41,6 +41,9 @@ jobs:
       - name: Run release check
         run: cargo +nightly check --release --workspace
 
+      - name: Run clippy
+        run: cargo +nightly clippy
+
       - name: Run License Check
         run: |
           echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
@@ -203,7 +206,7 @@ jobs:
             --notes "**這是使用Github Action製作的測試版**
             - 版本： ${{ steps.get_version.outputs.version }}
             - 時間： ${{ steps.get_datetime.outputs.datetime }}
-            - github_sha： ${{ github.sha }}" \
+            - commit sha： ${{ github.sha }}" \
             --prerelease \
             --repo="${{ github.repository }}"
           echo '----Get Upload Url----'
