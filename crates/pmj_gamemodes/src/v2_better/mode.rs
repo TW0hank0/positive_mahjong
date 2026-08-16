@@ -13,6 +13,8 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
+//! V2Better 伺服器
+
 use std::{
     self,
     net::{self, TcpListener, TcpStream},
@@ -27,8 +29,8 @@ use url;
 
 use pmj_shared::shared;
 
-use crate::base::shared as shared_base;
-use crate::base::{
+use crate::v2_better::shared as shared_base;
+use crate::v2_better::{
     self,
     shared::{GameActions, PMJCard, PMJCardFlowerType, PMJCardType, PMJCardWordsType, PMJPlayer},
 };
@@ -324,7 +326,7 @@ fn handle_server_base(
 
 #[derive(Debug)]
 pub struct PositiveMahjong {
-    players: Vec<base::shared::PMJPlayer>,
+    players: Vec<PMJPlayer>,
     is_game_start: bool,
     is_game_finish: bool,
     /// 未被 使用/抽取 的牌
@@ -635,10 +637,10 @@ impl PositiveMahjong {
                         }
                         match ws_msg {
                             Message::Text(text) => {
-                                let msg: base::shared::ClientMessageType =
+                                let msg: v2_better::shared::ClientMessageType =
                                     serde_json::from_str(&text).unwrap();
                                 match msg.msg_type {
-                                    base::shared::ClientMessageTypeKinds::GameAction => {
+                                    v2_better::shared::ClientMessageTypeKinds::GameAction => {
                                         match msg.info_game_action.unwrap() {
                                             GameActions::ThrowCard => {
                                                 if player

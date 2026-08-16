@@ -13,29 +13,44 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
+use clap::{self, Parser};
 use iced;
 use tracing::{debug, error, info, warn};
 
 use pmj_shared;
 
 mod base;
+mod v2_better;
+
+#[derive(clap::Parser)]
+#[command(
+    name = "pmj_server",
+    author,
+    version,
+    about = "positive_mahjong 伺服器"
+)]
+struct CliArgs {
+    #[command(subcommand)]
+    command: SubCmds,
+}
+
+#[derive(clap::Subcommand, Debug)]
+enum SubCmds {
+    Base,
+    V2Better,
+}
 
 fn main() {
     let _guard = pmj_shared::shared::init_tracing_fmt(String::from("pmj_server_gui"));
-    let config = pmj_shared::shared::read_server_config();
+    let args = CliArgs::parse();
     let iced_result: iced::Result;
-    match config.gamemode {
-        pmj_shared::shared::GameModes::Base => {
-            info!("config.gamemode = GameModes::Base");
+    info!("args.command = {:?}", args.command);
+    match args.command {
+        SubCmds::Base => {
             iced_result = base::main();
         }
-        pmj_shared::shared::GameModes::V1Simple => {
-            warn!("還未支援！");
-            std::process::exit(1);
-        }
-        pmj_shared::shared::GameModes::V2Better => {
-            warn!("還未支援！");
-            std::process::exit(1);
+        SubCmds::V2Better => {
+            iced_result = v2_better::main();
         }
     }
     match iced_result {

@@ -14,8 +14,8 @@
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 use std::{
-    self, io,
-    net::{self, TcpStream},
+    self,
+    net::{TcpStream},
     sync, thread, time,
 };
 
@@ -28,7 +28,7 @@ use iced::{
 };
 use serde_json;
 use tracing::{debug, error, info, trace, warn};
-use tungstenite::{Message, WebSocket, connect, stream::NoDelay};
+use tungstenite::{Message, WebSocket, stream::NoDelay};
 
 use crate::{circular, easing};
 
@@ -352,7 +352,8 @@ impl Client {
                                                                 .result_play_base_throw_card
                                                                 .unwrap()
                                                         );
-                                                        self.status_play_base.game_controller = PlayBaseController::NoCtrl;
+                                                        self.status_play_base.game_controller =
+                                                            PlayBaseController::NoCtrl;
                                                     }
                                                 }
                                             }
@@ -755,8 +756,7 @@ impl Client {
                                     }));
                         }
                         ctr_bar = ctr_bar.push(scrollable(card_bar));
-                        layout_play_base = layout_play_base
-                            .push(ctr_bar);
+                        layout_play_base = layout_play_base.push(ctr_bar);
                     }
                     // 玩家操作
                     {
@@ -964,8 +964,7 @@ impl Client {
         match tungstenite::client::client(uri.to_string(), tcp_stream) {
             Ok((mut row_ws, _resp)) => {
                 debug!("set_nodelay(): {:?}", row_ws.get_mut().set_nodelay(true));
-                let ws: sync::Arc<sync::RwLock<WsConn>> =
-                    sync::Arc::new(sync::RwLock::new(row_ws));
+                let ws: sync::Arc<sync::RwLock<WsConn>> = sync::Arc::new(sync::RwLock::new(row_ws));
                 self.ws = Some(ws.clone());
                 ws.write().unwrap().get_mut().set_nodelay(false).ok();
                 debug!("Websocket 連線成功。");
@@ -1175,7 +1174,7 @@ impl Client {
         let handle: thread::JoinHandle<ThreadResult> = thread::spawn(move || {
             let msg = serde_json::to_string(&pmj_gamemodes::base::shared::ClientMessageType {
                 msg_type: pmj_gamemodes::base::shared::ClientMessageTypeKinds::GameAction,
-                info_game_action: Some(pmj_gamemodes::base::shared::GameTurnTypes::ThrowCard),
+                info_game_action: Some(pmj_gamemodes::base::shared::GameActions::ThrowCard),
                 info_throw_card: Some(card.clone()),
                 ..Default::default()
             })

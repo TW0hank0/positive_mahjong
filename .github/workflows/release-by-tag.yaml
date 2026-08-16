@@ -226,11 +226,6 @@ jobs:
         run: |
           uv venv --python cpython-3.13
 
-      # - name: Download all artifacts
-      #   uses: actions/download-artifact@v8
-      #   with:
-      #     path: artifacts
-
       - name: Get datetime
         id: get_datetime
         run: |
@@ -251,4 +246,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          uv run scripts/ci/release_by_tag.py
+          uv run scripts/release_by_tag.py
