@@ -14,8 +14,8 @@
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 [unstable]
-profile-rustflags = true
 codegen-backend = true
+profile-rustflags = true
 
 [profile.dev]
 # GUI is NOT able with cranelift cg-backend currently!
@@ -30,9 +30,9 @@ codegen-backend = "llvm"
 # use release profile cause by: let rust-analyzer work
 rustflags = [
     "--remap-path-prefix",
-    "=/project",
-    "--remap-path-prefix",
     "~/.cargo=/.cargo",
+    "--remap-path-prefix",
+    "=/project",
 ]
 
 [target.x86_64-pc-windows-msvc]

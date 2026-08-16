@@ -152,3 +152,11 @@
 **2026-8-13**
 
 - 新增：［docs::intro］開發時間序
+
+**2026-8-14**
+
+- 修復：［pmj_sever::gui::base］iced window 設定未套用
+
+**2026-8-16**
+
+- 新增：［pmj_client_desktop］新增讀取超時

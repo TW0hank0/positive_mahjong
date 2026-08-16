@@ -29,8 +29,9 @@ lyon_algorithms = { workspace = true }
 pmj_gamemodes = { workspace = true }
 pmj_shared = { workspace = true }
 serde_json = { workspace = true }
-tungstenite = { workspace = true }
 tracing = { workspace = true }
+tungstenite = { workspace = true }
+url = { workspace = true }
 
 [features]
 default = []

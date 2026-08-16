@@ -20,6 +20,7 @@
     font-family: sans-serif;
     background-color: var(--background);
     color: var(--text-color);
+    color-scheme: dark light;
     /* 變數 */
     --normal-line-height: 10px;
     --primary-color: cornflowerblue;

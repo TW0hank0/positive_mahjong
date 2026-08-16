@@ -21,7 +21,7 @@ mod circular;
 mod client;
 mod easing;
 
-use pmj_shared::shared::{self, ICON_PNG_BYTES, PROJECT_NAME};
+use pmj_shared::shared::{self, FONT_NOTO_SANS_REG_BYTES, ICON_PNG_BYTES, PROJECT_NAME};
 
 pub const FONT_NOTO_SANS_REG: iced::font::Font = iced::font::Font::with_name("Noto Sans TC");
 
@@ -35,20 +35,21 @@ pub fn icon_init() -> Option<iced::window::Icon> {
 
 fn main() {
     let _guard = shared::init_tracing_fmt(String::from("pmj_client_desktop"));
-    let icon = icon_init();
     let window_settings = iced::window::Settings {
         maximized: true,
-        icon: icon,
-        min_size: Some(iced::Size::new(1080.0, 720.0)),
+        min_size: Some(iced::Size::new(720.0, 480.0)),
+        icon: icon_init(),
         position: iced::window::Position::Centered,
         ..Default::default()
     };
-    //
-    let mut app_settings = iced::Settings::default();
-    app_settings.id = Some(String::from(PROJECT_NAME));
-    app_settings.default_text_size = iced::Pixels::from(22);
-    app_settings.default_font = FONT_NOTO_SANS_REG;
-    //
+    let app_settings = iced::Settings {
+        id: Some(format!("{} - pmj_client_desktop", PROJECT_NAME)),
+        default_text_size: iced::Pixels::from(24),
+        default_font: FONT_NOTO_SANS_REG,
+        vsync: true,
+        fonts: vec![std::borrow::Cow::from(FONT_NOTO_SANS_REG_BYTES)],
+        ..Default::default()
+    };
     let iced_result = iced::application(
         client::Client::new,
         client::Client::update,

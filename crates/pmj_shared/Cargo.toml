@@ -23,10 +23,10 @@ rust-version.workspace = true
 version.workspace = true
 
 [dependencies]
+dirs = { workspace = true }
 image = { workspace = true }
+positive_tool_rs = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
-positive_tool_rs = { workspace = true }
-tracing = { workspace=true}
+tracing = { workspace = true }
 tracing-appender = { workspace = true }
-dirs = { workspace = true }

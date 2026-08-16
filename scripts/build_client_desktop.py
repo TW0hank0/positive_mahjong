@@ -13,15 +13,15 @@
 # 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-import subprocess
-import sys
 import time
+
+import util
 
 
 def main():
     start_time = time.time()
     print("-" * 10, "cargo build", "-" * 10)
-    subprocess.run(
+    util.run_cmd(
         [
             "cargo",
             "+nightly",
@@ -30,10 +30,6 @@ def main():
             "--release",
             "--locked",
         ],
-        check=True,
-        stdout=sys.stdout,
-        stdin=sys.stdin,
-        stderr=sys.stderr,
     )
     print("finish in", time.time() - start_time)
 
