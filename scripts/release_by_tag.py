@@ -13,10 +13,13 @@
 # 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
+import datetime
 import os
 import subprocess
 import sys
 from typing import Optional
+
+from ci import get_version
 
 
 def get_latest_commit_message(repo_path: str = ".") -> Optional[str]:
@@ -33,7 +36,7 @@ def get_latest_commit_message(repo_path: str = ".") -> Optional[str]:
         # 執行 git log 指令
         # --format=%B: 取得完整的 commit message body
         # -n 1: 只取最新的一筆
-        result: subprocess.CompletedProcess = subprocess.run(
+        result = subprocess.run(
             ["git", "log", "-n", "1", "--format=%B"],
             cwd=repo_path,
             capture_output=True,
@@ -68,13 +71,9 @@ def main():
     else:
         if "release" in msg:
             print("Release:")
-            import datetime
-
-            import get_version
 
             version = get_version.main()
-            # owner = "TW0hank0"
-            repo = "positive_mahjong"
+            repo = "TW0hank0/positive_mahjong"
             tag = f"v{version}"
             title = f"{repo} v{version}"
             date = datetime.datetime.now().date()

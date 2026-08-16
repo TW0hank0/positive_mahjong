@@ -13,10 +13,29 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
+use clap::{self, Parser};
 use local_ip_address;
 
 use pmj_gamemodes::{self, base};
 use pmj_shared::shared;
+
+#[derive(clap::Parser)]
+#[command(
+    name = "pmj_server",
+    author,
+    version,
+    about = "positive_mahjong 伺服器"
+)]
+struct CliArgs {
+    #[command(subcommand)]
+    command: SubCmds,
+}
+
+#[derive(clap::Subcommand)]
+enum SubCmds {
+    Base,
+    V2Better,
+}
 
 pub fn main() {
     let _guard = shared::init_tracing_fmt(String::from("pmj_server"));
@@ -24,16 +43,13 @@ pub fn main() {
     println!("ipv4: {}", local_ip_address::local_ip().unwrap());
     println!("ipv6: {}", local_ip_address::local_ipv6().unwrap());
     //
-    let config: shared::PMJServerConfig = shared::read_server_config();
-    match config.gamemode {
-        shared::GameModes::Base => {
+    let args = CliArgs::parse();
+    match args.command {
+        SubCmds::Base => {
             let _ = base::mode::main_base(false);
         }
-        shared::GameModes::V1Simple => {
-            println!("還未支援！");
-        }
-        shared::GameModes::V2Better => {
-            println!("還未支援！");
+        SubCmds::V2Better => {
+            let _ = pmj_gamemodes::v2_better::mode::main_base(false);
         }
     }
 }

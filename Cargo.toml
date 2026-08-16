@@ -72,6 +72,7 @@ tungstenite = { version = "0.30.0", features = [
     "rustls-tls-native-roots",
 ] }
 url = "2.5.8"
+clap = { version = "4.6.6", features = ["derive"]}
 # --- wasm ---
 console_error_panic_hook = { version = "0.1.5" }
 wasm-bindgen = { version = "0.2.127" }

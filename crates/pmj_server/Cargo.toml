@@ -24,6 +24,7 @@ rust-version.workspace = true
 version = { workspace = true }
 
 [dependencies]
+clap = { workspace = true }
 iced = { workspace = true }
 image = { workspace = true }
 local-ip-address = { workspace = true }

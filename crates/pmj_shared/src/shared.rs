@@ -15,12 +15,12 @@
 
 //! 通用資料
 
-use std::{env, fmt::Display, fs};
+use std::{env, fmt, fs};
 
 use positive_tool_rs;
 use serde;
 use serde_json;
-use tracing::{debug, error, info, trace, warn};
+use tracing::debug;
 use tracing_appender;
 
 pub const PROJECT_NAME: &str = "positive_mahjong";
@@ -36,62 +36,14 @@ pub const FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES: &[u8] = include_bytes!(
 );
 
 pub const SERVER_PORT: u16 = 6060;
-
-/*pub fn gui_init() -> Option<iced::window::Icon> {
-    let _ = iced::font::load(FONT_NOTO_SANS_REG_BYTES);
-    //
-    let img = image::load_from_memory_with_format(ICON_PNG_BYTES, image::ImageFormat::Png)
-        .unwrap()
-        .into_rgba8();
-    let (img_width, img_height) = img.dimensions();
-    let icon = iced::window::icon::from_rgba(img.into_raw(), img_width, img_height).ok();
-    icon
-}*/
-
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
-pub struct ClientFirstConnectType {
-    /// 需為 `positive_mahjong` 。
-    ///
-    /// 否則會拒絕連線
-    pub app_name: String,
-    /// 無限制。
-    ///
-    /// 不影響連線。
-    pub client: String,
-}
-
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
-pub struct ServerFirstConnectType {
-    pub is_start: Option<bool>,
-    pub is_error: bool,
-    #[serde(default)]
-    pub player_id: Option<u8>,
-    #[serde(default)]
-    pub error_type: Option<ServerFirstConnectErrorTypes>,
-}
-
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
-pub enum ServerFirstConnectErrorTypes {
-    TooManyPlayer,
-    IpBlocked,
-    Unknown,
-}
-
-impl Display for ServerFirstConnectErrorTypes {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(match self {
-            Self::TooManyPlayer => "玩家數量超出限制",
-            Self::IpBlocked => "Ip被封鎖",
-            Self::Unknown => "伺服器端未知錯誤",
-        })
-    }
-}
+pub const DEFAULT_GAMEMODE: GameModes = GameModes::Base;
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct ClientConnectRequestType {
     /// 需為 `positive_mahjong`
     /// 否則會拒絕
     pub app_name: String,
+    /// 目前無限制
     pub client: String,
 }
 
@@ -102,196 +54,20 @@ pub struct ServerConnectResponceType {
     pub too_many_player: bool,
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
-pub struct OldClientRequestType {
-    /// 需為 `positive_mahjong`
-    /// 否則會拒絕
-    pub app: String,
-    /// 客戶端程式名，無限制
-    pub client: String,
-    pub data: ClientRequestDataType,
-    //pub game_data_v1: Option<gamemodes_shared::sharedv1_simple::GameDataV1>,
-    //pub game_action_v1: Option<gamemodes_shared::sharedv1_simple::GameActions>,
-    pub is_test_connection: bool,
-}
-
-impl std::default::Default for OldClientRequestType {
-    fn default() -> Self {
-        Self {
-            app: String::from("positive_mahjong"),
-            client: String::from("pmj_client"),
-            data: ClientRequestDataType::default(),
-            //game_data_v1: None,
-            is_test_connection: true,
-        }
-    }
-}
-
-impl std::fmt::Display for OldClientRequestType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "ClientRequstType
-    app: {}
-    client: {}
-    data: {:?}",
-            self.app, self.client, self.data
-        )
-    }
-}
-
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub enum ActionType {
-    AddPlayer,
-    RemovePlayer,
-    TestConnection,
-    IsStart,
-    SendGameAction,
-    SyncGameStatus,
-}
-
-impl std::fmt::Display for ActionType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{}",
-            match self {
-                Self::AddPlayer => "新增玩家 (AddPlayer)",
-                Self::RemovePlayer => "刪除玩家 (RemovePlayer)",
-                Self::TestConnection => "測試連線 (TestConnection)",
-                Self::IsStart => "是否開始 (IsStart)",
-                Self::SendGameAction => "遊戲動作 (SendGameAction)",
-                Self::SyncGameStatus => "同步遊戲資料 (SyncGameStatus)",
-            }
-        )
-    }
-}
-
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
-pub struct ClientRequestDataType {
-    pub req_action_type: ActionType,
-    pub data_remove_player: Option<ClientRequestDataRemovePlayerType>,
-    pub data_test_connection: Option<ClientRequestDataTestConnectionType>,
-    pub data_is_start: Option<ClientRequestDataIsStartType>,
-}
-
-impl std::fmt::Display for ClientRequestDataType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "ClientRequestDataType
-    req_type: {}
-    data_remove_player: {:?}
-    data_test_connection: {:?}",
-            self.req_action_type, self.data_remove_player, self.data_test_connection
-        )
-    }
-}
-
-impl std::default::Default for ClientRequestDataType {
-    fn default() -> Self {
-        Self {
-            req_action_type: ActionType::TestConnection,
-            data_remove_player: None,
-            data_test_connection: None,
-            data_is_start: None,
-        }
-    }
-}
-
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
-pub struct ClientRequestDataRemovePlayerType {
-    pub number: u8,
-}
-
-impl std::fmt::Display for ClientRequestDataRemovePlayerType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "ClientRequestDataRemovePlayerType {{ number: {} }}",
-            self.number
-        )
-    }
-}
-
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
-pub struct ClientRequestDataTestConnectionType {
-    pub number: u8,
-}
-
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
-pub struct ClientRequestDataIsStartType {
-    pub number: u8,
-}
-
-impl std::fmt::Display for ClientRequestDataTestConnectionType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "ClientRequestDataTestConnectionType {{ number: {} }}",
-            self.number
-        )
-    }
-}
-
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
-pub struct ServerResponseDataAddPlayerType {
-    pub number: u8,
-}
-
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
-pub struct ServerResponseDataIsStartType {
-    pub is_start: bool,
-}
-
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
-pub struct ServerResponseDataTestConnectionType {
-    pub msg: String,
-}
-
-/// 伺服器回應資料
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
-pub struct ServerResponseType {
-    /// 客戶端名稱
-    pub app: String,
-    /// 資料
-    pub data: ServerResponseDataType,
-    /// 訊息 (通常錯誤時才有)
-    pub msg: String,
-    /// 是否錯誤
-    pub is_error: bool,
-    /// 遊戲模式
-    ///
-    /// 遊戲未開始時：`None`
-    ///
-    /// 遊戲已開始時：`Some(GameModes)`
-    pub gamemode: Option<GameModes>,
-}
-
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
 pub enum GameModes {
     Base,
     V1Simple,
     V2Better,
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
-pub struct ServerResponseDataType {
-    pub data_add_player: Option<ServerResponseDataAddPlayerType>,
-    pub data_test_connection: Option<ServerResponseDataTestConnectionType>,
-    pub data_is_start: Option<ServerResponseDataIsStartType>,
-    pub data_type: ActionType,
-    /* pub gamedata_v1 */ //FIXME
-}
-
-impl std::default::Default for ServerResponseDataType {
-    fn default() -> Self {
-        Self {
-            data_add_player: None,
-            data_test_connection: None,
-            data_is_start: None,
-            data_type: ActionType::TestConnection,
-        }
+impl fmt::Display for GameModes {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(match self {
+            Self::Base => "Base",
+            Self::V1Simple => "V1Simple",
+            Self::V2Better => "V2Better",
+        })
     }
 }
 

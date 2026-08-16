@@ -16,210 +16,210 @@
 name: release-build
 
 permissions:
-    contents: write
+  contents: write
 
 on:
-    release:
-        types: [published]
+  release:
+    types: [published]
 
 jobs:
-    build_computer:
-        runs-on: ${{ matrix.os }}
-        strategy:
-            fail-fast: false
-            matrix:
-                os: [ubuntu-latest, windows-latest]
+  build_computer:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v6
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
 
-            - name: Install Dep
-              uses: ./.github/workflows/instdep
+      - name: Install Dep
+        uses: ./.github/workflows/instdep
 
-            # - name: install rustup (Windows)
-            #   if: runner.os == 'Windows'
-            #   shell: pwsh
-            #   run: |
-            #     Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
-            #     ls
-            #     .\rustup-init.exe -y --profile minimal
+      # - name: install rustup (Windows)
+      #   if: runner.os == 'Windows'
+      #   shell: pwsh
+      #   run: |
+      #     Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
+      #     ls
+      #     .\rustup-init.exe -y --profile minimal
 
-            # - name: install rustup (Linux)
-            #   if: runner.os == 'Linux'
-            #   run: |
-            #     curl https://sh.rustup.rs -o rust-init.sh
-            #     sh rust-init.sh -y
+      # - name: install rustup (Linux)
+      #   if: runner.os == 'Linux'
+      #   run: |
+      #     curl https://sh.rustup.rs -o rust-init.sh
+      #     sh rust-init.sh -y
 
-            # - name: check rust Install
-            #   run: |
-            #     rustc --version
-            #     cargo --version
+      # - name: check rust Install
+      #   run: |
+      #     rustc --version
+      #     cargo --version
 
-            # - name: install java
-            #   uses: actions/setup-java@v5
-            #   with:
-            #     distribution: "temurin" # See 'Supported distributions' for available options
-            #     java-version: "21"
+      # - name: install java
+      #   uses: actions/setup-java@v5
+      #   with:
+      #     distribution: "temurin" # See 'Supported distributions' for available options
+      #     java-version: "21"
 
-            # - name: Setup Android
-            #   uses: android-actions/setup-android@v4
+      # - name: Setup Android
+      #   uses: android-actions/setup-android@v4
 
-            # - name: Install Android SDK and NDK
-            #   run: |
-            #     # 安裝基本工具與平台
-            #     sdkmanager "platform-tools" \
-            #     "platforms;android-35" \
-            #     "build-tools;35.0.0" \
-            #     "extras;android;m2repository" \
-            #     "extras;google;m2repository" \
-            #     # 安裝指定版本的 NDK
-            #     # 請將 '26.3.11579264' 替換為你專案需要的確切版本
-            #     "ndk;26.3.11579264" \
-            #     # 若使用 CMake，建議同時安裝對應版本的 CMake
-            #     "cmake;3.22.1"
+      # - name: Install Android SDK and NDK
+      #   run: |
+      #     # 安裝基本工具與平台
+      #     sdkmanager "platform-tools" \
+      #     "platforms;android-35" \
+      #     "build-tools;35.0.0" \
+      #     "extras;android;m2repository" \
+      #     "extras;google;m2repository" \
+      #     # 安裝指定版本的 NDK
+      #     # 請將 '26.3.11579264' 替換為你專案需要的確切版本
+      #     "ndk;26.3.11579264" \
+      #     # 若使用 CMake，建議同時安裝對應版本的 CMake
+      #     "cmake;3.22.1"
 
-            #     # 驗證安裝
-            #     sdkmanager --list_installed
+      #     # 驗證安裝
+      #     sdkmanager --list_installed
 
-            # - name: install cargo-about
-            #   run: |
-            #     cargo install cargo-about
+      # - name: install cargo-about
+      #   run: |
+      #     cargo install cargo-about
 
-            # - name: check cargo-about install
-            #   run: |
-            #     cargo-about --version
+      # - name: check cargo-about install
+      #   run: |
+      #     cargo-about --version
 
-            # - name: Install uv
-            #   uses: astral-sh/setup-uv@v7
+      # - name: Install uv
+      #   uses: astral-sh/setup-uv@v7
 
-            # - name: check uv install
-            #   run: |
-            #     uv self version
+      # - name: check uv install
+      #   run: |
+      #     uv self version
 
-            - name: sync dep
-              run: uv sync --all-extras
+      - name: sync dep
+        run: uv sync --all-extras
 
-            - name: use build script
-              run: uv run scripts/build_script.py
+      - name: use build script
+        run: uv run scripts/build_script.py
 
-            - name: zip files (Linux)
-              id: zip_files_linux
-              if: runner.os == 'Linux'
-              run: |
-                  file=$(uv run scripts/zip_files.py)
-                  echo "zip_path=$file" >> $GITHUB_OUTPUT
+      - name: zip files (Linux)
+        id: zip_files_linux
+        if: runner.os == 'Linux'
+        run: |
+          file=$(uv run scripts/zip_files.py)
+          echo "zip_path=$file" >> $GITHUB_OUTPUT
 
-            - name: zip files (Windows)
-              if: runner.os == 'Windows'
-              id: zip_files_windows
-              run: |
-                  $file = (uv run scripts/zip_files.py)
-                  echo "zip_path=$file" >> $env:GITHUB_OUTPUT
+      - name: zip files (Windows)
+        if: runner.os == 'Windows'
+        id: zip_files_windows
+        run: |
+          $file = (uv run scripts/zip_files.py)
+          echo "zip_path=$file" >> $env:GITHUB_OUTPUT
 
-            - name: Upload exe artifact (Linux)
-              uses: actions/upload-artifact@v4
-              if: runner.os == 'Linux'
-              with:
-                  name: ${{ steps.zip_files_linux.outputs.zip_path }}
-                  path: ${{ steps.zip_files_linux.outputs.zip_path }}
+      - name: Upload exe artifact (Linux)
+        uses: actions/upload-artifact@v4
+        if: runner.os == 'Linux'
+        with:
+          name: ${{ steps.zip_files_linux.outputs.zip_path }}
+          path: ${{ steps.zip_files_linux.outputs.zip_path }}
 
-            - name: Upload exe artifact (Windows)
-              uses: actions/upload-artifact@v4
-              if: runner.os == 'Windows'
-              with:
-                  name: ${{ steps.zip_files_windows.outputs.zip_path }}
-                  path: ${{ steps.zip_files_windows.outputs.zip_path }}
+      - name: Upload exe artifact (Windows)
+        uses: actions/upload-artifact@v4
+        if: runner.os == 'Windows'
+        with:
+          name: ${{ steps.zip_files_windows.outputs.zip_path }}
+          path: ${{ steps.zip_files_windows.outputs.zip_path }}
 
-    build_android:
-        runs-on: ${{ matrix.os }}
-        strategy:
-            fail-fast: false
-            matrix:
-                os: [ubuntu-latest]
+  # build_android:
+  #     runs-on: ${{ matrix.os }}
+  #     strategy:
+  #         fail-fast: false
+  #         matrix:
+  #             os: [ubuntu-latest]
 
-        steps:
-            - name: Checkout Repository
-              uses: actions/checkout@v6
+  #     steps:
+  #         - name: Checkout Repository
+  #           uses: actions/checkout@v6
 
-            - name: Checkout Secret
-              uses: actions/checkout@v6
-              with:
-                  repository: ${{ secrets.SECRET_REPO }}
-                  token: ${{ secrets.SECRET_REPO_TOKEN }} # Repo token
-                  path: secret
+  #         - name: Checkout Secret
+  #           uses: actions/checkout@v6
+  #           with:
+  #               repository: ${{ secrets.SECRET_REPO }}
+  #               token: ${{ secrets.SECRET_REPO_TOKEN }} # Repo token
+  #               path: secret
 
-            - name: Install Dep
-              uses: ./.github/workflows/instdep
+  #         - name: Install Dep
+  #           uses: ./.github/workflows/instdep
 
-            # - name: install rustup (Windows)
-            #   if: runner.os == 'Windows'
-            #   shell: pwsh
-            #   run: |
-            #     Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
-            #     ls
-            #     .\rustup-init.exe -y --profile minimal
+  #         # - name: install rustup (Windows)
+  #         #   if: runner.os == 'Windows'
+  #         #   shell: pwsh
+  #         #   run: |
+  #         #     Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
+  #         #     ls
+  #         #     .\rustup-init.exe -y --profile minimal
 
-            # - name: install rustup (Linux)
-            #   if: runner.os == 'Linux'
-            #   run: |
-            #     curl https://sh.rustup.rs -o rust-init.sh
-            #     sh rust-init.sh -y
+  #         # - name: install rustup (Linux)
+  #         #   if: runner.os == 'Linux'
+  #         #   run: |
+  #         #     curl https://sh.rustup.rs -o rust-init.sh
+  #         #     sh rust-init.sh -y
 
-            # - name: check rust Install
-            #   run: |
-            #     rustc --version
-            #     cargo --version
+  #         # - name: check rust Install
+  #         #   run: |
+  #         #     rustc --version
+  #         #     cargo --version
 
-            # - name: install cargo-apk
-            #   run: |
-            #     cargo install cargo-apk
+  #         # - name: install cargo-apk
+  #         #   run: |
+  #         #     cargo install cargo-apk
 
-            # - name: Install uv
-            #   uses: astral-sh/setup-uv@v7
+  #         # - name: Install uv
+  #         #   uses: astral-sh/setup-uv@v7
 
-            # - name: check uv install
-            #   run: |
-            #     uv self version
+  #         # - name: check uv install
+  #         #   run: |
+  #         #     uv self version
 
-            - name: build apk
-              run: |
-                  uv run scripts/build_android.py
+  #         - name: build apk
+  #           run: |
+  #               uv run scripts/build_android.py
 
-            - name: Upload apk artifact
-              uses: actions/upload-artifact@v6
-              with:
-                  name: target/release/apk/pmj_client.apk
-                  path: target/release/apk/pmj_client.apk
+  #         - name: Upload apk artifact
+  #           uses: actions/upload-artifact@v6
+  #           with:
+  #               name: target/release/apk/pmj_client.apk
+  #               path: target/release/apk/pmj_client.apk
 
-    upload:
-        needs:
-            - build_computer
-            - build_android
-        runs-on: ubuntu-latest
-        steps:
-            - name: Download all artifacts
-              uses: actions/download-artifact@v8
-              with:
-                  path: artifacts
+  upload:
+    needs:
+      - build_computer
+      #- build_android
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: artifacts
 
-            - name: Upload artifacts to release
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  UPLOAD_URL: ${{ github.event.release.upload_url }}
-              shell: bash
-              run: |
-                  set -euo pipefail
-                  upload_url="${UPLOAD_URL%\{*}"
-                  echo "Uploading artifacts to $upload_url"
-                  shopt -s globstar || true
-                  for f in artifacts/**; do
-                    if [ -f "$f" ]; then
-                      echo "Uploading $f"
-                      curl -sS -X POST \
-                        -H "Authorization: token $GITHUB_TOKEN" \
-                        -H "Content-Type: application/octet-stream" \
-                        --data-binary @"$f" \
-                        "$upload_url?name=$(basename "$f")"
-                    fi
-                  done
+      - name: Upload artifacts to release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UPLOAD_URL: ${{ github.event.release.upload_url }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          upload_url="${UPLOAD_URL%\{*}"
+          echo "Uploading artifacts to $upload_url"
+          shopt -s globstar || true
+          for f in artifacts/**; do
+            if [ -f "$f" ]; then
+              echo "Uploading $f"
+              curl -sS -X POST \
+                -H "Authorization: token $GITHUB_TOKEN" \
+                -H "Content-Type: application/octet-stream" \
+                --data-binary @"$f" \
+                "$upload_url?name=$(basename "$f")"
+            fi
+          done
