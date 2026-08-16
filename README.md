@@ -2,15 +2,13 @@
 
 ![icon](./assets/icon/icon.png)
 
-**繁體中文** | [English](READMEs/README_en.md)
+**繁體中文** | [English (outdated)](READMEs/README_en.md)
 
 ![GitLab Stars](https://img.shields.io/gitlab/stars/TW0hank0%2Fpositive_mahjong?style=for-the-badge&color=green)
 ![Deps.rs Repository Dependencies](https://img.shields.io/deps-rs/repo/gitlab/TW0hank0/positive_mahjong?style=for-the-badge&color=green)
 ![Gitlab Pipeline Status](https://img.shields.io/gitlab/pipeline-status/TW0hank0%2Fpositive_mahjong?branch=master&style=for-the-badge&label=Gitlab%20Pipeline&color=green)
 ![GitLab License](https://img.shields.io/gitlab/license/TW0hank0%2Fpositive_mahjong?style=for-the-badge&color=green)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/TW0hank0/positive_mahjong/commit-ci.yaml?branch=master&style=for-the-badge&label=Github%20Action&color=green)
-
-**仍在開發中，未完成**
 
 ### 特色
 
@@ -50,7 +48,10 @@
 
 #### 第三方模組庫授權
 
-見：[ThirdPartyLicense-Rust.md](https://tw0hank0.gitlab.io/positive_mahjong/docs/license/ThirdPartyLicense-Rust.md)
+見：
+[ThirdPartyLicense-Rust.md](https://tw0hank0.gitlab.io/positive_mahjong/files/ThirdPartyLicense-Rust.md)
+[ThirdPartyLicense-Rust.html](https://tw0hank0.gitlab.io/positive_mahjong/files/ThirdPartyLicense-Rust.html)
+[ThirdPartyLicense-Rust.json](https://tw0hank0.gitlab.io/positive_mahjong/files/ThirdPartyLicense-Rust.json)
 
 #### 第三方專案聲明
 

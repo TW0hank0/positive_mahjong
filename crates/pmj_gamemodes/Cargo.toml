@@ -29,8 +29,9 @@ pmj_shared = { workspace = true }
 rand = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
-tungstenite = { workspace = true }
 tracing = { workspace = true }
+tungstenite = { workspace = true }
+url = { workspace = true }
 
 [lib]
 name = "pmj_gamemodes"

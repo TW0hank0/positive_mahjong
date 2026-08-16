@@ -15,7 +15,10 @@
 
 //! Base玩法的GUI
 
-use std::sync::{self, Arc, RwLock};
+use std::{
+    sync::{self, Arc, RwLock},
+    thread,
+};
 
 use iced::{
     self, Border,
@@ -42,22 +45,27 @@ pub fn gui_init() -> Option<iced::window::Icon> {
 }
 
 pub fn main() -> iced::Result {
-    let icon = gui_init();
-    //
-    let mut window_settings = iced::window::Settings::default();
-    window_settings.maximized = true;
-    window_settings.icon = icon;
-    window_settings.min_size = Some(iced::Size::new(1080.0, 720.0));
-    window_settings.position = iced::window::Position::Centered;
-    //
-    let mut app_settings = iced::Settings::default();
-    app_settings.id = Some(String::from(PROJECT_NAME));
-    app_settings.default_text_size = iced::Pixels::from(24);
-    app_settings.default_font = FONT_NOTO_SANS_REG;
+    let window_settings = iced::window::Settings {
+        maximized: true,
+        min_size: Some(iced::Size::new(720.0, 480.0)),
+        icon: gui_init(),
+        position: iced::window::Position::Centered,
+        ..Default::default()
+    };
+    let app_settings = iced::Settings {
+        id: Some(format!("{} - pmj_server::gui", PROJECT_NAME)),
+        default_text_size: iced::Pixels::from(24),
+        default_font: FONT_NOTO_SANS_REG,
+        vsync: true,
+        fonts: vec![std::borrow::Cow::from(FONT_NOTO_SANS_REG_BYTES)],
+        ..Default::default()
+    };
     iced::application(ServerGUI::new, ServerGUI::update, ServerGUI::view)
         .title(ServerGUI::title)
         .theme(ServerGUI::theme)
         .subscription(ServerGUI::subscription)
+        .settings(app_settings)
+        .window(window_settings)
         .run()
 }
 
@@ -113,18 +121,27 @@ impl ServerGUI {
                     self.msg.push_str("至少需要一位玩家！");
                 } else {
                     self.is_start = true;
-                    let thread_backend = sync::Arc::clone(&self.backend);
-                    match thread_backend.try_write() {
-                        Ok(mut guard) => {
-                            guard.start_game();
+                    match self.backend.try_read() {
+                        Ok(backend) => {
+                            self.players = backend.get_players_info();
+                            drop(backend);
                         }
                         Err(e) => {
-                            error!("Fail to start game:{}", e);
-                            return iced::task::Task::done(GUIMessages::StartGame);
-                            //TODO: error handle
+                            warn!("FetchPlayerInfo error: {}", e);
                         }
-                    };
-                    return iced::task::Task::done(GUIMessages::FetchPlayerInfo);
+                    }
+                    let thread_backend = sync::Arc::clone(&self.backend);
+                    let _handle = thread::spawn(move || {
+                        match thread_backend.try_write() {
+                            Ok(mut guard) => {
+                                guard.start_game();
+                                info!("game finished.");
+                            }
+                            Err(e) => {
+                                error!("Fail to start game: {}", e);
+                            }
+                        };
+                    });
                 }
             }
             GUIMessages::FetchPlayerInfo => match self.backend.try_read() {
@@ -281,7 +298,7 @@ impl ServerGUI {
     }
 
     pub fn title(&self) -> String {
-        String::from(PROJECT_NAME)
+        format!("{} - pmj_server::gui", PROJECT_NAME)
     }
 
     pub fn theme(&self) -> iced::Theme {
@@ -289,19 +306,7 @@ impl ServerGUI {
     }
 
     pub fn subscription(&self) -> iced::Subscription<GUIMessages> {
-        iced::event::listen_with(|event, _status, _id| match event {
-            iced::Event::Window(window_event) => match window_event {
-                iced::window::Event::RedrawRequested(_) => {
-                    return Some(GUIMessages::FetchPlayerInfo);
-                }
-                _ => {
-                    return None;
-                }
-            },
-            _ => {
-                return None;
-            }
-        })
+        iced::Subscription::none()
     }
 }
 

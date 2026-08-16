@@ -14,15 +14,13 @@
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 use std::{
-    self,
-    net::{self, TcpListener, TcpStream},
-    sync::{self, Arc, RwLock},
-    thread, time,
+    self, net::{self, TcpListener, TcpStream}, sync::{self, Arc, RwLock}, thread, time,
 };
 
 use rand::{self, prelude::SliceRandom, seq::IndexedRandom};
 use tracing::{debug, error, info, trace, warn};
 use tungstenite::{Message, WebSocket, accept_with_config};
+use url;
 
 use pmj_shared::shared;
 
@@ -67,20 +65,20 @@ fn write_reply(
 
 // 處理單一客戶端連線的函式
 fn handle_client(
-    stream: TcpStream,
+    tcp_stream: TcpStream,
     backend: sync::Arc<sync::RwLock<crate::base::mode::PositiveMahjong>>,
 ) {
-    stream
+    tcp_stream
         .set_read_timeout(Some(time::Duration::from_secs(8)))
         .ok();
-    stream
+    tcp_stream
         .set_write_timeout(Some(time::Duration::from_secs(10)))
         .ok();
-    stream.set_nodelay(true).ok();
-    let client_ip = stream.peer_addr().unwrap().ip();
+    tcp_stream.set_nodelay(true).ok();
+    let client_ip = tcp_stream.peer_addr().unwrap().ip();
     info!("建立連線：{}", client_ip.to_string());
     let websocket: WebSocket<TcpStream> = match accept_with_config(
-        stream,
+        tcp_stream,
         Some(tungstenite::protocol::WebSocketConfig::default()),
     ) {
         Ok(ws) => ws,

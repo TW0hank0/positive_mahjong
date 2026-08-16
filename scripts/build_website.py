@@ -58,9 +58,32 @@ def remove_dir(path: str):
 
 
 def build_files_dl(dir_path: str):
-    dlable_files = [
+    dlable_files: list[str] = [
         os.path.join(os.path.dirname(os.path.dirname(__file__)), "LICENSE"),
         os.path.join(os.path.dirname(os.path.dirname(__file__)), "README.md"),
+        os.path.join(
+            os.path.dirname(os.path.dirname(__file__)),
+            "CHANGELOG.md",
+        ),
+        os.path.join(
+            os.path.dirname(os.path.dirname(__file__)),
+            "ROADMAP.md",
+        ),
+        os.path.join(
+            os.path.dirname(os.path.dirname(__file__)),
+            "auto_generated",
+            "ThirdPartyLicense-Rust.html",
+        ),
+        os.path.join(
+            os.path.dirname(os.path.dirname(__file__)),
+            "auto_generated",
+            "ThirdPartyLicense-Rust.json",
+        ),
+        os.path.join(
+            os.path.dirname(os.path.dirname(__file__)),
+            "auto_generated",
+            "ThirdPartyLicense-Rust.md",
+        ),
     ]
     files_summary_template = """\
     <!doctype html>
@@ -93,9 +116,11 @@ def build_files_dl(dir_path: str):
     for dlfile in dlable_files:
         print(f"{dlfile} -> {os.path.join(dir_path, os.path.basename(dlfile))}")
         shutil.copy2(dlfile, os.path.join(dir_path, os.path.basename(dlfile)))
-        summary_prepare = f"""{summary_prepare}
-        <div class="dlable-file"><a href="./{os.path.basename(dlfile)}">{os.path.basename(dlfile)}</a></div>
-        <div style="height: 5px;"></div>"""
+        summary_prepare = summary_prepare +
+        f"""
+        <div class="dlable-file">
+          <a href="./{os.path.basename(dlfile)}" target="_blank" download>{os.path.basename(dlfile)}</a>
+        </div>"""
     files_summary = files_summary_template.replace(
         "{{$DY_VAR_FILES_SUMMARY$}}", summary_prepare
     )
