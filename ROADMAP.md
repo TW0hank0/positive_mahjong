@@ -8,7 +8,7 @@
 
 - 修復客戶端錯誤
 
-### v0.2.0
+### v0.2.0 - [2026/8/16~]
 
 - V2Better 玩法
     - 包含 房間(room) 遊戲結束返回
@@ -21,7 +21,7 @@
 
 ### v0.3.0
 
-- pmj_client_core 供 pmj_client_desktop 與 pmj_client_cross 使用
+- （暫定）pmj_client_core 供 pmj_client_desktop 與 pmj_client_cross 使用
 
 ### v0.4.0
 
@@ -33,4 +33,5 @@
 
 ### v0.6.0
 
-- （暫定）客戶端優化
+- （暫定）伺服器GUI優化
+- （暫定）開發 pmj_server_tui

@@ -23,7 +23,7 @@ on:
     types: [published]
 
 jobs:
-  build_computer:
+  build_client_desktop:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -37,66 +37,6 @@ jobs:
       - name: Install Dep
         uses: ./.github/workflows/instdep
 
-      # - name: install rustup (Windows)
-      #   if: runner.os == 'Windows'
-      #   shell: pwsh
-      #   run: |
-      #     Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
-      #     ls
-      #     .\rustup-init.exe -y --profile minimal
-
-      # - name: install rustup (Linux)
-      #   if: runner.os == 'Linux'
-      #   run: |
-      #     curl https://sh.rustup.rs -o rust-init.sh
-      #     sh rust-init.sh -y
-
-      # - name: check rust Install
-      #   run: |
-      #     rustc --version
-      #     cargo --version
-
-      # - name: install java
-      #   uses: actions/setup-java@v5
-      #   with:
-      #     distribution: "temurin" # See 'Supported distributions' for available options
-      #     java-version: "21"
-
-      # - name: Setup Android
-      #   uses: android-actions/setup-android@v4
-
-      # - name: Install Android SDK and NDK
-      #   run: |
-      #     # 安裝基本工具與平台
-      #     sdkmanager "platform-tools" \
-      #     "platforms;android-35" \
-      #     "build-tools;35.0.0" \
-      #     "extras;android;m2repository" \
-      #     "extras;google;m2repository" \
-      #     # 安裝指定版本的 NDK
-      #     # 請將 '26.3.11579264' 替換為你專案需要的確切版本
-      #     "ndk;26.3.11579264" \
-      #     # 若使用 CMake，建議同時安裝對應版本的 CMake
-      #     "cmake;3.22.1"
-
-      #     # 驗證安裝
-      #     sdkmanager --list_installed
-
-      # - name: install cargo-about
-      #   run: |
-      #     cargo install cargo-about
-
-      # - name: check cargo-about install
-      #   run: |
-      #     cargo-about --version
-
-      # - name: Install uv
-      #   uses: astral-sh/setup-uv@v7
-
-      # - name: check uv install
-      #   run: |
-      #     uv self version
-
       - name: sync dep
         run: uv sync --all-extras
 
@@ -107,14 +47,14 @@ jobs:
         id: zip_files_linux
         if: runner.os == 'Linux'
         run: |
-          file=$(uv run scripts/zip_files.py)
+          file=$(uv run scripts/zip_client_desktop.py)
           echo "zip_path=$file" >> $GITHUB_OUTPUT
 
       - name: zip files (Windows)
         if: runner.os == 'Windows'
         id: zip_files_windows
         run: |
-          $file = (uv run scripts/zip_files.py)
+          $file = (uv run scripts/zip_client_desktop.py)
           echo "zip_path=$file" >> $env:GITHUB_OUTPUT
 
       - name: Upload exe artifact (Linux)

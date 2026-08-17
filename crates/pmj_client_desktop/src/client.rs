@@ -13,11 +13,7 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-use std::{
-    self,
-    net::{TcpStream},
-    sync, thread, time,
-};
+use std::{self, net::TcpStream, sync, thread, time};
 
 use iced::{
     self, Border, Color, Element, Length, Pixels, alignment, task,
@@ -295,35 +291,60 @@ impl Client {
                                                         let msg = serde_json::from_str::<pmj_gamemodes::base::shared::ServerMessageType>(
                                                             &msg_text
                                                         ).unwrap();
-                                                        self.status_play_base.game_msgs.push(
-                                                            serde_json::to_string_pretty(&msg)
-                                                                .unwrap(),
-                                                        );
                                                         match msg.msg_type {
                                                             pmj_gamemodes::base::shared::ServerMessageTypeKinds::GameStart => {
+                                                                self.status_play_base.game_msgs.push(String::from("遊戲開始"));
                                                                 info!("收到伺服器遊戲開始訊息。");
                                                                 self.status_play_base.is_start = Some(true);
                                                             }
                                                             pmj_gamemodes::base::shared::ServerMessageTypeKinds::GetCard => {
                                                                 let got_card = msg.info_get_card.unwrap();
                                                                 info!("取得卡牌：{:?}", got_card);
-                                                                self.status_play_base.game_msgs.push(format!("取得卡牌：{:#?}", got_card.clone()));
+                                                                self.status_play_base.game_msgs.push(format!("取得第{}張{} {}", got_card.card_id, match got_card.card_type {
+                                                                    pmj_gamemodes::base::shared::PMJCardType::Dots => {got_card.info_dots.unwrap().to_string()}
+                                                                    pmj_gamemodes::base::shared::PMJCardType::Flower => {format!("{}",got_card.clone().info_flower.unwrap())}
+                                                                    pmj_gamemodes::base::shared::PMJCardType::Line => {got_card.info_line.unwrap().to_string()}
+                                                                    pmj_gamemodes::base::shared::PMJCardType::TenThousand => {got_card.info_ten_thousand.unwrap().to_string()}
+                                                                    pmj_gamemodes::base::shared::PMJCardType::Words => {format!("{}", got_card.clone().info_words.unwrap())}
+                                                                }, match got_card.card_type {
+                                                                    pmj_gamemodes::base::shared::PMJCardType::Dots => {"筒"}
+                                                                    pmj_gamemodes::base::shared::PMJCardType::Flower => {""}
+                                                                    pmj_gamemodes::base::shared::PMJCardType::Line => {"條"}
+                                                                    pmj_gamemodes::base::shared::PMJCardType::TenThousand => {"萬"}
+                                                                    pmj_gamemodes::base::shared::PMJCardType::Words => {""}
+                                                                }));
                                                                 self.status_play_base.game_controller=PlayBaseController::ThrowCard;
                                                                 self.status_play_base.hand_cards.push(got_card);
                                                             }
                                                             pmj_gamemodes::base::shared::ServerMessageTypeKinds::HandCardChange => {
+                                                                self.status_play_base.game_msgs.push(
+                                                                    serde_json::to_string_pretty(&msg)
+                                                                        .unwrap(),
+                                                                );
                                                                 let handcard = msg.info_hand_card_change.unwrap();
                                                                 self.status_play_base.hand_cards = handcard.clone();
                                                                 debug!("手牌變動：{:#?}", handcard.clone());
                                                                 self.status_play_base.game_msgs.push(format!("手牌變動：{:?}", handcard));
                                                             }
                                                             pmj_gamemodes::base::shared::ServerMessageTypeKinds::ChangedTurn => {
+                                                                self.status_play_base.game_msgs.push(
+                                                                    serde_json::to_string_pretty(&msg)
+                                                                        .unwrap(),
+                                                                );
                                                                 self.status_play_base.current_turn = msg.info_change_turn;
                                                             }
                                                             pmj_gamemodes::base::shared::ServerMessageTypeKinds::Error => {
+                                                                self.status_play_base.game_msgs.push(
+                                                                    serde_json::to_string_pretty(&msg)
+                                                                        .unwrap(),
+                                                                );
                                                                 error!("ServerMessageTypeKinds::Error => {:?}", msg.info_error);
                                                             }
                                                             pmj_gamemodes::base::shared::ServerMessageTypeKinds::PlayerAction => {
+                                                                self.status_play_base.game_msgs.push(
+                                                                    serde_json::to_string_pretty(&msg)
+                                                                        .unwrap(),
+                                                                );
                                                                 let (act_player, act_type) = msg.info_player_action.unwrap();
                                                                 self.status_play_base.game_msgs.push(format!("{} 做了 {:?}", act_player, act_type));
                                                             }
@@ -701,20 +722,35 @@ impl Client {
                 } else {
                     {
                         let mut ctr_bar = Row::new().height(Length::FillPortion(2));
-                        let mut msg_bar = Column::new().width(Length::FillPortion(2));
+                        let mut msg_bar = Column::new().width(Length::FillPortion(3));
                         let mut msg_num: u16 = 1;
                         for msg in self.status_play_base.game_msgs.iter() {
-                            msg_bar = msg_bar
-                                .push(text(msg_num.to_string()).size(14).style(
-                                    |t: &iced::Theme| {
-                                        let p = t.extended_palette();
-                                        text::Style {
-                                            color: Some(p.primary.base.text),
-                                        }
-                                    },
-                                ))
-                                .push(space().width(15))
-                                .push(text(msg.clone()).size(14));
+                            msg_bar = msg_bar.push(
+                                container(
+                                    Row::new()
+                                        .push(text(msg_num.to_string()).size(17).style(
+                                            |t: &iced::Theme| {
+                                                let p = t.extended_palette();
+                                                text::Style {
+                                                    color: Some(p.primary.base.color),
+                                                }
+                                            },
+                                        ))
+                                        .push(space().width(15))
+                                        .push(text(msg.clone()).size(16)),
+                                )
+                                .style(|t: &iced::Theme| {
+                                    let p = t.extended_palette();
+                                    let mut style = container::Style::default();
+                                    style.border.radius = iced::border::Radius::new(10);
+                                    style.border.width = 1.2;
+                                    style.border.color = p.background.weak.color;
+                                    style.text_color = Some(p.background.base.text);
+                                    style.background =
+                                        Some(iced::Background::Color(iced::Color::TRANSPARENT));
+                                    style
+                                }),
+                            ).push(space().height(10));
                             msg_num += 1;
                         }
                         ctr_bar = ctr_bar.push(scrollable(msg_bar));
