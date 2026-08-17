@@ -37,7 +37,7 @@ def main():
     )
     if os.path.exists(build_root) is True:
         remove_dir(build_root)
-    shutil.copytree(website_root_path, build_root)
+    _ = shutil.copytree(website_root_path, build_root)
     os.makedirs(os.path.join(build_root, "files"), exist_ok=True)
     build_files_dl(os.path.join(build_root, "files"))
     process_dir(
@@ -115,12 +115,14 @@ def build_files_dl(dir_path: str):
     summary_prepare = ""
     for dlfile in dlable_files:
         print(f"{dlfile} -> {os.path.join(dir_path, os.path.basename(dlfile))}")
-        shutil.copy2(dlfile, os.path.join(dir_path, os.path.basename(dlfile)))
-        summary_prepare = summary_prepare +
-        f"""
+        _ = shutil.copy2(dlfile, os.path.join(dir_path, os.path.basename(dlfile)))
+        summary_prepare = (
+            summary_prepare
+            + f"""
         <div class="dlable-file">
           <a href="./{os.path.basename(dlfile)}" target="_blank" download>{os.path.basename(dlfile)}</a>
         </div>"""
+        )
     files_summary = files_summary_template.replace(
         "{{$DY_VAR_FILES_SUMMARY$}}", summary_prepare
     )

@@ -19,7 +19,7 @@ edition = "2024"
 license = "AGPL-3.0-only"
 repository = "https://github.com/TW0hank0/positive_mahjong"
 rust-version = "1.94"
-version = "0.1.0"
+version = "0.1.1-dev"
 
 [workspace.dependencies]
 # --- local ---

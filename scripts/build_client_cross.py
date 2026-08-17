@@ -16,7 +16,7 @@
 import platform
 import sys
 
-import util
+from . import util
 
 
 def main():
@@ -77,7 +77,13 @@ def main():
         target_inst_cmd = ["rustup", "target", "add", target_name]
         util.run_cmd(target_inst_cmd)
         print("=> Compiling pmj_client_cross_lib ...")
-        compile_cmd = ["cargo", "build", "+nightly", "--release", f"--target={target_name}"]
+        compile_cmd = [
+            "cargo",
+            "+nightly",
+            "build",
+            "--release",
+            f"--target={target_name}",
+        ]
         util.run_cmd(compile_cmd)
         print("=> Exporting godot ...")
         print("--- info")

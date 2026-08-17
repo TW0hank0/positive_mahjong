@@ -3593,7 +3593,7 @@ checksum = "b4596b6d070b27117e987119b4dac604f3c58cfb0b191112e24771b2faeac1a6"
 
 [[package]]
 name = "pmj_client_cross"
-version = "0.1.0"
+version = "0.1.1-dev"
 dependencies = [
  "android_logger",
  "console_error_panic_hook",
@@ -3608,7 +3608,7 @@ dependencies = [
 
 [[package]]
 name = "pmj_client_desktop"
-version = "0.1.0"
+version = "0.1.1-dev"
 dependencies = [
  "iced",
  "image",
@@ -3623,7 +3623,7 @@ dependencies = [
 
 [[package]]
 name = "pmj_gamemodes"
-version = "0.1.0"
+version = "0.1.1-dev"
 dependencies = [
  "image",
  "local-ip-address",
@@ -3638,7 +3638,7 @@ dependencies = [
 
 [[package]]
 name = "pmj_server"
-version = "0.1.0"
+version = "0.1.1-dev"
 dependencies = [
  "clap",
  "iced",
@@ -3655,7 +3655,7 @@ dependencies = [
 
 [[package]]
 name = "pmj_shared"
-version = "0.1.0"
+version = "0.1.1-dev"
 dependencies = [
  "dirs",
  "image",

@@ -24,7 +24,7 @@ use pmj_shared::shared;
     name = "pmj_server",
     author,
     version,
-    about = "positive_mahjong 伺服器"
+    about = "positive_mahjong 伺服器 GUI"
 )]
 struct CliArgs {
     #[command(subcommand)]
