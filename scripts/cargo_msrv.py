@@ -15,7 +15,7 @@
 
 import os
 
-import util
+from . import util
 
 
 def main():
@@ -29,13 +29,17 @@ def main():
         util.run_cmd(
             ["cargo", "msrv", "find"],
             cwd=os.path.join(
-                os.path.dirname(os.path.dirname(os.path.dirname(__file__))), pkg
+                os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+                "crates",
+                pkg,
             ),
         )
         util.run_cmd(
             ["cargo", "msrv", "verify"],
             cwd=os.path.join(
-                os.path.dirname(os.path.dirname(os.path.dirname(__file__))), pkg
+                os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+                "crates",
+                pkg,
             ),
         )
 
