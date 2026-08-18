@@ -24,6 +24,7 @@ jobs:
           RENOVATE_PLATFORM: "gitlab"
           # 帶入 GitLab PAT
           RENOVATE_TOKEN: ${{ secrets.GL_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           # 指定目標 GitLab 專案
           # 若有多個專案可用空格隔開，如 'org/repo1 org/repo2'
           RENOVATE_REPOSITORIES: "TW0hank0/positive_mahjong"
