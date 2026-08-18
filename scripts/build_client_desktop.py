@@ -15,7 +15,7 @@
 
 import time
 
-import util
+from . import util
 
 
 def main():

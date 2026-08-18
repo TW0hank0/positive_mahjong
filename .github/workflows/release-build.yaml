@@ -134,7 +134,7 @@ jobs:
 
   upload:
     needs:
-      - build_computer
+      - build_client_desktop
       #- build_android
     runs-on: ubuntu-latest
     steps:

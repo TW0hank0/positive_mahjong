@@ -17,12 +17,11 @@ import datetime
 import os
 import subprocess
 import sys
-from typing import Optional
 
-from ci import get_version
+from .ci import get_version
 
 
-def get_latest_commit_message(repo_path: str = ".") -> Optional[str]:
+def get_latest_commit_message(repo_path: str = ".") -> str | None:
     """
     取得指定 Git 最新一次的 commit message。
 
@@ -94,7 +93,7 @@ def create_release(tag: str, title: str, notes: str, is_prerelease: bool, repo: 
         title,
         "--notes",
         notes,
-        f'--repo="{repo}"',
+        f"--repo={repo}",
     ]
     if is_prerelease is True:
         command.append("--prerelease")

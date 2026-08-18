@@ -13,22 +13,23 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-//! Base玩法的GUI
+//! V2Better玩法的GUI
 
 use std::{
+    net,
     sync::{self, Arc, RwLock},
     thread,
 };
 
 use iced::{
     self, Border,
-    widget::{self, Column, Row, button, container, scrollable, space, text},
+    widget::{Column, Row, button, container, scrollable, space, text},
 };
 use image;
 use local_ip_address;
 use tracing::{debug, error, info, trace, warn};
 
-use pmj_gamemodes::base;
+use pmj_gamemodes::v2_better::{self, mode, shared as mode_shared};
 use pmj_shared::shared::{FONT_NOTO_SANS_REG_BYTES, ICON_PNG_BYTES, PROJECT_NAME};
 
 pub const FONT_NOTO_SANS_REG: iced::font::Font = iced::font::Font::with_name("Noto Sans TC");
@@ -78,12 +79,12 @@ enum GUIMessages {
 
 #[derive(Debug)]
 struct ServerGUI {
-    backend: Arc<RwLock<base::mode::PositiveMahjong>>,
-    local_ipv4_address: std::net::IpAddr,
-    local_ipv6_address: std::net::IpAddr,
+    backend: Arc<RwLock<mode::PositiveMahjong>>,
+    local_ipv4_address: net::IpAddr,
+    local_ipv6_address: net::IpAddr,
     msg: String,
     is_start: bool,
-    players: Vec<base::shared::PMJPlayer>,
+    players: Vec<mode_shared::PMJPlayer>,
 }
 
 impl ServerGUI {
@@ -93,7 +94,7 @@ impl ServerGUI {
         info!("第四代網路地址：{}", ipv4_address.to_string());
         info!("第六代網路地址：{}", ipv6_address.to_string());
         info!("端口：{}", pmj_shared::shared::SERVER_PORT);
-        let backend = base::mode::main_base(true).unwrap();
+        let backend = mode::main_v2_better(true).unwrap();
         Self {
             backend: backend,
             local_ipv4_address: ipv4_address,
