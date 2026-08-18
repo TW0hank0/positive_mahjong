@@ -26,4 +26,7 @@ jobs:
           RENOVATE_TOKEN: ${{ secrets.GL_PAT }}
           # 指定目標 GitLab 專案
           # 若有多個專案可用空格隔開，如 'org/repo1 org/repo2'
-          RENOVATE_EXTRA_FLAGS: "TW0hank0/positive_mahjong"
+          RENOVATE_REPOSITORIES: "TW0hank0/positive_mahjong"
+        with:
+          # 明確指定與 Action 版本相容的 Renovate 版本
+          renovate-version: "39"
