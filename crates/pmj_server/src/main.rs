@@ -49,7 +49,7 @@ pub fn main() {
             let _ = base::mode::main_base(false);
         }
         SubCmds::V2Better => {
-            let _ = pmj_gamemodes::v2_better::mode::main_base(false);
+            let _ = pmj_gamemodes::v2_better::mode::main_v2_better(false);
         }
     }
 }

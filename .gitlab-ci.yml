@@ -47,7 +47,9 @@ sync_to_mirrors:
     - git remote add codeberg git@codeberg.org:TW0hank0/positive_mahjong.git
     # 鏡像同步
     - git push codeberg --force
+    - git push codeberg --tags
     - git push github --force
+    - git push github --tags
     - cd ..
 
   rules:

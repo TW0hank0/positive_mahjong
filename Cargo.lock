@@ -931,6 +931,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "crossbeam"
+version = "0.8.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1137cd7e7fc0fb5d3c5a8678be38ec56e819125d8d7907411fe24ccb943faca8"
+dependencies = [
+ "crossbeam-channel",
+ "crossbeam-deque",
+ "crossbeam-epoch",
+ "crossbeam-queue",
+ "crossbeam-utils",
+]
+
+[[package]]
 name = "crossbeam-channel"
 version = "0.5.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -954,6 +967,15 @@ name = "crossbeam-epoch"
 version = "0.9.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5b82ac4a3c2ca9c3460964f020e1402edd5753411d7737aa39c3714ad1b5420e"
+dependencies = [
+ "crossbeam-utils",
+]
+
+[[package]]
+name = "crossbeam-queue"
+version = "0.3.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "803d13fb3b09d88be9f4dbc29062c66b19bf7170867ceb746d2a8689bf6c7a26"
 dependencies = [
  "crossbeam-utils",
 ]
@@ -3593,7 +3615,7 @@ checksum = "b4596b6d070b27117e987119b4dac604f3c58cfb0b191112e24771b2faeac1a6"
 
 [[package]]
 name = "pmj_client_cross"
-version = "0.1.1-dev"
+version = "0.1.1"
 dependencies = [
  "android_logger",
  "console_error_panic_hook",
@@ -3608,7 +3630,7 @@ dependencies = [
 
 [[package]]
 name = "pmj_client_desktop"
-version = "0.1.1-dev"
+version = "0.1.1"
 dependencies = [
  "iced",
  "image",
@@ -3623,8 +3645,9 @@ dependencies = [
 
 [[package]]
 name = "pmj_gamemodes"
-version = "0.1.1-dev"
+version = "0.1.1"
 dependencies = [
+ "crossbeam",
  "image",
  "local-ip-address",
  "pmj_shared",
@@ -3638,7 +3661,7 @@ dependencies = [
 
 [[package]]
 name = "pmj_server"
-version = "0.1.1-dev"
+version = "0.1.1"
 dependencies = [
  "clap",
  "iced",
@@ -3655,7 +3678,7 @@ dependencies = [
 
 [[package]]
 name = "pmj_shared"
-version = "0.1.1-dev"
+version = "0.1.1"
 dependencies = [
  "dirs",
  "image",

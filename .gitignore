@@ -5,6 +5,8 @@
 **/.venv/**
 **/__pycache__/**
 **/__pypy_cache__/**
+**/.ruff_cache/**
+**/.mypy_cache/**
 
 # --- Other ---
 positive_*_v*_*.zip

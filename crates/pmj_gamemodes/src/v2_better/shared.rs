@@ -15,11 +15,7 @@
 
 //! V2Better 資料
 
-use std::{
-    fmt::Display,
-    net::{self},
-    sync,
-};
+use std::{self, fmt::Display, net, sync};
 use tungstenite;
 
 pub const MAX_PLAYER_COUNT: u8 = 4;
@@ -28,35 +24,68 @@ type WsConnection = tungstenite::WebSocket<net::TcpStream>;
 
 #[derive(Debug, Clone)]
 pub struct PMJPlayer {
-    pub player_ip_addr: std::net::IpAddr,
+    pub player_ip_addr: net::IpAddr,
     pub player_id: u8,
     pub player_ws: sync::Arc<sync::RwLock<WsConnection>>,
     /// 可使用的牌
     pub player_hand_cards: Vec<PMJCard>,
-    /// 存放使用過的牌，例：碰、槓、吃
-    ///
-    /// 格式為：
-    ///
-    /// [ [A, A, A], [B, C, D] ]
-    ///   ^碰~~~~     ^吃~~~~~
-    pub player_used_cards: Vec<Vec<PMJCard>>,
+    /// 存放使用過的牌
+    pub player_used_cards: Vec<(Vec<PMJCard>, GameActions)>,
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
-pub struct ServerMessageType {
-    pub msg_type: ServerMessageTypeKinds,
+pub struct ServerMessage {
+    pub msg_type: ServerMsgKinds,
+    pub room_msg: Option<ServerRoomMsg>,
+    pub game_msg: Option<ServerGameMsg>,
+}
+
+impl Default for ServerMessage {
+    fn default() -> Self {
+        Self {
+            msg_type: ServerMsgKinds::RoomMsg,
+            room_msg: None,
+            game_msg: None,
+        }
+    }
+}
+#[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
+pub enum ServerMsgKinds {
+    GameMsg,
+    RoomMsg,
+}
+
+#[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
+pub struct ServerRoomMsg {
+    msg_type: ServerGameMsgKinds,
+    /// Option<(玩家識別碼, 發言內容)>
+    info_player_say: Option<(u8, String)>,
+    info_root_say: Option<String>,
+}
+
+#[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
+pub enum ServerRoomMsgKinds {
+    // 玩家發言
+    PlayerSay,
+    // 伺服主發言
+    RootSay
+}
+
+#[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
+pub struct ServerGameMsg {
+    pub msg_type: ServerGameMsgKinds,
     pub info_hand_card_change: Option<Vec<PMJCard>>,
     pub info_error: Option<String>,
-    /// Option<(玩家Id, 動作)>
+    /// 來自你和其他玩家的動作 Option<(玩家Id, 動作)>
     pub info_player_action: Option<(u8, GameActions)>,
     pub info_get_card: Option<PMJCard>,
     pub info_change_turn: Option<u8>,
 }
 
-impl Default for ServerMessageType {
+impl Default for ServerGameMsg {
     fn default() -> Self {
         Self {
-            msg_type: ServerMessageTypeKinds::Error,
+            msg_type: ServerGameMsgKinds::Error,
             info_player_action: None,
             info_hand_card_change: None,
             info_error: Some(String::from("Default `info_error` value.")),
@@ -67,7 +96,7 @@ impl Default for ServerMessageType {
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
-pub enum ServerMessageTypeKinds {
+pub enum ServerGameMsgKinds {
     GameStart,
     GameFinish,
     ChangedTurn,
@@ -80,8 +109,20 @@ pub enum ServerMessageTypeKinds {
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
-pub struct ClientMessageType {
-    pub msg_type: ClientMessageTypeKinds,
+pub struct ClientMessage {
+    msg_type: ClientMsgKinds,
+    game_msg: Option<ClientGameMsg>
+}
+
+#[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
+pub enum ClientMsgKinds {
+    GameMsg,
+    RoomMsg,
+}
+
+#[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
+pub struct ClientGameMsg {
+    pub msg_type: ClientGameMsgKinds,
     pub info_game_action: Option<GameActions>,
     ///丟牌
     pub info_throw_card: Option<PMJCard>,
@@ -97,10 +138,10 @@ pub struct ClientMessageType {
     pub info_concealed_kong: Option<(PMJCard, PMJCard, PMJCard)>,
 }
 
-impl Default for ClientMessageType {
+impl Default for ClientGameMsg {
     fn default() -> Self {
         Self {
-            msg_type: ClientMessageTypeKinds::GameAction,
+            msg_type: ClientGameMsgKinds::GameAction,
             info_game_action: None,
             info_throw_card: None,
             info_replace_a_flower: None,
@@ -113,7 +154,7 @@ impl Default for ClientMessageType {
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
-pub enum ClientMessageTypeKinds {
+pub enum ClientGameMsgKinds {
     GameAction,
 }
 
@@ -135,7 +176,7 @@ pub enum GameActions {
     ReplaceFlower,
 }
 
-/// Base玩法的卡牌
+/// 卡牌
 #[derive(Debug, serde::Deserialize, serde::Serialize, PartialEq, PartialOrd, Ord, Eq, Clone)]
 pub struct PMJCard {
     /// 種類
@@ -152,6 +193,24 @@ pub struct PMJCard {
     pub info_flower: Option<PMJCardFlowerType>,
     /// 字
     pub info_words: Option<PMJCardWordsType>,
+}
+
+impl Display for PMJCard {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&format!("{}{}", match self.card_type {
+            PMJCardType::Dots => {self.info_dots.unwrap().to_string()}
+            PMJCardType::Flower => {self.info_flower.clone().unwrap().to_string()}
+            PMJCardType::Line => {self.info_line.unwrap().to_string()}
+            PMJCardType::TenThousand => {self.info_ten_thousand.unwrap().to_string()}
+            PMJCardType::Words => {self.info_words.clone().unwrap().to_string()}
+        }, match self.card_type {
+            PMJCardType::Dots => {"筒"}
+            PMJCardType::Flower => {""}
+            PMJCardType::Line => {"條"}
+            PMJCardType::TenThousand => {"萬"}
+            PMJCardType::Words => {""}
+        }))
+    }
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize, PartialEq, PartialOrd, Ord, Eq, Clone)]
@@ -223,18 +282,14 @@ pub enum PMJCardWordsType {
 
 impl std::fmt::Display for PMJCardWordsType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{}",
-            match self {
-                Self::East => "東",
-                Self::South => "南",
-                Self::West => "西",
-                Self::North => "北",
-                Self::RedDragon => "中",
-                Self::GreenDragon => "青發",
-                Self::WhiteDragon => "白板",
-            }
-        )
+        f.write_str(match self {
+            Self::East => "東",
+            Self::South => "南",
+            Self::West => "西",
+            Self::North => "北",
+            Self::RedDragon => "中",
+            Self::GreenDragon => "青發",
+            Self::WhiteDragon => "白板",
+        })
     }
 }

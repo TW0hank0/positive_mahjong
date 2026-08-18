@@ -1,0 +1,13 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": ["config:best-practices"],
+    "timezone": "Asia/Taipei",
+    "packageRules": [
+        {
+            "description": "將所有 minor 與 patch 更新打包成同一個 MR",
+            "matchUpdateTypes": ["minor", "patch"],
+            "groupName": "non-major dependencies",
+            "groupSlug": "minor-patch"
+        }
+    ]
+}

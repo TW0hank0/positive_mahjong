@@ -22,6 +22,7 @@ use std::{
     thread, time,
 };
 
+use crossbeam;
 use rand::{self, prelude::SliceRandom, seq::IndexedRandom};
 use tracing::{debug, error, info, trace, warn};
 use tungstenite::{Message, WebSocket, accept_with_config};
@@ -29,11 +30,215 @@ use url;
 
 use pmj_shared::shared;
 
-use crate::v2_better::shared as shared_base;
 use crate::v2_better::{
-    self,
+    self, shared as mode_shared,
     shared::{GameActions, PMJCard, PMJCardFlowerType, PMJCardType, PMJCardWordsType, PMJPlayer},
 };
+
+#[derive(Debug)]
+pub struct MsgMgrThreadResult {
+    is_error: bool,
+}
+#[derive(Debug, Clone)]
+pub struct MsgMgrTaskmsg {
+    msg_kind: MsgMgrTaskKinds,
+    /// 玩家id
+    kind_read: Option<u8>,
+    kind_write: Option<(u8, String)>,
+    kind_add_player: Option<Vec<PMJPlayer>>,
+}
+impl Default for MsgMgrTaskmsg {
+    fn default() -> Self {
+        Self { msg_kind: MsgMgrTaskKinds::Ping, kind_read: None, kind_write: None, kind_add_player: None }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum MsgMgrTaskKinds {
+    Read,
+    Write,
+    Ping,
+    AddPlayer,
+}
+#[derive(Debug)]
+pub struct MsgMgrTaskresult {
+    msg_kind: MsgMgrTaskKinds,
+    kind_read: Option<String>,
+}
+impl Default for MsgMgrTaskresult {
+    fn default() -> Self {
+        Self {
+            msg_kind: MsgMgrTaskKinds::Write,
+            kind_read: None,
+        }
+    }
+}
+/// TODO: Read Msg Cache Buf
+#[derive(Debug)]
+pub struct MessageMgr {
+    process_thread: thread::JoinHandle<MsgMgrThreadResult>,
+    pub players: Vec<PMJPlayer>,
+    task_sender: crossbeam::channel::Sender<(MsgMgrTaskmsg, crossbeam::channel::Sender<MsgMgrTaskresult>)>,
+    tasks: Vec<(u64, MsgMgrTaskmsg, crossbeam::channel::Receiver<MsgMgrTaskresult>)>,
+    last_task_id:u64,
+}
+impl MessageMgr {
+    pub fn new(players: Vec<PMJPlayer>) -> Self {
+        let thread_players = players.clone();
+        let (handle, task_sender) = MessageMgr::spawn_thread(thread_players);
+        Self {
+            process_thread: handle,
+            players,
+            task_sender: task_sender,
+            tasks: Vec::new(),
+            last_task_id:0,
+        }
+    }
+
+    pub fn get_task_result(&mut self, task_id:&u64) -> MsgMgrTaskresult {
+        let mut task_index = 0;
+        loop {
+            let (tid, _tmsg, tresult) = self.tasks.get(task_index).unwrap();
+            if tid == task_id {
+                return tresult.recv().unwrap();
+            } else {
+                task_index += 1;
+            }
+        }
+    }
+
+    fn task_new(&mut self, task: MsgMgrTaskmsg) -> u64 {
+        let (r_send, r_resv) = crossbeam::channel::bounded(2);
+        self.last_task_id += 1;
+        self.tasks.push((self.last_task_id.clone(), task.clone(), r_resv));
+        let sender = self.task_sender.clone();
+        sender.send((task, r_send)).ok();
+        drop(sender);
+        self.last_task_id.clone()
+    }
+
+    pub fn task_add_player(&mut self, players: Vec<PMJPlayer>) -> u64 {
+        self.players = players.clone();
+        self.task_new(MsgMgrTaskmsg { msg_kind: MsgMgrTaskKinds::AddPlayer, kind_add_player: Some(players),..Default::default() })
+    }
+
+    pub fn task_ping(&mut self) -> u64 {
+        self.task_new(MsgMgrTaskmsg { msg_kind: MsgMgrTaskKinds::Ping, ..Default::default() })
+    }
+
+    fn spawn_thread(
+        tplayers: Vec<PMJPlayer>,
+    ) -> (
+        thread::JoinHandle<MsgMgrThreadResult>,
+        crossbeam::channel::Sender<(MsgMgrTaskmsg, crossbeam::channel::Sender<MsgMgrTaskresult>)>,
+    ) {
+        let (task_sender, task_receiver) = crossbeam::channel::unbounded::<(MsgMgrTaskmsg, crossbeam::channel::Sender<MsgMgrTaskresult>)>();
+        let mut players = tplayers;
+        let handle = thread::spawn(move || {
+            loop {
+                match task_receiver.recv() {
+                    Ok((task, result_sender)) => match task.msg_kind.clone() {
+                        MsgMgrTaskKinds::Write => {
+                            let (task_player, task_content) = task.kind_write.unwrap();
+                            loop {
+                                let mut index = 0;
+                                let p = players.get(index).unwrap();
+                                if p.player_id == task_player {
+                                    let ws = p.player_ws.clone();
+                                    loop {
+                                        match ws.write() {
+                                            Ok(mut guard) => {
+                                                match guard
+                                                    .send(tungstenite::Message::text(&task_content))
+                                                {
+                                                    Ok(_) => {
+                                                        result_sender
+                                                            .send(MsgMgrTaskresult {
+                                                                msg_kind: task.msg_kind,
+                                                                kind_read: None,
+                                                            })
+                                                            .ok();
+                                                        return MsgMgrThreadResult {
+                                                            is_error: false,
+                                                        };
+                                                    }
+                                                    Err(e) => {
+                                                        warn!("msgmgr: {}", e);
+                                                    }
+                                                }
+                                            }
+                                            Err(e) => {
+                                                warn!("msgmgr: {}", e);
+                                            }
+                                        }
+                                        thread::sleep(time::Duration::from_secs(1));
+                                    }
+                                } else {
+                                    index += 1;
+                                }
+                            }
+                        }
+                        MsgMgrTaskKinds::AddPlayer => {
+                            players = task.kind_add_player.unwrap();
+                            return MsgMgrThreadResult { is_error: false };
+                        }
+                        MsgMgrTaskKinds::Ping => {}
+                        MsgMgrTaskKinds::Read => {
+                            let task_player = task.kind_read.unwrap();
+                            loop {
+                                let mut index = 0;
+                                let p = players.get(index).unwrap();
+                                if p.player_id == task_player {
+                                    let ws = p.player_ws.clone();
+                                    loop {
+                                        match ws.write() {
+                                            Ok(mut guard) => match guard.read() {
+                                                Ok(msg) => {
+                                                    match msg {
+                                                        tungstenite::Message::Text(text) => {
+                                                            result_sender
+                                                                .send(MsgMgrTaskresult {
+                                                                    msg_kind: task.msg_kind,
+                                                                    kind_read: Some(
+                                                                        text.to_string()
+                                                                    ),
+                                                                })
+                                                                .ok();
+                                                            return MsgMgrThreadResult { is_error: false };
+                                                        }
+                                                        tungstenite::Message::Ping(_) => {}
+                                                        tungstenite::Message::Pong(_) => {}
+                                                        _ => {
+                                                            drop(guard);
+                                                            warn!("unmatched message: {:?}", msg);
+                                                        }
+                                                    }
+                                                }
+                                                Err(e) => {
+                                                    warn!("msgmgr: {}", e);
+                                                }
+                                            },
+                                            Err(e) => {
+                                                warn!("msgmgr: {}", e);
+                                            }
+                                        }
+                                        thread::sleep(time::Duration::from_secs(1));
+                                    }
+                                } else {
+                                    index += 1;
+                                }
+                            }
+                        }
+                    },
+                    Err(_) => {
+                        return MsgMgrThreadResult { is_error: true };
+                    }
+                }
+            }
+        });
+        (handle, task_sender)
+    }
+}
 
 fn write_reply(
     text: String,
@@ -69,10 +274,7 @@ fn write_reply(
 }
 
 // 處理單一客戶端連線的函式
-fn handle_client(
-    tcp_stream: TcpStream,
-    backend: sync::Arc<sync::RwLock<crate::base::mode::PositiveMahjong>>,
-) {
+fn handle_client(tcp_stream: TcpStream, backend: sync::Arc<sync::RwLock<PositiveMahjong>>) {
     tcp_stream
         .set_read_timeout(Some(time::Duration::from_secs(8)))
         .ok();
@@ -159,14 +361,14 @@ fn handle_client(
                             }
                             let resp = if result_player_id.is_none() {
                                 shared::ServerConnectResponceType {
-                                    gamemode: shared::GameModes::Base,
+                                    gamemode: shared::GameModes::V2Better,
                                     player_id: None,
                                     too_many_player: true,
                                 }
                             } else {
                                 debug!("後端已返回玩家識別碼：{:?}", result_player_id.clone());
                                 shared::ServerConnectResponceType {
-                                    gamemode: shared::GameModes::Base,
+                                    gamemode: shared::GameModes::V2Better,
                                     player_id: result_player_id,
                                     too_many_player: false,
                                 }
@@ -176,28 +378,13 @@ fn handle_client(
                             info!("已回復客戶端初訊息。");
                             trace!("因為連接並回覆初訊息，將定期發送 Ping。");
                             loop {
-                                match ws.try_write() {
+                                match backend.try_write() {
                                     Ok(mut guard) => {
-                                        match guard.send(tungstenite::Message::Ping(
-                                            tungstenite::Bytes::new(),
-                                        )) {
-                                            Ok(_) => {
-                                                trace!("成功發送 Ping。");
-                                            }
-                                            Err(
-                                                tungstenite::Error::AlreadyClosed
-                                                | tungstenite::Error::ConnectionClosed,
-                                            ) => {
-                                                break 'connection;
-                                            }
-                                            Err(e) => {
-                                                trace!("ping process err: {:?}", e);
-                                                thread::sleep(time::Duration::from_secs(1));
-                                            }
-                                        }
+                                        guard.msg_mgr.task_ping();
+                                        drop(guard);
                                     }
-                                    Err(_e) => {
-                                        thread::sleep(time::Duration::from_secs(1));
+                                    Err(e) => {
+                                        warn!("ping: {}", e);
                                     }
                                 }
                                 thread::sleep(time::Duration::from_secs(2));
@@ -233,8 +420,8 @@ fn handle_client(
     }
 }
 
-pub fn main_base(gui_mode: bool) -> Option<Arc<RwLock<crate::base::mode::PositiveMahjong>>> {
-    let backend = sync::Arc::new(sync::RwLock::new(crate::base::mode::PositiveMahjong::new()));
+pub fn main_v2_better(return_backend: bool) -> Option<Arc<RwLock<PositiveMahjong>>> {
+    let backend = sync::Arc::new(sync::RwLock::new(PositiveMahjong::new()));
     let server_addr_ipv4 = std::net::SocketAddr::V4(std::net::SocketAddrV4::new(
         std::net::Ipv4Addr::UNSPECIFIED,
         shared::SERVER_PORT,
@@ -248,13 +435,13 @@ pub fn main_base(gui_mode: bool) -> Option<Arc<RwLock<crate::base::mode::Positiv
     let mut servers = Vec::new();
     let server_backend_ipv4 = sync::Arc::clone(&backend);
     servers.push(thread::spawn(move || {
-        handle_server_base(server_addr_ipv4, server_backend_ipv4)
+        handle_server(server_addr_ipv4, server_backend_ipv4)
     }));
     let server_backend_ipv6 = sync::Arc::clone(&backend);
     servers.push(thread::spawn(move || {
-        handle_server_base(server_addr_ipv6, server_backend_ipv6)
+        handle_server(server_addr_ipv6, server_backend_ipv6)
     }));
-    if gui_mode {
+    if return_backend {
         Some(backend)
     } else {
         info!("按 enter 開始遊戲");
@@ -286,10 +473,7 @@ pub fn main_base(gui_mode: bool) -> Option<Arc<RwLock<crate::base::mode::Positiv
     }
 }
 
-fn handle_server_base(
-    addr: std::net::SocketAddr,
-    backend: sync::Arc<sync::RwLock<crate::base::mode::PositiveMahjong>>,
-) {
+fn handle_server(addr: net::SocketAddr, backend: sync::Arc<sync::RwLock<PositiveMahjong>>) {
     // 建立 TCP Listener
     let listener: TcpListener = match TcpListener::bind(addr) {
         Ok(i) => {
@@ -331,6 +515,7 @@ pub struct PositiveMahjong {
     is_game_finish: bool,
     /// 未被 使用/抽取 的牌
     unused_card: Vec<PMJCard>,
+    msg_mgr: MessageMgr,
 }
 
 impl PositiveMahjong {
@@ -427,6 +612,7 @@ impl PositiveMahjong {
             is_game_finish: false,
             is_game_start: false,
             unused_card: unused_card,
+            msg_mgr: MessageMgr::new(Vec::new()),
         }
     }
 
@@ -451,7 +637,7 @@ impl PositiveMahjong {
         player_ws: sync::Arc<sync::RwLock<WebSocket<TcpStream>>>,
     ) -> Option<u8> {
         let current_player_count = self.players.len();
-        if (current_player_count as u8) < shared_base::MAX_PLAYER_COUNT {
+        if (current_player_count as u8) < mode_shared::MAX_PLAYER_COUNT {
             let player_id: u8 = (current_player_count + 1) as u8;
             self.players.push(PMJPlayer {
                 player_ip_addr,
@@ -460,6 +646,7 @@ impl PositiveMahjong {
                 player_hand_cards: Vec::new(),
                 player_used_cards: Vec::new(),
             });
+            self.msg_mgr.task_add_player(self.players.clone());
             Some(player_id)
         } else {
             None
@@ -469,8 +656,12 @@ impl PositiveMahjong {
     /// 開始遊戲
     pub fn start_game(&mut self) {
         self.is_game_start = true;
-        let game_start_msg = serde_json::to_string(&shared_base::ServerMessageType {
-            msg_type: shared_base::ServerMessageTypeKinds::GameStart,
+        let game_start_msg = serde_json::to_string(&mode_shared::ServerMessage {
+            msg_type: mode_shared::ServerMsgKinds::GameMsg,
+            game_msg: Some(mode_shared::ServerGameMsg {
+                msg_type: mode_shared::ServerGameMsgKinds::GameStart,
+                ..Default::default()
+            }),
             ..Default::default()
         })
         .unwrap();
@@ -512,9 +703,13 @@ impl PositiveMahjong {
                 player.player_ip_addr.to_string(),
                 player.player_hand_cards.clone()
             );
-            let hand_card_msg = serde_json::to_string(&shared_base::ServerMessageType {
-                msg_type: shared_base::ServerMessageTypeKinds::HandCardChange,
-                info_hand_card_change: Some(player.player_hand_cards.clone()),
+            let hand_card_msg = serde_json::to_string(&mode_shared::ServerMessage {
+                msg_type: mode_shared::ServerMsgKinds::GameMsg,
+                game_msg: Some(mode_shared::ServerGameMsg {
+                    msg_type: mode_shared::ServerGameMsgKinds::HandCardChange,
+                    info_hand_card_change: Some(player.player_hand_cards.clone()),
+                    ..Default::default()
+                }),
                 ..Default::default()
             })
             .unwrap();
@@ -535,9 +730,13 @@ impl PositiveMahjong {
         // main loop
         'game: loop {
             {
-                let msg = serde_json::to_string(&shared_base::ServerMessageType {
-                    msg_type: shared_base::ServerMessageTypeKinds::ChangedTurn,
-                    info_change_turn: Some(current_turn_player_id.clone()),
+                let msg = serde_json::to_string(&mode_shared::ServerMessage {
+                    msg_type: mode_shared::ServerMsgKinds::GameMsg,
+                    game_msg: Some(mode_shared::ServerGameMsg {
+                        msg_type: mode_shared::ServerGameMsgKinds::ChangedTurn,
+                        info_change_turn: Some(current_turn_player_id.clone()),
+                        ..Default::default()
+                    }),
                     ..Default::default()
                 })
                 .unwrap();
@@ -566,9 +765,13 @@ impl PositiveMahjong {
                                 let player_card = self.unused_card.remove(index);
                                 player.player_hand_cards.push(player_card.clone());
                                 let client_msg =
-                                    serde_json::to_string(&shared_base::ServerMessageType {
-                                        msg_type: shared_base::ServerMessageTypeKinds::GetCard,
-                                        info_get_card: Some(player_card),
+                                    serde_json::to_string(&mode_shared::ServerMessage {
+                                        msg_type: mode_shared::ServerMsgKinds::GameMsg,
+                                        game_msg: Some(mode_shared::ServerGameMsg {
+                                            msg_type: mode_shared::ServerGameMsgKinds::GetCard,
+                                            info_get_card: Some(player_card),
+                                            ..Default::default()
+                                        }),
                                         ..Default::default()
                                     })
                                     .unwrap();
@@ -637,10 +840,10 @@ impl PositiveMahjong {
                         }
                         match ws_msg {
                             Message::Text(text) => {
-                                let msg: v2_better::shared::ClientMessageType =
+                                let msg: v2_better::shared::ClientGameMsg =
                                     serde_json::from_str(&text).unwrap();
                                 match msg.msg_type {
-                                    v2_better::shared::ClientMessageTypeKinds::GameAction => {
+                                    v2_better::shared::ClientGameMsgKinds::GameAction => {
                                         match msg.info_game_action.unwrap() {
                                             GameActions::ThrowCard => {
                                                 if player
@@ -661,28 +864,26 @@ impl PositiveMahjong {
                                                         }
                                                     }
                                                     player.player_hand_cards.remove(card_index);
-                                                    let client_msg = serde_json::to_string(&shared_base::ServerMessageType {
-                                                    msg_type: shared_base::ServerMessageTypeKinds::HandCardChange,
+                                                    let client_msg = serde_json::to_string(&mode_shared::ServerMessage{msg_type:mode_shared::ServerMsgKinds::GameMsg,game_msg:Some(mode_shared::ServerGameMsg {
+                                                    msg_type: mode_shared::ServerGameMsgKinds::HandCardChange,
                                                     info_hand_card_change: Some(player.player_hand_cards.clone()),
                                                     ..Default::default()
-                                                })
+                                                }),..Default::default()})
                                                 .unwrap();
                                                     let _write_result = write_reply(
                                                         client_msg,
                                                         player.player_ws.clone(),
                                                     );
-                                                    let msg_to_else_player = serde_json::to_string(&shared_base::ServerMessageType{
-                                                    msg_type:shared_base::ServerMessageTypeKinds::PlayerAction,
+                                                    let msg_to_else_player = serde_json::to_string(&mode_shared::ServerMessage{msg_type:mode_shared::ServerMsgKinds::GameMsg,game_msg:Some(mode_shared::ServerGameMsg{
+                                                    msg_type:mode_shared::ServerGameMsgKinds::PlayerAction,
                                                     info_player_action:Some((current_turn_player_id, GameActions::ThrowCard)),
                                                     ..Default::default()
-                                                }).unwrap();
+                                                }),..Default::default()}).unwrap();
                                                     for p in self.players.iter() {
-                                                        if p.player_id != current_turn_player_id {
-                                                            let _ = write_reply(
-                                                                msg_to_else_player.clone(),
-                                                                p.player_ws.clone(),
-                                                            );
-                                                        }
+                                                        let _ = write_reply(
+                                                            msg_to_else_player.clone(),
+                                                            p.player_ws.clone(),
+                                                        );
                                                     }
                                                     if current_turn_player_id >= players_count {
                                                         current_turn_player_id = 1;

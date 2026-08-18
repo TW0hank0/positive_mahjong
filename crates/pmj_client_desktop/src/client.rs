@@ -725,32 +725,37 @@ impl Client {
                         let mut msg_bar = Column::new().width(Length::FillPortion(3));
                         let mut msg_num: u16 = 1;
                         for msg in self.status_play_base.game_msgs.iter() {
-                            msg_bar = msg_bar.push(
-                                container(
-                                    Row::new()
-                                        .push(text(msg_num.to_string()).size(17).style(
-                                            |t: &iced::Theme| {
-                                                let p = t.extended_palette();
-                                                text::Style {
-                                                    color: Some(p.primary.base.color),
-                                                }
-                                            },
-                                        ))
-                                        .push(space().width(15))
-                                        .push(text(msg.clone()).size(16)),
+                            msg_bar = msg_bar
+                                .push(
+                                    container(
+                                        Row::new()
+                                            .push(text(msg_num.to_string()).size(17).style(
+                                                |t: &iced::Theme| {
+                                                    let p = t.extended_palette();
+                                                    text::Style {
+                                                        color: Some(p.primary.base.color),
+                                                    }
+                                                },
+                                            ))
+                                            .push(space().width(15))
+                                            .push(text(msg.clone()).size(16)),
+                                    )
+                                    .style(
+                                        |t: &iced::Theme| {
+                                            let p = t.extended_palette();
+                                            let mut style = container::Style::default();
+                                            style.border.radius = iced::border::Radius::new(10);
+                                            style.border.width = 1.2;
+                                            style.border.color = p.background.weak.color;
+                                            style.text_color = Some(p.background.base.text);
+                                            style.background = Some(iced::Background::Color(
+                                                iced::Color::TRANSPARENT,
+                                            ));
+                                            style
+                                        },
+                                    ),
                                 )
-                                .style(|t: &iced::Theme| {
-                                    let p = t.extended_palette();
-                                    let mut style = container::Style::default();
-                                    style.border.radius = iced::border::Radius::new(10);
-                                    style.border.width = 1.2;
-                                    style.border.color = p.background.weak.color;
-                                    style.text_color = Some(p.background.base.text);
-                                    style.background =
-                                        Some(iced::Background::Color(iced::Color::TRANSPARENT));
-                                    style
-                                }),
-                            ).push(space().height(10));
+                                .push(space().height(10));
                             msg_num += 1;
                         }
                         ctr_bar = ctr_bar.push(scrollable(msg_bar));

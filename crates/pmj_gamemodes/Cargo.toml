@@ -32,6 +32,7 @@ serde_json = { workspace = true }
 tracing = { workspace = true }
 tungstenite = { workspace = true }
 url = { workspace = true }
+crossbeam = { workspace = true }
 
 [lib]
 name = "pmj_gamemodes"
