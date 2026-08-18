@@ -19,8 +19,6 @@ jobs:
 
       - name: Run Renovate against GitLab
         uses: renovatebot/github-action@v41.0.1
-        with:
-          renovate-image: renovate/renovate:latest
         env:
           # 告訴 Renovate 平臺是 GitLab
           RENOVATE_PLATFORM: "gitlab"
