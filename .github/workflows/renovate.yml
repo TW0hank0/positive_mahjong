@@ -6,6 +6,9 @@ on:
     - cron: "0 10 * * 1"
   # 支援在 GitHub 上手動點擊觸發
   workflow_dispatch:
+  push:
+    branches:
+      - master
 
 jobs:
   renovate:

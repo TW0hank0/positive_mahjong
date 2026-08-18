@@ -17,7 +17,7 @@ stages:
   - sync
   - deploy
 
-sync_to_mirrors:
+sync_code_to_mirrors:
   stage: sync
   image: alpine:latest
   before_script:
@@ -47,13 +47,46 @@ sync_to_mirrors:
     - git remote add codeberg git@codeberg.org:TW0hank0/positive_mahjong.git
     # 鏡像同步
     - git push codeberg --force
-    - git push codeberg --tags
     - git push github --force
-    - git push github --tags
     - cd ..
-
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+sync_tags_to_mirrors:
+  stage: sync
+  image: alpine:latest
+  before_script:
+    # 安裝必要工具
+    - apk add --no-cache git openssh-client curl bash
+    - curl -s https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer | bash
+
+    # 啟動 SSH Agent 並載入安全檔案中的私鑰
+    - eval $(ssh-agent -s) > /dev/null
+    - chmod 400 .secure_files/sync_bot
+    - ssh-add .secure_files/sync_bot > /dev/null 2>&1
+
+    # 建立信任主機
+    - mkdir -p ~/.ssh && chmod 700 ~/.ssh
+    - ssh-keyscan github.com codeberg.org >> ~/.ssh/known_hosts 2>/dev/null
+
+    # 設定 Bot 身份
+    - git config --global user.email "TW0hank0@noreply.codeberg.org"
+    - git config --global user.name "sync-bot-TW0hank0"
+
+    - git clone https://gitlab.com/TW0hank0/positive_mahjong.git
+
+  script:
+    - cd positive_mahjong
+    # 設定遠端並推送
+    - git remote add github git@github.com:TW0hank0/positive_mahjong.git
+    - git remote add codeberg git@codeberg.org:TW0hank0/positive_mahjong.git
+    # 鏡像同步
+    - git push codeberg --tags
+    - git push github --tags
+    - cd ..
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG # Job executes only if a git tag is pushed
 
 pages:
   stage: deploy
