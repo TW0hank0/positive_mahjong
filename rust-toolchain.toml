@@ -14,6 +14,6 @@
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 [toolchain]
-channel = "nightly"
+channel = "nightly-2026-08-19"
 components = ["clippy", "rustc-codegen-cranelift-preview"]
 targets = []

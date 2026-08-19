@@ -30,7 +30,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
 
       - name: Install Dep
         uses: ./.github/workflows/instdep
@@ -72,7 +72,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
 
       - name: Install Dep
         uses: ./.github/workflows/instdep
@@ -95,14 +95,14 @@ jobs:
           echo "zip_path=$file" >> $env:GITHUB_OUTPUT
 
       - name: Upload exe artifact on Linux
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.1
         if: runner.os == 'Linux'
         with:
           name: ${{ steps.zip_files_linux.outputs.zip_path }}
           path: ${{ steps.zip_files_linux.outputs.zip_path }}
 
       - name: Upload exe artifact on Windows
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.1
         if: runner.os == 'Windows'
         with:
           name: ${{ steps.zip_files_windows.outputs.zip_path }}
@@ -162,7 +162,7 @@ jobs:
       contents: write
     steps:
       - name: checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
 
       - name: install Dep
         uses: ./.github/workflows/instdep
@@ -172,7 +172,7 @@ jobs:
           uv venv --python cpython-3.14
 
       - name: download all artifacts
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@v8.0.1
         with:
           path: artifacts
 
