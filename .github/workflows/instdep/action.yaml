@@ -64,7 +64,7 @@ runs:
         sudo apt-get install libfontconfig1-dev pkg-config mold gcc -y
 
     - name: install go
-      uses: actions/setup-go@v6
+      uses: actions/setup-go@v7
       with:
         go-version: "stable"
 

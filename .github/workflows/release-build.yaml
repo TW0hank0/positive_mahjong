@@ -32,7 +32,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Install Dep
         uses: ./.github/workflows/instdep
@@ -58,14 +58,14 @@ jobs:
           echo "zip_path=$file" >> $env:GITHUB_OUTPUT
 
       - name: Upload exe artifact (Linux)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: runner.os == 'Linux'
         with:
           name: ${{ steps.zip_files_linux.outputs.zip_path }}
           path: ${{ steps.zip_files_linux.outputs.zip_path }}
 
       - name: Upload exe artifact (Windows)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: runner.os == 'Windows'
         with:
           name: ${{ steps.zip_files_windows.outputs.zip_path }}
