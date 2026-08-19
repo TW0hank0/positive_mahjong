@@ -17,13 +17,13 @@ name: 功能請求（Feature request）
 description: 為這個專案提供建議
 title: "[Feature] "
 labels:
-    - enhancement
+  - enhancement
 
 body:
-    - type: textarea
-      attributes:
-          label: 你想要什么新功能？
-          description: |
-              你想要什麼新功能？
-      validations:
-          required: true
+  - type: textarea
+    attributes:
+      label: 你想要什麼新功能？
+      description: |
+        你想要什麼新功能？
+    validations:
+      required: true
