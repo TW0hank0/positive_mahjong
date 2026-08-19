@@ -37,15 +37,15 @@ use crate::v2_better::{
 
 #[derive(Debug)]
 pub struct MsgMgrThreadResult {
-    is_error: bool,
+    pub is_error: bool,
 }
 #[derive(Debug, Clone)]
 pub struct MsgMgrTaskmsg {
-    msg_kind: MsgMgrTaskKinds,
+    pub msg_kind: MsgMgrTaskKinds,
     /// 玩家id
-    kind_read: Option<u8>,
-    kind_write: Option<(u8, String)>,
-    kind_add_player: Option<Vec<PMJPlayer>>,
+    pub kind_read: Option<u8>,
+    pub kind_write: Option<(u8, String)>,
+    pub kind_add_player: Option<Vec<PMJPlayer>>,
 }
 impl Default for MsgMgrTaskmsg {
     fn default() -> Self {
@@ -62,8 +62,8 @@ pub enum MsgMgrTaskKinds {
 }
 #[derive(Debug)]
 pub struct MsgMgrTaskresult {
-    msg_kind: MsgMgrTaskKinds,
-    kind_read: Option<String>,
+    pub msg_kind: MsgMgrTaskKinds,
+    pub kind_read: Option<String>,
 }
 impl Default for MsgMgrTaskresult {
     fn default() -> Self {
