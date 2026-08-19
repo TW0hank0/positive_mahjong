@@ -28,7 +28,7 @@ pmj_shared = { path = "crates/pmj_shared" }
 positive_mahjong = { path = "." }
 # --- shared ---
 dirs = "=6.0.0"
-godot = { version = "=0.5.3", features = ["api-4-6"] }
+godot = { version = "=0.5.5", features = ["api-4-6"] }
 iced = { version = "=0.14.0", features = [
     "advanced",
     "canvas",
@@ -63,8 +63,8 @@ local-ip-address = "=0.6.13"
 lyon_algorithms = "=1.0.20"
 positive_tool_rs = { git = "https://gitlab.com/TW0hank0/positive_tool_rs.git", rev = "4467e45d" }
 rand = "=0.10.2"
-serde = { version = "=1.0.228", features = ["derive", "serde_derive"] }
-serde_json = "=1.0.149"
+serde = { version = "=1.0.229", features = ["derive", "serde_derive"] }
+serde_json = "=1.0.151"
 tracing = { version = "=0.1.44" }
 tracing-appender = { version = "=0.2.5" }
 tungstenite = { version = "=0.30.0", features = [
@@ -75,7 +75,7 @@ url = "=2.5.8"
 clap = { version = "=4.6.6", features = ["derive"]}
 crossbeam = "=0.8.4"
 # --- wasm ---
-console_error_panic_hook = { version = "=0.1.5" }
+console_error_panic_hook = { version = "=0.1.7" }
 wasm-bindgen = { version = "=0.2.127" }
 # --- android ---
 android_logger = { version = "=0.14.1" }
