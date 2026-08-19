@@ -31,4 +31,4 @@ jobs:
           RENOVATE_REPOSITORIES: "TW0hank0/positive_mahjong"
         with:
           # 明確指定與 Action 版本相容的 Renovate 版本
-          renovate-version: "39"
+          renovate-version: "44"
