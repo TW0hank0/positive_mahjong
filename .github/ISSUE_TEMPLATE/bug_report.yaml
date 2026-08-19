@@ -17,21 +17,28 @@ name: 錯誤回報（Bug report）
 description: 回報非預期行為
 title: "[Bug] "
 labels:
-    - bug
+  - bug
 
 body:
-    - type: textarea
-      attributes:
-          label: 目前的錯誤行為
-          description: |
-              目前行為
-      validations:
-          required: true
+  - type: textarea
+    attributes:
+      label: 錯誤
+      description: |
+        目前行為
+    validations:
+      required: true
 
-    - type: textarea
-      attributes:
-          label: 預期的正確行為
-          description: |
-              正確行為
-      validations:
-          required: true
+  - type: textarea
+    attributes:
+      label: 觸發步驟
+      description: "如何觸發這個錯誤"
+      placeholder: "type something here."
+
+  - type: textarea
+    attributes:
+      label: 應為何樣：
+      description: |
+        正確的行為
+      placeholder: "type something here."
+    validations:
+      required: true
