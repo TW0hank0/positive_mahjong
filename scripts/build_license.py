@@ -17,7 +17,7 @@ import json
 import os
 import shutil
 
-from . import util
+import util
 
 
 def main():

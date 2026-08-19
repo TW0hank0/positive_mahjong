@@ -18,7 +18,7 @@ import os
 import subprocess
 import sys
 
-from .ci import get_version
+from ci import get_version
 
 
 def get_latest_commit_message(repo_path: str = ".") -> str | None:
