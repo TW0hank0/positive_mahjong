@@ -17,6 +17,11 @@
             "groupName": "major dependencies",
             "groupSlug": "all-major",
             "labels": ["major-update"]
+        },
+        {
+            "description": "將所有未鎖定或萬用字元版本釘選到具體版本",
+            "matchPackagePatterns": ["*"],
+            "rangeStrategy": "pin"
         }
     ],
     "timezone": "Asia/Taipei",

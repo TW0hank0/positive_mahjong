@@ -16,7 +16,7 @@
 import platform
 import sys
 
-from . import util
+import util
 
 
 def main():

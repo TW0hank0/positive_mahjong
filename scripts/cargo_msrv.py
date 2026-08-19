@@ -15,7 +15,7 @@
 
 import os
 
-from . import util
+import util
 
 
 def main():
