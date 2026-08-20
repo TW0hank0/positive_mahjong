@@ -34,25 +34,9 @@ pub struct PMJPlayer {
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
-pub struct ServerMessage {
-    pub msg_type: ServerMsgKinds,
-    pub room_msg: Option<ServerRoomMsg>,
-    pub game_msg: Option<ServerGameMsg>,
-}
-
-impl Default for ServerMessage {
-    fn default() -> Self {
-        Self {
-            msg_type: ServerMsgKinds::RoomMsg,
-            room_msg: None,
-            game_msg: None,
-        }
-    }
-}
-#[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
-pub enum ServerMsgKinds {
-    GameMsg,
-    RoomMsg,
+pub enum ServerMessage {
+    GameMsg(ServerGameMsg),
+    RoomMsg(ServerRoomMsg),
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
@@ -109,48 +93,25 @@ pub enum ServerGameMsgKinds {
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
-pub struct ClientMessage {
-    msg_type: ClientMsgKinds,
-    game_msg: Option<ClientGameMsg>
-}
-
-#[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
-pub enum ClientMsgKinds {
-    GameMsg,
+pub enum ClientMessage {
+    GameMsg(ClientGameMsg),
     RoomMsg,
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
-pub struct ClientGameMsg {
-    pub msg_type: ClientGameMsgKinds,
-    pub info_game_action: Option<GameActions>,
+pub enum ClientGameMsg {
     ///丟牌
-    pub info_throw_card: Option<PMJCard>,
+    ThrowCard(PMJCard),
     ///補花
-    pub info_replace_a_flower: Option<PMJCard>,
+    ReplaceAFlower(PMJCard),
     ///吃
-    pub info_eat: Option<(PMJCard, PMJCard)>,
+    Eat((PMJCard, PMJCard)),
     ///碰
-    pub info_triplet: Option<(PMJCard, PMJCard)>,
+    Triplet((PMJCard, PMJCard)),
     ///明槓
-    pub info_exposed_kong: Option<(PMJCard, PMJCard, PMJCard)>,
+    ExposedKong((PMJCard, PMJCard, PMJCard)),
     ///暗槓
-    pub info_concealed_kong: Option<(PMJCard, PMJCard, PMJCard)>,
-}
-
-impl Default for ClientGameMsg {
-    fn default() -> Self {
-        Self {
-            msg_type: ClientGameMsgKinds::GameAction,
-            info_game_action: None,
-            info_throw_card: None,
-            info_replace_a_flower: None,
-            info_concealed_kong: None,
-            info_eat: None,
-            info_exposed_kong: None,
-            info_triplet: None,
-        }
-    }
+    ConcealedKong((PMJCard, PMJCard, PMJCard)),
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
@@ -183,48 +144,65 @@ pub struct PMJCard {
     pub card_type: PMJCardType,
     /// 此卡牌第`card_id`張
     pub card_id: u8,
-    ///萬
-    pub info_ten_thousand: Option<u8>,
-    ///條
-    pub info_line: Option<u8>,
-    ///筒
-    pub info_dots: Option<u8>,
-    ///花
-    pub info_flower: Option<PMJCardFlowerType>,
-    /// 字
-    pub info_words: Option<PMJCardWordsType>,
 }
 
 impl Display for PMJCard {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&format!("{}{}", match self.card_type {
-            PMJCardType::Dots => {self.info_dots.unwrap().to_string()}
-            PMJCardType::Flower => {self.info_flower.clone().unwrap().to_string()}
-            PMJCardType::Line => {self.info_line.unwrap().to_string()}
-            PMJCardType::TenThousand => {self.info_ten_thousand.unwrap().to_string()}
-            PMJCardType::Words => {self.info_words.clone().unwrap().to_string()}
-        }, match self.card_type {
-            PMJCardType::Dots => {"筒"}
-            PMJCardType::Flower => {""}
-            PMJCardType::Line => {"條"}
-            PMJCardType::TenThousand => {"萬"}
-            PMJCardType::Words => {""}
-        }))
+        f.write_str(&match self.card_type.clone() {
+            PMJCardType::Dots(num) => {format!("{}筒", num)}
+            PMJCardType::Flower(flower) => {flower.to_string()}
+            PMJCardType::Line(num) => {format!("{}條", num)}
+            PMJCardType::TenThousand(num) => {format!("{}萬", num)}
+            PMJCardType::Words(word) => {word.to_string()}
+        })
     }
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize, PartialEq, PartialOrd, Ord, Eq, Clone)]
 pub enum PMJCardType {
     ///萬
-    TenThousand,
+    TenThousand(u8),
     ///條
-    Line,
+    Line(u8),
     ///筒
-    Dots,
+    Dots(u8),
     ///花
-    Flower,
+    Flower(PMJCardFlowerType),
     ///字
-    Words,
+    Words(PMJCardWordsType),
+}
+
+impl PMJCardType {
+    pub fn is_ten_thousand(&self) -> bool {
+        match self {
+            Self::TenThousand(_) => {true}
+            _ => {false}
+        }
+    }
+    pub fn is_line(&self) -> bool {
+        match self {
+            Self::Line(_) => {true}
+            _ => {false}
+        }
+    }
+    pub fn is_dots(&self) -> bool {
+        match self {
+            Self::Dots(_) => {true}
+            _ => {false}
+        }
+    }
+    pub fn is_flower(&self) -> bool {
+        match self {
+            Self::Flower(_) => {true}
+            _ => {false}
+        }
+    }
+    pub fn is_words(&self) -> bool {
+        match self {
+            Self::Words(_) => {true}
+            _ => {false}
+        }
+    }
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize, PartialEq, PartialOrd, Ord, Eq, Clone)]

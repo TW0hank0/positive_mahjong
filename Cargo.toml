@@ -17,7 +17,7 @@
 authors = ["TW0hank0 <public.email.hank@tutamail.com>"]
 edition = "2024"
 license = "AGPL-3.0-only"
-repository = "https://github.com/TW0hank0/positive_mahjong"
+repository = "https://gitlab.com/TW0hank0/positive_mahjong"
 rust-version = "1.94"
 version = "0.1.1"
 
@@ -25,6 +25,7 @@ version = "0.1.1"
 # --- local ---
 pmj_gamemodes = { path = "crates/pmj_gamemodes" }
 pmj_shared = { path = "crates/pmj_shared" }
+pmj_client_core = { path = "crates/pmj_client_core" }
 positive_mahjong = { path = "." }
 # --- shared ---
 dirs = "=6.0.0"
@@ -84,9 +85,11 @@ android_logger = { version = "=0.14.1" }
 members = [
     "crates/pmj_client_cross/rust",
     "crates/pmj_client_desktop",
+    "crates/pmj_client_desktop_base",
     "crates/pmj_gamemodes",
     "crates/pmj_server",
     "crates/pmj_shared",
+    "crates/pmj_client_core"
 ]
 resolver = "3"
 

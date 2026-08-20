@@ -79,7 +79,6 @@ def main():
         print("=> Compiling pmj_client_cross_lib ...")
         compile_cmd = [
             "cargo",
-            "+nightly",
             "build",
             "--release",
             f"--target={target_name}",

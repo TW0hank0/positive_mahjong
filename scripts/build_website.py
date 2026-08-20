@@ -58,7 +58,7 @@ def remove_dir(path: str):
 
 
 def build_files_dl(dir_path: str):
-    dlable_files: list[str] = [
+    dlable_files: list[str | tuple[str, str]] = [
         os.path.join(os.path.dirname(os.path.dirname(__file__)), "LICENSE"),
         os.path.join(os.path.dirname(os.path.dirname(__file__)), "README.md"),
         os.path.join(
@@ -83,6 +83,24 @@ def build_files_dl(dir_path: str):
             os.path.dirname(os.path.dirname(__file__)),
             "auto_generated",
             "ThirdPartyLicense-Rust.md",
+        ),
+        (
+            os.path.join(
+                os.path.dirname(os.path.dirname(__file__)),
+                "assets",
+                "Noto_Sans_TC",
+                "OFL.txt",
+            ),
+            "Noto_Sans_TC_OFL.txt",
+        ),
+        (
+            os.path.join(
+                os.path.dirname(os.path.dirname(__file__)),
+                "assets",
+                "material_symbols",
+                "LICENSE",
+            ),
+            "material_symbols_LICENSE",
         ),
     ]
     files_summary_template = """\
@@ -114,20 +132,28 @@ def build_files_dl(dir_path: str):
     </html>\n"""
     summary_prepare = ""
     for dlfile in dlable_files:
-        print(f"{dlfile} -> {os.path.join(dir_path, os.path.basename(dlfile))}")
-        _ = shutil.copy2(dlfile, os.path.join(dir_path, os.path.basename(dlfile)))
+        if type(dlfile) is str:
+            file_path = dlfile
+            new_name = os.path.basename(dlfile)
+        elif type(dlfile) is tuple:
+            file_path = dlfile[0]
+            new_name = dlfile[1]
+        else:
+            raise RuntimeError("type(dlfile) is not (str, tuple)")
+        print(f"{dlfile} -> {os.path.join(dir_path, new_name)}")
+        _ = shutil.copy2(file_path, os.path.join(dir_path, new_name))
         summary_prepare = (
             summary_prepare
             + f"""
         <div class="dlable-file">
-          <a href="./{os.path.basename(dlfile)}" target="_blank" download>{os.path.basename(dlfile)}</a>
+          <a href="./{new_name}" target="_blank" download>{new_name}</a>
         </div>"""
         )
     files_summary = files_summary_template.replace(
         "{{$DY_VAR_FILES_SUMMARY$}}", summary_prepare
     )
     with open(os.path.join(dir_path, "index.html"), "w", encoding="utf-8") as f:
-        f.write(files_summary)
+        _ = f.write(files_summary)
 
 
 def process_dir(

@@ -1,9 +1,9 @@
 name: Renovate GitLab Projects
 
 on:
-  # 設定定時觸發（每週一早上 10 點 UTC）
+  # 設定定時觸發（每天早上 10 點 UTC）
   schedule:
-    - cron: "0 10 * * 1"
+    - cron: "0 10 * * *"
   # 支援在 GitHub 上手動點擊觸發
   workflow_dispatch:
   push:

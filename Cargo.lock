@@ -3614,6 +3614,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b4596b6d070b27117e987119b4dac604f3c58cfb0b191112e24771b2faeac1a6"
 
 [[package]]
+name = "pmj_client_core"
+version = "0.1.1"
+dependencies = [
+ "pmj_gamemodes",
+ "pmj_shared",
+ "serde_json",
+ "tracing",
+ "tungstenite",
+ "url",
+]
+
+[[package]]
 name = "pmj_client_cross"
 version = "0.1.1"
 dependencies = [
@@ -3630,6 +3642,22 @@ dependencies = [
 
 [[package]]
 name = "pmj_client_desktop"
+version = "0.1.1"
+dependencies = [
+ "iced",
+ "image",
+ "lyon_algorithms",
+ "pmj_client_core",
+ "pmj_gamemodes",
+ "pmj_shared",
+ "serde_json",
+ "tracing",
+ "tungstenite",
+ "url",
+]
+
+[[package]]
+name = "pmj_client_desktop_base"
 version = "0.1.1"
 dependencies = [
  "iced",

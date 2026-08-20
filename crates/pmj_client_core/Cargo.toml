@@ -17,18 +17,14 @@
 authors = { workspace = true }
 edition = { workspace = true }
 license = { workspace = true }
-name = "pmj_client_desktop"
+name = "pmj_client_core"
 repository = { workspace = true }
 rust-version.workspace = true
 version = { workspace = true }
 
 [dependencies]
-iced = { workspace = true }
-image = { workspace = true }
-lyon_algorithms = { workspace = true }
 pmj_gamemodes = { workspace = true }
 pmj_shared = { workspace = true }
-pmj_client_core = { workspace = true }
 serde_json = { workspace = true }
 tracing = { workspace = true }
 tungstenite = { workspace = true }
@@ -37,6 +33,5 @@ url = { workspace = true }
 [features]
 default = []
 
-[[bin]]
-name = "pmj_client_desktop"
-path = "src/main.rs"
+[lib]
+path = "src/lib.rs"

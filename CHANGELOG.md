@@ -20,6 +20,12 @@
 }
 ```
 
+發佈版本時使用：
+
+```
+git tag -a "版本" -m "release pmj: 版本"
+```
+
 ---
 
 ## [未發布]
@@ -29,6 +35,10 @@
 **2026-8-17**
 
 - ［V2Better］分離 `room_msg` `game_msg`
+
+**2026-8-20**
+
+- init [pmj_ccore](./TODO.md#pmj_client_core)
 
 ## [v0.1.1] - 2026-8-17
 
