@@ -36,13 +36,13 @@ jobs:
         uses: ./.github/workflows/instdep
 
       - name: Run debug check
-        run: cargo +nightly check --workspace
+        run: cargo check --workspace
 
       - name: Run release check
-        run: cargo +nightly check --release --workspace
+        run: cargo check --release --workspace
 
       - name: Run clippy
-        run: cargo +nightly clippy
+        run: cargo clippy
 
       - name: Run License Check
         run: |
@@ -188,6 +188,12 @@ jobs:
           version=$(uv run scripts/ci/get_version.py)
           echo "version=$version" >> $GITHUB_OUTPUT
 
+      - name: get commit msg
+        id: get_commit_msg
+        run: |
+          commit_msg=$(uv run scripts/ci/get_commit_msg.py)
+          echo "commit_msg=$commit_msg" >> $GITHUB_OUTPUT
+
       - name: List Dir (for debug)
         run: |
           ls .
@@ -206,7 +212,8 @@ jobs:
             --notes "**這是使用Github Action製作的測試版**
             - 版本： ${{ steps.get_version.outputs.version }}
             - 時間： ${{ steps.get_datetime.outputs.datetime }}
-            - commit sha： ${{ github.sha }}" \
+            - commit sha: ${{ github.sha }}
+            - commit msg: ${{ steps.get_commit_msg.outputs.commit_msg }}" \
             --prerelease \
             --repo="${{ github.repository }}"
           echo '----Get Upload Url----'

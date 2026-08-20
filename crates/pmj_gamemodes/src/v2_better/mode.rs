@@ -49,7 +49,12 @@ pub struct MsgMgrTaskmsg {
 }
 impl Default for MsgMgrTaskmsg {
     fn default() -> Self {
-        Self { msg_kind: MsgMgrTaskKinds::Ping, kind_read: None, kind_write: None, kind_add_player: None }
+        Self {
+            msg_kind: MsgMgrTaskKinds::Ping,
+            kind_read: None,
+            kind_write: None,
+            kind_add_player: None,
+        }
     }
 }
 
@@ -78,9 +83,14 @@ impl Default for MsgMgrTaskresult {
 pub struct MessageMgr {
     process_thread: thread::JoinHandle<MsgMgrThreadResult>,
     pub players: Vec<PMJPlayer>,
-    task_sender: crossbeam::channel::Sender<(MsgMgrTaskmsg, crossbeam::channel::Sender<MsgMgrTaskresult>)>,
-    tasks: Vec<(u64, MsgMgrTaskmsg, crossbeam::channel::Receiver<MsgMgrTaskresult>)>,
-    last_task_id:u64,
+    task_sender:
+        crossbeam::channel::Sender<(MsgMgrTaskmsg, crossbeam::channel::Sender<MsgMgrTaskresult>)>,
+    tasks: Vec<(
+        u64,
+        MsgMgrTaskmsg,
+        crossbeam::channel::Receiver<MsgMgrTaskresult>,
+    )>,
+    last_task_id: u64,
 }
 impl MessageMgr {
     pub fn new(players: Vec<PMJPlayer>) -> Self {
@@ -91,11 +101,11 @@ impl MessageMgr {
             players,
             task_sender: task_sender,
             tasks: Vec::new(),
-            last_task_id:0,
+            last_task_id: 0,
         }
     }
 
-    pub fn get_task_result(&mut self, task_id:&u64) -> MsgMgrTaskresult {
+    pub fn get_task_result(&mut self, task_id: &u64) -> MsgMgrTaskresult {
         let mut task_index = 0;
         loop {
             let (tid, _tmsg, tresult) = self.tasks.get(task_index).unwrap();
@@ -110,7 +120,8 @@ impl MessageMgr {
     fn task_new(&mut self, task: MsgMgrTaskmsg) -> u64 {
         let (r_send, r_resv) = crossbeam::channel::bounded(2);
         self.last_task_id += 1;
-        self.tasks.push((self.last_task_id.clone(), task.clone(), r_resv));
+        self.tasks
+            .push((self.last_task_id.clone(), task.clone(), r_resv));
         let sender = self.task_sender.clone();
         sender.send((task, r_send)).ok();
         drop(sender);
@@ -119,11 +130,18 @@ impl MessageMgr {
 
     pub fn task_add_player(&mut self, players: Vec<PMJPlayer>) -> u64 {
         self.players = players.clone();
-        self.task_new(MsgMgrTaskmsg { msg_kind: MsgMgrTaskKinds::AddPlayer, kind_add_player: Some(players),..Default::default() })
+        self.task_new(MsgMgrTaskmsg {
+            msg_kind: MsgMgrTaskKinds::AddPlayer,
+            kind_add_player: Some(players),
+            ..Default::default()
+        })
     }
 
     pub fn task_ping(&mut self) -> u64 {
-        self.task_new(MsgMgrTaskmsg { msg_kind: MsgMgrTaskKinds::Ping, ..Default::default() })
+        self.task_new(MsgMgrTaskmsg {
+            msg_kind: MsgMgrTaskKinds::Ping,
+            ..Default::default()
+        })
     }
 
     fn spawn_thread(
@@ -132,7 +150,10 @@ impl MessageMgr {
         thread::JoinHandle<MsgMgrThreadResult>,
         crossbeam::channel::Sender<(MsgMgrTaskmsg, crossbeam::channel::Sender<MsgMgrTaskresult>)>,
     ) {
-        let (task_sender, task_receiver) = crossbeam::channel::unbounded::<(MsgMgrTaskmsg, crossbeam::channel::Sender<MsgMgrTaskresult>)>();
+        let (task_sender, task_receiver) = crossbeam::channel::unbounded::<(
+            MsgMgrTaskmsg,
+            crossbeam::channel::Sender<MsgMgrTaskresult>,
+        )>();
         let mut players = tplayers;
         let handle = thread::spawn(move || {
             loop {
@@ -193,27 +214,25 @@ impl MessageMgr {
                                     loop {
                                         match ws.write() {
                                             Ok(mut guard) => match guard.read() {
-                                                Ok(msg) => {
-                                                    match msg {
-                                                        tungstenite::Message::Text(text) => {
-                                                            result_sender
-                                                                .send(MsgMgrTaskresult {
-                                                                    msg_kind: task.msg_kind,
-                                                                    kind_read: Some(
-                                                                        text.to_string()
-                                                                    ),
-                                                                })
-                                                                .ok();
-                                                            return MsgMgrThreadResult { is_error: false };
-                                                        }
-                                                        tungstenite::Message::Ping(_) => {}
-                                                        tungstenite::Message::Pong(_) => {}
-                                                        _ => {
-                                                            drop(guard);
-                                                            warn!("unmatched message: {:?}", msg);
-                                                        }
+                                                Ok(msg) => match msg {
+                                                    tungstenite::Message::Text(text) => {
+                                                        result_sender
+                                                            .send(MsgMgrTaskresult {
+                                                                msg_kind: task.msg_kind,
+                                                                kind_read: Some(text.to_string()),
+                                                            })
+                                                            .ok();
+                                                        return MsgMgrThreadResult {
+                                                            is_error: false,
+                                                        };
                                                     }
-                                                }
+                                                    tungstenite::Message::Ping(_) => {}
+                                                    tungstenite::Message::Pong(_) => {}
+                                                    _ => {
+                                                        drop(guard);
+                                                        warn!("unmatched message: {:?}", msg);
+                                                    }
+                                                },
                                                 Err(e) => {
                                                     warn!("msgmgr: {}", e);
                                                 }
@@ -525,13 +544,8 @@ impl PositiveMahjong {
         for card_id in 1..=4 {
             for card_number in 1..=9 {
                 unused_card.push(PMJCard {
-                    card_type: PMJCardType::Dots,
+                    card_type: PMJCardType::Dots(card_number),
                     card_id: card_id,
-                    info_ten_thousand: None,
-                    info_line: None,
-                    info_dots: Some(card_number),
-                    info_flower: None,
-                    info_words: None,
                 });
             }
         }
@@ -539,13 +553,8 @@ impl PositiveMahjong {
         for card_id in 1..=4 {
             for card_number in 1..=9 {
                 unused_card.push(PMJCard {
-                    card_type: PMJCardType::Line,
+                    card_type: PMJCardType::Line(card_number),
                     card_id: card_id,
-                    info_ten_thousand: None,
-                    info_line: Some(card_number),
-                    info_dots: None,
-                    info_flower: None,
-                    info_words: None,
                 });
             }
         }
@@ -553,13 +562,8 @@ impl PositiveMahjong {
         for card_id in 1..=4 {
             for card_number in 1..=9 {
                 unused_card.push(PMJCard {
-                    card_type: PMJCardType::TenThousand,
+                    card_type: PMJCardType::TenThousand(card_number),
                     card_id: card_id,
-                    info_ten_thousand: Some(card_number),
-                    info_line: None,
-                    info_dots: None,
-                    info_flower: None,
-                    info_words: None,
                 });
             }
         }
@@ -575,13 +579,8 @@ impl PositiveMahjong {
             PMJCardFlowerType::Winter,
         ] {
             unused_card.push(PMJCard {
-                card_type: PMJCardType::Flower,
+                card_type: PMJCardType::Flower(flower_type),
                 card_id: 1,
-                info_ten_thousand: None,
-                info_line: None,
-                info_dots: None,
-                info_flower: Some(flower_type),
-                info_words: None,
             });
         }
         //初始化`字`
@@ -596,13 +595,8 @@ impl PositiveMahjong {
                 PMJCardWordsType::WhiteDragon,
             ] {
                 unused_card.push(PMJCard {
-                    card_type: PMJCardType::Words,
+                    card_type: PMJCardType::Words(word_type),
                     card_id: card_id,
-                    info_ten_thousand: None,
-                    info_line: None,
-                    info_dots: None,
-                    info_flower: None,
-                    info_words: Some(word_type),
                 });
             }
         }
@@ -656,14 +650,12 @@ impl PositiveMahjong {
     /// 開始遊戲
     pub fn start_game(&mut self) {
         self.is_game_start = true;
-        let game_start_msg = serde_json::to_string(&mode_shared::ServerMessage {
-            msg_type: mode_shared::ServerMsgKinds::GameMsg,
-            game_msg: Some(mode_shared::ServerGameMsg {
+        let game_start_msg = serde_json::to_string(&mode_shared::ServerMessage::GameMsg(
+            mode_shared::ServerGameMsg {
                 msg_type: mode_shared::ServerGameMsgKinds::GameStart,
                 ..Default::default()
-            }),
-            ..Default::default()
-        })
+            },
+        ))
         .unwrap();
         for player in self.players.iter() {
             info!(
@@ -703,15 +695,12 @@ impl PositiveMahjong {
                 player.player_ip_addr.to_string(),
                 player.player_hand_cards.clone()
             );
-            let hand_card_msg = serde_json::to_string(&mode_shared::ServerMessage {
-                msg_type: mode_shared::ServerMsgKinds::GameMsg,
-                game_msg: Some(mode_shared::ServerGameMsg {
+            let hand_card_msg = serde_json::to_string(&mode_shared::ServerMessage::GameMsg(mode_shared::ServerGameMsg {
                     msg_type: mode_shared::ServerGameMsgKinds::HandCardChange,
                     info_hand_card_change: Some(player.player_hand_cards.clone()),
                     ..Default::default()
-                }),
-                ..Default::default()
-            })
+                })
+            )
             .unwrap();
             let _write_result = write_reply(hand_card_msg, player.player_ws.clone());
         }
@@ -730,15 +719,11 @@ impl PositiveMahjong {
         // main loop
         'game: loop {
             {
-                let msg = serde_json::to_string(&mode_shared::ServerMessage {
-                    msg_type: mode_shared::ServerMsgKinds::GameMsg,
-                    game_msg: Some(mode_shared::ServerGameMsg {
-                        msg_type: mode_shared::ServerGameMsgKinds::ChangedTurn,
-                        info_change_turn: Some(current_turn_player_id.clone()),
-                        ..Default::default()
-                    }),
+                let msg = serde_json::to_string(&&mode_shared::ServerMessage::GameMsg(mode_shared::ServerGameMsg {
+                    msg_type: mode_shared::ServerGameMsgKinds::ChangedTurn,
+                    info_change_turn: Some(current_turn_player_id.clone()),
                     ..Default::default()
-                })
+                }))
                 .unwrap();
                 for player in self.players.iter() {
                     write_reply(msg.clone(), player.player_ws.clone()).ok();
@@ -753,7 +738,7 @@ impl PositiveMahjong {
                     {
                         'choose_card: loop {
                             let got_card = self.unused_card.choose(&mut rng).unwrap();
-                            if got_card.card_type != PMJCardType::Flower {
+                            if !got_card.card_type.is_flower() {
                                 let mut index = 0;
                                 'find_index: for i in self.unused_card.iter() {
                                     if i == got_card {
@@ -765,15 +750,11 @@ impl PositiveMahjong {
                                 let player_card = self.unused_card.remove(index);
                                 player.player_hand_cards.push(player_card.clone());
                                 let client_msg =
-                                    serde_json::to_string(&mode_shared::ServerMessage {
-                                        msg_type: mode_shared::ServerMsgKinds::GameMsg,
-                                        game_msg: Some(mode_shared::ServerGameMsg {
+                                    serde_json::to_string(&mode_shared::ServerMessage::GameMsg(mode_shared::ServerGameMsg {
                                             msg_type: mode_shared::ServerGameMsgKinds::GetCard,
                                             info_get_card: Some(player_card),
                                             ..Default::default()
-                                        }),
-                                        ..Default::default()
-                                    })
+                                        }))
                                     .unwrap();
                                 write_reply(client_msg, player.player_ws.clone()).ok();
                                 break 'choose_card;
@@ -842,17 +823,15 @@ impl PositiveMahjong {
                             Message::Text(text) => {
                                 let msg: v2_better::shared::ClientGameMsg =
                                     serde_json::from_str(&text).unwrap();
-                                match msg.msg_type {
-                                    v2_better::shared::ClientGameMsgKinds::GameAction => {
-                                        match msg.info_game_action.unwrap() {
-                                            GameActions::ThrowCard => {
+                                match msg {
+                                    v2_better::shared::ClientGameMsg::ThrowCard(want_throw_card) => {
                                                 if player
                                                     .player_hand_cards
-                                                    .contains(&msg.info_throw_card.clone().unwrap())
+                                                    .contains(&want_throw_card)
                                                 {
                                                     let mut card_index: usize = 0;
                                                     'find_index: loop {
-                                                        if &msg.info_throw_card.clone().unwrap()
+                                                        if &want_throw_card
                                                             == player
                                                                 .player_hand_cards
                                                                 .get(card_index.clone())
@@ -864,21 +843,21 @@ impl PositiveMahjong {
                                                         }
                                                     }
                                                     player.player_hand_cards.remove(card_index);
-                                                    let client_msg = serde_json::to_string(&mode_shared::ServerMessage{msg_type:mode_shared::ServerMsgKinds::GameMsg,game_msg:Some(mode_shared::ServerGameMsg {
+                                                    let client_msg = serde_json::to_string(&mode_shared::ServerMessage::GameMsg(mode_shared::ServerGameMsg {
                                                     msg_type: mode_shared::ServerGameMsgKinds::HandCardChange,
                                                     info_hand_card_change: Some(player.player_hand_cards.clone()),
                                                     ..Default::default()
-                                                }),..Default::default()})
+                                                }))
                                                 .unwrap();
                                                     let _write_result = write_reply(
                                                         client_msg,
                                                         player.player_ws.clone(),
                                                     );
-                                                    let msg_to_else_player = serde_json::to_string(&mode_shared::ServerMessage{msg_type:mode_shared::ServerMsgKinds::GameMsg,game_msg:Some(mode_shared::ServerGameMsg{
+                                                    let msg_to_else_player = serde_json::to_string(&mode_shared::ServerMessage::GameMsg(mode_shared::ServerGameMsg{
                                                     msg_type:mode_shared::ServerGameMsgKinds::PlayerAction,
                                                     info_player_action:Some((current_turn_player_id, GameActions::ThrowCard)),
                                                     ..Default::default()
-                                                }),..Default::default()}).unwrap();
+                                                })).unwrap();
                                                     for p in self.players.iter() {
                                                         let _ = write_reply(
                                                             msg_to_else_player.clone(),
@@ -892,29 +871,27 @@ impl PositiveMahjong {
                                                     }
                                                     current_action = GameActions::GetCard;
                                                     break 'get_player_throw;
-                                                }
-                                            }
+                                                }}
                                             _ => {
                                                 error!("錯誤：客戶端錯誤訊息");
                                                 todo!("錯誤處理");
                                             }
                                         }
                                     }
-                                }
-                            }
+
+
                             Message::Ping(_) => {}
                             Message::Pong(_) => {}
                             _ => {
                                 error!("錯誤：客戶端錯誤訊息");
                                 todo!("錯誤處理");
-                            }
+                            }}}
                         }
-                    }
-                }
+
                 _ => {
                     error!("不支援的動作！Action：{:?}", current_action)
                 }
             }
         }
     }
-}
+    }

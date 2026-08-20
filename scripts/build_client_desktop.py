@@ -24,7 +24,6 @@ def main():
     util.run_cmd(
         [
             "cargo",
-            "+nightly",
             "build",
             "--package=pmj_client_desktop",
             "--release",

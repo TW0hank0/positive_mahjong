@@ -68,8 +68,8 @@ def main():
     if msg is None:
         raise RuntimeError("msg=None")
     else:
-        if "release" in msg:
-            print("Release:")
+        if "release pmj:" in msg.lower():
+            print("Release PMJ:")
 
             version = get_version.main()
             repo = "TW0hank0/positive_mahjong"
@@ -78,7 +78,6 @@ def main():
             date = datetime.datetime.now().date()
             notes = f"v{version} released: {date.year}/{date.month}/{date.day}"
             create_release(tag, title, notes, is_prerelease=False, repo=repo)
-            # upload_file(files=os.listdir("artifacts"), tag=tag, owner=owner, repo=repo)
         else:
             print("No release.")
 
