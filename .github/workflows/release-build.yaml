@@ -37,11 +37,21 @@ jobs:
       - name: Install Dep
         uses: ./.github/workflows/instdep
 
+      - name: Prepare venv
+        run: |
+          cd scripts
+          uv venv
+          uv sync
+          cd ..
+
       - name: sync dep
         run: uv sync --all-extras
 
       - name: use build script
-        run: uv run scripts/build_client_desktop.py
+        run: |
+          cd scripts
+          uv run build_client_desktop.py
+          cd ..
 
       - name: zip files (Linux)
         id: zip_files_linux

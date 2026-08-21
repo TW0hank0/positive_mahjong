@@ -35,6 +35,13 @@ jobs:
       - name: Install Dep
         uses: ./.github/workflows/instdep
 
+      - name: Prepare venv
+        run: |
+          cd scripts
+          uv venv
+          uv sync
+          cd ..
+
       - name: Run debug check
         run: cargo check --workspace
 
@@ -47,13 +54,18 @@ jobs:
       - name: Run License Check
         run: |
           echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
-          uv run scripts/license_check.py
+          cd scripts
+          uv run license_check.py
+          cd ..
 
       - name: Lint toml file
         run: taplo lint
 
       - name: Run cargo-msrv script
-        run: uv run scripts/cargo_msrv.py
+        run: |
+          cd scripts
+          uv run cargo_msrv.py
+          cd ..
 
       - name: Run cargo-audit
         run: cargo audit
@@ -77,8 +89,18 @@ jobs:
       - name: Install Dep
         uses: ./.github/workflows/instdep
 
+      - name: Prepare venv
+        run: |
+          cd scripts
+          uv venv
+          uv sync
+          cd ..
+
       - name: use build script
-        run: uv run scripts/build_client_desktop.py
+        run: |
+          cd scripts
+          uv run build_client_desktop.py
+          cd ..
 
       - name: zip files on Linux
         id: zip_files_linux
@@ -169,30 +191,15 @@ jobs:
 
       - name: prepare CI Venv
         run: |
-          uv venv --python cpython-3.14
+          cd scripts
+          uv venv
+          uv sync
+          cd ..
 
       - name: download all artifacts
         uses: actions/download-artifact@v8.0.1
         with:
           path: artifacts
-
-      - name: get datetime
-        id: get_datetime
-        run: |
-          datetime=$(uv run scripts/ci/get_datetime.py)
-          echo "datetime=$datetime" >> $GITHUB_OUTPUT
-
-      - name: get package get_version
-        id: get_version
-        run: |
-          version=$(uv run scripts/ci/get_version.py)
-          echo "version=$version" >> $GITHUB_OUTPUT
-
-      - name: get commit msg
-        id: get_commit_msg
-        run: |
-          commit_msg=$(uv run scripts/ci/get_commit_msg.py)
-          echo "commit_msg=$commit_msg" >> $GITHUB_OUTPUT
 
       - name: List Dir (for debug)
         run: |
@@ -206,33 +213,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo '----create_release----'
-          gh release create "ci-pre-v${{ steps.get_version.outputs.version }}-${{ github.sha }}" \
-            --title "pre-release: ${{ steps.get_version.outputs.version }}+${{ steps.get_datetime.outputs.datetime }} (${{ github.sha }})" \
-            --notes "**這是使用Github Action製作的測試版**
-            - 版本： ${{ steps.get_version.outputs.version }}
-            - 時間： ${{ steps.get_datetime.outputs.datetime }}
-            - commit sha: ${{ github.sha }}
-            - commit msg: ${{ steps.get_commit_msg.outputs.commit_msg }}" \
-            --prerelease \
-            --repo="${{ github.repository }}"
-          echo '----Get Upload Url----'
-          upload_url_base=$(gh api \
-            repos/${{ github.repository }}/releases/tags/ci-pre-v${{ steps.get_version.outputs.version }}-${{ github.sha }} \
-            --jq '.upload_url')
-          echo 'upload_url_base=$upload_url_base'
-          echo '----upload----'
-          set -euo pipefail
-          upload_url="${upload_url_base%\{*}"
-          echo "Uploading artifacts to $upload_url"
-          shopt -s globstar || true
-          for f in artifacts/**; do
-            if [ -f "$f" ]; then
-              echo "Uploading $f"
-              curl -X POST \
-                -H "Authorization: token $GITHUB_TOKEN" \
-                -H "Content-Type: application/octet-stream" \
-                --data-binary @"$f" \
-                "$upload_url?name=$(basename "$f")"
-            fi
-          done
+          cd scripts
+          uv run release_gh.py
+          cd ..
