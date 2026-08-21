@@ -13,6 +13,7 @@
 # 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
+import os
 import time
 
 import util
@@ -29,6 +30,7 @@ def main():
             "--release",
             "--locked",
         ],
+        cwd=os.path.dirname(os.path.dirname(__file__)),
     )
     print("finish in", time.time() - start_time)
 

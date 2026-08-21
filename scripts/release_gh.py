@@ -18,7 +18,13 @@ import os
 import subprocess
 import sys
 
+import typer
+
 from ci import get_version
+from util import run_cmd
+
+REPO = "TW0hank0/positive_mahjong"
+app = typer.Typer()
 
 
 def get_latest_commit_message(repo_path: str = ".") -> str | None:
@@ -44,9 +50,10 @@ def get_latest_commit_message(repo_path: str = ".") -> str | None:
             timeout=30,
         )
 
-        # 移除首尾空白字元（包含換行符）
-        commit_msg: str = result.stdout
-        return commit_msg if commit_msg else None
+        if result.stdout == "":
+            return None
+        else:
+            return result.stdout
 
     except FileNotFoundError:
         print(
@@ -63,8 +70,9 @@ def get_latest_commit_message(repo_path: str = ".") -> str | None:
         return None
 
 
-def main():
-    msg = get_latest_commit_message()
+@app.command()
+def main(pre_release: bool = False, pre_release_commit_sha: str = "No commit sha get"):
+    msg: str | None = get_latest_commit_message()
     if msg is None:
         raise RuntimeError("msg=None")
     else:
@@ -77,7 +85,33 @@ def main():
             title = f"{repo} v{version}"
             date = datetime.datetime.now().date()
             notes = f"v{version} released: {date.year}/{date.month}/{date.day}"
-            create_release(tag, title, notes, is_prerelease=False, repo=repo)
+            create_release(tag, title, notes, is_prerelease=pre_release, repo=REPO)
+        elif pre_release is True:
+            print("PreRelease:", end="")
+            version = get_version.main()
+            date = datetime.datetime.now().date()
+            time = datetime.datetime.now().time()
+            tag = f"ci-v{version}+{date.month}_{date.day}-{pre_release_commit_sha}"
+            title = f"PreRelease v{version}+{date.month}/{date.day}+{time.hour}:{time.minute}"
+            notes = f"""這是使用 Github Action 制作的測試版
+            ##### 版本
+            {version}
+            ##### 時間
+            {date.year}/{date.month}/{date.day} {time.hour}:{time.minute}:{time.second}
+            ##### 提交訊息（{pre_release_commit_sha}）
+            {msg}
+            """
+            create_release(tag, title, notes, is_prerelease=pre_release, repo=REPO)
+            upload_file(
+                files=os.listdir(
+                    os.path.join(
+                        os.path.dirname(os.path.dirname(__file__)), "artifacts"
+                    )
+                ),
+                tag=tag,
+                owner=REPO.split("/")[0],
+                repo=REPO.split("/")[1],
+            )
         else:
             print("No release.")
 
@@ -130,13 +164,6 @@ def upload_file(files: list[str], tag: str, owner: str, repo: str):
                 str(upload_url_base) + str(os.path.basename(file)),
             ]
         )
-
-
-def run_cmd(cmd: list[str]):
-    print(f"Run:{' '.join(cmd)}")
-    subprocess.run(
-        cmd, check=True, stderr=sys.stderr, stdout=sys.stdout, stdin=sys.stdin
-    )
 
 
 if __name__ == "__main__":

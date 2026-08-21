@@ -13,11 +13,6 @@
 # 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-# /// script
-# dependencies = [
-#     "mistune==3.3.4"
-# ]
-# ///
 import os
 import shutil
 
