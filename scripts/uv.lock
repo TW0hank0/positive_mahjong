@@ -1,6 +1,6 @@
 version = 1
 revision = 3
-requires-python = ">=3.14"
+requires-python = "==3.14.7"
 
 [[package]]
 name = "annotated-doc"
@@ -62,7 +62,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "mistune", specifier = "==3.3.4" },
-    { name = "typer", specifier = ">=0.27.1" },
+    { name = "typer", specifier = "==0.27.1" },
 ]
 
 [[package]]
