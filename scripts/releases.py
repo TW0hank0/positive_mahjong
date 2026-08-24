@@ -18,12 +18,14 @@ import os
 import subprocess
 import sys
 
+import requests
 import typer
 
 from ci import get_version
 from util import run_cmd
 
-REPO = "TW0hank0/positive_mahjong"
+OWNER = "TW0hank0"
+REPO = "positive_mahjong"
 app = typer.Typer()
 
 
@@ -71,7 +73,7 @@ def get_latest_commit_message(repo_path: str = ".") -> str | None:
 
 
 @app.command()
-def main(pre_release: bool = False, pre_release_commit_sha: str = "No commit sha get"):
+def main(commit_sha: str = "No commit sha get"):
     msg: str | None = get_latest_commit_message()
     if msg is None:
         raise RuntimeError("msg=None")
@@ -85,38 +87,64 @@ def main(pre_release: bool = False, pre_release_commit_sha: str = "No commit sha
             title = f"{repo} v{version}"
             date = datetime.datetime.now().date()
             notes = f"v{version} released: {date.year}/{date.month}/{date.day}"
-            create_release(tag, title, notes, is_prerelease=pre_release, repo=REPO)
-        elif pre_release is True:
-            print("PreRelease:", end="")
-            version = get_version.main()
-            date = datetime.datetime.now().date()
-            time = datetime.datetime.now().time()
-            tag = f"ci-v{version}+{date.month}_{date.day}-{pre_release_commit_sha}"
-            title = f"PreRelease v{version}+{date.month}/{date.day}+{time.hour}:{time.minute}"
-            notes = f"""這是使用 Github Action 制作的測試版
-            ##### 版本
-            {version}
-            ##### 時間
-            {date.year}/{date.month}/{date.day} {time.hour}:{time.minute}:{time.second}
-            ##### 提交訊息（{pre_release_commit_sha}）
-            {msg}
-            """
-            create_release(tag, title, notes, is_prerelease=pre_release, repo=REPO)
-            upload_file(
+            create_release_gh(tag, title, notes, is_prerelease=False, repo=REPO)
+            upload_file_gh(
                 files=os.listdir(
                     os.path.join(
                         os.path.dirname(os.path.dirname(__file__)), "artifacts"
                     )
                 ),
                 tag=tag,
-                owner=REPO.split("/")[0],
-                repo=REPO.split("/")[1],
+                owner=OWNER,
+                repo=REPO,
             )
+            cb_token = os.environ.get("CODEBERG_PAT_TOKEN")
+            if cb_token is None:
+                print("No codeberg token!", file=sys.stderr)
+                sys.exit(1)
+            else:
+                _ = codeberg_release(
+                    token=cb_token,
+                    owner=OWNER,
+                    repo=REPO,
+                    release_tag=tag,
+                    release_notes=notes,
+                    release_title=title,
+                    release_files=os.listdir(
+                        os.path.join(
+                            os.path.dirname(os.path.dirname(__file__)), "artifacts"
+                        )
+                    ),
+                )
         else:
-            print("No release.")
+            print("PreRelease:", end="")
+            version = get_version.main()
+            date = datetime.datetime.now().date()
+            time = datetime.datetime.now().time()
+            tag = f"ci-v{version}+{date.month}_{date.day}-{commit_sha}"
+            title = f"PreRelease v{version}+{date.month}/{date.day}+{time.hour}:{time.minute}"
+            notes = f"""這是使用 Github Action 制作的測試版
+            ##### 版本
+            {version}
+            ##### 時間
+            {date.year}/{date.month}/{date.day} {time.hour}:{time.minute}:{time.second}
+            ##### 提交訊息（{commit_sha}）
+            {msg}
+            """
+            create_release_gh(tag, title, notes, is_prerelease=True, repo=REPO)
+            upload_file_gh(
+                files=os.listdir(
+                    os.path.join(
+                        os.path.dirname(os.path.dirname(__file__)), "artifacts"
+                    )
+                ),
+                tag=tag,
+                owner=OWNER,
+                repo=REPO,
+            )
 
 
-def create_release(tag: str, title: str, notes: str, is_prerelease: bool, repo: str):
+def create_release_gh(tag: str, title: str, notes: str, is_prerelease: bool, repo: str):
     command: list[str] = [
         "gh",
         "release",
@@ -133,7 +161,7 @@ def create_release(tag: str, title: str, notes: str, is_prerelease: bool, repo: 
     run_cmd(command)
 
 
-def upload_file(files: list[str], tag: str, owner: str, repo: str):
+def upload_file_gh(files: list[str], tag: str, owner: str, repo: str):
     get_url_command = [
         "gh",
         "api",
@@ -146,8 +174,6 @@ def upload_file(files: list[str], tag: str, owner: str, repo: str):
     )
     upload_url_base = get_url_process.stdout
     print(f"upload_url_base={upload_url_base}")
-    subprocess.run(["set", "-euo", "pipefail"])
-    subprocess.run(["shopt", "-s", "globstar", "||", "true"])
     for file in files:
         print(f"uploading {file}")
         run_cmd(
@@ -164,6 +190,70 @@ def upload_file(files: list[str], tag: str, owner: str, repo: str):
                 str(upload_url_base) + str(os.path.basename(file)),
             ]
         )
+
+
+def codeberg_release(
+    token: str,
+    owner: str,
+    repo: str,
+    release_tag: str,
+    release_title: str,
+    release_notes: str,
+    release_files: list[str] | None = None,
+    draft: bool = False,
+    prerelease: bool = False,
+) -> dict:
+    """
+    在 Codeberg 建立 Release 並上傳附檔。
+
+    :param token: Codeberg API Personal Access Token
+    :param owner: 儲存庫擁有者
+    :param repo: 儲存庫名稱
+    :param release_tag: 標籤名稱
+    :param release_title: Release 標題
+    :param release_notes: Release 內容說明 (Markdown)
+    :param release_files: 欲上傳的檔案路徑列表 (str)
+    :param draft: 是否設為草稿
+    :param prerelease: 是否設為預覽版
+    :return: 建立好的 Release API 回傳資料 (dict)
+    """
+    base_url = f"https://codeberg.org/api/v1/repos/{owner}/{repo}/releases"
+    headers = {
+        "Authorization": f"token {token}",
+        "Accept": "application/json",
+    }
+    # 建立 Release
+    payload = {
+        "tag_name": release_tag,
+        "title": release_title,
+        "body": release_notes,
+        "draft": draft,
+        "prerelease": prerelease,
+    }
+
+    response = requests.post(base_url, json=payload, headers=headers, timeout=30)
+    response.raise_for_status()
+    release_data = response.json()
+
+    # 2. 上傳 Release 附件
+    if release_files:
+        release_id = release_data["id"]
+        upload_url = f"{base_url}/{release_id}/attachments"
+
+        for file_path in release_files:
+            if not os.path.isfile(file_path):
+                raise FileNotFoundError(f"找不到檔案: {file_path}")
+
+            filename = os.path.basename(file_path)
+
+            with open(file_path, "rb") as f:
+                files = {"attachment": (filename, f)}
+                upload_resp = requests.post(
+                    upload_url, headers=headers, files=files, timeout=60
+                )
+                upload_resp.raise_for_status()
+
+    return release_data
 
 
 if __name__ == "__main__":

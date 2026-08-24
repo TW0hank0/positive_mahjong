@@ -67,9 +67,6 @@ jobs:
           uv run cargo_msrv.py
           cd ..
 
-      - name: Run cargo-audit
-        run: cargo audit
-
       - name: Run cargo-deny
         run: |
           cargo deny fetch
@@ -209,10 +206,11 @@ jobs:
           echo '--------'
           ls -la artifacts
 
-      - name: prerelease
+      - name: release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CODEBERG_PAT_TOKEN: ${{ secrets.CODEBERG_PAT_TOKEN }}
         run: |
           cd scripts
-          uv run release_gh.py
+          uv run releases.py --commit-sha "${{ github.sha }}"
           cd ..
