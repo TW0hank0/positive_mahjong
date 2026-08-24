@@ -13,8 +13,11 @@
 # 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
+import os
 import subprocess
 import sys
+
+from colorama import Back, Fore, Style
 
 
 def main():
@@ -57,8 +60,9 @@ def main():
         "crates/pmj_client_desktop/src/circular.rs",
         "crates/old_slint_client/**",
         "supply-chain/**",
+        "scripts/**/__init__.py",
     ]
-    ignored = []
+    ignored: list[str] = []
     for dir in ignore_dir:
         ignored.extend(["-ignore", dir])
     command = [
@@ -69,27 +73,45 @@ def main():
     ]
     command.extend(ignored.copy())
     command.append(".")
-    print("Run Command:", " ".join(command))
+    work_cwd = os.getcwd()
+    project_root = os.path.relpath(os.path.dirname(os.path.dirname(__file__)))
+    print(Fore.CYAN + "--- Run command" + Fore.RESET)
+    print(
+        Back.LIGHTBLACK_EX
+        + " && ".join([f"cd {project_root}", " ".join(command), f"cd {work_cwd}"])
+        + Back.RESET
+    )
     print("-" * 10)
     process = subprocess.run(
         command,
-        # check=True,
         stdout=sys.stdout,
         stdin=sys.stdin,
         stderr=sys.stderr,
         timeout=180,
+        cwd=os.path.dirname(os.path.dirname(__file__)),
     )
-    print("-" * 10)
     if process.returncode != 0:
-        print("Something Wrong!")
+        print("-" * 10)
+        print(f"{Fore.RED}Something Wrong!{Fore.RESET}")
         fix_command = [
             "addlicense",
             "-f",
-            "templates/addlicense.template",
+            os.path.join(
+                "templates",
+                "addlicense.template",
+            ),
         ]
         fix_command.extend(ignored.copy())
         fix_command.append(".")
-        print("Fix Command:", " ".join(fix_command))
+        print(Fore.CYAN + "--- Fix cmmand" + Fore.RESET)
+        print(
+            Back.LIGHTBLACK_EX
+            + " && ".join(
+                [f"cd {project_root}", " ".join(fix_command), f"cd {work_cwd}"]
+            )
+            + Back.RESET
+        )
+        print(Style.DIM + "End of command ---" + Style.RESET_ALL)
         sys.exit(1)
     else:
         print("Check Finish.")

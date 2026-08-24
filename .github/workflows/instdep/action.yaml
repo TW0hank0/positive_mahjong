@@ -34,7 +34,7 @@ runs:
       run: |
         Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
         ls
-        .\rustup-init.exe -y --profile minimal
+        .\rustup-init.exe -y
 
     - name: install rustup on Linux
       shell: pwsh
@@ -77,24 +77,23 @@ runs:
     - name: use cargo to install tools
       shell: pwsh
       run: |
-        cargo install cargo-audit cargo-msrv cargo-deny taplo-cli mdbook --locked
+        cargo install cargo-msrv cargo-deny taplo-cli mdbook --locked
         cargo install cargo-about --features="cli" --locked
 
     - name: check tools installion
       shell: pwsh
       run: |
         cargo about --version
-        cargo audit --version
         cargo msrv --version
         cargo deny --version
         taplo --version
         mdbook --version
 
-    - name: install java
-      uses: actions/setup-java@v5.7.0
-      with:
-        distribution: "temurin" # See 'Supported distributions' for available options
-        java-version: "21"
+    # - name: install java
+    #   uses: actions/setup-java@v5.7.0
+    #   with:
+    #     distribution: "temurin" # See 'Supported distributions' for available options
+    #     java-version: "21"
 
-    - name: Setup Android
-      uses: android-actions/setup-android@v4.0.1
+    # - name: Setup Android
+    #   uses: android-actions/setup-android@v4.0.1

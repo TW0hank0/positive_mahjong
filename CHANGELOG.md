@@ -40,6 +40,10 @@ git tag -a "版本" -m "release pmj: 版本"
 
 - init [pmj_ccore](./TODO.md#pmj_client_core)
 
+**2026-8-21**
+
+- fix ci
+
 ## [v0.1.1] - 2026-8-17
 
 修復客戶端錯誤，並改進訊息顯示。
