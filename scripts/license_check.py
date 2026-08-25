@@ -19,6 +19,8 @@ import sys
 
 from colorama import Back, Fore, Style
 
+import util
+
 
 def main():
     ignore_dir = [
@@ -75,23 +77,24 @@ def main():
     command.append(".")
     work_cwd = os.getcwd()
     project_root = os.path.relpath(os.path.dirname(os.path.dirname(__file__)))
-    print(Fore.CYAN + "--- Run command" + Fore.RESET)
-    print(
-        Back.LIGHTBLACK_EX
-        + " && ".join([f"cd {project_root}", " ".join(command), f"cd {work_cwd}"])
-        + Back.RESET
-    )
-    print("-" * 10)
-    process = subprocess.run(
-        command,
-        stdout=sys.stdout,
-        stdin=sys.stdin,
-        stderr=sys.stderr,
-        timeout=180,
-        cwd=os.path.dirname(os.path.dirname(__file__)),
-    )
-    if process.returncode != 0:
-        print("-" * 10)
+    # print(Fore.CYAN + "--- Run command" + Fore.RESET)
+    # print(
+    #     Back.LIGHTBLACK_EX
+    #     + " && ".join([f"cd {project_root}", " ".join(command), f"cd {work_cwd}"])
+    #     + Back.RESET
+    # )
+    # print("-" * 10)
+    returncode = util.run_cmd(command, cwd=os.path.dirname(os.path.dirname(__file__)))
+    # process = subprocess.run(
+    #     command,
+    #     stdout=sys.stdout,
+    #     stdin=sys.stdin,
+    #     stderr=sys.stderr,
+    #     timeout=180,
+    #     cwd=os.path.dirname(os.path.dirname(__file__)),
+    # )
+    if returncode != 0:
+        print(Style.DIM + ("-" * 10) + Style.NORMAL)
         print(f"{Fore.RED}Something Wrong!{Fore.RESET}")
         fix_command = [
             "addlicense",

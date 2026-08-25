@@ -17,23 +17,32 @@
 
 import subprocess
 
+from colorama import Back, Fore, Style
 
-def run_cmd(command: list[str], cwd: str | None = None):
-    print(f"===> Running command: {' '.join(command)}")
+
+def run_cmd(command: list[str], cwd: str | None = None) -> int:
+    print(
+        f"{Style.DIM}===>{Style.NORMAL} {Fore.CYAN}Running command:{Fore.RESET} {Back.LIGHTBLACK_EX}{' '.join(command)}{Back.RESET}"
+    )
     process = subprocess.run(
         command,
-        timeout=60 * 40,
+        timeout=60 * 10,
         stderr=subprocess.PIPE,
         stdout=subprocess.PIPE,
-        text=True,
-        cwd=cwd
+        cwd=cwd,
     )
     if process.returncode == 0:
-        print("=====> Process fnished sucessful.")
+        print(f"=====> {Fore.GREEN}Process fnished sucessful.{Fore.RESET}")
     else:
-        print(f"=====> Process exited with non-zero code ({process.returncode})!")
-        print("--- process stdout ---")
-        print(process.stdout)
-        print("--- process stderr ---")
-        print(process.stderr)
-        print("--- end-of output ---")
+        print(
+            f"=====> {Fore.RED}Process exited with non-zero code{Fore.RESET} {Style.DIM}({process.returncode}){Style.NORMAL}!"
+        )
+        for name, data in [
+            ("stdout", process.stdout.decode()),
+            ("stderr", process.stderr.decode()),
+        ]:
+            print(f"{Style.DIM}---{Style.NORMAL} {name}")
+            for line in data.split("\n"):
+                print(f" {Style.DIM}|{Style.NORMAL} {line}")
+            print(f"{Style.DIM}---{Style.NORMAL} end-of {name}")
+    return process.returncode

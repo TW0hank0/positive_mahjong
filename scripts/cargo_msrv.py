@@ -19,29 +19,14 @@ import util
 
 
 def main():
-    packages = [
-        "pmj_client_desktop",
-        "pmj_server",
-        "pmj_shared",
-        "pmj_gamemodes",
-    ]
-    for pkg in packages:
-        util.run_cmd(
-            ["cargo", "msrv", "find"],
-            cwd=os.path.join(
-                os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-                "crates",
-                pkg,
-            ),
-        )
-        util.run_cmd(
-            ["cargo", "msrv", "verify"],
-            cwd=os.path.join(
-                os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-                "crates",
-                pkg,
-            ),
-        )
+    util.run_cmd(
+        ["cargo", "msrv", "find", "--", "--workspace"],
+        cwd=os.path.dirname(os.path.dirname(__file__)),
+    )
+    util.run_cmd(
+        ["cargo", "msrv", "verify", "--", "--workspace"],
+        cwd=os.path.dirname(os.path.dirname(__file__)),
+    )
 
 
 main()
