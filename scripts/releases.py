@@ -76,12 +76,14 @@ def get_latest_commit_message(repo_path: str = ".") -> str | None:
 @app.command()
 def main():
     msg: str | None = get_latest_commit_message()
-    commit_sha = subprocess.run(
-        ["git", "rev-parse", "HEAD"], stdout=subprocess.PIPE, timeout=10, check=True
-    ).stdout.decode()
-    if commit_sha is None:
-        raise RuntimeError("commit_sha=None")
-    elif msg is None:
+    commit_sha = (
+        subprocess.run(
+            ["git", "rev-parse", "HEAD"], stdout=subprocess.PIPE, timeout=10, check=True
+        )
+        .stdout.decode()
+        .replace("\n", "")
+    )
+    if msg is None:
         raise RuntimeError("msg=None")
     else:
         if "release pmj:" in msg.lower():
