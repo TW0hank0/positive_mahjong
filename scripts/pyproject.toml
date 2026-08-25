@@ -22,7 +22,7 @@ requires-python = "==3.14.6"
 dependencies = [
     "typer==0.27.1",
     "mistune==3.3.4",
-    "colorama>=0.4.6",
-    "requests>=2.34.2",
-    "python-gitlab>=8.5.0",
+    "colorama==0.4.6",
+    "requests==2.34.2",
+    "python-gitlab==8.5.0",
 ]
