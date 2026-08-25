@@ -18,6 +18,7 @@ import os
 import subprocess
 import sys
 
+import gitlab
 import requests
 import typer
 
@@ -73,8 +74,11 @@ def get_latest_commit_message(repo_path: str = ".") -> str | None:
 
 
 @app.command()
-def main(commit_sha: str = "No commit sha get"):
+def main():
     msg: str | None = get_latest_commit_message()
+    commit_sha = subprocess.run(
+        ["git", "rev-parse", "HEAD"], text=True, timeout=10, check=True
+    ).stdout
     if msg is None:
         raise RuntimeError("msg=None")
     else:
@@ -87,7 +91,9 @@ def main(commit_sha: str = "No commit sha get"):
             title = f"{repo} v{version}"
             date = datetime.datetime.now().date()
             notes = f"v{version} released: {date.year}/{date.month}/{date.day}"
-            create_release_gh(tag, title, notes, is_prerelease=False, repo=REPO)
+            create_release_gh(
+                tag, title, notes, is_prerelease=False, owner=OWNER, repo=REPO
+            )
             upload_file_gh(
                 files=os.listdir(
                     os.path.join(
@@ -98,6 +104,18 @@ def main(commit_sha: str = "No commit sha get"):
                 owner=OWNER,
                 repo=REPO,
             )
+            gl_token = os.environ.get("GITLAB_PAT_TOKEN")
+            if gl_token is None:
+                print("No gitlab token!", file=sys.stderr)
+                sys.exit(1)
+            else:
+                _ = release_gitlab(
+                    gitlab_pat=gl_token,
+                    project_id=f"{OWNER}/{REPO}",
+                    tag_name=tag,
+                    release_name=title,
+                    description=notes,
+                )
             cb_token = os.environ.get("CODEBERG_PAT_TOKEN")
             if cb_token is None:
                 print("No codeberg token!", file=sys.stderr)
@@ -131,7 +149,9 @@ def main(commit_sha: str = "No commit sha get"):
             ##### 提交訊息（{commit_sha}）
             {msg}
             """
-            create_release_gh(tag, title, notes, is_prerelease=True, repo=REPO)
+            create_release_gh(
+                tag, title, notes, is_prerelease=True, owner=OWNER, repo=REPO
+            )
             upload_file_gh(
                 files=os.listdir(
                     os.path.join(
@@ -144,7 +164,9 @@ def main(commit_sha: str = "No commit sha get"):
             )
 
 
-def create_release_gh(tag: str, title: str, notes: str, is_prerelease: bool, repo: str):
+def create_release_gh(
+    tag: str, title: str, notes: str, is_prerelease: bool, owner: str, repo: str
+):
     command: list[str] = [
         "gh",
         "release",
@@ -154,7 +176,7 @@ def create_release_gh(tag: str, title: str, notes: str, is_prerelease: bool, rep
         title,
         "--notes",
         notes,
-        f"--repo={repo}",
+        f"--repo={owner}/{repo}",
     ]
     if is_prerelease is True:
         command.append("--prerelease")
@@ -237,7 +259,7 @@ def codeberg_release(
 
     # 2. 上傳 Release 附件
     if release_files:
-        release_id = release_data["id"]
+        release_id = str(release_data["id"])
         upload_url = f"{base_url}/{release_id}/attachments"
 
         for file_path in release_files:
@@ -254,6 +276,66 @@ def codeberg_release(
                 upload_resp.raise_for_status()
 
     return release_data
+
+
+def release_gitlab(
+    gitlab_pat: str,
+    project_id: int | str,
+    tag_name: str,
+    release_name: str,
+    description: str,
+    file_paths: list[str] | None = None,
+    ref: str = "master",
+    gitlab_url: str = "https://gitlab.com",
+) -> dict:
+    """建立 GitLab Release
+
+    :param gitlab_url: GitLab 伺服器網址 (例如 'https://gitlab.com')
+    :param gitlab_pat: GitLab Personal Access Token
+    :param project_id: 專案 ID 或 'owner/repo' 路徑
+    :param tag_name: Git Tag 名稱 (如 'v1.0.0')
+    :param release_name: Release 標題
+    :param description: Release 內文 (支援 Markdown)
+    :param file_paths: 要上傳的本地檔案路徑列表
+    :param ref: 若 Tag 不存在時，指定建 Tag 的來源分支
+    :return: 建立好的 Release 資訊字典
+    """
+    # 1. 初始化連線 (使用 gitlab_pat)
+    gl = gitlab.Gitlab(gitlab_url, private_token=gitlab_pat)
+    gl.auth()
+    project = gl.projects.get(project_id)
+
+    # 2. 上傳檔案並收集 assets 連結
+    assets_links: list[dict[str, str]] = []
+    if file_paths is not None:
+        for file in file_paths:
+            if os.path.exists(file) is False:
+                raise FileNotFoundError(f"找不到檔案: {file}")
+            else:
+                # 呼叫 GitLab Project Uploads API
+                upload_result = project.upload(os.path.basename(file), filepath=file)
+                # 組合 Release Asset Link 格式
+                assets_links.append(
+                    {
+                        "name": os.path.basename(file),
+                        "url": f"{gitlab_url.rstrip('/')}{upload_result['full_path']}",
+                        "filepath": f"/{os.path.basename(file)}",
+                        "link_type": "package",
+                    }
+                )
+
+        # 組裝 Release 資料並建立
+        release_data: dict[str, str | dict[str, list[dict[str, str]]]] = {
+            "name": release_name,
+            "tag_name": tag_name,
+            "description": description,
+            "ref": ref,
+        }
+
+        if len(assets_links) > 0:
+            release_data["assets"] = {"links": assets_links}
+        release = project.releases.create(release_data)
+        return release.attributes
 
 
 if __name__ == "__main__":

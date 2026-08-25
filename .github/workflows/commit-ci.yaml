@@ -208,9 +208,10 @@ jobs:
 
       - name: release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CODEBERG_PAT_TOKEN: ${{ secrets.CODEBERG_PAT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Github Action Token
+          CODEBERG_PAT_TOKEN: ${{ secrets.CODEBERG_PAT_TOKEN }} # PAT
+          GITLAB_PAT_TOKEN: ${{ secrets.GL_PAT }} # PAT
         run: |
           cd scripts
-          uv run releases.py --commit-sha "${{ github.sha }}"
+          uv run releases.py
           cd ..
