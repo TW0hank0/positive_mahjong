@@ -77,9 +77,11 @@ def get_latest_commit_message(repo_path: str = ".") -> str | None:
 def main():
     msg: str | None = get_latest_commit_message()
     commit_sha = subprocess.run(
-        ["git", "rev-parse", "HEAD"], text=True, timeout=10, check=True
-    ).stdout
-    if msg is None:
+        ["git", "rev-parse", "HEAD"], stdout=subprocess.PIPE, timeout=10, check=True
+    ).stdout.decode()
+    if commit_sha is None:
+        raise RuntimeError("commit_sha=None")
+    elif msg is None:
         raise RuntimeError("msg=None")
     else:
         if "release pmj:" in msg.lower():
@@ -142,13 +144,13 @@ def main():
             tag = f"ci-v{version}+{date.month}_{date.day}-{commit_sha}"
             title = f"PreRelease v{version}+{date.month}/{date.day}+{time.hour}:{time.minute}"
             notes = f"""這是使用 Github Action 制作的測試版
-            ##### 版本
-            {version}
-            ##### 時間
-            {date.year}/{date.month}/{date.day} {time.hour}:{time.minute}:{time.second}
-            ##### 提交訊息（{commit_sha}）
-            {msg}
-            """
+#### 版本
+{version}
+#### 時間
+{date.year}/{date.month}/{date.day} {time.hour}:{time.minute}:{time.second}
+#### 提交訊息（{commit_sha}）
+{msg}
+"""
             create_release_gh(
                 tag, title, notes, is_prerelease=True, owner=OWNER, repo=REPO
             )

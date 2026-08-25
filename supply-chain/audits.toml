@@ -16,6 +16,12 @@ who = "TW0hank0 <public.email.hank@tutamail.com>"
 criteria = "safe-to-deploy"
 delta = "0.2.11 -> 0.2.12"
 
+[[audits.idna_adapter]]
+who = "TW0hank0 <public.email.hank@tutamail.com>"
+criteria = "safe-to-run"
+delta = "1.2.1 -> 1.2.2"
+notes = "this version update its dep version"
+
 [[audits.naga]]
 who = "TW0hank0 <public.email.hank@tutamail.com>"
 criteria = "safe-to-deploy"

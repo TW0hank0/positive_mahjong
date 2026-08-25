@@ -44,6 +44,11 @@ git tag -a "版本" -m "release pmj: 版本"
 
 - fix ci
 
+**2026-8-25**
+
+- 移除：`.github/workflows/release-build.yaml`
+- 更改：Rust 為穩定版
+
 ## [v0.1.1] - 2026-8-17
 
 修復客戶端錯誤，並改進訊息顯示。
