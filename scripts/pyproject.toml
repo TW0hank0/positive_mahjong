@@ -25,4 +25,5 @@ dependencies = [
     "colorama==0.4.6",
     "requests==2.34.2",
     "python-gitlab==8.5.0",
+    "positive-tool>=0.7.4",
 ]

@@ -18,11 +18,16 @@
 import os
 import subprocess
 import sys
+import tomllib
+from typing import Literal
 
 from colorama import Back, Fore, Style
+from positive_tool import verify
 
 
 def run_cmd(command: list[str], cwd: str | None = None) -> tuple[int, str]:
+    verify.ArgType("command", command, list[str]).check_value_type()
+    verify.ArgType("cwd", cwd, str | None).check_value_type()
     print(
         f"{Fore.CYAN}Running command:{Fore.RESET} {Back.LIGHTBLACK_EX}{' '.join(command)}{Back.RESET}"
     )
@@ -67,3 +72,32 @@ def get_commit_info():
 
 def fix_path(*p: str) -> str:
     return os.path.join(os.path.dirname(os.path.dirname(__file__)), *p)
+
+
+def get_version(workspace_type: Literal["workspace", "package"] = "workspace") -> str:
+    verify.ArgType(
+        "workspace_type", workspace_type, Literal["workspace", "package"]
+    ).check_value_type()
+    with open(
+        fix_path("Cargo.toml"),
+        "rb",
+    ) as f:
+        data = tomllib.load(f)
+    match workspace_type:
+        case "package":
+            version = str(data["package"]["version"])
+        case "workspace":
+            version = str(data["workspace"]["package"]["version"])
+    return version
+
+
+if __name__ == "__main__":
+    import typer
+
+    app = typer.Typer()
+
+    @app.command()
+    def main(command: Literal["get_version"]):
+        match command:
+            case "get_version":
+                print(get_version())

@@ -17,12 +17,13 @@ import datetime
 import os
 import subprocess
 import sys
+from typing import Any
 
 import gitlab
 import requests
 import typer
 
-from ci import get_version
+import util
 from util import run_cmd
 
 OWNER = "TW0hank0"
@@ -89,19 +90,14 @@ def main():
         if "release pmj:" in msg.lower():
             print("Release PMJ:")
 
-            version = get_version.main()
-            repo = "TW0hank0/positive_mahjong"
+            version = util.get_version()
             tag = f"v{version}"
-            title = f"{repo} v{version}"
+            title = f"{REPO} v{version}"
             date = datetime.datetime.now().date()
-            notes = f"v{version} released: {date.year}/{date.month}/{date.day}"
+            notes = f"v{version} released at {date.year}/{date.month}/{date.day} by `scripts/releases.py`"
             files = list(
-                os.path.join(os.path.dirname(os.path.dirname(__file__)), "artifacts", i)
-                for i in os.listdir(
-                    os.path.join(
-                        os.path.dirname(os.path.dirname(__file__)), "artifacts"
-                    )
-                )
+                util.fix_path("artifacts", i)
+                for i in os.listdir(util.fix_path("artifacts"))
             )
             create_release_gh(
                 tag, title, notes, is_prerelease=False, owner=OWNER, repo=REPO
@@ -141,7 +137,7 @@ def main():
                 )
         else:
             print("PreRelease:", end="")
-            version = get_version.main()
+            version = util.get_version()
             date = datetime.datetime.now().date()
             time = datetime.datetime.now().time()
             tag = f"ci-v{version}+{date.month}_{date.day}-{commit_sha}"
@@ -296,7 +292,7 @@ def release_gitlab(
     file_paths: list[str] | None = None,
     ref: str = "master",
     gitlab_url: str = "https://gitlab.com",
-) -> dict:
+) -> dict[str, Any]:
     """建立 GitLab Release
 
     :param gitlab_url: GitLab 伺服器網址 (例如 'https://gitlab.com')
