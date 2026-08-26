@@ -15,6 +15,7 @@
 
 """`positive_mahjong` script util"""
 
+import os
 import subprocess
 import sys
 
@@ -62,3 +63,7 @@ def get_commit_info():
         ["git", "log", "-1", "--format='%cd'", "--date=iso"]
     )
     return (commit_sha, commit_time)
+
+
+def fix_path(*p: str) -> str:
+    return os.path.join(os.path.dirname(os.path.dirname(__file__)), *p)
