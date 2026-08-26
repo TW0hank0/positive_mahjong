@@ -42,8 +42,9 @@ pub const DEFAULT_GAMEMODE: GameModes = GameModes::Base;
 pub struct ClientConnectRequestType {
     /// 需為 `positive_mahjong`
     /// 否則會拒絕
+    /// TODO: 一個更好的做法
     pub app_name: String,
-    /// 目前無限制
+    /// 無限制
     pub client: String,
 }
 

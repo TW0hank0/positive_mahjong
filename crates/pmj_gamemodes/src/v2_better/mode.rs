@@ -651,10 +651,7 @@ impl PositiveMahjong {
     pub fn start_game(&mut self) {
         self.is_game_start = true;
         let game_start_msg = serde_json::to_string(&mode_shared::ServerMessage::GameMsg(
-            mode_shared::ServerGameMsg {
-                msg_type: mode_shared::ServerGameMsgKinds::GameStart,
-                ..Default::default()
-            },
+            mode_shared::ServerGameMsg::GameStart,
         ))
         .unwrap();
         for player in self.players.iter() {
@@ -695,11 +692,8 @@ impl PositiveMahjong {
                 player.player_ip_addr.to_string(),
                 player.player_hand_cards.clone()
             );
-            let hand_card_msg = serde_json::to_string(&mode_shared::ServerMessage::GameMsg(mode_shared::ServerGameMsg {
-                    msg_type: mode_shared::ServerGameMsgKinds::HandCardChange,
-                    info_hand_card_change: Some(player.player_hand_cards.clone()),
-                    ..Default::default()
-                })
+            let hand_card_msg = serde_json::to_string(&mode_shared::ServerMessage::GameMsg(mode_shared::ServerGameMsg::HandCardChange
+                    (player.player_hand_cards.clone()))
             )
             .unwrap();
             let _write_result = write_reply(hand_card_msg, player.player_ws.clone());
@@ -719,11 +713,8 @@ impl PositiveMahjong {
         // main loop
         'game: loop {
             {
-                let msg = serde_json::to_string(&&mode_shared::ServerMessage::GameMsg(mode_shared::ServerGameMsg {
-                    msg_type: mode_shared::ServerGameMsgKinds::ChangedTurn,
-                    info_change_turn: Some(current_turn_player_id.clone()),
-                    ..Default::default()
-                }))
+                let msg = serde_json::to_string(&mode_shared::ServerMessage::GameMsg(mode_shared::ServerGameMsg::ChangedTurn
+                    (current_turn_player_id.clone())))
                 .unwrap();
                 for player in self.players.iter() {
                     write_reply(msg.clone(), player.player_ws.clone()).ok();
@@ -750,11 +741,8 @@ impl PositiveMahjong {
                                 let player_card = self.unused_card.remove(index);
                                 player.player_hand_cards.push(player_card.clone());
                                 let client_msg =
-                                    serde_json::to_string(&mode_shared::ServerMessage::GameMsg(mode_shared::ServerGameMsg {
-                                            msg_type: mode_shared::ServerGameMsgKinds::GetCard,
-                                            info_get_card: Some(player_card),
-                                            ..Default::default()
-                                        }))
+                                    serde_json::to_string(&mode_shared::ServerMessage::GameMsg(mode_shared::ServerGameMsg::GetCard
+                                            (player_card)))
                                     .unwrap();
                                 write_reply(client_msg, player.player_ws.clone()).ok();
                                 break 'choose_card;
@@ -823,8 +811,9 @@ impl PositiveMahjong {
                             Message::Text(text) => {
                                 let msg: v2_better::shared::ClientGameMsg =
                                     serde_json::from_str(&text).unwrap();
-                                match msg {
-                                    v2_better::shared::ClientGameMsg::ThrowCard(want_throw_card) => {
+                                match msg{
+                                    v2_better::shared::ClientGameMsg::Pga(pga) => match pga {
+                                    v2_better::shared::PlayerGameActions::ThrowCard(want_throw_card) => {
                                                 if player
                                                     .player_hand_cards
                                                     .contains(&want_throw_card)
@@ -843,21 +832,16 @@ impl PositiveMahjong {
                                                         }
                                                     }
                                                     player.player_hand_cards.remove(card_index);
-                                                    let client_msg = serde_json::to_string(&mode_shared::ServerMessage::GameMsg(mode_shared::ServerGameMsg {
-                                                    msg_type: mode_shared::ServerGameMsgKinds::HandCardChange,
-                                                    info_hand_card_change: Some(player.player_hand_cards.clone()),
-                                                    ..Default::default()
-                                                }))
+                                                    let client_msg = serde_json::to_string(&mode_shared::ServerMessage::GameMsg(mode_shared::ServerGameMsg::HandCardChange
+                                                    (player.player_hand_cards.clone())
+                                                    ))
                                                 .unwrap();
                                                     let _write_result = write_reply(
                                                         client_msg,
                                                         player.player_ws.clone(),
                                                     );
-                                                    let msg_to_else_player = serde_json::to_string(&mode_shared::ServerMessage::GameMsg(mode_shared::ServerGameMsg{
-                                                    msg_type:mode_shared::ServerGameMsgKinds::PlayerAction,
-                                                    info_player_action:Some((current_turn_player_id, GameActions::ThrowCard)),
-                                                    ..Default::default()
-                                                })).unwrap();
+                                                    let msg_to_else_player = serde_json::to_string(&mode_shared::ServerMessage::GameMsg(mode_shared::ServerGameMsg::PlayerAction
+                                                    (current_turn_player_id, mode_shared::PlayerGameActions::ThrowCard(want_throw_card.clone())))).unwrap();
                                                     for p in self.players.iter() {
                                                         let _ = write_reply(
                                                             msg_to_else_player.clone(),
@@ -876,7 +860,7 @@ impl PositiveMahjong {
                                                 error!("錯誤：客戶端錯誤訊息");
                                                 todo!("錯誤處理");
                                             }
-                                        }
+                                        }}
                                     }
 
 
