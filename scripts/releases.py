@@ -95,15 +95,19 @@ def main():
             title = f"{repo} v{version}"
             date = datetime.datetime.now().date()
             notes = f"v{version} released: {date.year}/{date.month}/{date.day}"
+            files = list(
+                os.path.join(os.path.dirname(os.path.dirname(__file__)), "artifacts", i)
+                for i in os.listdir(
+                    os.path.join(
+                        os.path.dirname(os.path.dirname(__file__)), "artifacts"
+                    )
+                )
+            )
             create_release_gh(
                 tag, title, notes, is_prerelease=False, owner=OWNER, repo=REPO
             )
             upload_file_gh(
-                files=os.listdir(
-                    os.path.join(
-                        os.path.dirname(os.path.dirname(__file__)), "artifacts"
-                    )
-                ),
+                files=files,
                 tag=tag,
                 owner=OWNER,
                 repo=REPO,
@@ -119,6 +123,7 @@ def main():
                     tag_name=tag,
                     release_name=title,
                     description=notes,
+                    file_paths=files,
                 )
             cb_token = os.environ.get("CODEBERG_PAT_TOKEN")
             if cb_token is None:
@@ -132,11 +137,7 @@ def main():
                     release_tag=tag,
                     release_notes=notes,
                     release_title=title,
-                    release_files=os.listdir(
-                        os.path.join(
-                            os.path.dirname(os.path.dirname(__file__)), "artifacts"
-                        )
-                    ),
+                    release_files=files,
                 )
         else:
             print("PreRelease:", end="")
@@ -156,12 +157,16 @@ def main():
             create_release_gh(
                 tag, title, notes, is_prerelease=True, owner=OWNER, repo=REPO
             )
-            upload_file_gh(
-                files=os.listdir(
+            files = list(
+                os.path.join(os.path.dirname(os.path.dirname(__file__)), "artifacts", i)
+                for i in os.listdir(
                     os.path.join(
                         os.path.dirname(os.path.dirname(__file__)), "artifacts"
                     )
-                ),
+                )
+            )
+            upload_file_gh(
+                files=files,
                 tag=tag,
                 owner=OWNER,
                 repo=REPO,
@@ -202,7 +207,7 @@ def upload_file_gh(files: list[str], tag: str, owner: str, repo: str):
     print(f"upload_url_base={upload_url_base}")
     for file in files:
         print(f"uploading {file}")
-        run_cmd(
+        _ = run_cmd(
             [
                 "curl",
                 "-X",
