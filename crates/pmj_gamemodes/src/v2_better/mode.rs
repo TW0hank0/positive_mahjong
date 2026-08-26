@@ -31,8 +31,7 @@ use url;
 use pmj_shared::shared;
 
 use crate::v2_better::{
-    self, shared as mode_shared,
-    shared::{GameActions, PMJCard, PMJCardFlowerType, PMJCardType, PMJCardWordsType, PMJPlayer},
+    self, shared::{self as mode_shared, GameActions, PMJCard, PMJCardFlowerType, PMJCardType, PMJCardWordsType, PMJPlayer, PlayerGameActions},
 };
 
 #[derive(Debug)]
@@ -128,6 +127,18 @@ impl MessageMgr {
         self.last_task_id.clone()
     }
 
+    pub fn is_task_finish(&mut self, task_id: &u64) -> bool {
+        let mut task_index = 0;
+        loop {
+            let (tid, _tmsg, tresult) = self.tasks.get(task_index).unwrap();
+            if tid == task_id {
+                return !tresult.is_empty();
+            } else {
+                task_index += 1;
+            }
+        }
+    }
+
     pub fn task_add_player(&mut self, players: Vec<PMJPlayer>) -> u64 {
         self.players = players.clone();
         self.task_new(MsgMgrTaskmsg {
@@ -135,6 +146,10 @@ impl MessageMgr {
             kind_add_player: Some(players),
             ..Default::default()
         })
+    }
+
+    pub fn task_read(&mut self, pid:u8) -> u64 {
+        self.task_new(MsgMgrTaskmsg { msg_kind: MsgMgrTaskKinds::Read, kind_read: Some(pid),..Default::default() })
     }
 
     pub fn task_ping(&mut self) -> u64 {
@@ -705,7 +720,10 @@ impl PositiveMahjong {
     /// 遊戲旋環
     fn game_loop(&mut self) {
         let mut current_turn_player_id: u8 = 1;
-        let mut current_action: GameActions = GameActions::GetCard;
+        let mut current_action: PlayerGameActions = PlayerGameActions::GetCard;
+        let mut last_turn_player_id: u8 = 0;
+        let mut last_action = mode_shared::PlayerGameActions::GetCard;
+        let mut last_action_need_throw: bool = false;
         let players_count = self.players.len() as u8;
         // rng init
         let mut rng = rand::rng();
@@ -720,8 +738,51 @@ impl PositiveMahjong {
                     write_reply(msg.clone(), player.player_ws.clone()).ok();
                 }
             }
+            {
+                let mut rtask_ids = Vec::new();
+                for p in self.players.iter() {
+                    rtask_ids.push((p.player_id, self.msg_mgr.task_read(p.player_id)));
+                }
+                for (player_id, rtask_id) in rtask_ids.iter() {
+                    if self.msg_mgr.is_task_finish(rtask_id) {
+                        let tresult = self.msg_mgr.get_task_result(rtask_id).kind_read.unwrap();
+                        let msg = serde_json::from_str::<mode_shared::ClientMessage>(&tresult).unwrap();
+                        match msg {
+                            mode_shared::ClientMessage::GameMsg(cgm) => {
+                                match cgm {
+                                    mode_shared::ClientGameMsg::Pga(pga) => {
+                                        match pga {
+                                            PlayerGameActions::GetCard => {
+                                                if player_id == &current_turn_player_id {
+                                                    current_action = PlayerGameActions::GetCard;
+                                                } else {
+                                                    // 客戶端錯誤訊息
+                                                    todo!("not impl yet!");
+                                                }
+                                            }
+                                            PlayerGameActions::ThrowCard(card) => {
+
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            mode_shared::ClientMessage::RoomMsg(crm) => {
+                                todo!("unsupport yet!");
+                            }
+                        }
+                    }
+                }
+            }
+            {
+                let msg = serde_json::to_string(&mode_shared::ServerMessage::GameMsg(mode_shared::ServerGameMsg::PlayerAction(current_turn_player_id, current_action)))
+                .unwrap();
+                for player in self.players.iter() {
+                    write_reply(msg.clone(), player.player_ws.clone()).ok();
+                }
+            }
             match current_action {
-                GameActions::GetCard => {
+                PlayerGameActions::GetCard => {
                     let player = self
                         .players
                         .get_mut((current_turn_player_id - 1) as usize) // `-1` to match index
@@ -749,7 +810,6 @@ impl PositiveMahjong {
                             }
                         }
                     }
-                    current_action = GameActions::ThrowCard;
                 }
                 GameActions::ThrowCard => {
                     let player = self
@@ -848,12 +908,6 @@ impl PositiveMahjong {
                                                             p.player_ws.clone(),
                                                         );
                                                     }
-                                                    if current_turn_player_id >= players_count {
-                                                        current_turn_player_id = 1;
-                                                    } else {
-                                                        current_turn_player_id += 1;
-                                                    }
-                                                    current_action = GameActions::GetCard;
                                                     break 'get_player_throw;
                                                 }}
                                             _ => {
@@ -876,6 +930,13 @@ impl PositiveMahjong {
                     error!("不支援的動作！Action：{:?}", current_action)
                 }
             }
+            last_turn_player_id = current_turn_player_id;
+            last_action = current_action;
+            if current_turn_player_id >= players_count {
+                current_turn_player_id = 1;
+            } else {
+                current_turn_player_id += 1;
+            }
         }
     }
-    }
+}
