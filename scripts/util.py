@@ -16,13 +16,14 @@
 """`positive_mahjong` script util"""
 
 import subprocess
+import sys
 
 from colorama import Back, Fore, Style
 
 
-def run_cmd(command: list[str], cwd: str | None = None) -> int:
+def run_cmd(command: list[str], cwd: str | None = None) -> tuple[int, str]:
     print(
-        f"{Style.DIM}===>{Style.NORMAL} {Fore.CYAN}Running command:{Fore.RESET} {Back.LIGHTBLACK_EX}{' '.join(command)}{Back.RESET}"
+        f"{Fore.CYAN}Running command:{Fore.RESET} {Back.LIGHTBLACK_EX}{' '.join(command)}{Back.RESET}"
     )
     process = subprocess.run(
         command,
@@ -32,10 +33,12 @@ def run_cmd(command: list[str], cwd: str | None = None) -> int:
         cwd=cwd,
     )
     if process.returncode == 0:
-        print(f"=====> {Fore.GREEN}Process fnished sucessful.{Fore.RESET}")
+        print(
+            f"{Style.DIM}=>{Style.NORMAL} {Fore.GREEN}Process fnished sucessful.{Fore.RESET}"
+        )
     else:
         print(
-            f"=====> {Fore.RED}Process exited with non-zero code{Fore.RESET} {Style.DIM}({process.returncode}){Style.NORMAL}!"
+            f"{Style.DIM}=>{Style.NORMAL} {Fore.RED}Process exited with non-zero code{Fore.RESET} {Style.DIM}({process.returncode}){Style.NORMAL}!"
         )
         for name, data in [
             ("stdout", process.stdout.decode()),
@@ -43,6 +46,19 @@ def run_cmd(command: list[str], cwd: str | None = None) -> int:
         ]:
             print(f"{Style.DIM}---{Style.NORMAL} {name}")
             for line in data.split("\n"):
-                print(f" {Style.DIM}|{Style.NORMAL} {line}")
+                print(
+                    f" {Style.DIM}{Fore.LIGHTBLACK_EX}|{Fore.RESET}{Style.NORMAL} {line}"
+                )
             print(f"{Style.DIM}---{Style.NORMAL} end-of {name}")
-    return process.returncode
+        sys.exit(1)
+    return (process.returncode, process.stdout.decode())
+
+
+def get_commit_info():
+    """return (commit_sha, commit_time)"""
+    (_returncode, stdout) = run_cmd(["git", "rev-parse", "HEAD"])
+    commit_sha = stdout.replace("\n", "")
+    (_returncode, commit_time) = run_cmd(
+        ["git", "log", "-1", "--format='%cd'", "--date=iso"]
+    )
+    return (commit_sha, commit_time)

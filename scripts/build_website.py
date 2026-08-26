@@ -18,6 +18,8 @@ import shutil
 
 import mistune
 
+import util
+
 
 def main():
     website_root_path = os.path.join(
@@ -169,7 +171,7 @@ def process_dir(
                     )
                     if new_content != orig_content:
                         with open(full_dir_path, "w", encoding="utf-8") as f:
-                            f.write(new_content)
+                            _ = f.write(new_content)
                         print(f"Wrote html file: {full_dir_path}")
             elif os.path.isdir(full_dir_path) is True:
                 process_dir(
@@ -219,6 +221,9 @@ def replace_var(
         t = f.read()
         html_vars["VAR_THIRD_PARTY_LICENSE_RUST_MD"] = t
         html_vars["VAR_THIRD_PARTY_LICENSE_RUST_MD_TO_HTML"] = str(mistune.html(t))
+    (commit_sha, commit_time) = util.get_commit_info()
+    html_vars["VAR_COMMIT_SHA"] = commit_sha
+    html_vars["VAR_COMMIT_TIME"] = commit_time
     #
     with open(replace_html_path, "r", encoding="utf-8") as f:
         new_html_content = f.read()

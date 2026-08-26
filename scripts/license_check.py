@@ -14,7 +14,6 @@
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 import os
-import subprocess
 import sys
 
 from colorama import Back, Fore, Style
@@ -84,7 +83,9 @@ def main():
     #     + Back.RESET
     # )
     # print("-" * 10)
-    returncode = util.run_cmd(command, cwd=os.path.dirname(os.path.dirname(__file__)))
+    (returncode, _stdout) = util.run_cmd(
+        command, cwd=os.path.dirname(os.path.dirname(__file__))
+    )
     # process = subprocess.run(
     #     command,
     #     stdout=sys.stdout,

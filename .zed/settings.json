@@ -1,8 +1,8 @@
 {
     "languages": {
         "YAML": {
-            "tab_size": 2
-        }
+            "tab_size": 2,
+        },
     },
     "tab_size": 4,
     "lsp": {
@@ -16,4 +16,12 @@
         },
     },
     "ensure_final_newline_on_save": true,
+    "file_scan_exclusions": [
+        "**/.git",
+        "**/.svn",
+        "**/.hg",
+        "**/.jj",
+        "**/.DS_Store",
+        "**/Thumbs.db",
+    ],
 }

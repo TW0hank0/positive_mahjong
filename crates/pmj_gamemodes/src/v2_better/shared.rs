@@ -40,83 +40,35 @@ pub enum ServerMessage {
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
-pub struct ServerRoomMsg {
-    msg_type: ServerGameMsgKinds,
-    /// Option<(玩家識別碼, 發言內容)>
-    info_player_say: Option<(u8, String)>,
-    info_root_say: Option<String>,
-}
-
-#[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
-pub enum ServerRoomMsgKinds {
+pub enum ServerRoomMsg {
     // 玩家發言
-    PlayerSay,
+    PlayerSay(u8, String),
     // 伺服主發言
-    RootSay
+    RootSay(String)
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
-pub struct ServerGameMsg {
-    pub msg_type: ServerGameMsgKinds,
-    pub info_hand_card_change: Option<Vec<PMJCard>>,
-    pub info_error: Option<String>,
-    /// 來自你和其他玩家的動作 Option<(玩家Id, 動作)>
-    pub info_player_action: Option<(u8, GameActions)>,
-    pub info_get_card: Option<PMJCard>,
-    pub info_change_turn: Option<u8>,
-}
-
-impl Default for ServerGameMsg {
-    fn default() -> Self {
-        Self {
-            msg_type: ServerGameMsgKinds::Error,
-            info_player_action: None,
-            info_hand_card_change: None,
-            info_error: Some(String::from("Default `info_error` value.")),
-            info_change_turn: None,
-            info_get_card: None,
-        }
-    }
-}
-
-#[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
-pub enum ServerGameMsgKinds {
+pub enum ServerGameMsg {
     GameStart,
     GameFinish,
-    ChangedTurn,
+    ChangedTurn(u8),
     /// 手牌變動
-    HandCardChange,
-    Error,
+    HandCardChange(Vec<PMJCard>),
+    Error(String),
     /// 玩家動作
-    PlayerAction,
-    GetCard,
+    PlayerAction(u8, PlayerGameActions),
+    GetCard(PMJCard),
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
 pub enum ClientMessage {
     GameMsg(ClientGameMsg),
-    RoomMsg,
+    RoomMsg(String),
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
 pub enum ClientGameMsg {
-    ///丟牌
-    ThrowCard(PMJCard),
-    ///補花
-    ReplaceAFlower(PMJCard),
-    ///吃
-    Eat((PMJCard, PMJCard)),
-    ///碰
-    Triplet((PMJCard, PMJCard)),
-    ///明槓
-    ExposedKong((PMJCard, PMJCard, PMJCard)),
-    ///暗槓
-    ConcealedKong((PMJCard, PMJCard, PMJCard)),
-}
-
-#[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
-pub enum ClientGameMsgKinds {
-    GameAction,
+    Pga(PlayerGameActions)
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
@@ -135,6 +87,24 @@ pub enum GameActions {
     ConcealedKong,
     ///補花
     ReplaceFlower,
+}
+
+#[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
+pub enum PlayerGameActions {
+    ///抽牌
+    GetCard,
+    ///丟牌
+    ThrowCard(PMJCard),
+    ///吃
+    Eat {with: (PMJCard, PMJCard), eat_card: PMJCard},
+    ///碰
+    Triplet(PMJCard, PMJCard),
+    ///明槓
+    ExposedKong { with: (PMJCard, PMJCard, PMJCard), kong_card:PMJCard},
+    ///暗槓
+    ConcealedKong { with: (PMJCard, PMJCard, PMJCard), kong_card:PMJCard},
+    ///補花
+    ReplaceFlower(PMJCard),
 }
 
 /// 卡牌

@@ -87,7 +87,7 @@ pub enum V2BetterEvents {
     GameStart,
     GameFinish,
     ChangeTurn(u8),
-    PlayerAction((u8, pmj_gamemodes::v2_better::shared::GameActions)),
+    PlayerAction(u8, pmj_gamemodes::v2_better::shared::PlayerGameActions),
     YouGetCard(pmj_gamemodes::v2_better::shared::PMJCard),
     YouHandCardChange(Vec<pmj_gamemodes::v2_better::shared::PMJCard>),
 }
@@ -310,7 +310,7 @@ impl ClientCore {
         let handle = thread::spawn(move || {
             let req_text =
                 serde_json::to_string(&pmj_gamemodes::v2_better::shared::ClientMessage::GameMsg(
-                    pmj_gamemodes::v2_better::shared::ClientGameMsg::ThrowCard(thread_card),
+                    pmj_gamemodes::v2_better::shared::ClientGameMsg::Pga(pmj_gamemodes::v2_better::shared::PlayerGameActions::ThrowCard(thread_card)),
                 ))
                 .unwrap();
             match thread_ws.lock() {
@@ -378,42 +378,42 @@ impl ClientCore {
                                                         pmj_gamemodes::v2_better::shared::ServerMessage::GameMsg(game_msg) =>{
                                                             match self.gamemode_state {
                                                                 GMState::V2Better(ref mut state_v2) => {
-                                                                    match game_msg.msg_type {
-                                                                        pmj_gamemodes::v2_better::shared::ServerGameMsgKinds::GameStart => {
+                                                                    match game_msg {
+                                                                        pmj_gamemodes::v2_better::shared::ServerGameMsg::GameStart => {
                                                                             state_v2.game_events.push(
                                                                                 ((state_v2.game_events.len() as u64) +1,
                                                                                     V2BetterEvents::GameStart)
                                                                             );
                                                                         }
-                                                                        pmj_gamemodes::v2_better::shared::ServerGameMsgKinds::ChangedTurn => {
+                                                                        pmj_gamemodes::v2_better::shared::ServerGameMsg::ChangedTurn(player_turn) => {
                                                                             state_v2.game_events.push(
                                                                                 ((state_v2.game_events.len() as u64) +1,
-                                                                                    V2BetterEvents::ChangeTurn(game_msg.info_change_turn.unwrap()))
+                                                                                    V2BetterEvents::ChangeTurn(player_turn))
                                                                             );
                                                                         }
-                                                                        pmj_gamemodes::v2_better::shared::ServerGameMsgKinds::Error => { todo!("not support yet")}
-                                                                        pmj_gamemodes::v2_better::shared::ServerGameMsgKinds::GameFinish => {
+                                                                        pmj_gamemodes::v2_better::shared::ServerGameMsg::Error(_e) => { todo!("not support yet")}
+                                                                        pmj_gamemodes::v2_better::shared::ServerGameMsg::GameFinish => {
                                                                             state_v2.game_events.push(
                                                                                 ((state_v2.game_events.len() as u64) +1,
                                                                                     V2BetterEvents::GameFinish)
                                                                             );
                                                                         }
-                                                                        pmj_gamemodes::v2_better::shared::ServerGameMsgKinds::GetCard => {
+                                                                        pmj_gamemodes::v2_better::shared::ServerGameMsg::GetCard(card) => {
                                                                             state_v2.game_events.push(
                                                                                 ((state_v2.game_events.len() as u64) +1,
-                                                                                    V2BetterEvents::YouGetCard(game_msg.info_get_card.unwrap()))
+                                                                                    V2BetterEvents::YouGetCard(card))
                                                                             );
                                                                         }
-                                                                        pmj_gamemodes::v2_better::shared::ServerGameMsgKinds::HandCardChange => {
+                                                                        pmj_gamemodes::v2_better::shared::ServerGameMsg::HandCardChange(hand_card) => {
                                                                             state_v2.game_events.push(
                                                                                 ((state_v2.game_events.len() as u64) +1,
-                                                                                    V2BetterEvents::YouHandCardChange(game_msg.info_hand_card_change.unwrap()))
+                                                                                    V2BetterEvents::YouHandCardChange(hand_card))
                                                                             );
                                                                         }
-                                                                        pmj_gamemodes::v2_better::shared::ServerGameMsgKinds::PlayerAction => {
+                                                                        pmj_gamemodes::v2_better::shared::ServerGameMsg::PlayerAction(player, action) => {
                                                                             state_v2.game_events.push(
                                                                                 ((state_v2.game_events.len() as u64) +1,
-                                                                                    V2BetterEvents::PlayerAction(game_msg.info_player_action.unwrap()))
+                                                                                    V2BetterEvents::PlayerAction(player, action))
                                                                             );
                                                                         }
                                                                     }
