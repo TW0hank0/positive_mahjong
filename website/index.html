@@ -58,13 +58,32 @@
             <section class="content">
                 <div class="row-layout">
                     <p><strong>提交訊息</strong></p>
-                    <p class="t-style-dim">({{$VAR_COMMIT_SHA$}})</p>
-                    <div style="width: 30px"></div>
-                    <p class="t-small">
-                        由 {{$VAR_COMMIT_COMMITTER_NAME$}} 於
-                        {{$VAR_COMMIT_TIME$}} 提交
-                    </p>
+                    <p class="t-style-dim">({{$VAR_COMMIT_TIME$}})</p>
                 </div>
+                <p>
+                    <a
+                        title="{{$VAR_COMMIT_AUTHOR_EMAIL$}}"
+                        href="mailto:{{$VAR_COMMIT_AUTHOR_EMAIL$}}"
+                        target="_blank"
+                        >{{$VAR_COMMIT_AUTHOR_NAME$}}</a
+                    >
+                    撰寫，由
+                    <a
+                        title="{{$VAR_COMMIT_COMMITTER_EMAIL$}}"
+                        href="mailto:{{$VAR_COMMIT_COMMITTER_EMAIL$}}"
+                        target="_blank"
+                        >{{$VAR_COMMIT_COMMITTER_NAME$}}</a
+                    >
+                    於
+                    <a
+                        title="在 gitlab 查看"
+                        href="https://gitlab.com/TW0hank0/positive_mahjong/-/commit/{{$VAR_COMMIT_SHA$}}"
+                        target="_blank"
+                        >{{$VAR_COMMIT_SHA$}}</a
+                    >
+                    提交
+                </p>
+                <hr />
                 <p class="text-block">{{$VAR_COMMIT_MSG$}}</p>
             </section>
         </main>

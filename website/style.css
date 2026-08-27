@@ -91,7 +91,7 @@
     .nav_item:hover {
         color: var(--secondary-text-color);
         margin: 14px;
-        font-size: min(calc(var(--text-size) + 7), 17px);
+        font-size: max(calc(var(--text-size) + 7), 24px);
         transition-duration: 200ms;
         cursor: pointer;
     }
