@@ -22,12 +22,9 @@ import tomllib
 from typing import Literal
 
 from colorama import Back, Fore, Style
-from positive_tool import verify
 
 
 def run_cmd(command: list[str], cwd: str | None = None) -> tuple[int, str]:
-    verify.ArgType("command", command, list[str]).check_value_type()
-    verify.ArgType("cwd", cwd, str | None).check_value_type()
     print(
         f"{Fore.CYAN}Running command:{Fore.RESET} {Back.LIGHTBLACK_EX}{' '.join(command)}{Back.RESET}"
     )
@@ -75,9 +72,6 @@ def fix_path(*p: str) -> str:
 
 
 def get_version(workspace_type: Literal["workspace", "package"] = "workspace") -> str:
-    verify.ArgType(
-        "workspace_type", workspace_type, Literal["workspace", "package"]
-    ).check_value_type()
     with open(
         fix_path("Cargo.toml"),
         "rb",
