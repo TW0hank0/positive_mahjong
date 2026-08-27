@@ -23,7 +23,6 @@ use std::{
 use rand::{self, prelude::SliceRandom, seq::IndexedRandom};
 use tracing::{debug, error, info, trace, warn};
 use tungstenite::{Message, WebSocket, accept_with_config};
-use url;
 
 use pmj_shared::shared;
 
@@ -136,9 +135,9 @@ fn handle_client(
                     serde_json::from_str(&text);
                 match value {
                     Ok(req) => {
-                        if req.app_name != String::from("positive_mahjong") {
+                        if req.app_name != "positive_mahjong" {
                             let _reply_result = write_reply(
-                                format!("這是 `positive_mahjong` 的伺服器端！"),
+                                "這是 `positive_mahjong` 的伺服器端！".to_string(),
                                 sync::Arc::clone(&ws),
                             );
                         } else {
@@ -339,7 +338,7 @@ impl PositiveMahjong {
             for card_number in 1..=9 {
                 unused_card.push(PMJCard {
                     card_type: PMJCardType::Dots,
-                    card_id: card_id,
+                    card_id,
                     info_ten_thousand: None,
                     info_line: None,
                     info_dots: Some(card_number),
@@ -353,7 +352,7 @@ impl PositiveMahjong {
             for card_number in 1..=9 {
                 unused_card.push(PMJCard {
                     card_type: PMJCardType::Line,
-                    card_id: card_id,
+                    card_id,
                     info_ten_thousand: None,
                     info_line: Some(card_number),
                     info_dots: None,
@@ -367,7 +366,7 @@ impl PositiveMahjong {
             for card_number in 1..=9 {
                 unused_card.push(PMJCard {
                     card_type: PMJCardType::TenThousand,
-                    card_id: card_id,
+                    card_id,
                     info_ten_thousand: Some(card_number),
                     info_line: None,
                     info_dots: None,
@@ -410,7 +409,7 @@ impl PositiveMahjong {
             ] {
                 unused_card.push(PMJCard {
                     card_type: PMJCardType::Words,
-                    card_id: card_id,
+                    card_id,
                     info_ten_thousand: None,
                     info_line: None,
                     info_dots: None,
@@ -424,7 +423,7 @@ impl PositiveMahjong {
             players: Vec::new(),
             is_game_finish: false,
             is_game_start: false,
-            unused_card: unused_card,
+            unused_card,
         }
     }
 
@@ -535,7 +534,7 @@ impl PositiveMahjong {
             {
                 let msg = serde_json::to_string(&shared_base::ServerMessageType {
                     msg_type: shared_base::ServerMessageTypeKinds::ChangedTurn,
-                    info_change_turn: Some(current_turn_player_id.clone()),
+                    info_change_turn: Some(current_turn_player_id),
                     ..Default::default()
                 })
                 .unwrap();
@@ -650,7 +649,7 @@ impl PositiveMahjong {
                                                         if &msg.info_throw_card.clone().unwrap()
                                                             == player
                                                                 .player_hand_cards
-                                                                .get(card_index.clone())
+                                                                .get(card_index)
                                                                 .unwrap()
                                                         {
                                                             break 'find_index;
@@ -713,5 +712,11 @@ impl PositiveMahjong {
                 }
             }
         }
+    }
+}
+
+impl Default for PositiveMahjong {
+    fn default() -> Self {
+        Self::new()
     }
 }

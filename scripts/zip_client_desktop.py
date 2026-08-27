@@ -19,22 +19,24 @@ import platform
 import subprocess
 import zipfile
 
+import util
+
 
 def main():
-    process = subprocess.run(
-        ["cargo", "metadata", "--format-version", "1", "--no-deps"], capture_output=True
-    )
-    metadata = json.loads(process.stdout)
-    for pkg in metadata["packages"]:
-        if pkg["name"] == "pmj_client_desktop":
-            version = pkg["version"]
-            break
-    else:
-        raise RuntimeError("no version found.")
-    #
-    include_files = []
-    target_path = os.path.join(
-        os.path.dirname(os.path.dirname(__file__)),
+    #     process = subprocess.run(
+    #         ["cargo", "metadata", "--format-version", "1", "--no-deps"], capture_output=True
+    #     )
+    #     metadata = json.loads(process.stdout)
+    #     for pkg in metadata["packages"]:
+    #         if pkg["name"] == "pmj_client_desktop":
+    #             version = pkg["version"]
+    #             break
+    #     else:
+    #         raise RuntimeError("no version found.")
+    #     #
+    version = util.get_version()
+    include_files: list[str] = []
+    target_path = util.fix_path(
         "target",
         "release",
     )
@@ -56,21 +58,19 @@ def main():
     #         "pmj_launcher",
     #     )
     # )
-    match platform.system():
-        case "Linux":
-            pf = "linux"
-        case "Windows":
-            pf = "windows"
-            # launcher_path = launcher_path + ".exe"
-        case _:
-            pf = "unknown"
+    # match platform.system():
+    #     case "Linux":
+    #         pf = "linux"
+    #     case "Windows":
+    #         pf = "windows"
+    #         # launcher_path = launcher_path + ".exe"
+    #     case _:
+    #         pf = "unknown"
+    pf = platform.system().lower()
     # include_files.append(launcher_path)
-    zip_file_name = f"positive_mahjong_v{version}_{pf}.zip"
+    zip_file_name = util.fix_path(f"positive_mahjong_v{version}_{pf}.zip")
     with zipfile.ZipFile(
-        os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
-            zip_file_name,
-        ),
+        zip_file_name,
         mode="w",
         compression=zipfile.ZIP_DEFLATED,
     ) as zipf:

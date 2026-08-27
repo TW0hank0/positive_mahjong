@@ -13,7 +13,7 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-use std::{self, net::TcpStream, sync, thread, time};
+use std::{self, net::TcpStream, sync};
 
 use iced::{
     self, Border, Color, Element, Length, Pixels, alignment, task,
@@ -22,17 +22,14 @@ use iced::{
         text_input,
     },
 };
-use serde_json;
-use tracing::{debug, error, info, trace, warn};
-use tungstenite::{Message, WebSocket};
+use tracing::error;
+use tungstenite::WebSocket;
 
 use crate::{circular, easing};
 
-use pmj_gamemodes;
 use pmj_shared::shared::{
     self, FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES, FONT_NOTO_SANS_REG_BYTES, PROJECT_NAME,
 };
-use pmj_client_core;
 
 /// 自定義型別別名，避開 MaybeTlsStream
 type WsConn = WebSocket<TcpStream>;
@@ -170,7 +167,7 @@ impl Client {
                             .msgs
                             .push(String::from("已有正在嘗試連接的伺服器！"));
                     } else {
-                        if key == String::from("backspace") || key == String::from("\u{e14a}") {
+                        if key == "backspace" || key == "\u{e14a}" {
                             self.status_home.server_ip.pop();
                         } else {
                             self.status_home.server_ip.push_str(&key);
@@ -233,7 +230,7 @@ impl Client {
                 {
                     let mut title_bar = Row::new().align_y(alignment::Vertical::Center);
                     title_bar = title_bar.push(
-                        text(format!("{}", shared::PROJECT_NAME))
+                        text(shared::PROJECT_NAME.to_string())
                             .height(Length::Shrink)
                             .size(Pixels::from(26)),
                     );
@@ -290,7 +287,7 @@ impl Client {
                     }
                     for key in [":", "[", "]", ".", "/", "backspace"] {
                         vsoft_keyboard = vsoft_keyboard
-                            .push(self.home_create_vsoft_key(format!("{}", key)))
+                            .push(self.home_create_vsoft_key(key.to_string()))
                             .spacing(10);
                     }
                     layout_home = layout_home.push(vsoft_keyboard);
@@ -600,7 +597,7 @@ impl Client {
                 layout = layout.push(layout_play_base);
             }
         }
-        return layout.into();
+        layout.into()
     }
 
     fn home_create_vsoft_key<'a>(
@@ -608,10 +605,10 @@ impl Client {
         key: String,
     ) -> button::Button<'a, UIMessage, iced::theme::Theme, iced::Renderer> {
         button(
-            if key == String::from("backspace") || key == String::from("\u{e14a}") {
-                text(format!("\u{e14a}")).font(MATERIAL_SYMBOLS_OUTLINED)
+            if key == "backspace" || key == "\u{e14a}" {
+                text("\u{e14a}".to_string()).font(MATERIAL_SYMBOLS_OUTLINED)
             } else {
-                text(format!("{}", key))
+                text(key.to_string())
             }
             .size(Pixels::from(28))
             .height(Length::Fill)
@@ -627,10 +624,7 @@ impl Client {
         )
         .height(Length::Shrink)
         .width(Length::Shrink)
-        .on_press(UIMessage::Home(HomeMessage::VSoftKeyBoardInput(format!(
-            "{}",
-            key
-        ))))
+        .on_press(UIMessage::Home(HomeMessage::VSoftKeyBoardInput(key.to_string())))
         .style(rounded_primary_button)
     }
 

@@ -14,7 +14,6 @@
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 use clap::{self, Parser};
-use local_ip_address;
 
 use pmj_gamemodes::{self, base};
 use pmj_shared::shared;
