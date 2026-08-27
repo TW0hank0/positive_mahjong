@@ -206,8 +206,8 @@ jobs:
 
       - name: install eza
         run: |
-          apt update
-          apt install eza -y
+          sudo apt-get update
+          sudo apt-get install eza -y
 
       - name: prepare CI Venv
         run: |
