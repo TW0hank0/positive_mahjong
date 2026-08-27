@@ -53,6 +53,10 @@ git tag -a "版本" -m "release pmj: 版本"
 
 - 更改：Rust 為 nightly
 
+**2026-8-27**
+
+- ［pmj_gamemodes::v2_better::mode］客戶端訊息接收
+
 ## [v0.1.1] - 2026-8-17
 
 修復客戶端錯誤，並改進訊息顯示。

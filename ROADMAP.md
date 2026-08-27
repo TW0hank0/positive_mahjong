@@ -29,7 +29,7 @@
 
 ### v0.5.0
 
-- （暫定）pmj_server_core 供 pmj_server_gui 和 pmj_server_tui 使用
+- [更穩定的電腦伺服器端](./TODO.md#更穩定的電腦伺服器端)
 
 ### v0.6.0
 
@@ -37,7 +37,7 @@
 
 ### v0.7.0
 
-- [V3Updates 玩法](<./TODO.md#V3Updates 玩法>)
+- [V3Private 玩法](<./TODO.md#V3Private 玩法>)
     - 資料傳輸加密
     - 資料完整性檢查 (blake3)
     - 資料超時檢查 (資料帶時間)

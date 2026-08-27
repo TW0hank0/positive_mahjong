@@ -98,13 +98,58 @@ pub enum PlayerGameActions {
     ///吃
     Eat {with: (PMJCard, PMJCard), eat_card: PMJCard},
     ///碰
-    Triplet(PMJCard, PMJCard),
+    Triplet{with: (PMJCard, PMJCard), triplet_card: PMJCard},
     ///明槓
     ExposedKong { with: (PMJCard, PMJCard, PMJCard), kong_card:PMJCard},
     ///暗槓
     ConcealedKong { with: (PMJCard, PMJCard, PMJCard), kong_card:PMJCard},
     ///補花
     ReplaceFlower(PMJCard),
+}
+
+impl PlayerGameActions {
+    pub fn is_get_card(&self) -> bool {
+        match self {
+            Self::GetCard => {true}
+            _ => {false}
+        }
+    }
+    pub fn is_throw_card(&self) -> bool {
+        match self {
+            Self::ThrowCard(_) => {true}
+            _ => {false}
+        }
+    }
+    pub fn is_eat(&self) -> bool {
+        match self {
+            Self::Eat { with:_, eat_card:_ }=> {true}
+            _ => {false}
+        }
+    }
+    pub fn is_triplet(&self) -> bool {
+        match self {
+            Self::Triplet { with:_, triplet_card:_ } => {true}
+            _ => {false}
+        }
+    }
+    pub fn is_exposed_kong(&self) -> bool {
+        match self {
+            Self::ExposedKong { with:_, kong_card:_}=> {true}
+            _ => {false}
+        }
+    }
+    pub fn is_concealed_kong(&self)->bool {
+        match self {
+            Self::ConcealedKong { with:_, kong_card:_ } => {true}
+            _ => {false}
+        }
+    }
+    pub fn is_replace_flower(&self)-> bool {
+        match self {
+            Self::ReplaceFlower(_) => {true}
+            _ => {false}
+        }
+    }
 }
 
 /// 卡牌
