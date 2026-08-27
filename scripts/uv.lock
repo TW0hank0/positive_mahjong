@@ -137,7 +137,6 @@ source = { virtual = "." }
 dependencies = [
     { name = "colorama" },
     { name = "mistune" },
-    { name = "positive-tool" },
     { name = "python-gitlab" },
     { name = "requests" },
     { name = "typer" },
@@ -147,21 +146,9 @@ dependencies = [
 requires-dist = [
     { name = "colorama", specifier = "==0.4.6" },
     { name = "mistune", specifier = "==3.3.4" },
-    { name = "positive-tool", specifier = ">=0.7.4" },
     { name = "python-gitlab", specifier = "==8.5.0" },
     { name = "requests", specifier = "==2.34.2" },
     { name = "typer", specifier = "==0.27.1" },
-]
-
-[[package]]
-name = "positive-tool"
-version = "0.7.4"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "rich" },
-]
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/bc/d9/5d13c7f6aa3320dc540dde208ba6f31adea5aa83a85b9df9981730c3cba4/positive_tool-0.7.4-py3-none-any.whl", hash = "sha256:64fbcca9f75d2502fb5c73bdee640a639acc6bca457a38dbcb8276113b83262d", size = 33606, upload-time = "2026-01-25T12:31:46.593Z" },
 ]
 
 [[package]]

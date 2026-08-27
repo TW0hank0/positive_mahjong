@@ -36,27 +36,37 @@
         <header>
             <nav>{{$VAR_NAV$}}</nav>
         </header>
-        <section class="content">
-            <span class="logo-text"
-                >使用 Rust、tungstenite 和 iced 製作，支援 linux 和
-                windows 系統。</span
-            >
-        </section>
-        <section class="content">
-            <h4>授權與聲明</h4>
-            <p>版權所有 (C) 2026 TW0hank0</p>
-            <p>
-                本程式基於 GNU Affero General Public License v3
-                （僅此版本） 授權
-            </p>
-            <p>
-                完整全文請見
-                <a href="./files/LICENSE">LICENSE</a> 檔案
-            </p>
-        </section>
-        <section class="content">
-            <h5>{{$VAR_COMMIT_SHA}} ({{$VAR_COMMIT_TIME}})</h5>
-            <p>制作中</p>
-        </section>
+        <main>
+            <section class="content">
+                <span class="logo-text"
+                    >使用 Rust、tungstenite 和 iced 製作，支援 linux
+                    和 windows 系統。</span
+                >
+            </section>
+            <section class="content">
+                <h4>授權與聲明</h4>
+                <p>版權所有 (C) 2026 TW0hank0</p>
+                <p>
+                    本程式基於 GNU Affero General Public License v3
+                    （僅此版本） 授權
+                </p>
+                <p>
+                    完整全文請見
+                    <a href="./files/LICENSE">LICENSE</a> 檔案
+                </p>
+            </section>
+            <section class="content">
+                <div class="row-layout">
+                    <p><strong>提交訊息</strong></p>
+                    <p class="t-style-dim">({{$VAR_COMMIT_SHA$}})</p>
+                    <div style="width: 30px"></div>
+                    <p class="t-small">
+                        由 {{$VAR_COMMIT_COMMITTER_NAME$}} 於
+                        {{$VAR_COMMIT_TIME$}} 提交
+                    </p>
+                </div>
+                <p class="text-block">{{$VAR_COMMIT_MSG$}}</p>
+            </section>
+        </main>
     </body>
 </html>

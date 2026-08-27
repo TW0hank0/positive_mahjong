@@ -30,6 +30,7 @@
     --background: black;
     --text-color: white;
     --text-size: 22px;
+    --text-small: 18px;
     --large-margin: 18px;
     --normal-margin: 12px;
     --normal-radius: 16px;
@@ -54,12 +55,14 @@
 @media (width >= 2160px) {
     :root {
         --text-size: 26px;
+        --text-small: 22px;
     }
 }
 
 @media (width < 1080px) {
     :root {
         --text-size: 20px;
+        --text-small: 16px;
         --normal-line-height: 30px;
     }
 }
@@ -203,15 +206,16 @@ code {
 
 .text-block {
     max-height: max(40dvh, 550px);
-    min-height: 600px;
-    line-height: 30px;
+    min-height: 400px;
+    line-height: calc(var(--normal-line-height) + 10px);
     overflow-y: scroll;
+    overflow-x: scroll;
     white-space: pre;
 }
 @media (width < 1080px) {
     .text-block {
-        min-height: 250px;
-        max-height: max(30dvh, 400px);
+        min-height: 225px;
+        max-height: max(25dvh, 350px);
     }
 }
 
@@ -235,4 +239,18 @@ code {
         height: 100%;
         vertical-align: middle;
     }
+}
+
+.row-layout {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+
+.t-small {
+    font-size: var(--text-small);
+}
+
+.t-style-dim {
+    color: gray;
 }
