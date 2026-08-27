@@ -30,7 +30,7 @@ def run_cmd(command: list[str], cwd: str | None = None) -> tuple[int, str]:
     )
     process = subprocess.run(
         command,
-        timeout=60 * 10,
+        timeout=60 * 20,
         stderr=subprocess.PIPE,
         stdout=subprocess.PIPE,
         cwd=cwd,
@@ -58,13 +58,16 @@ def run_cmd(command: list[str], cwd: str | None = None) -> tuple[int, str]:
 
 
 def get_commit_info():
-    """return (commit_sha, commit_time)"""
-    (_returncode, stdout) = run_cmd(["git", "rev-parse", "HEAD"])
+    """return (commit_sha, commit_time, commit_msg)"""
+    (_returncode, stdout) = run_cmd(["git", "rev-parse", "HEAD"], cwd=fix_path())
     commit_sha = stdout.replace("\n", "")
     (_returncode, commit_time) = run_cmd(
-        ["git", "log", "-1", "--format='%cd'", "--date=iso"]
+        ["git", "log", "-1", '--format="%cd"', "--date=iso"], cwd=fix_path()
     )
-    return (commit_sha, commit_time)
+    (_returncode, commit_msg) = run_cmd(
+        ["git", "log", "-n", "1", "--format=%B"], cwd=fix_path()
+    )
+    return (commit_sha, commit_time, commit_msg)
 
 
 def fix_path(*p: str) -> str:

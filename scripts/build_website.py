@@ -221,9 +221,12 @@ def replace_var(
         t = f.read()
         html_vars["VAR_THIRD_PARTY_LICENSE_RUST_MD"] = t
         html_vars["VAR_THIRD_PARTY_LICENSE_RUST_MD_TO_HTML"] = str(mistune.html(t))
-    (commit_sha, commit_time) = util.get_commit_info()
+    (commit_sha, commit_time, commit_msg) = util.get_commit_info()
     html_vars["VAR_COMMIT_SHA"] = commit_sha
     html_vars["VAR_COMMIT_TIME"] = commit_time
+    html_vars["VAR_COMMIT_MSG"] = commit_msg
+    (_, commit_committer_name) = util.run_cmd(["git", "log", "-1", '--format="%cn"'])
+    html_vars["VAR_COMMIT_COMMITTER_NAME"] = commit_committer_name
     #
     with open(replace_html_path, "r", encoding="utf-8") as f:
         new_html_content = f.read()
@@ -233,7 +236,6 @@ def replace_var(
             new_html_content = new_html_content.replace(key_fixed_name, html_vars[key])
             print(f"Replaced `{key}` in file: {replace_html_path}")
     os.chdir(orig_work_dir)
-    # print(f"new_html_content={new_html_content}")
     return new_html_content
 
 

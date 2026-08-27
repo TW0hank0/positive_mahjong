@@ -22,6 +22,7 @@
 ### v0.3.0
 
 - （暫定）pmj_client_core 供 pmj_client_desktop 與 pmj_client_cross 使用
+- （暫定）讓 pmj_client_desktop 可在網頁使用
 
 ### v0.4.0
 

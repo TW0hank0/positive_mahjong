@@ -102,12 +102,7 @@ def main():
             create_release_gh(
                 tag, title, notes, is_prerelease=False, owner=OWNER, repo=REPO
             )
-            upload_file_gh(
-                files=files,
-                tag=tag,
-                owner=OWNER,
-                repo=REPO,
-            )
+            upload_file_gh(files=files, tag=tag, owner=OWNER, repo=REPO)
             gl_token = os.environ.get("GITLAB_PAT_TOKEN")
             if gl_token is None:
                 print("No gitlab token!", file=sys.stderr)
@@ -161,12 +156,7 @@ def main():
                     )
                 )
             )
-            upload_file_gh(
-                files=files,
-                tag=tag,
-                owner=OWNER,
-                repo=REPO,
-            )
+            upload_file_gh(files=files, tag=tag, owner=OWNER, repo=REPO)
 
 
 def create_release_gh(
@@ -189,34 +179,17 @@ def create_release_gh(
 
 
 def upload_file_gh(files: list[str], tag: str, owner: str, repo: str):
-    get_url_command = [
-        "gh",
-        "api",
-        f"repos/{owner}/{repo}/releases/tags/{tag}",
-        "--jq",
-        ".upload_url",
-    ]
-    get_url_process = subprocess.run(
-        get_url_command, stdout=subprocess.PIPE, text=True, encoding="utf-8"
-    )
-    upload_url_base = get_url_process.stdout
-    print(f"upload_url_base={upload_url_base}")
     for file in files:
         print(f"uploading {file}")
-        _ = run_cmd(
-            [
-                "curl",
-                "-X",
-                "POST",
-                "-H",
-                "Authorization: token $GITHUB_TOKEN",
-                "-H",
-                "Content-Type: application/octet-stream",
-                "--data-binary",
-                f"@'{file}'",
-                str(upload_url_base) + str(os.path.basename(file)),
-            ]
-        )
+        command: list[str] = [
+            "gh",
+            "release",
+            "upload",
+            tag,
+            file,
+            f"--repo={owner}/{repo}",
+        ]
+        _ = run_cmd(command)
 
 
 def codeberg_release(
