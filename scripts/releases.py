@@ -87,6 +87,7 @@ def main():
     if msg is None:
         raise RuntimeError("msg=None")
     else:
+        files = list_files("artifacts")
         if "release pmj:" in msg.lower():
             print("Release PMJ:")
 
@@ -95,10 +96,6 @@ def main():
             title = f"{REPO} v{version}"
             date = datetime.datetime.now().date()
             notes = f"v{version} released at {date.year}/{date.month}/{date.day} by `scripts/releases.py`"
-            files = list(
-                util.fix_path("artifacts", i)
-                for i in os.listdir(util.fix_path("artifacts"))
-            )
             create_release_gh(
                 tag, title, notes, is_prerelease=False, owner=OWNER, repo=REPO
             )
@@ -148,15 +145,20 @@ def main():
             create_release_gh(
                 tag, title, notes, is_prerelease=True, owner=OWNER, repo=REPO
             )
-            files = list(
-                os.path.join(os.path.dirname(os.path.dirname(__file__)), "artifacts", i)
-                for i in os.listdir(
-                    os.path.join(
-                        os.path.dirname(os.path.dirname(__file__)), "artifacts"
-                    )
-                )
-            )
             upload_file_gh(files=files, tag=tag, owner=OWNER, repo=REPO)
+
+
+def list_files(path: str) -> list[str]:
+    files: list[str] = []
+    for file in os.listdir(path):
+        file_path = os.path.join(path, file)
+        if os.path.isfile(file_path) is True:
+            files.append(file_path)
+        elif os.path.isdir(file_path) is True:
+            files.extend(list_files(file_path))
+        else:
+            print(f"???? not file not dir: {file_path}")
+    return files
 
 
 def create_release_gh(
