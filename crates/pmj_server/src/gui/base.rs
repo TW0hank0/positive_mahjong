@@ -22,11 +22,9 @@ use std::{
 
 use iced::{
     self, Border,
-    widget::{self, Column, Row, button, container, scrollable, space, text},
+    widget::{Column, Row, button, container, scrollable, space, text},
 };
-use image;
-use local_ip_address;
-use tracing::{debug, error, info, trace, warn};
+use tracing::{error, info, warn};
 
 use pmj_gamemodes::base;
 use pmj_shared::shared::{FONT_NOTO_SANS_REG_BYTES, ICON_PNG_BYTES, PROJECT_NAME};
@@ -40,8 +38,8 @@ pub fn gui_init() -> Option<iced::window::Icon> {
         .unwrap()
         .into_rgba8();
     let (img_width, img_height) = img.dimensions();
-    let icon = iced::window::icon::from_rgba(img.into_raw(), img_width, img_height).ok();
-    icon
+    
+    iced::window::icon::from_rgba(img.into_raw(), img_width, img_height).ok()
 }
 
 pub fn main() -> iced::Result {
@@ -95,7 +93,7 @@ impl ServerGUI {
         info!("端口：{}", pmj_shared::shared::SERVER_PORT);
         let backend = base::mode::main_base(true).unwrap();
         Self {
-            backend: backend,
+            backend,
             local_ipv4_address: ipv4_address,
             local_ipv6_address: ipv6_address,
             msg: String::new(),
@@ -116,7 +114,7 @@ impl ServerGUI {
                         return iced::task::Task::done(GUIMessages::StartGame);
                     }
                 }
-                if self.players.len() < 1 {
+                if self.players.is_empty() {
                     warn!("至少需要一位玩家！");
                     self.msg.push_str("至少需要一位玩家！");
                 } else {
@@ -226,7 +224,7 @@ impl ServerGUI {
                 .style(rounded_primary_button),
         );
         let mut player_info = Column::new();
-        if self.players.len() > 0 {
+        if !self.players.is_empty() {
             for player in self.players.iter() {
                 let mut info_bar = Row::new();
                 info_bar = info_bar
@@ -294,7 +292,7 @@ impl ServerGUI {
             }),
         );
         //
-        return layout;
+        layout
     }
 
     pub fn title(&self) -> String {

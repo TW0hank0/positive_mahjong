@@ -98,3 +98,5 @@ if __name__ == "__main__":
         match command:
             case "get_version":
                 print(get_version())
+
+    app()

@@ -61,7 +61,7 @@ runs:
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update
-        sudo apt-get install libfontconfig1-dev pkg-config mold gcc -y
+        sudo apt-get install libfontconfig1-dev pkg-config mold gcc eza -y
 
     - name: install go
       uses: actions/setup-go@v7.0.0

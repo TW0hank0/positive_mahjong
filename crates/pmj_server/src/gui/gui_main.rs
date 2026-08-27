@@ -14,10 +14,8 @@
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 use clap::{self, Parser};
-use iced;
-use tracing::{debug, error, info, warn};
+use tracing::{debug, error, info};
 
-use pmj_shared;
 
 mod base;
 mod v2_better;
@@ -43,16 +41,16 @@ enum SubCmds {
 fn main() {
     let _guard = pmj_shared::shared::init_tracing_fmt(String::from("pmj_server_gui"));
     let args = CliArgs::parse();
-    let iced_result: iced::Result;
+    
     info!("args.command = {:?}", args.command);
-    match args.command {
+    let iced_result: iced::Result = match args.command {
         SubCmds::Base => {
-            iced_result = base::main();
+            base::main()
         }
         SubCmds::V2Better => {
-            iced_result = v2_better::main();
+            v2_better::main()
         }
-    }
+    };
     match iced_result {
         Ok(_) => {
             debug!("iced::Result::Ok");

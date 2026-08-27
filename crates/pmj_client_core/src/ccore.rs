@@ -44,21 +44,13 @@ enum CTaskKinds {
     ThrowCard(pmj_gamemodes::v2_better::shared::PMJCard),
 }
 #[derive(Debug, Clone)]
+#[derive(Default)]
 struct CTaskResult {
     rfirstmsgresp_player_id: Option<u8>,
     rfirstmsgresp_gamemode: Option<pmj_shared::shared::GameModes>,
     read_ws_msg_v2: Option<pmj_gamemodes::v2_better::shared::ServerMessage>,
 }
 
-impl Default for CTaskResult {
-    fn default() -> Self {
-        Self {
-            rfirstmsgresp_player_id: None,
-            rfirstmsgresp_gamemode: None,
-            read_ws_msg_v2: None,
-        }
-    }
-}
 
 #[derive(Debug, Clone)]
 enum GMState {
@@ -104,7 +96,7 @@ impl ClientCore {
                 PlayerCtrl::NoCtrl
             }
             GMState::V2Better(ref state) => {
-                let (_event_num, event)=state.game_events.get(state.game_events.len() - 1).unwrap();
+                let (_event_num, event)=state.game_events.last().unwrap();
                 match event {
                     V2BetterEvents::YouGetCard(_) => {PlayerCtrl::ThrowCard}
                     _ => {PlayerCtrl::NoCtrl}
@@ -192,7 +184,7 @@ impl ClientCore {
         });
         self.tasks.push(ClientTask {
             kind: CTaskKinds::SendFirstMsgReq,
-            handle: handle,
+            handle,
         });
     }
 
@@ -210,7 +202,7 @@ impl ClientCore {
                                         match serde_json::from_str::<
                                             pmj_shared::shared::ServerConnectResponceType,
                                         >(
-                                            &text.to_string()
+                                            text.as_ref()
                                         ) {
                                             Ok(tmsg) => {
                                                 if !tmsg.too_many_player {
@@ -263,7 +255,7 @@ impl ClientCore {
         });
         self.tasks.push(ClientTask {
             kind: CTaskKinds::ReadFirstMsgResp,
-            handle: handle,
+            handle,
         });
     }
 
@@ -300,7 +292,7 @@ impl ClientCore {
         });
         self.tasks.push(ClientTask {
             kind: CTaskKinds::PingPong,
-            handle: handle,
+            handle,
         });
     }
 
@@ -337,7 +329,7 @@ impl ClientCore {
         });
         self.tasks.push(ClientTask {
             kind: CTaskKinds::ThrowCard(card),
-            handle: handle,
+            handle,
         });
     }
 
@@ -445,7 +437,7 @@ impl ClientCore {
                                             }
                                             self.gamemode_state =
                                                 GMState::V2Better(V2BetterState {
-                                                    player_id: player_id,
+                                                    player_id,
                                                     cards: Vec::new(),
                                                     player_turn: None,
                                                     game_events: Vec::new(),
@@ -530,7 +522,7 @@ impl ClientCore {
                                 tungstenite::Message::Text(text) => {
                                     match serde_json::from_str::<
                                         pmj_gamemodes::v2_better::shared::ServerMessage,
-                                    >(&text.to_string())
+                                    >(text.as_ref())
                                     {
                                         Ok(tmsg) => {
                                             return Result::Ok(CTaskResult {
@@ -575,7 +567,7 @@ impl ClientCore {
         });
         self.tasks.push(ClientTask {
             kind: CTaskKinds::ReadWsMsg,
-            handle: handle,
+            handle,
         })
     }
 }

@@ -113,18 +113,36 @@ jobs:
           $file = (uv run scripts/zip_client_desktop.py)
           echo "zip_path=$file" >> $env:GITHUB_OUTPUT
 
+      - name: get version on Linux
+        id: get_version_linux
+        if: runner.os == 'Linux'
+        run: |
+          cd scripts
+          file=$(uv run util.py get_version)
+          echo "version=$file" >> $GITHUB_OUTPUT
+          cd ..
+
+      - name: get version on Windows
+        id: get_version_windows
+        if: runner.os == 'Windows'
+        run: |
+          cd scripts
+          $file = (uv run util.py get_version)
+          echo "version=$file" >> $env:GITHUB_OUTPUT
+          cd ..
+
       - name: Upload exe artifact on Linux
         uses: actions/upload-artifact@v7.0.1
         if: runner.os == 'Linux'
         with:
-          name: ${{ steps.zip_files_linux.outputs.zip_path }}
+          name: positive_mahjong-v${{ steps.get_version_linux.outputs.version }}-linux.zip
           path: ${{ steps.zip_files_linux.outputs.zip_path }}
 
       - name: Upload exe artifact on Windows
         uses: actions/upload-artifact@v7.0.1
         if: runner.os == 'Windows'
         with:
-          name: ${{ steps.zip_files_windows.outputs.zip_path }}
+          name: positive_mahjong-v${{ steps.get_version_windows.outputs.version }}-windows.zip
           path: ${{ steps.zip_files_windows.outputs.zip_path }}
 
   # build_android:
@@ -200,11 +218,7 @@ jobs:
 
       - name: List Dir (for debug)
         run: |
-          ls .
-          echo '--------'
-          ls artifacts
-          echo '--------'
-          ls -la artifacts
+          eza --tree .
 
       - name: release
         env:

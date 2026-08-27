@@ -22,17 +22,14 @@ use iced::{
         text_input,
     },
 };
-use serde_json;
 use tracing::{debug, error, info, trace, warn};
 use tungstenite::{Message, WebSocket, stream::NoDelay};
 
 use crate::{circular, easing};
 
-use pmj_gamemodes;
 use pmj_shared::shared::{
     self, FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES, FONT_NOTO_SANS_REG_BYTES, PROJECT_NAME,
 };
-use url;
 
 /// 自定義型別別名，避開 MaybeTlsStream
 type WsConn = WebSocket<TcpStream>;
@@ -192,7 +189,7 @@ impl Client {
     pub fn update(&mut self, message: UIMessage) -> task::Task<UIMessage> {
         match message {
             UIMessage::FetchThreadsStatus => {
-                if self.process_threads.len() > 0 {
+                if !self.process_threads.is_empty() {
                     trace!("Start fetch thread status...");
                     let mut rp_index = 0;
                     {
@@ -273,7 +270,7 @@ impl Client {
                                                         );
                                                         debug!(
                                                             "ThreadProcessTypes::ReadFirstMsgResp => player_id -> {}",
-                                                            self.player_id.clone().unwrap()
+                                                            self.player_id.unwrap()
                                                         );
                                                         self.status_play_base.is_start =
                                                             Some(false);
@@ -419,7 +416,7 @@ impl Client {
                             .msgs
                             .push(String::from("已有正在嘗試連接的伺服器！"));
                     } else {
-                        if key == String::from("backspace") || key == String::from("\u{e14a}") {
+                        if key == "backspace" || key == "\u{e14a}" {
                             self.status_home.server_ip.pop();
                         } else {
                             self.status_home.server_ip.push_str(&key);
@@ -511,7 +508,7 @@ impl Client {
                 {
                     let mut title_bar = Row::new().align_y(alignment::Vertical::Center);
                     title_bar = title_bar.push(
-                        text(format!("{}", shared::PROJECT_NAME))
+                        text(shared::PROJECT_NAME.to_string())
                             .height(Length::Shrink)
                             .size(Pixels::from(26)),
                     );
@@ -568,7 +565,7 @@ impl Client {
                     }
                     for key in [":", "[", "]", ".", "/", "backspace"] {
                         vsoft_keyboard = vsoft_keyboard
-                            .push(self.home_create_vsoft_key(format!("{}", key)))
+                            .push(self.home_create_vsoft_key(key.to_string()))
                             .spacing(10);
                     }
                     layout_home = layout_home.push(vsoft_keyboard);
@@ -765,23 +762,23 @@ impl Client {
                                 .push(space().height(5))
                                 .push(container(Row::new().padding(10).width(Length::Fill).height(40)
                                     .push(
-                                        text(format!("{}", match card.card_type {
-                                            pmj_gamemodes::base::shared::PMJCardType::Dots => { card.info_dots.clone().unwrap().to_string()}
+                                        text((match card.card_type {
+                                            pmj_gamemodes::base::shared::PMJCardType::Dots => { card.info_dots.unwrap().to_string()}
                                             pmj_gamemodes::base::shared::PMJCardType::Flower => {card.info_flower.clone().unwrap().to_string()}
-                                            pmj_gamemodes::base::shared::PMJCardType::Line => { card.info_line.clone().unwrap().to_string() }
-                                            pmj_gamemodes::base::shared::PMJCardType::TenThousand => { card.info_ten_thousand.clone().unwrap().to_string()}
+                                            pmj_gamemodes::base::shared::PMJCardType::Line => { card.info_line.unwrap().to_string() }
+                                            pmj_gamemodes::base::shared::PMJCardType::TenThousand => { card.info_ten_thousand.unwrap().to_string()}
                                             pmj_gamemodes::base::shared::PMJCardType::Words => { card.info_words.clone().unwrap().to_string()}
-                                        })).size(24),
+                                        }).to_string()).size(24),
                                     )
                                     .push(space().width(5))
                                     .push(
-                                        text(format!("{}", match card.card_type {
+                                        text((match card.card_type {
                                             pmj_gamemodes::base::shared::PMJCardType::Dots => {"筒"}
                                             pmj_gamemodes::base::shared::PMJCardType::Flower => {"花"}
                                             pmj_gamemodes::base::shared::PMJCardType::Line => {"條"}
                                             pmj_gamemodes::base::shared::PMJCardType::TenThousand => {"萬"}
                                             pmj_gamemodes::base::shared::PMJCardType::Words => {"字"}
-                                        })).size(18).align_y(alignment::Vertical::Bottom)
+                                        }).to_string()).size(18).align_y(alignment::Vertical::Bottom)
                                     )
                                     .push(
                                         text(format!("第 {} 張", card.card_id.clone())).width(Length::Fill).size(15).align_x(alignment::Horizontal::Right)
@@ -814,22 +811,22 @@ impl Client {
                                             Column::new().width(120)
                                             .height(160)
                                                 .push(
-                                                    text(format!("{}", match card.card_type {
-                                                        pmj_gamemodes::base::shared::PMJCardType::Dots => { card.info_dots.clone().unwrap().to_string()}
+                                                    text((match card.card_type {
+                                                        pmj_gamemodes::base::shared::PMJCardType::Dots => { card.info_dots.unwrap().to_string()}
                                                         pmj_gamemodes::base::shared::PMJCardType::Flower => {card.info_flower.clone().unwrap().to_string()}
-                                                        pmj_gamemodes::base::shared::PMJCardType::Line => { card.info_line.clone().unwrap().to_string() }
-                                                        pmj_gamemodes::base::shared::PMJCardType::TenThousand => { card.info_ten_thousand.clone().unwrap().to_string()}
+                                                        pmj_gamemodes::base::shared::PMJCardType::Line => { card.info_line.unwrap().to_string() }
+                                                        pmj_gamemodes::base::shared::PMJCardType::TenThousand => { card.info_ten_thousand.unwrap().to_string()}
                                                         pmj_gamemodes::base::shared::PMJCardType::Words => { card.info_words.clone().unwrap().to_string()}
-                                                    })).size(24),
+                                                    }).to_string()).size(24),
                                                 )
                                                 .push(
-                                                    text(format!("{}", match card.card_type {
+                                                    text((match card.card_type {
                                                         pmj_gamemodes::base::shared::PMJCardType::Dots => {"筒"}
                                                         pmj_gamemodes::base::shared::PMJCardType::Flower => {"花"}
                                                         pmj_gamemodes::base::shared::PMJCardType::Line => {"條"}
                                                         pmj_gamemodes::base::shared::PMJCardType::TenThousand => {"萬"}
                                                         pmj_gamemodes::base::shared::PMJCardType::Words => {"字"}
-                                                    })).size(18)
+                                                    }).to_string()).size(18)
                                                 )
                                                 .push(
                                                     text(format!("第 {} 張", card.card_id.clone())).height(Length::Fill).align_y(alignment::Vertical::Bottom).size(15).align_x(alignment::Horizontal::Right)
@@ -909,7 +906,7 @@ impl Client {
                 layout = layout.push(layout_play_base);
             }
         }
-        return layout.into();
+        layout.into()
     }
 
     fn home_create_vsoft_key<'a>(
@@ -917,10 +914,10 @@ impl Client {
         key: String,
     ) -> button::Button<'a, UIMessage, iced::theme::Theme, iced::Renderer> {
         button(
-            if key == String::from("backspace") || key == String::from("\u{e14a}") {
-                text(format!("\u{e14a}")).font(MATERIAL_SYMBOLS_OUTLINED)
+            if key == "backspace" || key == "\u{e14a}" {
+                text("\u{e14a}".to_string()).font(MATERIAL_SYMBOLS_OUTLINED)
             } else {
-                text(format!("{}", key))
+                text(key.to_string())
             }
             .size(Pixels::from(28))
             .height(Length::Fill)
@@ -936,10 +933,7 @@ impl Client {
         )
         .height(Length::Shrink)
         .width(Length::Shrink)
-        .on_press(UIMessage::Home(HomeMessage::VSoftKeyBoardInput(format!(
-            "{}",
-            key
-        ))))
+        .on_press(UIMessage::Home(HomeMessage::VSoftKeyBoardInput(key.to_string())))
         .style(rounded_primary_button)
     }
 
@@ -984,7 +978,7 @@ impl Client {
             }
         });
         ProThread {
-            handle: handle,
+            handle,
             start_time: time::Instant::now(),
             process_type: ThreadProcessTypes::KeepPingPong,
         }
@@ -1014,7 +1008,7 @@ impl Client {
                 self.status_home.try_connecting_server = false;
             }
         }
-        return task::Task::none();
+        task::Task::none()
     }
 
     fn home_send_first_msg(&mut self) -> task::Task<UIMessage> {
@@ -1031,24 +1025,24 @@ impl Client {
                     match guard.send(Message::Text(req_text.into())) {
                         Ok(_) => {
                             debug!("已傳送初連結訊息，等待伺服器回應...");
-                            return task::Task::done(UIMessage::Home(
+                            task::Task::done(UIMessage::Home(
                                 HomeMessage::ReadFirstMsgResp,
-                            ));
+                            ))
                         }
                         Err(e) => {
                             warn!("error: {}", e);
                             self.status_home.try_connecting_server = false;
-                            return task::Task::none();
+                            task::Task::none()
                         }
                     }
                 }
                 Err(e) => {
                     warn!("First msg: get guard error: {}", e);
-                    return task::Task::done(UIMessage::Home(HomeMessage::SendFirstMsg));
+                    task::Task::done(UIMessage::Home(HomeMessage::SendFirstMsg))
                 }
             },
             None => {
-                return task::Task::done(UIMessage::Home(HomeMessage::ConnectServer));
+                task::Task::done(UIMessage::Home(HomeMessage::ConnectServer))
             }
         }
     }
@@ -1102,7 +1096,7 @@ impl Client {
                                 serde_json::from_str(&text).unwrap();
                             if msg.player_id.is_some() {
                                 info!("成功取得玩家識別碼：{}", msg.player_id.unwrap());
-                                return ThreadResult {
+                                ThreadResult {
                                     is_error: false,
                                     result_read_first_msg_resp: Some(
                                         ThreadProcessResultReadFirstMsgResp {
@@ -1110,38 +1104,38 @@ impl Client {
                                         },
                                     ),
                                     ..Default::default()
-                                };
+                                }
                             } else {
                                 error!("error: msg.player_id is None");
-                                return ThreadResult {
+                                ThreadResult {
                                     is_error: true,
                                     result_read_first_msg_resp: None,
                                     ..Default::default()
-                                };
+                                }
                             }
                         }
                         _ => {
-                            return ThreadResult {
+                            ThreadResult {
                                 is_error: true,
                                 result_read_first_msg_resp: None,
                                 ..Default::default()
-                            };
+                            }
                             /* TODO:BIN-MsgPack */
                         }
                     }
                 }
                 Err(e) => {
                     error!("raw_msg => Err: {}", e);
-                    return ThreadResult {
+                    ThreadResult {
                         is_error: true,
                         result_read_first_msg_resp: None,
                         ..Default::default()
-                    };
+                    }
                 }
             }
         });
         ProThread {
-            handle: handle,
+            handle,
             start_time: std::time::Instant::now(),
             process_type: ThreadProcessTypes::ReadFirstMsgResp,
         }
@@ -1200,7 +1194,7 @@ impl Client {
             }
         });
         ProThread {
-            handle: handle,
+            handle,
             start_time: std::time::Instant::now(),
             process_type: ThreadProcessTypes::PlayBaseReadWebsocket,
         }
@@ -1257,7 +1251,7 @@ impl Client {
             }
         });
         ProThread {
-            handle: handle,
+            handle,
             start_time: time::Instant::now(),
             process_type: ThreadProcessTypes::PlayBaseThrowCard,
         }
