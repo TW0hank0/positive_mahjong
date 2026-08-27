@@ -204,6 +204,11 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v10.0.1
 
+      - name: install eza
+        run: |
+          apt update
+          apt install eza -y
+
       - name: prepare CI Venv
         run: |
           cd scripts
