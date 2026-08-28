@@ -22,9 +22,7 @@ import util
 
 def main():
     print("-" * 10, "cargo-about", "-" * 10)
-    autogen_path = os.path.join(
-        os.path.dirname(os.path.dirname(__file__)), "auto_generated"
-    )
+    autogen_path = util.fix_path("auto_generated")
     if os.path.exists(autogen_path) is False:
         os.mkdir(autogen_path)
     #
@@ -37,7 +35,7 @@ def main():
             os.path.join(autogen_path, "ThirdPartyLicense-Rust.html"),
             "--threshold",
             "1.0",
-            "templates/about_html.hbs",
+            util.fix_path("templates", "about_html.hbs"),
         ],
         [
             "cargo",
@@ -47,7 +45,7 @@ def main():
             "1.0",
             "--output-file",
             os.path.join(autogen_path, "ThirdPartyLicense-Rust.json"),
-            "templates/about_json.hbs",
+            util.fix_path("templates", "about_json.hbs"),
         ],
         [
             "cargo",
@@ -57,22 +55,17 @@ def main():
             os.path.join(autogen_path, "ThirdPartyLicense-Rust.md"),
             "--threshold",
             "1.0",
-            "templates/about_markdown.hbs",
+            util.fix_path("templates", "about_markdown.hbs"),
         ],
     ]
     #
     for command in all_commands:
-        util.run_cmd(command)
+        _ = util.run_cmd(command, cwd=util.fix_path())
     #
     print("Indenting json file...", end="")
-    json_file_path = os.path.abspath(
-        os.path.join(
-            __file__,
-            "..",
-            "..",
-            "auto_generated",
-            "ThirdPartyLicense-Rust.json",
-        )
+    json_file_path = util.fix_path(
+        "auto_generated",
+        "ThirdPartyLicense-Rust.json",
     )
     with open(json_file_path, "r", encoding="utf-8") as f:
         json_data = json.load(f)
@@ -80,14 +73,12 @@ def main():
         json.dump(json_data, f, ensure_ascii=False, sort_keys=True, indent=4)
     print("Finish!")
     print("Copying ThirdPartyLicense.md ...", end="")
-    shutil.copyfile(
-        os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
+    _ = shutil.copyfile(
+        util.fix_path(
             "auto_generated",
             "ThirdPartyLicense-Rust.md",
         ),
-        os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
+        util.fix_path(
             "docs",
             "src",
             "license",

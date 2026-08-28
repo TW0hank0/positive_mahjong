@@ -205,8 +205,8 @@ code {
 }
 
 .text-block {
-    max-height: max(40dvh, 550px);
-    min-height: 400px;
+    max-height: max(30dvh, 500px);
+    min-height: 150px;
     line-height: calc(var(--normal-line-height) + 10px);
     overflow-y: scroll;
     overflow-x: scroll;
@@ -214,8 +214,8 @@ code {
 }
 @media (width < 1080px) {
     .text-block {
-        min-height: 225px;
-        max-height: max(25dvh, 350px);
+        min-height: 100px;
+        max-height: max(20dvh, 300px);
     }
 }
 

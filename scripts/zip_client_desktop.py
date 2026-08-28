@@ -19,6 +19,9 @@ import zipfile
 
 import util
 
+# 臨時開啟
+INCLUDE_ALL_FILES = True
+
 
 def main():
     version = util.get_version()
@@ -30,31 +33,19 @@ def main():
     for file in os.listdir(target_path):
         full_file_path = os.path.join(target_path, file)
         if os.path.isfile(full_file_path) is True:
-            match platform.system():
-                case "Linux":
-                    if len(file.split(".")) == 1:
-                        include_files.append(full_file_path)
-                case "Windows":
-                    if (file.split(".")[1] == "exe") and (len(file.split(".")) > 1):
-                        include_files.append(full_file_path)
-    #
-    # launcher_path = os.path.abspath(
-    #     os.path.join(
-    #         os.path.dirname(os.path.dirname(__file__)),
-    #         "dist",
-    #         "pmj_launcher",
-    #     )
-    # )
-    # match platform.system():
-    #     case "Linux":
-    #         pf = "linux"
-    #     case "Windows":
-    #         pf = "windows"
-    #         # launcher_path = launcher_path + ".exe"
-    #     case _:
-    #         pf = "unknown"
+            if INCLUDE_ALL_FILES:
+                include_files.append(full_file_path)
+            else:
+                match platform.system():
+                    case "Linux":
+                        if len(file.split(".")) == 1:
+                            include_files.append(full_file_path)
+                    case "Windows":
+                        if (file.split(".")[1] == "exe") and (len(file.split(".")) > 1):
+                            include_files.append(full_file_path)
+                    case _:
+                        raise RuntimeError("Not support system!")
     pf = platform.system().lower()
-    # include_files.append(launcher_path)
     zip_file_name = util.fix_path(f"positive_mahjong_v{version}_{pf}.zip")
     with zipfile.ZipFile(
         zip_file_name,

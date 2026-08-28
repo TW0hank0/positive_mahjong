@@ -57,6 +57,10 @@ git tag -a "版本" -m "release pmj: 版本"
 
 - ［pmj_gamemodes::v2_better::mode］客戶端訊息接收
 
+**2026-8-28**
+
+- ［pmj_gamemodes::v2_better::mode］玩家動作吃的邏輯
+
 ## [v0.1.1] - 2026-8-17
 
 修復客戶端錯誤，並改進訊息顯示。
