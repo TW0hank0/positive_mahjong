@@ -20,6 +20,7 @@ import json
 import os
 import subprocess
 import sys
+import time
 import tomllib
 from typing import Literal
 from zoneinfo import ZoneInfo
@@ -31,6 +32,7 @@ def run_cmd(command: list[str], cwd: str | None = None) -> tuple[int, str]:
     print(
         f"{Fore.CYAN}Running command:{Fore.RESET} {Back.LIGHTBLACK_EX}{' '.join(command)}{Back.RESET}"
     )
+    start_time = time.time()
     process = subprocess.run(
         command,
         timeout=60 * 20,
@@ -38,13 +40,14 @@ def run_cmd(command: list[str], cwd: str | None = None) -> tuple[int, str]:
         stdout=subprocess.PIPE,
         cwd=cwd,
     )
+    end_time = time.time()
     if process.returncode == 0:
         print(
-            f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.GREEN}Process fnished sucessful.{Fore.RESET}"
+            f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.GREEN}Process fnished sucessful.{Fore.RESET} {Fore.LIGHTBLACK_EX}({int(end_time - start_time)} secs){Fore.RESET}"
         )
     else:
         print(
-            f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.RED}Process exited with non-zero code{Fore.RESET} {Style.DIM}({process.returncode}){Style.NORMAL}!"
+            f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.RED}Process exited with non-zero code{Fore.RESET} {Style.DIM}({process.returncode}){Style.NORMAL}! {Fore.LIGHTBLACK_EX}({int(end_time - start_time)} secs){Fore.RESET}"
         )
         for name, data in [
             ("stdout", process.stdout.decode()),
@@ -60,13 +63,17 @@ def run_cmd(command: list[str], cwd: str | None = None) -> tuple[int, str]:
 
 def get_commit_info():
     """return CommitInfo"""
-    (_returncode, stdout) = run_cmd(["git", "rev-parse", "HEAD"], cwd=fix_path())
-    commit_sha = stdout.replace("\n", "")
+    (_returncode, sha_stdout) = run_cmd(["git", "rev-parse", "HEAD"], cwd=fix_path())
+    commit_sha = sha_stdout.replace("\n", "")
+    (_returncode, ssha_stdout) = run_cmd(
+        ["git", "rev-parse", "--short", "HEAD"], cwd=fix_path()
+    )
+    commit_short_sha = ssha_stdout.replace("\n", "")
     (_returncode, commit_time) = run_cmd(
         ["git", "log", "-1", "--format=%cd", "--date=iso"], cwd=fix_path()
     )
     (_returncode, commit_msg) = run_cmd(
-        ["git", "log", "-n", "1", "--format=%B"], cwd=fix_path()
+        ["git", "log", "-1", "--format=%B"], cwd=fix_path()
     )
     (_, commit_committer_name) = run_cmd(["git", "log", "-1", "--format=%cn"])
     (_, commit_committer_email) = run_cmd(["git", "log", "-1", "--format=%ce"])
@@ -74,6 +81,7 @@ def get_commit_info():
     (_, commit_author_email) = run_cmd(["git", "log", "-1", "--format=%ae"])
     return CommitInfo(
         commit_sha,
+        commit_short_sha,
         commit_time,
         commit_msg,
         commit_committer_name,
@@ -86,6 +94,7 @@ def get_commit_info():
 class CommitInfo:
     __slots__: list[str] = [
         "sha",
+        "short_sha",
         "time",
         "msg",
         "committer_name",
@@ -94,6 +103,7 @@ class CommitInfo:
         "author_email",
     ]
     sha: str
+    short_sha: str
     time: str
     msg: str
     committer_name: str
@@ -104,6 +114,7 @@ class CommitInfo:
     def __init__(
         self,
         commit_sha: str,
+        commit_short_sha: str,
         commit_time: str,
         commit_msg: str,
         committer_name: str,
@@ -112,6 +123,7 @@ class CommitInfo:
         author_email: str,
     ) -> None:
         self.sha = commit_sha
+        self.short_sha = commit_short_sha
         self.time = commit_time
         self.msg = commit_msg
         self.committer_name = committer_name

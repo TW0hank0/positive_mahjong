@@ -70,48 +70,30 @@ def main():
         "addlicense",
         "-check",
         "-f",
-        "templates/addlicense.template",
+        util.fix_path("templates", "addlicense.template"),
     ]
     command.extend(ignored.copy())
     command.append(".")
-    work_cwd = os.getcwd()
-    project_root = os.path.relpath(os.path.dirname(os.path.dirname(__file__)))
-    # print(Fore.CYAN + "--- Run command" + Fore.RESET)
-    # print(
-    #     Back.LIGHTBLACK_EX
-    #     + " && ".join([f"cd {project_root}", " ".join(command), f"cd {work_cwd}"])
-    #     + Back.RESET
-    # )
-    # print("-" * 10)
-    (returncode, _stdout) = util.run_cmd(
-        command, cwd=os.path.dirname(os.path.dirname(__file__))
-    )
-    # process = subprocess.run(
-    #     command,
-    #     stdout=sys.stdout,
-    #     stdin=sys.stdin,
-    #     stderr=sys.stderr,
-    #     timeout=180,
-    #     cwd=os.path.dirname(os.path.dirname(__file__)),
-    # )
+    (returncode, _stdout) = util.run_cmd(command, cwd=util.fix_path())
     if returncode != 0:
         print(Style.DIM + ("-" * 10) + Style.NORMAL)
         print(f"{Fore.RED}Something Wrong!{Fore.RESET}")
         fix_command = [
             "addlicense",
             "-f",
-            os.path.join(
+            util.fix_path(
                 "templates",
                 "addlicense.template",
             ),
         ]
         fix_command.extend(ignored.copy())
         fix_command.append(".")
+        work_cwd = os.getcwd()
         print(Fore.CYAN + "--- Fix cmmand" + Fore.RESET)
         print(
             Back.LIGHTBLACK_EX
             + " && ".join(
-                [f"cd {project_root}", " ".join(fix_command), f"cd {work_cwd}"]
+                [f"cd {util.fix_path}", " ".join(fix_command), f"cd {work_cwd}"]
             )
             + Back.RESET
         )

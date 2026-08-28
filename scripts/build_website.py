@@ -56,34 +56,29 @@ def remove_dir(path: str):
 
 def build_files_dl(dir_path: str):
     dlable_files: list[str | tuple[str, str]] = [
-        os.path.join(os.path.dirname(os.path.dirname(__file__)), "LICENSE"),
-        os.path.join(os.path.dirname(os.path.dirname(__file__)), "README.md"),
-        os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
+        util.fix_path("LICENSE"),
+        util.fix_path("README.md"),
+        util.fix_path("TODO.md"),
+        util.fix_path(
             "CHANGELOG.md",
         ),
-        os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
+        util.fix_path(
             "ROADMAP.md",
         ),
-        os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
+        util.fix_path(
             "auto_generated",
             "ThirdPartyLicense-Rust.html",
         ),
-        os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
+        util.fix_path(
             "auto_generated",
             "ThirdPartyLicense-Rust.json",
         ),
-        os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
+        util.fix_path(
             "auto_generated",
             "ThirdPartyLicense-Rust.md",
         ),
         (
-            os.path.join(
-                os.path.dirname(os.path.dirname(__file__)),
+            util.fix_path(
                 "assets",
                 "Noto_Sans_TC",
                 "OFL.txt",
@@ -91,8 +86,7 @@ def build_files_dl(dir_path: str):
             "Noto_Sans_TC_OFL.txt",
         ),
         (
-            os.path.join(
-                os.path.dirname(os.path.dirname(__file__)),
+            util.fix_path(
                 "assets",
                 "material_symbols",
                 "LICENSE",
@@ -223,6 +217,7 @@ def replace_var(
         html_vars["VAR_THIRD_PARTY_LICENSE_RUST_MD_TO_HTML"] = str(mistune.html(t))
     commit_info = util.get_commit_info()
     html_vars["VAR_COMMIT_SHA"] = commit_info.sha
+    html_vars["VAR_COMMIT_SHORT_SHA"] = commit_info.short_sha
     html_vars["VAR_COMMIT_TIME"] = commit_info.time
     html_vars["VAR_COMMIT_MSG"] = commit_info.msg
     html_vars["VAR_COMMIT_COMMITTER_NAME"] = commit_info.committer_name

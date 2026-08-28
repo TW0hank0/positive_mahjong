@@ -29,10 +29,9 @@ use tungstenite::{Message, WebSocket, accept_with_config};
 
 use pmj_shared::shared;
 
-use crate::v2_better::shared::{
-        self as mode_shared, PMJCard, PMJCardFlowerType, PMJCardType,
-        PMJCardWordsType, PMJPlayer, PlayerGameActions,
-    };
+use crate::{v2_better::shared::{
+        self as mode_shared, PMJCard, PMJCardFlowerType, PMJCardType, PMJCardWordsType, PMJPlayer, PlayerGameActions,
+    }};
 
 #[derive(Debug)]
 pub struct MsgMgrThreadResult {
@@ -873,6 +872,68 @@ impl PositiveMahjong {
                 }
             }
             match current_action {
+                PlayerGameActions::Eat { with: (ref with1, ref with2), ref eat_card } => {
+                    for card in [with1.clone(), with2.clone()] {
+                        let p = self.players.get(current_turn_player_id as usize).unwrap();
+                        if !p.player_hand_cards.contains(&card) {
+                            warn!("玩家({})無此牌: {}", current_turn_player_id.clone(), card.clone());
+                            current_turn_player_id = last_turn_player_id + 1;
+                            continue 'game;
+                        } else if card.card_type != eat_card.card_type {
+                            warn!("玩家 Eat 的卡牌類型不相同！");
+                            current_turn_player_id = last_turn_player_id + 1;
+                            continue 'game;
+                        } else if card.card_type.is_flower() || card.card_type.is_words() {
+                            warn!("花字不可吃！");
+                            current_turn_player_id = last_turn_player_id + 1;
+                            continue 'game;
+                        }
+                    }
+                    let mut card_nums = Vec::new();
+                    for card in [with1.clone(), with2.clone(), eat_card.clone()] {
+                        match card.card_type {
+                            PMJCardType::Flower(_) | PMJCardType::Words(_) => {
+                                error!("?????: 上個if 就該解決");
+                                panic!("?????: 上個if 就該解決");
+                            }
+                            PMJCardType::Dots(num) | PMJCardType::Line(num) | PMJCardType::TenThousand(num) => {
+                                card_nums.push(num);
+                            }
+                        }
+                    }
+                    card_nums.sort();
+                    if !((card_nums.get(1).unwrap() == &(card_nums.get(0).unwrap() + 1)) && (card_nums.get(2).unwrap() ==&(card_nums.get(1).unwrap()+1))) {
+                        warn!("EAT：卡牌數字非連續！");
+                        current_turn_player_id = last_turn_player_id + 1;
+                        continue 'game;
+                    } else {
+                        last_action_need_throw = true;
+                        let player = self.players.get_mut(current_turn_player_id as usize).unwrap();
+                        player.player_used_cards.push((vec![with1.clone(), with2.clone(), eat_card.clone()], mode_shared::GameActions::Eat));
+                        for card in [with1.clone(), with2.clone()] {
+                            let mut cindex = 0;
+                            loop {
+                                let c = player.player_hand_cards.get(cindex).unwrap();
+                                if c == &card {
+                                    break;
+                                } else {
+                                    cindex += 1;
+                                }
+                            }
+                            player.player_hand_cards.remove(cindex);
+                        }
+                        {
+                            {let msg = serde_json::to_string(&mode_shared::ServerMessage::GameMsg(mode_shared::ServerGameMsg::HandCardChange(player.player_hand_cards.clone()))).unwrap();
+                                let _ = write_reply(msg, player.player_ws.clone());}
+                            {
+                                let msg = serde_json::to_string(&mode_shared::ServerMessage::GameMsg(mode_shared::ServerGameMsg::PlayerAction(player.player_id, PlayerGameActions::Eat { with: (with1.clone(), with2.clone()), eat_card:eat_card.clone() }))).unwrap();
+                                for p in self.players.iter() {
+                                    let _ = write_reply(msg.clone(), p.player_ws.clone());
+                                }
+                            }
+                        }
+                    }
+                }
                 PlayerGameActions::GetCard => {
                     let player = self
                         .players
@@ -951,12 +1012,12 @@ impl PositiveMahjong {
                     }
                 }
                 _ => {
-                    error!("不支援的動作！Action：{:?}", current_action);
-                    continue 'game;
+                    error!("Not impl Yet! 不支援的動作！Action：{:?}", current_action);
+                    panic!("not impl yet!");
                 }
             }
             last_turn_player_id = current_turn_player_id;
-            last_action = current_action;
+            last_action = current_action.clone();
             if current_turn_player_id >= players_count {
                 current_turn_player_id = 1;
             } else {
