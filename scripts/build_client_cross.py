@@ -67,7 +67,7 @@ def main():
                 ]
             )
         case _:
-            print(f"platform not in [Linux, Windows], is {pf_sys}, not support!")
+            print(f"platform not in [Linux, Windows], {pf_sys} not support!")
             sys.exit(1)
     for ex_preset_name, target_name, ex_dir_path in platforms:
         print("=> Installing rust target ...")
@@ -75,7 +75,7 @@ def main():
         print("target: " + target_name)
         print("end-of info ---")
         target_inst_cmd = ["rustup", "target", "add", target_name]
-        util.run_cmd(target_inst_cmd)
+        _ = util.run_cmd(target_inst_cmd)
         print("=> Compiling pmj_client_cross_lib ...")
         compile_cmd = [
             "cargo",
@@ -83,7 +83,7 @@ def main():
             "--release",
             f"--target={target_name}",
         ]
-        util.run_cmd(compile_cmd)
+        _ = util.run_cmd(compile_cmd)
         print("=> Exporting godot ...")
         print("--- info")
         print("export_name: " + ex_preset_name)
@@ -97,7 +97,7 @@ def main():
             ex_preset_name,
             ex_dir_path,
         ]
-        util.run_cmd(export_command)
+        _ = util.run_cmd(export_command)
 
 
 if __name__ == "__main__":

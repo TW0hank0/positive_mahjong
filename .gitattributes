@@ -1,4 +1,2 @@
-auto_generated/** linguist-generated
 crates/old_slint_client/** linguist-vendored
 crates/old_pmj_client/** linguist-vendored
-# docs/book/** linguist-documentation

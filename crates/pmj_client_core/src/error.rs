@@ -15,17 +15,17 @@
 
 //! pmj_client_core__error
 
-use std::{fmt, error};
+use std::{error, fmt};
 
 #[derive(Debug, Clone)]
 pub struct CCError {
-    pub kind:CCErrKinds
+    pub kind: CCErrKinds,
 }
 
 #[derive(Debug, Clone)]
 pub enum CCErrKinds {
     HandShakeError,
-    Other
+    Other,
 }
 
 impl fmt::Display for CCError {
