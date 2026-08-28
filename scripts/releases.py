@@ -15,7 +15,6 @@
 
 import datetime
 import os
-import subprocess
 import sys
 from typing import Any
 
@@ -24,128 +23,73 @@ import requests
 import typer
 
 import util
-from util import run_cmd
 
 OWNER = "TW0hank0"
 REPO = "positive_mahjong"
 app = typer.Typer()
 
 
-def get_latest_commit_message(repo_path: str = ".") -> str | None:
-    """
-    取得指定 Git 最新一次的 commit message。
-
-    Args:
-        repo_path (str): Git 倉庫的路徑，預設為當前目錄。
-
-    Returns:
-        Optional[str]: 最新的 commit message，若發生錯誤則回傳 None。
-    """
-    try:
-        # 執行 git log 指令
-        # --format=%B: 取得完整的 commit message body
-        # -n 1: 只取最新的一筆
-        result = subprocess.run(
-            ["git", "log", "-n", "1", "--format=%B"],
-            cwd=repo_path,
-            capture_output=True,
-            text=True,
-            check=True,
-            timeout=30,
-        )
-
-        if result.stdout == "":
-            return None
-        else:
-            return result.stdout
-
-    except FileNotFoundError:
-        print(
-            "錯誤：找不到 git 執行檔，請確認已安裝 Git 並加入環境變數。",
-            file=sys.stderr,
-        )
-        return None
-    except subprocess.CalledProcessError as e:
-        print(f"錯誤：Git 指令執行失敗。返回碼: {e.returncode}", file=sys.stderr)
-        print(f"stderr: {e.stderr}", file=sys.stderr)
-        return None
-    except subprocess.TimeoutExpired:
-        print("錯誤：Git 指令執行超時。", file=sys.stderr)
-        return None
-
-
 @app.command()
 def main():
-    msg: str | None = get_latest_commit_message()
-    commit_sha = (
-        subprocess.run(
-            ["git", "rev-parse", "HEAD"], stdout=subprocess.PIPE, timeout=10, check=True
+    commit_info = util.get_commit_info()
+    files = list_files(util.fix_path("artifacts"))
+    if "release pmj:" in commit_info.msg.lower():
+        print("Release PMJ:")
+        version = util.get_version()
+        tag = f"v{version}"
+        title = f"{REPO} v{version}"
+        date = datetime.datetime.now().date()
+        notes = f"v{version} released at {date.year}/{date.month}/{date.day} by `scripts/releases.py`"
+        create_release_gh(
+            tag, title, notes, is_prerelease=False, owner=OWNER, repo=REPO
         )
-        .stdout.decode()
-        .replace("\n", "")
-    )
-    if msg is None:
-        raise RuntimeError("msg=None")
-    else:
-        files = list_files("artifacts")
-        if "release pmj:" in msg.lower():
-            print("Release PMJ:")
-
-            version = util.get_version()
-            tag = f"v{version}"
-            title = f"{REPO} v{version}"
-            date = datetime.datetime.now().date()
-            notes = f"v{version} released at {date.year}/{date.month}/{date.day} by `scripts/releases.py`"
-            create_release_gh(
-                tag, title, notes, is_prerelease=False, owner=OWNER, repo=REPO
-            )
-            upload_file_gh(files=files, tag=tag, owner=OWNER, repo=REPO)
-            gl_token = os.environ.get("GITLAB_PAT_TOKEN")
-            if gl_token is None:
-                print("No gitlab token!", file=sys.stderr)
-                sys.exit(1)
-            else:
-                _ = release_gitlab(
-                    gitlab_pat=gl_token,
-                    project_id=f"{OWNER}/{REPO}",
-                    tag_name=tag,
-                    release_name=title,
-                    description=notes,
-                    file_paths=files,
-                )
-            cb_token = os.environ.get("CODEBERG_PAT_TOKEN")
-            if cb_token is None:
-                print("No codeberg token!", file=sys.stderr)
-                sys.exit(1)
-            else:
-                _ = codeberg_release(
-                    token=cb_token,
-                    owner=OWNER,
-                    repo=REPO,
-                    release_tag=tag,
-                    release_notes=notes,
-                    release_title=title,
-                    release_files=files,
-                )
+        upload_file_gh(files=files, tag=tag, owner=OWNER, repo=REPO)
+        gl_token = os.environ.get("GITLAB_PAT_TOKEN")
+        if gl_token is None:
+            print("No gitlab token!", file=sys.stderr)
+            sys.exit(1)
         else:
-            print("PreRelease:", end="")
-            version = util.get_version()
-            date = datetime.datetime.now().date()
-            time = datetime.datetime.now().time()
-            tag = f"ci-v{version}+{date.month}_{date.day}-{commit_sha}"
-            title = f"PreRelease v{version}+{date.month}/{date.day}+{time.hour}:{time.minute}"
-            notes = f"""這是使用 Github Action 制作的測試版
+            _ = release_gitlab(
+                gitlab_pat=gl_token,
+                project_id=f"{OWNER}/{REPO}",
+                tag_name=tag,
+                release_name=title,
+                description=notes,
+                file_paths=files,
+            )
+        cb_token = os.environ.get("CODEBERG_PAT_TOKEN")
+        if cb_token is None:
+            print("No codeberg token!", file=sys.stderr)
+            sys.exit(1)
+        else:
+            _ = codeberg_release(
+                token=cb_token,
+                owner=OWNER,
+                repo=REPO,
+                release_tag=tag,
+                release_notes=notes,
+                release_title=title,
+                release_files=files,
+            )
+    else:
+        print("PreRelease:", end="")
+        version = util.get_version()
+        date = datetime.datetime.now().date()
+        time = datetime.datetime.now().time()
+        tag = f"ci-v{version}+{date.month}_{date.day}-{commit_info.sha}"
+        title = (
+            f"PreRelease v{version}+{date.month}/{date.day}+{time.hour}:{time.minute}"
+        )
+        notes = f"""這是使用 Github Action 制作的測試版
 #### 版本
 {version}
 #### 時間
 {date.year}/{date.month}/{date.day} {time.hour}:{time.minute}:{time.second}
-#### 提交訊息（{commit_sha}）
-{msg}
+#### 提交訊息（{commit_info.sha}）
+{commit_info.msg}
 """
-            create_release_gh(
-                tag, title, notes, is_prerelease=True, owner=OWNER, repo=REPO
-            )
-            upload_file_gh(files=files, tag=tag, owner=OWNER, repo=REPO)
+        create_release_gh(tag, title, notes, is_prerelease=True, owner=OWNER, repo=REPO)
+        upload_file_gh(files=files, tag=tag, owner=OWNER, repo=REPO)
 
 
 def list_files(path: str) -> list[str]:
@@ -177,7 +121,7 @@ def create_release_gh(
     ]
     if is_prerelease is True:
         command.append("--prerelease")
-    run_cmd(command)
+    _ = util.run_cmd(command)
 
 
 def upload_file_gh(files: list[str], tag: str, owner: str, repo: str):
@@ -191,7 +135,7 @@ def upload_file_gh(files: list[str], tag: str, owner: str, repo: str):
             file,
             f"--repo={owner}/{repo}",
         ]
-        _ = run_cmd(command)
+        _ = util.run_cmd(command)
 
 
 def codeberg_release(
