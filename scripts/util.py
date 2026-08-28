@@ -25,7 +25,7 @@ import tomllib
 from typing import Literal
 from zoneinfo import ZoneInfo
 
-from colorama import Back, Fore, Style
+from colorama import Back, Fore
 
 
 def run_cmd(command: list[str], cwd: str | None = None) -> tuple[int, str]:
@@ -47,16 +47,23 @@ def run_cmd(command: list[str], cwd: str | None = None) -> tuple[int, str]:
         )
     else:
         print(
-            f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.RED}Process exited with non-zero code{Fore.RESET} {Style.DIM}({process.returncode}){Style.NORMAL}! {Fore.LIGHTBLACK_EX}({int(end_time - start_time)} secs){Fore.RESET}"
+            f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.RED}Process exited with non-zero code{Fore.RESET} {Fore.LIGHTBLACK_EX}({process.returncode}){Fore.RESET}! {Fore.LIGHTBLACK_EX}({int(end_time - start_time)} secs){Fore.RESET}"
         )
         for name, data in [
             ("stdout", process.stdout.decode()),
             ("stderr", process.stderr.decode()),
         ]:
-            print(f"{Style.DIM}---{Style.NORMAL} {name}")
-            for line in data.split("\n"):
-                print(f" {Fore.LIGHTBLACK_EX}|{Fore.RESET} {line}")
-            print(f"{Fore.LIGHTBLACK_EX}---{Fore.RESET} end-of {name}")
+            if (data == "\n") or (data.strip() == ""):
+                print(f"{name} does not have any content.")
+            else:
+                print(f"{Fore.LIGHTBLACK_EX}---{Fore.RESET} {name}")
+                line_num = 1
+                for line in data.split("\n"):
+                    print(
+                        f"{Fore.LIGHTBLACK_EX}{str(line_num).rjust(3)}|{Fore.RESET} {line}"
+                    )
+                    line_num += 1
+                print(f"{Fore.LIGHTBLACK_EX}--- end-of {name}{Fore.RESET}")
         sys.exit(1)
     return (process.returncode, process.stdout.decode().rstrip("\n"))
 
@@ -166,6 +173,19 @@ def get_version(
 def get_datetime():
     tz = ZoneInfo("Asia/Taipei")
     return datetime.datetime.now(tz).strftime("%Y-%m-%d_%H-%M-%S")
+
+
+def list_files(path: str) -> list[str]:
+    files: list[str] = []
+    for file in os.listdir(path):
+        file_path = os.path.join(path, file)
+        if os.path.isfile(file_path) is True:
+            files.append(file_path)
+        elif os.path.isdir(file_path) is True:
+            files.extend(list_files(file_path))
+        else:
+            print(f"???? not file not dir: {file_path}")
+    return files
 
 
 if __name__ == "__main__":

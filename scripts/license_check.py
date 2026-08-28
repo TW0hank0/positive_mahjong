@@ -93,7 +93,7 @@ def main():
         print(
             Back.LIGHTBLACK_EX
             + " && ".join(
-                [f"cd {util.fix_path}", " ".join(fix_command), f"cd {work_cwd}"]
+                [f"cd {util.fix_path()}", " ".join(fix_command), f"cd {work_cwd}"]
             )
             + Back.RESET
         )

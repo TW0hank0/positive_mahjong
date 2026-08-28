@@ -13,6 +13,8 @@
 # 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
+# this workflow was changed to commit-ci.yaml
+
 name: pages-deploy
 
 on:
@@ -37,14 +39,22 @@ jobs:
         uses: ./.github/workflows/instdep/
 
       - name: Build license
-        run: uv run scripts/build_license.py
+        run: |
+          cd scripts
+          uv run build_license.py
+          cd ..
 
       - name: Copy webiste dep
-        run: uv run scripts/copy_website_dep.py
+        run: |
+          cd scripts
+          uv run copy_website_dep.py
+          cd ..
 
       - name: Build doc and website
         run: |
-          uv run scripts/build_website.py
+          cd scripts
+          uv run build_website.py
+          cd ..
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5.0.0

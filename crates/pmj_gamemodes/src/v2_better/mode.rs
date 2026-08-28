@@ -29,9 +29,10 @@ use tungstenite::{Message, WebSocket, accept_with_config};
 
 use pmj_shared::shared;
 
-use crate::{v2_better::shared::{
-        self as mode_shared, PMJCard, PMJCardFlowerType, PMJCardType, PMJCardWordsType, PMJPlayer, PlayerGameActions,
-    }};
+use crate::v2_better::shared::{
+    self as mode_shared, PMJCard, PMJCardFlowerType, PMJCardType, PMJCardWordsType, PMJPlayer,
+    PlayerGameActions,
+};
 
 #[derive(Debug)]
 pub struct MsgMgrThreadResult {
@@ -118,8 +119,7 @@ impl MessageMgr {
     fn task_new(&mut self, task: MsgMgrTaskmsg) -> u64 {
         let (r_send, r_resv) = crossbeam::channel::bounded(2);
         self.last_task_id += 1;
-        self.tasks
-            .push((self.last_task_id, task.clone(), r_resv));
+        self.tasks.push((self.last_task_id, task.clone(), r_resv));
         let sender = self.task_sender.clone();
         sender.send((task, r_send)).ok();
         drop(sender);
@@ -802,13 +802,21 @@ impl PositiveMahjong {
                                                             warn!("客戶端錯誤訊息");
                                                         }
                                                     }
-                                                    PlayerGameActions::Triplet { with:_, triplet_card:_ } => {
+                                                    PlayerGameActions::Triplet {
+                                                        with: _,
+                                                        triplet_card: _,
+                                                    } => {
                                                         current_action = pga;
                                                         current_turn_player_id = *player_id;
                                                         break 'wait_action;
                                                     }
-                                                    PlayerGameActions::Eat { with:_, eat_card:_ } => {
-                                                        if player_id == &current_turn_player_id && threw_card.is_some() {
+                                                    PlayerGameActions::Eat {
+                                                        with: _,
+                                                        eat_card: _,
+                                                    } => {
+                                                        if player_id == &current_turn_player_id
+                                                            && threw_card.is_some()
+                                                        {
                                                             current_action = pga;
                                                             break 'wait_action;
                                                         } else {
@@ -831,20 +839,33 @@ impl PositiveMahjong {
                                                         error!("??????：應在上個if處理");
                                                         panic!("這很奇怪");
                                                     }
-                                                    PlayerGameActions::ExposedKong { with:_, kong_card:_ }=> {
-                                                        if &last_turn_player_id == player_id && last_action.is_throw_card() {
+                                                    PlayerGameActions::ExposedKong {
+                                                        with: _,
+                                                        kong_card: _,
+                                                    } => {
+                                                        if &last_turn_player_id == player_id
+                                                            && last_action.is_throw_card()
+                                                        {
                                                             warn!("不允許的行為！");
                                                         } else {
-                                                        current_turn_player_id = *player_id;
-                                                        current_action = pga;
-                                                        break 'wait_action;}
-                                                    }
-                                                    PlayerGameActions::ConcealedKong { with:_, kong_card:_ } => {
-                                                        if &last_turn_player_id == player_id && last_action.is_get_card() {
                                                             current_turn_player_id = *player_id;
                                                             current_action = pga;
                                                             break 'wait_action;
-                                                        } else { warn!("不允許的行為！");}
+                                                        }
+                                                    }
+                                                    PlayerGameActions::ConcealedKong {
+                                                        with: _,
+                                                        kong_card: _,
+                                                    } => {
+                                                        if &last_turn_player_id == player_id
+                                                            && last_action.is_get_card()
+                                                        {
+                                                            current_turn_player_id = *player_id;
+                                                            current_action = pga;
+                                                            break 'wait_action;
+                                                        } else {
+                                                            warn!("不允許的行為！");
+                                                        }
                                                     }
                                                 }
                                             }
@@ -872,11 +893,18 @@ impl PositiveMahjong {
                 }
             }
             match current_action {
-                PlayerGameActions::Eat { with: (ref with1, ref with2), ref eat_card } => {
+                PlayerGameActions::Eat {
+                    with: (ref with1, ref with2),
+                    ref eat_card,
+                } => {
                     for card in [with1.clone(), with2.clone()] {
                         let p = self.players.get(current_turn_player_id as usize).unwrap();
                         if !p.player_hand_cards.contains(&card) {
-                            warn!("玩家({})無此牌: {}", current_turn_player_id.clone(), card.clone());
+                            warn!(
+                                "玩家({})無此牌: {}",
+                                current_turn_player_id.clone(),
+                                card.clone()
+                            );
                             current_turn_player_id = last_turn_player_id + 1;
                             continue 'game;
                         } else if card.card_type != eat_card.card_type {
@@ -896,20 +924,30 @@ impl PositiveMahjong {
                                 error!("?????: 上個if 就該解決");
                                 panic!("?????: 上個if 就該解決");
                             }
-                            PMJCardType::Dots(num) | PMJCardType::Line(num) | PMJCardType::TenThousand(num) => {
+                            PMJCardType::Dots(num)
+                            | PMJCardType::Line(num)
+                            | PMJCardType::TenThousand(num) => {
                                 card_nums.push(num);
                             }
                         }
                     }
                     card_nums.sort();
-                    if !((card_nums.get(1).unwrap() == &(card_nums.get(0).unwrap() + 1)) && (card_nums.get(2).unwrap() ==&(card_nums.get(1).unwrap()+1))) {
+                    if !((card_nums.get(1).unwrap() == &(card_nums.get(0).unwrap() + 1))
+                        && (card_nums.get(2).unwrap() == &(card_nums.get(1).unwrap() + 1)))
+                    {
                         warn!("EAT：卡牌數字非連續！");
                         current_turn_player_id = last_turn_player_id + 1;
                         continue 'game;
                     } else {
                         last_action_need_throw = true;
-                        let player = self.players.get_mut(current_turn_player_id as usize).unwrap();
-                        player.player_used_cards.push((vec![with1.clone(), with2.clone(), eat_card.clone()], mode_shared::GameActions::Eat));
+                        let player = self
+                            .players
+                            .get_mut(current_turn_player_id as usize)
+                            .unwrap();
+                        player.player_used_cards.push((
+                            vec![with1.clone(), with2.clone(), eat_card.clone()],
+                            mode_shared::GameActions::Eat,
+                        ));
                         for card in [with1.clone(), with2.clone()] {
                             let mut cindex = 0;
                             loop {
@@ -923,10 +961,28 @@ impl PositiveMahjong {
                             player.player_hand_cards.remove(cindex);
                         }
                         {
-                            {let msg = serde_json::to_string(&mode_shared::ServerMessage::GameMsg(mode_shared::ServerGameMsg::HandCardChange(player.player_hand_cards.clone()))).unwrap();
-                                let _ = write_reply(msg, player.player_ws.clone());}
                             {
-                                let msg = serde_json::to_string(&mode_shared::ServerMessage::GameMsg(mode_shared::ServerGameMsg::PlayerAction(player.player_id, PlayerGameActions::Eat { with: (with1.clone(), with2.clone()), eat_card:eat_card.clone() }))).unwrap();
+                                let msg =
+                                    serde_json::to_string(&mode_shared::ServerMessage::GameMsg(
+                                        mode_shared::ServerGameMsg::HandCardChange(
+                                            player.player_hand_cards.clone(),
+                                        ),
+                                    ))
+                                    .unwrap();
+                                let _ = write_reply(msg, player.player_ws.clone());
+                            }
+                            {
+                                let msg =
+                                    serde_json::to_string(&mode_shared::ServerMessage::GameMsg(
+                                        mode_shared::ServerGameMsg::PlayerAction(
+                                            player.player_id,
+                                            PlayerGameActions::Eat {
+                                                with: (with1.clone(), with2.clone()),
+                                                eat_card: eat_card.clone(),
+                                            },
+                                        ),
+                                    ))
+                                    .unwrap();
                                 for p in self.players.iter() {
                                     let _ = write_reply(msg.clone(), p.player_ws.clone());
                                 }
@@ -975,15 +1031,14 @@ impl PositiveMahjong {
                     if player.player_hand_cards.contains(&want_throw_card) {
                         let mut card_index: usize = 0;
                         'find_index: loop {
-                            if &want_throw_card
-                                == player.player_hand_cards.get(card_index).unwrap()
+                            if &want_throw_card == player.player_hand_cards.get(card_index).unwrap()
                             {
                                 break 'find_index;
                             } else {
                                 card_index += 1;
                             }
                         }
-                         threw_card=Some(player.player_hand_cards.remove(card_index));
+                        threw_card = Some(player.player_hand_cards.remove(card_index));
                         let client_msg =
                             serde_json::to_string(&mode_shared::ServerMessage::GameMsg(
                                 mode_shared::ServerGameMsg::HandCardChange(

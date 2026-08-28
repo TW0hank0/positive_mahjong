@@ -13,7 +13,7 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-use std::{self, net::TcpStream, sync};
+use std::{self, net::TcpStream};
 
 use iced::{
     self, Border, Color, Element, Length, Pixels, alignment, task,
@@ -22,7 +22,7 @@ use iced::{
         text_input,
     },
 };
-use tracing::error;
+use tracing::{error, warn};
 use tungstenite::WebSocket;
 
 use crate::{circular, easing};
@@ -31,67 +31,46 @@ use pmj_shared::shared::{
     self, FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES, FONT_NOTO_SANS_REG_BYTES, PROJECT_NAME,
 };
 
-/// 自定義型別別名，避開 MaybeTlsStream
-type WsConn = WebSocket<TcpStream>;
-
 pub const FONT_NOTO_SANS_REG: iced::font::Font = iced::font::Font::with_name("Noto Sans TC");
 pub const MATERIAL_SYMBOLS_OUTLINED: iced::font::Font =
     iced::font::Font::with_name("Material Symbols Outlined");
 
 #[derive(Debug)]
 pub struct Client {
-    current_scene: ClientScenes,
-    status_home: HomeStatus,
-    status_play_v2_better: PlayV2BetterStatus,
-    ws: Option<sync::Arc<sync::RwLock<WsConn>>>,
-    player_id: Option<u8>,
+    server_url: String,
+    scene: ClientScenes,
     theme: iced::theme::Theme,
-    ccore: Option<pmj_client_core::ccore::ClientCore>,
+}
+
+#[derive(Debug)]
+pub enum ClientScenes {
+    Home(HomeState),
+    Play(PlayState),
 }
 
 #[derive(Debug, PartialEq, Eq)]
-pub enum ClientScenes {
-    Home,
-    PlayV2Better,
-}
-
-#[derive(Debug)]
-pub struct HomeStatus {
-    server_ip: String,
+pub struct HomeState {
     try_connecting_server: bool,
     msgs: Vec<String>,
     connect_msg: Option<String>,
-    read_first_msg_resp: OnceState,
 }
 
 #[derive(Debug)]
-pub struct PlayV2BetterStatus {
-    server_ip: Option<String>,
-    is_start: Option<bool>,
+pub struct PlayState {
+    is_start: bool,
+    player_id: u8,
     hand_cards: Vec<pmj_gamemodes::v2_better::shared::PMJCard>,
     game_msgs: Vec<String>,
-    game_controller: PlayV2BetterController,
+    game_controller: pmj_client_core::ccore::PlayerCtrl,
     current_turn: Option<u8>,
-}
-
-#[derive(Debug)]
-pub enum OnceState {
-    NotYet,
-    Running,
-    Finish,
-    WaitReRun,
-}
-
-#[derive(Debug)]
-pub enum PlayV2BetterController {
-    NoCtrl,
-    ThrowCard,
+    ccore:pmj_client_core::ccore::ClientCore,
+    gm_state: pmj_client_core::ccore::GMState,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum UIMessage {
     Home(HomeMessage),
-    PlayV2Better(PlayV2BetterMsg),
+    Play(PlayMsg),
     CCoreProcessTask,
 }
 
@@ -103,7 +82,7 @@ pub enum HomeMessage {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum PlayV2BetterMsg {
+pub enum PlayMsg {
     ThrowCard(pmj_gamemodes::v2_better::shared::PMJCard),
 }
 
@@ -116,106 +95,126 @@ impl Client {
     pub fn new() -> Self {
         let _ = iced::font::load(FONT_NOTO_SANS_REG_BYTES);
         let _ = iced::font::load(FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES);
-        Self {
-            ccore:None,
-            current_scene: ClientScenes::Home,
-            status_home: HomeStatus {
-                server_ip: String::new(),
-                try_connecting_server: false,
-                msgs: Vec::new(),
-                connect_msg: None,
-                read_first_msg_resp: OnceState::NotYet,
-            },
-            status_play_v2_better: PlayV2BetterStatus {
-                server_ip: None,
-                is_start: None,
-                hand_cards: Vec::new(),
-                game_controller: PlayV2BetterController::NoCtrl,
-                game_msgs: Vec::new(),
-                current_turn: None,
-            },
-            ws: None,
-            player_id: None,
-            theme: iced::theme::Theme::TokyoNight,
-        }
+        Self { server_url: String::new(), scene: ClientScenes::Home(HomeState { try_connecting_server: false, msgs: Vec::new(), connect_msg: None }), theme: iced::theme::Theme::TokyoNight }
     }
     pub fn update(&mut self, message: UIMessage) -> task::Task<UIMessage> {
         match message {
-        UIMessage::CCoreProcessTask => {
-            match self.ccore {
-                None => {task::Task::none()}
-                Some(ref mut ccore) => {
-                    ccore.process_task();
-                    task::Task::done(UIMessage::CCoreProcessTask)
+            UIMessage::CCoreProcessTask =>  {
+                match self.scene {
+                    ClientScenes::Home(ref _home_state) => {
+                        warn!("update: warn scene");
+                    }
+                    ClientScenes::Play(ref mut play_state) => {
+                        play_state.ccore.process_task();
+                        play_state.game_controller=play_state.ccore.current_ctrl();
+                        play_state.gm_state = play_state.ccore.game_state();
+                        match play_state.gm_state {
+                            pmj_client_core::ccore::GMState::HomePage => {
+                                warn!("update: warn GMState");
+                            }
+                            pmj_client_core::ccore::GMState::V2Better(ref gms_v2) => {
+                                play_state.current_turn = gms_v2.player_turn;
+                                play_state.player_id = gms_v2.player_id;
+                            }
+                        }
+                        return iced::Task::done(UIMessage::CCoreProcessTask);
+                    }
                 }
-            }
-        }
+            },
             UIMessage::Home(home_message) => match home_message {
                 HomeMessage::InputServerIpChanged(server_ip) => {
-                    if self.status_home.try_connecting_server {
-                        self.status_home
-                            .msgs
-                            .push(String::from("已有正在嘗試連接的伺服器！"));
-                    } else {
-                        self.status_home.server_ip = server_ip;
-                    }
-                    task::Task::none()
-                }
-                HomeMessage::VSoftKeyBoardInput(key) => {
-                    if self.status_home.try_connecting_server {
-                        self.status_home
-                            .msgs
-                            .push(String::from("已有正在嘗試連接的伺服器！"));
-                    } else {
-                        if key == "backspace" || key == "\u{e14a}" {
-                            self.status_home.server_ip.pop();
-                        } else {
-                            self.status_home.server_ip.push_str(&key);
+                    match self.scene {
+                        ClientScenes::Home(ref mut home_state) => {
+                            if home_state.try_connecting_server {
+                                home_state.msgs.push(String::from("已有正在嘗試連接的伺服器！"));
+                            } else {
+                                self.server_url = server_ip;
+                            }
+                        }
+                        ClientScenes::Play(ref _play_state) => {
+                            warn!("update: warn scene");
                         }
                     }
-                    task::Task::none()
+                }
+                HomeMessage::VSoftKeyBoardInput(key) => {
+                    match self.scene {
+                        ClientScenes::Home(ref mut home_state) => {
+                            if home_state.try_connecting_server {
+                                let msg = String::from("已有正在嘗試連接的伺服器！");
+                                home_state.msgs.push(msg.clone());
+                                warn!("update: {}", msg);
+                            } else {
+                                if key == "backspace" || key == "\u{e14a}" {
+                                    self.server_url.pop();
+                                } else {
+                                    self.server_url.push_str(&key);
+                                }
+                            }
+                        }
+                        ClientScenes::Play(ref _play_state) => {
+                            warn!("update: warn scene");
+                        }
+                    }
                 }
                 HomeMessage::ConnectServer => {
-                    if self.status_home.server_ip.is_empty() {
-                        self.status_home
-                            .msgs
-                            .push(String::from("未輸入伺服器地址！"));
-                        task::Task::none()
-                    } else if self.status_home.try_connecting_server {
-                        self.status_home
-                            .msgs
-                            .push(String::from("已有正在嘗試連接的伺服器！"));
-                        task::Task::none()
-                    } else {
-                        self.status_home.try_connecting_server = true;
-                        match pmj_client_core::ccore::ClientCore::connect(self.status_home.server_ip.clone()) {
-                            Ok(ccore) => {
-                                self.ccore = Some(ccore);
-                                task::Task::done(UIMessage::CCoreProcessTask)
+                    match self.scene {
+                        ClientScenes::Home(ref mut home_state) => {
+                            if self.server_url.is_empty() {
+                                let msg = String::from("未輸入伺服器地址！");
+                                home_state.msgs.push(msg.clone());
+                                warn!("update: {}", msg);
+                            } else if home_state.try_connecting_server {
+                                let msg = String::from("已有正在嘗試連接的伺服器！");
+                                home_state.msgs.push(msg.clone());
+                                warn!("update: {}", msg);
+                            } else {
+                                    home_state.try_connecting_server = true;
+                                    match pmj_client_core::ccore::ClientCore::connect(
+                                        self.server_url.clone(),
+                                    ) {
+                                        Ok(ccore) => {
+                                            let gm_state = ccore.game_state();
+                                            loop{match gm_state.clone() {
+                                                pmj_client_core::ccore::GMState::HomePage => {
+                                                    warn!("update: warn GMState");
+                                                    std::thread::sleep(std::time::Duration::from_millis(500));
+                                                }
+                                                pmj_client_core::ccore::GMState::V2Better(gms_v2) => {
+                                                    self.scene = ClientScenes::Play(PlayState { is_start: false, hand_cards: Vec::new()
+                                                        , game_msgs: Vec::new(), game_controller: pmj_client_core::ccore::PlayerCtrl::NoCtrl, current_turn: None, ccore, gm_state, player_id:gms_v2.player_id });
+                                                    break;
+                                                }
+                                            }}
+                                            return task::Task::done(UIMessage::CCoreProcessTask);
+                                        }
+                                        Err(e) => {
+                                            error!("update: {}", e);
+                                            home_state.msgs.push(format!("update: {}", e));
+                                        }
+                                    }
+
                             }
-                            Err(e) => {
-                                error!("update: {}", e);
-                                self.status_home.msgs.push(format!("update: {}", e));
-                                task::Task::none()
-                            }
+                        }
+                        ClientScenes::Play(ref _play_state) => {
+                            warn!("update: warn scene");
                         }
                     }
                 }
             },
-            UIMessage::PlayV2Better(play_base_message) => match play_base_message {
-                PlayV2BetterMsg::ThrowCard(card) => {
-                    match self.ccore {
-                        Some(ref mut ccore) => {
-                            ccore.throw_card(card);
+            UIMessage::Play(play_base_message) => match play_base_message {
+                PlayMsg::ThrowCard(card) => {
+                    match self.scene {
+                        ClientScenes::Home(ref _home_state) => {
+                            warn!("update: warn scene");
                         }
-                        None => {
-                            error!("update: self.ccore => None");
+                        ClientScenes::Play(ref mut play_state) => {
+                            play_state.ccore.throw_card(card);
                         }
                     }
-                    iced::task::Task::none()
                 }
             },
         }
+        iced::task::Task::none()
     }
 
     pub fn view(&self) -> Element<'_, UIMessage, iced::Theme, iced::Renderer> {
@@ -223,8 +222,8 @@ impl Client {
             .align_x(alignment::Horizontal::Left)
             .padding(10);
         //
-        match self.current_scene {
-            ClientScenes::Home => {
+        match self.scene {
+            ClientScenes::Home(ref home_state) => {
                 let mut layout_home = Column::new();
                 // 標題欄
                 {
@@ -248,7 +247,7 @@ impl Client {
                     let mut server_ip_input_bar = Row::new();
                     server_ip_input_bar = server_ip_input_bar
                         .push(
-                            text_input("輸入伺服器地址...", &self.status_home.server_ip)
+                            text_input("輸入伺服器地址...", &self.server_url)
                                 .on_input(|content| {
                                     UIMessage::Home(HomeMessage::InputServerIpChanged(content))
                                 })
@@ -298,7 +297,7 @@ impl Client {
                     let mut msg_area = Column::new();
                     msg_area = msg_area.spacing(5);
                     let mut msg_number: u64 = 1;
-                    for msg in self.status_home.msgs.iter() {
+                    for msg in home_state.msgs.iter() {
                         let ex_palette = self.theme.extended_palette();
                         let mut msg_row = Row::new();
                         msg_row = msg_row.spacing(3);
@@ -333,7 +332,7 @@ impl Client {
                 }
                 layout_home = layout_home.push(space().height(5));
                 //
-                if self.status_home.try_connecting_server {
+                if home_state.try_connecting_server {
                     let mut content_column = Column::new().padding(5).spacing(2);
                     content_column = content_column.push(
                         circular::Circular::new()
@@ -355,10 +354,10 @@ impl Client {
                         .spacing(2);
                     content_column = content_column.push(
                         text(
-                            self.status_home
+                            home_state
                                 .connect_msg
                                 .clone()
-                                .unwrap_or(String::from("none")),
+                                .unwrap_or(String::from("None")),
                         )
                         .style(|_t: &iced::Theme| text::Style {
                             color: Some(iced::Color::from_rgb8(56, 56, 56)),
@@ -404,30 +403,35 @@ impl Client {
                     layout = layout.push(scrollable(layout_home));
                 }
             }
-            ClientScenes::PlayV2Better => {
-                let mut layout_play_base = Column::new();
+            ClientScenes::Play(ref play_state) => {
+                let mut layout_play = Column::new();
                 {
                     let mut info_bar = Row::new().padding(iced::Padding::new(8.0));
                     info_bar = info_bar.push(text(format!(
                         "伺服器地址：{}",
-                        self.status_play_v2_better.server_ip.clone().unwrap(),
+                        self.server_url.clone(),
                     )));
                     info_bar = info_bar.push(space().width(Length::from(14)));
                     info_bar =
-                        info_bar.push(text(format!("玩家識別碼：{}", self.player_id.unwrap())));
-                    if self.status_play_v2_better.is_start.unwrap_or(false) {
+                        info_bar.push(text(format!("玩家識別碼：{}", (match play_state.gm_state.clone() {
+                            pmj_client_core::ccore::GMState::HomePage => { warn!("資料錯誤");"資料錯誤".to_string() }
+                            pmj_client_core::ccore::GMState::V2Better(gms_v2) => { gms_v2.player_id.to_string()}
+                        }))));
+                    if play_state.is_start {
                         info_bar = info_bar.push(space().width(10)).push(text(format!(
                             "目前回合：{}",
-                            if self.status_play_v2_better.current_turn.is_some() {
-                                format!("{}", self.status_play_v2_better.current_turn.unwrap())
-                            } else {
-                                format!("{:?}", self.status_play_v2_better.current_turn)
+                            match play_state.current_turn {
+                                Some(turn) => {turn.to_string()}
+                                None => {
+                                    warn!("view: play_state.current_turn => None");
+                                    String::from("None")
+                                }
                             }
                         )));
                     }
-                    layout_play_base = layout_play_base.push(info_bar)
+                    layout_play = layout_play.push(info_bar)
                 }
-                if !self.status_play_v2_better.is_start.unwrap() {
+                if !play_state.is_start {
                     let mut status_bar = Column::new();
                     status_bar = status_bar.push(
                         text("等待遊戲開始")
@@ -437,13 +441,13 @@ impl Client {
                             .height(Length::Fill)
                             .width(Length::Fill),
                     );
-                    layout_play_base = layout_play_base.push(status_bar);
+                    layout_play = layout_play.push(status_bar);
                 } else {
                     {
                         let mut ctr_bar = Row::new().height(Length::FillPortion(2));
                         let mut msg_bar = Column::new().width(Length::FillPortion(3));
                         let mut msg_num: u16 = 1;
-                        for msg in self.status_play_v2_better.game_msgs.iter() {
+                        for msg in play_state.game_msgs.iter() {
                             msg_bar = msg_bar
                                 .push(
                                     container(
@@ -479,53 +483,64 @@ impl Client {
                         }
                         ctr_bar = ctr_bar.push(scrollable(msg_bar));
                         let mut card_bar = Column::new().width(Length::FillPortion(2));
-                        for card in self.status_play_v2_better.hand_cards.iter() {
-                            card_bar = card_bar
-                                .push(space().height(5))
-                                .push(container(Row::new().padding(10).width(Length::Fill).height(40)
-                                    .push(
-                                        text( card.to_string()).size(24),
-                                    )
-                                    .push(
-                                        text(format!("第 {} 張", card.card_id.clone())).width(Length::Fill).size(15).align_x(alignment::Horizontal::Right)
-                                    )).style(|t:&iced::Theme| {
-                                        let p = t.extended_palette();
-                                        let mut style = container::Style::default();
-                                        style.border.radius = iced::border::Radius::new(10);
-                                        style.border.width = 1.2;
-                                        style.border.color = p.background.weak.color;
-                                        style.text_color = Some(p.background.base.text);
-                                        style.background = Some(iced::Background::Color(iced::Color::TRANSPARENT));
-                                        style
-                                    }));
+                        for card in play_state.hand_cards.iter() {
+                            card_bar = card_bar.push(space().height(5)).push(
+                                container(
+                                    Row::new()
+                                        .padding(10)
+                                        .width(Length::Fill)
+                                        .height(40)
+                                        .push(text(card.to_string()).size(24))
+                                        .push(
+                                            text(format!("第 {} 張", card.card_id.clone()))
+                                                .width(Length::Fill)
+                                                .size(15)
+                                                .align_x(alignment::Horizontal::Right),
+                                        ),
+                                )
+                                .style(|t: &iced::Theme| {
+                                    let p = t.extended_palette();
+                                    let mut style = container::Style::default();
+                                    style.border.radius = iced::border::Radius::new(10);
+                                    style.border.width = 1.2;
+                                    style.border.color = p.background.weak.color;
+                                    style.text_color = Some(p.background.base.text);
+                                    style.background =
+                                        Some(iced::Background::Color(iced::Color::TRANSPARENT));
+                                    style
+                                }),
+                            );
                         }
                         ctr_bar = ctr_bar.push(scrollable(card_bar));
-                        layout_play_base = layout_play_base.push(ctr_bar);
+                        layout_play = layout_play.push(ctr_bar);
                     }
                     // 玩家操作
                     {
                         let mut controller_bar = Column::new();
-                        match self.status_play_v2_better.game_controller {
-                            PlayV2BetterController::NoCtrl => {}
-                            PlayV2BetterController::ThrowCard => {
+                        match play_state.game_controller {
+                            pmj_client_core::ccore::PlayerCtrl::NoCtrl => {}
+                            pmj_client_core::ccore::PlayerCtrl::ThrowCard => {
                                 controller_bar = controller_bar.push(text("選擇一張你要丟的牌"));
                                 let mut card_bar_elements: Vec<iced::Element<'_, UIMessage>> =
                                     Vec::new();
-                                for card in self.status_play_v2_better.hand_cards.iter() {
+                                for card in play_state.hand_cards.iter() {
                                     card_bar_elements.push(
                                         button(
-                                            Column::new().width(120)
-                                            .height(160)
+                                            Column::new()
+                                                .width(120)
+                                                .height(160)
+                                                .push(text(card.to_string()).size(18))
                                                 .push(
-                                                    text(card.to_string()).size(18)
-                                                )
-                                                .push(
-                                                    text(format!("第 {} 張", card.card_id.clone())).height(Length::Fill).align_y(alignment::Vertical::Bottom).size(15).align_x(alignment::Horizontal::Right)
-                                                )
+                                                    text(format!("第 {} 張", card.card_id.clone()))
+                                                        .height(Length::Fill)
+                                                        .align_y(alignment::Vertical::Bottom)
+                                                        .size(15)
+                                                        .align_x(alignment::Horizontal::Right),
+                                                ),
                                         )
-                                        .on_press(UIMessage::PlayV2Better(PlayV2BetterMsg::ThrowCard(
-                                            card.clone(),
-                                        )))
+                                        .on_press(UIMessage::Play(
+                                            PlayMsg::ThrowCard(card.clone()),
+                                        ))
                                         .style(|t: &iced::Theme, s: button::Status| {
                                             let p = t.extended_palette();
                                             let mut style = button::Style::default();
@@ -574,7 +589,7 @@ impl Client {
                                 controller_bar = controller_bar.push(card_bar_y);
                             }
                         }
-                        layout_play_base = layout_play_base.push(
+                        layout_play = layout_play.push(
                             scrollable(
                                 container(controller_bar)
                                     .style(|t: &iced::Theme| {
@@ -594,7 +609,7 @@ impl Client {
                         );
                     }
                 }
-                layout = layout.push(layout_play_base);
+                layout = layout.push(layout_play);
             }
         }
         layout.into()
@@ -624,7 +639,9 @@ impl Client {
         )
         .height(Length::Shrink)
         .width(Length::Shrink)
-        .on_press(UIMessage::Home(HomeMessage::VSoftKeyBoardInput(key.to_string())))
+        .on_press(UIMessage::Home(HomeMessage::VSoftKeyBoardInput(
+            key.to_string(),
+        )))
         .style(rounded_primary_button)
     }
 

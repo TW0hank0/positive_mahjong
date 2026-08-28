@@ -16,4 +16,4 @@
 [toolchain]
 channel = "nightly-2026-08-26"
 components = ["clippy"]
-targets = []
+targets = ["aarch64-linux-android", "x86_64-linux-android", "wasm32-unknown-unknown"]

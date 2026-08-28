@@ -16,7 +16,6 @@
 use clap::{self, Parser};
 use tracing::{debug, error, info};
 
-
 mod base;
 mod v2_better;
 
@@ -41,15 +40,11 @@ enum SubCmds {
 fn main() {
     let _guard = pmj_shared::shared::init_tracing_fmt(String::from("pmj_server_gui"));
     let args = CliArgs::parse();
-    
+
     info!("args.command = {:?}", args.command);
     let iced_result: iced::Result = match args.command {
-        SubCmds::Base => {
-            base::main()
-        }
-        SubCmds::V2Better => {
-            v2_better::main()
-        }
+        SubCmds::Base => base::main(),
+        SubCmds::V2Better => v2_better::main(),
     };
     match iced_result {
         Ok(_) => {

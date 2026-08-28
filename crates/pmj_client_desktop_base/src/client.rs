@@ -933,7 +933,9 @@ impl Client {
         )
         .height(Length::Shrink)
         .width(Length::Shrink)
-        .on_press(UIMessage::Home(HomeMessage::VSoftKeyBoardInput(key.to_string())))
+        .on_press(UIMessage::Home(HomeMessage::VSoftKeyBoardInput(
+            key.to_string(),
+        )))
         .style(rounded_primary_button)
     }
 
@@ -1025,9 +1027,7 @@ impl Client {
                     match guard.send(Message::Text(req_text.into())) {
                         Ok(_) => {
                             debug!("已傳送初連結訊息，等待伺服器回應...");
-                            task::Task::done(UIMessage::Home(
-                                HomeMessage::ReadFirstMsgResp,
-                            ))
+                            task::Task::done(UIMessage::Home(HomeMessage::ReadFirstMsgResp))
                         }
                         Err(e) => {
                             warn!("error: {}", e);
@@ -1041,9 +1041,7 @@ impl Client {
                     task::Task::done(UIMessage::Home(HomeMessage::SendFirstMsg))
                 }
             },
-            None => {
-                task::Task::done(UIMessage::Home(HomeMessage::ConnectServer))
-            }
+            None => task::Task::done(UIMessage::Home(HomeMessage::ConnectServer)),
         }
     }
 

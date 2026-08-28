@@ -20,10 +20,24 @@ import zipfile
 import util
 
 # 臨時開啟
-INCLUDE_ALL_FILES = True
+INCLUDE_ALL_FILES = False
 
 
 def main():
+    print("-" * 10, "cargo build", "-" * 10)
+    _ = util.run_cmd(
+        [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+        ],
+        cwd=util.fix_path(),
+    )
+    zip_desktop()
+
+
+def zip_desktop():
     version = util.get_version()
     include_files: list[str] = []
     target_path = util.fix_path(
@@ -46,7 +60,7 @@ def main():
                     case _:
                         raise RuntimeError("Not support system!")
     pf = platform.system().lower()
-    zip_file_name = util.fix_path(f"positive_mahjong_v{version}_{pf}.zip")
+    zip_file_name = util.fix_path(f"positive_mahjong-desktop-v{version}-{pf}.zip")
     with zipfile.ZipFile(
         zip_file_name,
         mode="w",

@@ -20,6 +20,11 @@ on:
     branches:
       - master
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   check:
     runs-on: ${{ matrix.os }}
@@ -53,7 +58,6 @@ jobs:
 
       - name: Run License Check
         run: |
-          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
           cd scripts
           uv run license_check.py
           cd ..
@@ -96,22 +100,8 @@ jobs:
       - name: use build script
         run: |
           cd scripts
-          uv run build_client_desktop.py
+          uv run build_desktop.py
           cd ..
-
-      - name: zip files on Linux
-        id: zip_files_linux
-        if: runner.os == 'Linux'
-        run: |
-          file=$(uv run scripts/zip_client_desktop.py)
-          echo "zip_path=$file" >> $GITHUB_OUTPUT
-
-      - name: zip files on Windows
-        id: zip_files_windows
-        if: runner.os == 'Windows'
-        run: |
-          $file = (uv run scripts/zip_client_desktop.py)
-          echo "zip_path=$file" >> $env:GITHUB_OUTPUT
 
       - name: get version on Linux
         id: get_version_linux
@@ -131,19 +121,19 @@ jobs:
           echo "version=$file" >> $env:GITHUB_OUTPUT
           cd ..
 
-      - name: Upload exe artifact on Linux
+      - name: Upload desktop artifact on Linux
         uses: actions/upload-artifact@v7.0.1
         if: runner.os == 'Linux'
         with:
           name: positive_mahjong-v${{ steps.get_version_linux.outputs.version }}-linux.zip
-          path: ${{ steps.zip_files_linux.outputs.zip_path }}
+          path: positive_mahjong-v${{ steps.get_version_linux.outputs.version }}-linux.zip
 
-      - name: Upload exe artifact on Windows
+      - name: Upload desktop artifact on Windows
         uses: actions/upload-artifact@v7.0.1
         if: runner.os == 'Windows'
         with:
-          name: positive_mahjong-v${{ steps.get_version_windows.outputs.version }}-windows.zip
-          path: ${{ steps.zip_files_windows.outputs.zip_path }}
+          name: positive_mahjong-desktop-v${{ steps.get_version_windows.outputs.version }}-windows.zip
+          path: positive_mahjong-desktop-v${{ steps.get_version_windows.outputs.version }}-windows.zip
 
   # build_android:
   #     runs-on: ${{ matrix.os }}
@@ -221,11 +211,11 @@ jobs:
         with:
           path: artifacts
 
-      - name: List Dir (for debug)
+      - name: List Dir
         run: |
           eza --tree .
 
-      - name: release
+      - name: release and upload artifacts
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Github Action Token
           CODEBERG_PAT_TOKEN: ${{ secrets.CODEBERG_PAT_TOKEN }} # PAT
@@ -234,3 +224,45 @@ jobs:
           cd scripts
           uv run releases.py
           cd ..
+
+  deploy:
+    needs:
+      - build_client_desktop
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7.0.1
+
+      - name: Install Dep
+        uses: ./.github/workflows/instdep/
+
+      - name: download all artifacts
+        uses: actions/download-artifact@v8.0.1
+        with:
+          path: artifacts
+
+      - name: Build license
+        run: |
+          cd scripts
+          uv run build_license.py
+          cd ..
+
+      - name: Copy webiste dep
+        run: |
+          cd scripts
+          uv run copy_website_dep.py
+          cd ..
+
+      - name: Build doc and website
+        run: |
+          cd scripts
+          uv run build_website.py
+          cd ..
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v5.0.0
+        with:
+          path: ./website_build/
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v5.0.0

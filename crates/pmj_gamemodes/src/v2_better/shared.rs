@@ -44,7 +44,7 @@ pub enum ServerRoomMsg {
     // 玩家發言
     PlayerSay(u8, String),
     // 伺服主發言
-    RootSay(String)
+    RootSay(String),
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
@@ -68,7 +68,7 @@ pub enum ClientMessage {
 
 #[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
 pub enum ClientGameMsg {
-    Pga(PlayerGameActions)
+    Pga(PlayerGameActions),
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
@@ -96,13 +96,25 @@ pub enum PlayerGameActions {
     ///丟牌
     ThrowCard(PMJCard),
     ///吃
-    Eat {with: (PMJCard, PMJCard), eat_card: PMJCard},
+    Eat {
+        with: (PMJCard, PMJCard),
+        eat_card: PMJCard,
+    },
     ///碰
-    Triplet{with: (PMJCard, PMJCard), triplet_card: PMJCard},
+    Triplet {
+        with: (PMJCard, PMJCard),
+        triplet_card: PMJCard,
+    },
     ///明槓
-    ExposedKong { with: (PMJCard, PMJCard, PMJCard), kong_card:PMJCard},
+    ExposedKong {
+        with: (PMJCard, PMJCard, PMJCard),
+        kong_card: PMJCard,
+    },
     ///暗槓
-    ConcealedKong { with: (PMJCard, PMJCard, PMJCard), kong_card:PMJCard},
+    ConcealedKong {
+        with: (PMJCard, PMJCard, PMJCard),
+        kong_card: PMJCard,
+    },
     ///補花
     ReplaceFlower(PMJCard),
 }
@@ -110,44 +122,56 @@ pub enum PlayerGameActions {
 impl PlayerGameActions {
     pub fn is_get_card(&self) -> bool {
         match self {
-            Self::GetCard => {true}
-            _ => {false}
+            Self::GetCard => true,
+            _ => false,
         }
     }
     pub fn is_throw_card(&self) -> bool {
         match self {
-            Self::ThrowCard(_) => {true}
-            _ => {false}
+            Self::ThrowCard(_) => true,
+            _ => false,
         }
     }
     pub fn is_eat(&self) -> bool {
         match self {
-            Self::Eat { with:_, eat_card:_ }=> {true}
-            _ => {false}
+            Self::Eat {
+                with: _,
+                eat_card: _,
+            } => true,
+            _ => false,
         }
     }
     pub fn is_triplet(&self) -> bool {
         match self {
-            Self::Triplet { with:_, triplet_card:_ } => {true}
-            _ => {false}
+            Self::Triplet {
+                with: _,
+                triplet_card: _,
+            } => true,
+            _ => false,
         }
     }
     pub fn is_exposed_kong(&self) -> bool {
         match self {
-            Self::ExposedKong { with:_, kong_card:_}=> {true}
-            _ => {false}
+            Self::ExposedKong {
+                with: _,
+                kong_card: _,
+            } => true,
+            _ => false,
         }
     }
-    pub fn is_concealed_kong(&self)->bool {
+    pub fn is_concealed_kong(&self) -> bool {
         match self {
-            Self::ConcealedKong { with:_, kong_card:_ } => {true}
-            _ => {false}
+            Self::ConcealedKong {
+                with: _,
+                kong_card: _,
+            } => true,
+            _ => false,
         }
     }
-    pub fn is_replace_flower(&self)-> bool {
+    pub fn is_replace_flower(&self) -> bool {
         match self {
-            Self::ReplaceFlower(_) => {true}
-            _ => {false}
+            Self::ReplaceFlower(_) => true,
+            _ => false,
         }
     }
 }
@@ -164,11 +188,17 @@ pub struct PMJCard {
 impl Display for PMJCard {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(&match self.card_type.clone() {
-            PMJCardType::Dots(num) => {format!("{}筒", num)}
-            PMJCardType::Flower(flower) => {flower.to_string()}
-            PMJCardType::Line(num) => {format!("{}條", num)}
-            PMJCardType::TenThousand(num) => {format!("{}萬", num)}
-            PMJCardType::Words(word) => {word.to_string()}
+            PMJCardType::Dots(num) => {
+                format!("{}筒", num)
+            }
+            PMJCardType::Flower(flower) => flower.to_string(),
+            PMJCardType::Line(num) => {
+                format!("{}條", num)
+            }
+            PMJCardType::TenThousand(num) => {
+                format!("{}萬", num)
+            }
+            PMJCardType::Words(word) => word.to_string(),
         })
     }
 }
@@ -190,32 +220,32 @@ pub enum PMJCardType {
 impl PMJCardType {
     pub fn is_ten_thousand(&self) -> bool {
         match self {
-            Self::TenThousand(_) => {true}
-            _ => {false}
+            Self::TenThousand(_) => true,
+            _ => false,
         }
     }
     pub fn is_line(&self) -> bool {
         match self {
-            Self::Line(_) => {true}
-            _ => {false}
+            Self::Line(_) => true,
+            _ => false,
         }
     }
     pub fn is_dots(&self) -> bool {
         match self {
-            Self::Dots(_) => {true}
-            _ => {false}
+            Self::Dots(_) => true,
+            _ => false,
         }
     }
     pub fn is_flower(&self) -> bool {
         match self {
-            Self::Flower(_) => {true}
-            _ => {false}
+            Self::Flower(_) => true,
+            _ => false,
         }
     }
     pub fn is_words(&self) -> bool {
         match self {
-            Self::Words(_) => {true}
-            _ => {false}
+            Self::Words(_) => true,
+            _ => false,
         }
     }
 }

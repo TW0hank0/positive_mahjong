@@ -22,16 +22,12 @@ import util
 
 
 def main():
-    website_root_path = os.path.join(
-        os.path.dirname(os.path.dirname(__file__)), "website"
-    )
+    website_root_path = util.fix_path("website")
     nav_template_path = os.path.join(website_root_path, "nav.html.template")
     with open(nav_template_path, "r", encoding="utf-8") as f:
         nav_template_content = f.read()
     ignored: list[str] = ["docs", ".git", "__pycache__", "__pypy_cache__"]
-    build_root = os.path.join(
-        os.path.dirname(os.path.dirname(__file__)), "website_build"
-    )
+    build_root = util.fix_path("website_build")
     if os.path.exists(build_root) is True:
         remove_dir(build_root)
     _ = shutil.copytree(website_root_path, build_root)
@@ -94,8 +90,10 @@ def build_files_dl(dir_path: str):
             "material_symbols_LICENSE",
         ),
     ]
+    if os.path.exists(util.fix_path("artifacts")) is True:
+        dlable_files.extend(util.list_files(util.fix_path("artifacts")))
     files_summary_template = """\
-    <!doctype html>
+<!doctype html>
     <html lang="zh-TW">
         <head>
             <meta charset="UTF-8" />
@@ -105,7 +103,7 @@ def build_files_dl(dir_path: str):
             />
             <meta
                 name="description"
-                content="positive_mahjong&#x27;s website"
+                content="positive_mahjong project website"
             />
             <title>positive_mahjong —— 檔案</title>
             <link rel="stylesheet" href="../style.css" />
@@ -195,17 +193,15 @@ def replace_var(
             new_template = new_template.replace(key_fixed_name, template_vars[key])
             print(f"Replaced `{key}` in template.")
     html_vars: dict[str, str] = {}
-    # print(f"new_template={new_template}")
     html_vars["VAR_NAV"] = new_template
     with open(
-        os.path.join(os.path.dirname(os.path.dirname(__file__)), "LICENSE"),
+        util.fix_path("LICENSE"),
         "r",
         encoding="utf-8",
     ) as f:
         html_vars["VAR_LICENSE"] = f.read()
     with open(
-        os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
+        util.fix_path(
             "auto_generated",
             "ThirdPartyLicense-Rust.md",
         ),
@@ -213,8 +209,8 @@ def replace_var(
         encoding="utf-8",
     ) as f:
         t = f.read()
-        html_vars["VAR_THIRD_PARTY_LICENSE_RUST_MD"] = t
-        html_vars["VAR_THIRD_PARTY_LICENSE_RUST_MD_TO_HTML"] = str(mistune.html(t))
+    html_vars["VAR_THIRD_PARTY_LICENSE_RUST_MD"] = t
+    html_vars["VAR_THIRD_PARTY_LICENSE_RUST_MD_TO_HTML"] = str(mistune.html(t))
     commit_info = util.get_commit_info()
     html_vars["VAR_COMMIT_SHA"] = commit_info.sha
     html_vars["VAR_COMMIT_SHORT_SHA"] = commit_info.short_sha

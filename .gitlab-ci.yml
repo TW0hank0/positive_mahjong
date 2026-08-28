@@ -15,7 +15,7 @@
 
 stages:
   - sync
-  # - deploy
+  - deploy
 
 sync_to_mirrors:
   stage: sync
@@ -54,31 +54,37 @@ sync_to_mirrors:
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
-# pages:
-#   stage: deploy
-#   image: alpine:latest
-#   pages:
-#     # The folder that contains the files to be exposed at the Page URL
-#     publish: website_build/
-#   artifacts:
-#     paths:
-#       - website_build/
-#   rules:
-#     # This ensures that only pushes to the default branch will trigger
-#     # a pages deploy
-#     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-#   # Functions that should be executed before the build script is run
-#   before_script:
-#     - apk add --no-cache git curl bash llvm gcc clang
-#     - curl https://sh.rustup.rs -o rustup-inst.sh
-#     - sh rustup-inst.sh -y
-#     - . "$HOME/.cargo/env"
-#     - cargo install cargo-about --features cli
-#     - cargo install mdbook
-#     - curl -LsSf https://astral.sh/uv/install.sh | sh
-#     - source $HOME/.local/bin/env
-#     - uv python install cpython-3.14
-#   script:
-#     - uv run scripts/build_license.py
-#     - uv run scripts/copy_website_dep.py
-#     - uv run scripts/build_website.py
+pages:
+  stage: deploy
+  image: alpine:latest
+  pages:
+    # The folder that contains the files to be exposed at the Page URL
+    publish: website_build/
+  artifacts:
+    paths:
+      - website_build/
+  rules:
+    # This ensures that only pushes to the default branch will trigger
+    # a pages deploy
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+  # Functions that should be executed before the build script is run
+  before_script:
+    - apk add --no-cache git curl bash llvm gcc clang
+    - curl https://sh.rustup.rs -o rustup-inst.sh
+    - sh rustup-inst.sh -y
+    - . "$HOME/.cargo/env"
+    - cargo install cargo-about --features cli --locked
+    - cargo install mdbook --locked
+    - curl -LsSf https://astral.sh/uv/install.sh | sh
+    - source $HOME/.local/bin/env
+    - uv python install cpython-3.14
+    - cd scripts
+    - uv venv
+    - uv sync
+    - cd ..
+  script:
+    - cd scripts
+    - uv run build_license.py
+    - uv run copy_website_dep.py
+    - uv run build_website.py
+    - cd ..

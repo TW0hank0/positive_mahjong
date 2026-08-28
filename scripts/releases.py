@@ -32,7 +32,7 @@ app = typer.Typer()
 @app.command()
 def main():
     commit_info = util.get_commit_info()
-    files = list_files(util.fix_path("artifacts"))
+    files = util.list_files(util.fix_path("artifacts"))
     if "release pmj:" in commit_info.msg.lower():
         print("Release PMJ:")
         version = util.get_version()
@@ -90,19 +90,6 @@ def main():
 """
         create_release_gh(tag, title, notes, is_prerelease=True, owner=OWNER, repo=REPO)
         upload_file_gh(files=files, tag=tag, owner=OWNER, repo=REPO)
-
-
-def list_files(path: str) -> list[str]:
-    files: list[str] = []
-    for file in os.listdir(path):
-        file_path = os.path.join(path, file)
-        if os.path.isfile(file_path) is True:
-            files.append(file_path)
-        elif os.path.isdir(file_path) is True:
-            files.extend(list_files(file_path))
-        else:
-            print(f"???? not file not dir: {file_path}")
-    return files
 
 
 def create_release_gh(

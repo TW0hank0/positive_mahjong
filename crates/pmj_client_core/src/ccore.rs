@@ -43,17 +43,15 @@ enum CTaskKinds {
     ReadWsMsg,
     ThrowCard(pmj_gamemodes::v2_better::shared::PMJCard),
 }
-#[derive(Debug, Clone)]
-#[derive(Default)]
+#[derive(Debug, Clone, Default)]
 struct CTaskResult {
     rfirstmsgresp_player_id: Option<u8>,
     rfirstmsgresp_gamemode: Option<pmj_shared::shared::GameModes>,
     read_ws_msg_v2: Option<pmj_gamemodes::v2_better::shared::ServerMessage>,
 }
 
-
 #[derive(Debug, Clone)]
-enum GMState {
+pub enum GMState {
     HomePage,
     V2Better(V2BetterState),
 }
@@ -67,11 +65,11 @@ pub struct ClientCore {
 
 #[derive(Debug, Clone)]
 pub struct V2BetterState {
-    player_id: u8,
-    cards: Vec<pmj_gamemodes::v2_better::shared::PMJCard>,
-    player_turn: Option<u8>,
-    game_events: Vec<(u64, V2BetterEvents)>,
-    room_msgs: Vec<(u64, pmj_gamemodes::v2_better::shared::ServerRoomMsg)>,
+    pub player_id: u8,
+    pub cards: Vec<pmj_gamemodes::v2_better::shared::PMJCard>,
+    pub player_turn: Option<u8>,
+    pub game_events: Vec<(u64, V2BetterEvents)>,
+    pub room_msgs: Vec<(u64, pmj_gamemodes::v2_better::shared::ServerRoomMsg)>,
 }
 
 #[derive(Debug, Clone)]
@@ -84,22 +82,24 @@ pub enum V2BetterEvents {
     YouHandCardChange(Vec<pmj_gamemodes::v2_better::shared::PMJCard>),
 }
 
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum PlayerCtrl {
     NoCtrl,
     ThrowCard,
 }
 
 impl ClientCore {
+    pub fn game_state(&self) -> GMState {
+        self.gamemode_state.clone()
+    }
     pub fn current_ctrl(&self) -> PlayerCtrl {
         match self.gamemode_state {
-            GMState::HomePage => {
-                PlayerCtrl::NoCtrl
-            }
+            GMState::HomePage => PlayerCtrl::NoCtrl,
             GMState::V2Better(ref state) => {
-                let (_event_num, event)=state.game_events.last().unwrap();
+                let (_event_num, event) = state.game_events.last().unwrap();
                 match event {
-                    V2BetterEvents::YouGetCard(_) => {PlayerCtrl::ThrowCard}
-                    _ => {PlayerCtrl::NoCtrl}
+                    V2BetterEvents::YouGetCard(_) => PlayerCtrl::ThrowCard,
+                    _ => PlayerCtrl::NoCtrl,
                 }
             }
         }
@@ -302,7 +302,9 @@ impl ClientCore {
         let handle = thread::spawn(move || {
             let req_text =
                 serde_json::to_string(&pmj_gamemodes::v2_better::shared::ClientMessage::GameMsg(
-                    pmj_gamemodes::v2_better::shared::ClientGameMsg::Pga(pmj_gamemodes::v2_better::shared::PlayerGameActions::ThrowCard(thread_card)),
+                    pmj_gamemodes::v2_better::shared::ClientGameMsg::Pga(
+                        pmj_gamemodes::v2_better::shared::PlayerGameActions::ThrowCard(thread_card),
+                    ),
                 ))
                 .unwrap();
             match thread_ws.lock() {

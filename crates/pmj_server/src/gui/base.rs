@@ -38,7 +38,7 @@ pub fn gui_init() -> Option<iced::window::Icon> {
         .unwrap()
         .into_rgba8();
     let (img_width, img_height) = img.dimensions();
-    
+
     iced::window::icon::from_rgba(img.into_raw(), img_width, img_height).ok()
 }
 
