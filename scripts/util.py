@@ -16,6 +16,7 @@
 """`positive_mahjong` script util"""
 
 import datetime
+import json
 import os
 import subprocess
 import sys
@@ -123,17 +124,30 @@ def fix_path(*p: str) -> str:
     return os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), *p))
 
 
-def get_version(workspace_type: Literal["workspace", "package"] = "workspace") -> str:
-    with open(
-        fix_path("Cargo.toml"),
-        "rb",
-    ) as f:
-        data = tomllib.load(f)
-    match workspace_type:
-        case "package":
+def get_version(
+    how_get: Literal["file_workspace", "file_package", "cargo"] = "file_workspace",
+) -> str:
+    if how_get == "file_package" or how_get == "file_workspace":
+        with open(
+            fix_path("Cargo.toml"),
+            "rb",
+        ) as f:
+            data = tomllib.load(f)
+        if how_get == "file_package":
             version = str(data["package"]["version"])
-        case "workspace":
+        elif how_get == "file_workspace":
             version = str(data["workspace"]["package"]["version"])
+    elif how_get == "cargo":
+        (_returncode, stdout) = run_cmd(
+            ["cargo", "metadata", "--format-version", "1", "--no-deps"], cwd=fix_path()
+        )
+        metadata = json.loads(stdout)
+        for pkg in metadata["packages"]:
+            if pkg["name"] == "pmj_client_desktop":
+                version = str(pkg["version"])
+                break
+        else:
+            raise RuntimeError("no version found.")
     return version
 
 
