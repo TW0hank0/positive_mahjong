@@ -15,12 +15,13 @@
 
 import os
 import platform
+import sys
 import zipfile
+from typing import Literal
 
 import util
 
-# 臨時開啟
-INCLUDE_ALL_FILES = False
+INCLUDE_FILES_MATCH_TYPE: Literal["exe_split", "inclue_all_files"] = "exe_split"
 
 
 def main():
@@ -47,9 +48,9 @@ def zip_desktop():
     for file in os.listdir(target_path):
         full_file_path = os.path.join(target_path, file)
         if os.path.isfile(full_file_path) is True:
-            if INCLUDE_ALL_FILES:
+            if INCLUDE_FILES_MATCH_TYPE == "inclue_all_files":
                 include_files.append(full_file_path)
-            else:
+            elif INCLUDE_FILES_MATCH_TYPE == "exe_split":
                 match platform.system():
                     case "Linux":
                         if len(file.split(".")) == 1:
@@ -59,6 +60,8 @@ def zip_desktop():
                             include_files.append(full_file_path)
                     case _:
                         raise RuntimeError("Not support system!")
+            else:
+                print(f"unmatched type: {INCLUDE_FILES_MATCH_TYPE}", file=sys.stderr)
     pf = platform.system().lower()
     zip_file_name = util.fix_path(f"positive_mahjong-desktop-v{version}-{pf}.zip")
     with zipfile.ZipFile(

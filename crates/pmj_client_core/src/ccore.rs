@@ -96,10 +96,14 @@ impl ClientCore {
         match self.gamemode_state {
             GMState::HomePage => PlayerCtrl::NoCtrl,
             GMState::V2Better(ref state) => {
-                let (_event_num, event) = state.game_events.last().unwrap();
-                match event {
-                    V2BetterEvents::YouGetCard(_) => PlayerCtrl::ThrowCard,
-                    _ => PlayerCtrl::NoCtrl,
+                if state.game_events.len() > 1 {
+                    let (_event_num, event) = state.game_events.last().unwrap();
+                    match event {
+                        V2BetterEvents::YouGetCard(_) => PlayerCtrl::ThrowCard,
+                        _ => PlayerCtrl::NoCtrl,
+                    }
+                } else {
+                    PlayerCtrl::NoCtrl
                 }
             }
         }
@@ -112,24 +116,24 @@ impl ClientCore {
         match tcp_stream.set_nodelay(true) {
             Ok(_) => {}
             Err(e) => {
-                warn!("set_nodelay: {}", e);
+                warn!("connect: set_nodelay: {}", e);
             }
         }
         match tcp_stream.set_read_timeout(Some(time::Duration::from_secs(4))) {
             Ok(_) => {}
             Err(e) => {
-                warn!("set_read_timeout: {}", e);
+                warn!("connect: set_read_timeout: {}", e);
             }
         }
         match tcp_stream.set_write_timeout(Some(time::Duration::from_secs(5))) {
             Ok(_) => {}
             Err(e) => {
-                warn!("set_write_timeout: {}", e);
+                warn!("connect: set_write_timeout: {}", e);
             }
         }
         match tungstenite::client::client(uri.to_string(), tcp_stream) {
             Ok((orig_ws, _resp)) => {
-                debug!("Websocket 連線成功。");
+                debug!("connect: websocket 連線成功。");
                 let mut ccore = Self {
                     ws: sync::Arc::new(sync::Mutex::new(orig_ws)),
                     tasks: Vec::new(),
@@ -139,7 +143,7 @@ impl ClientCore {
                 Result::Ok(ccore)
             }
             Err(e) => {
-                warn!("ws connect error: {}", e);
+                warn!("connect: ws connect error: {}", e);
                 Result::Err(error::CCError {
                     kind: error::CCErrKinds::HandShakeError,
                 })
@@ -192,10 +196,11 @@ impl ClientCore {
         let thread_ws = self.ws.clone();
         let handle = thread::spawn(move || {
             loop {
-                match thread_ws.lock() {
+                match thread_ws.try_lock() {
                     Ok(mut guard) => {
                         match guard.read() {
                             Ok(msg) => {
+                                debug!("read_first_msg_resp: msg={:?}", msg);
                                 drop(guard);
                                 match msg {
                                     tungstenite::Message::Text(text) => {
@@ -355,23 +360,23 @@ impl ClientCore {
                                             let server_msg = ctr.read_ws_msg_v2.unwrap();
                                             info!("server_msg: {:?}", server_msg);
                                             match server_msg {
-                                                        pmj_gamemodes::v2_better::shared::ServerMessage::RoomMsg(room_msg) => {
-                                                            match self.gamemode_state {
-                                                                GMState::V2Better(ref mut state_v2) => {
+                                                pmj_gamemodes::v2_better::shared::ServerMessage::RoomMsg(room_msg) => {
+                                                    match self.gamemode_state {
+                                                        GMState::V2Better(ref mut state_v2) => {
                                                                     state_v2.room_msgs.push((
                                                                         (state_v2.room_msgs.len() as u64) +1,
                                                                         room_msg
                                                                     ));
                                                                 }
-                                                                GMState::HomePage => {
+                                                        GMState::HomePage => {
                                                                     error!("????????????");
                                                                     panic!("????????????");
                                                                 }
                                                             }
                                                         }
-                                                        pmj_gamemodes::v2_better::shared::ServerMessage::GameMsg(game_msg) =>{
-                                                            match self.gamemode_state {
-                                                                GMState::V2Better(ref mut state_v2) => {
+                                                pmj_gamemodes::v2_better::shared::ServerMessage::GameMsg(game_msg) =>{
+                                                    match self.gamemode_state {
+                                                        GMState::V2Better(ref mut state_v2) => {
                                                                     match game_msg {
                                                                         pmj_gamemodes::v2_better::shared::ServerGameMsg::GameStart => {
                                                                             state_v2.game_events.push(
@@ -419,6 +424,7 @@ impl ClientCore {
                                                             }
                                                         }
                                                     }
+                                            self.read_ws_msg();
                                         }
                                         CTaskKinds::SendFirstMsgReq => {
                                             self.read_first_msg_resp();
@@ -430,6 +436,9 @@ impl ClientCore {
                                             break;
                                         }
                                         CTaskKinds::ReadFirstMsgResp => {
+                                            info!(
+                                                "process_task: Task(CTaskKinds::ReadFirstMsgResp) finish sucessful"
+                                            );
                                             let player_id = ctr.rfirstmsgresp_player_id.unwrap();
                                             match ctr.rfirstmsgresp_gamemode.unwrap() {
                                                 pmj_shared::shared::GameModes::V2Better => {}
@@ -446,6 +455,7 @@ impl ClientCore {
                                                     room_msgs: Vec::new(),
                                                 });
                                             self.ping_pong_thread();
+                                            self.read_ws_msg();
                                         }
                                     },
                                     Err(e) => {
@@ -501,6 +511,7 @@ impl ClientCore {
                                 }
                             }
                         } else {
+                            debug!("task not finish");
                             task_index += 1;
                         }
                     }

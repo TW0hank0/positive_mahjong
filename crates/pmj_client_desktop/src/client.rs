@@ -63,7 +63,7 @@ pub struct PlayState {
     game_msgs: Vec<String>,
     game_controller: pmj_client_core::ccore::PlayerCtrl,
     current_turn: Option<u8>,
-    ccore:pmj_client_core::ccore::ClientCore,
+    ccore: pmj_client_core::ccore::ClientCore,
     gm_state: pmj_client_core::ccore::GMState,
 }
 
@@ -95,38 +95,56 @@ impl Client {
     pub fn new() -> Self {
         let _ = iced::font::load(FONT_NOTO_SANS_REG_BYTES);
         let _ = iced::font::load(FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES);
-        Self { server_url: String::new(), scene: ClientScenes::Home(HomeState { try_connecting_server: false, msgs: Vec::new(), connect_msg: None }), theme: iced::theme::Theme::TokyoNight }
+        Self {
+            server_url: String::new(),
+            scene: ClientScenes::Home(HomeState {
+                try_connecting_server: false,
+                msgs: Vec::new(),
+                connect_msg: None,
+            }),
+            theme: iced::theme::Theme::TokyoNight,
+        }
     }
     pub fn update(&mut self, message: UIMessage) -> task::Task<UIMessage> {
         match message {
-            UIMessage::CCoreProcessTask =>  {
-                match self.scene {
-                    ClientScenes::Home(ref _home_state) => {
-                        warn!("update: warn scene");
-                    }
-                    ClientScenes::Play(ref mut play_state) => {
-                        play_state.ccore.process_task();
-                        play_state.game_controller=play_state.ccore.current_ctrl();
-                        play_state.gm_state = play_state.ccore.game_state();
-                        match play_state.gm_state {
-                            pmj_client_core::ccore::GMState::HomePage => {
-                                warn!("update: warn GMState");
-                            }
-                            pmj_client_core::ccore::GMState::V2Better(ref gms_v2) => {
-                                play_state.current_turn = gms_v2.player_turn;
-                                play_state.player_id = gms_v2.player_id;
+            UIMessage::CCoreProcessTask => match self.scene {
+                ClientScenes::Home(ref _home_state) => {
+                    warn!("update: warn scene");
+                }
+                ClientScenes::Play(ref mut play_state) => {
+                    play_state.ccore.process_task();
+                    play_state.game_controller = play_state.ccore.current_ctrl();
+                    play_state.gm_state = play_state.ccore.game_state();
+                    match play_state.gm_state {
+                        pmj_client_core::ccore::GMState::HomePage => {
+                            warn!("update: warn GMState");
+                        }
+                        pmj_client_core::ccore::GMState::V2Better(ref gms_v2) => {
+                            play_state.current_turn = gms_v2.player_turn;
+                            play_state.player_id = gms_v2.player_id;
+                            if (!play_state.is_start)&& gms_v2.game_events.iter().any(|(_, event)| {
+                                match event {
+                                    pmj_client_core::ccore::V2BetterEvents::GameStart => {
+                                        true
+                                    }
+                                    _ => {false}
+                                }
+                            }) {
+                                play_state.is_start = true;
                             }
                         }
-                        return iced::Task::done(UIMessage::CCoreProcessTask);
                     }
+                    return iced::Task::done(UIMessage::CCoreProcessTask);
                 }
             },
-            UIMessage::Home(home_message) => match home_message {
-                HomeMessage::InputServerIpChanged(server_ip) => {
-                    match self.scene {
+            UIMessage::Home(home_message) => {
+                match home_message {
+                    HomeMessage::InputServerIpChanged(server_ip) => match self.scene {
                         ClientScenes::Home(ref mut home_state) => {
                             if home_state.try_connecting_server {
-                                home_state.msgs.push(String::from("已有正在嘗試連接的伺服器！"));
+                                home_state
+                                    .msgs
+                                    .push(String::from("已有正在嘗試連接的伺服器！"));
                             } else {
                                 self.server_url = server_ip;
                             }
@@ -134,10 +152,8 @@ impl Client {
                         ClientScenes::Play(ref _play_state) => {
                             warn!("update: warn scene");
                         }
-                    }
-                }
-                HomeMessage::VSoftKeyBoardInput(key) => {
-                    match self.scene {
+                    },
+                    HomeMessage::VSoftKeyBoardInput(key) => match self.scene {
                         ClientScenes::Home(ref mut home_state) => {
                             if home_state.try_connecting_server {
                                 let msg = String::from("已有正在嘗試連接的伺服器！");
@@ -154,10 +170,8 @@ impl Client {
                         ClientScenes::Play(ref _play_state) => {
                             warn!("update: warn scene");
                         }
-                    }
-                }
-                HomeMessage::ConnectServer => {
-                    match self.scene {
+                    },
+                    HomeMessage::ConnectServer => match self.scene {
                         ClientScenes::Home(ref mut home_state) => {
                             if self.server_url.is_empty() {
                                 let msg = String::from("未輸入伺服器地址！");
@@ -168,50 +182,56 @@ impl Client {
                                 home_state.msgs.push(msg.clone());
                                 warn!("update: {}", msg);
                             } else {
-                                    home_state.try_connecting_server = true;
-                                    match pmj_client_core::ccore::ClientCore::connect(
-                                        self.server_url.clone(),
-                                    ) {
-                                        Ok(ccore) => {
-                                            let gm_state = ccore.game_state();
-                                            loop{match gm_state.clone() {
+                                home_state.try_connecting_server = true;
+                                match pmj_client_core::ccore::ClientCore::connect(
+                                    self.server_url.clone(),
+                                ) {
+                                    Ok(mut ccore) => {
+                                        ccore.process_task();
+                                        let mut gm_state = ccore.game_state();
+                                        loop {
+                                            match gm_state.clone() {
                                                 pmj_client_core::ccore::GMState::HomePage => {
                                                     warn!("update: warn GMState");
-                                                    std::thread::sleep(std::time::Duration::from_millis(500));
+                                                    std::thread::sleep(
+                                                        std::time::Duration::from_millis(500),
+                                                    );
+                                                    ccore.process_task();
+                                                    gm_state = ccore.game_state();
                                                 }
-                                                pmj_client_core::ccore::GMState::V2Better(gms_v2) => {
+                                                pmj_client_core::ccore::GMState::V2Better(
+                                                    gms_v2,
+                                                ) => {
                                                     self.scene = ClientScenes::Play(PlayState { is_start: false, hand_cards: Vec::new()
                                                         , game_msgs: Vec::new(), game_controller: pmj_client_core::ccore::PlayerCtrl::NoCtrl, current_turn: None, ccore, gm_state, player_id:gms_v2.player_id });
                                                     break;
                                                 }
-                                            }}
-                                            return task::Task::done(UIMessage::CCoreProcessTask);
+                                            }
                                         }
-                                        Err(e) => {
-                                            error!("update: {}", e);
-                                            home_state.msgs.push(format!("update: {}", e));
-                                        }
+                                        return task::Task::done(UIMessage::CCoreProcessTask);
                                     }
-
+                                    Err(e) => {
+                                        error!("update: {}", e);
+                                        home_state.msgs.push(format!("update: {}", e));
+                                    }
+                                }
                             }
                         }
                         ClientScenes::Play(ref _play_state) => {
                             warn!("update: warn scene");
                         }
-                    }
+                    },
                 }
-            },
+            }
             UIMessage::Play(play_base_message) => match play_base_message {
-                PlayMsg::ThrowCard(card) => {
-                    match self.scene {
-                        ClientScenes::Home(ref _home_state) => {
-                            warn!("update: warn scene");
-                        }
-                        ClientScenes::Play(ref mut play_state) => {
-                            play_state.ccore.throw_card(card);
-                        }
+                PlayMsg::ThrowCard(card) => match self.scene {
+                    ClientScenes::Home(ref _home_state) => {
+                        warn!("update: warn scene");
                     }
-                }
+                    ClientScenes::Play(ref mut play_state) => {
+                        play_state.ccore.throw_card(card);
+                    }
+                },
             },
         }
         iced::task::Task::none()
@@ -407,21 +427,28 @@ impl Client {
                 let mut layout_play = Column::new();
                 {
                     let mut info_bar = Row::new().padding(iced::Padding::new(8.0));
-                    info_bar = info_bar.push(text(format!(
-                        "伺服器地址：{}",
-                        self.server_url.clone(),
-                    )));
-                    info_bar = info_bar.push(space().width(Length::from(14)));
                     info_bar =
-                        info_bar.push(text(format!("玩家識別碼：{}", (match play_state.gm_state.clone() {
-                            pmj_client_core::ccore::GMState::HomePage => { warn!("資料錯誤");"資料錯誤".to_string() }
-                            pmj_client_core::ccore::GMState::V2Better(gms_v2) => { gms_v2.player_id.to_string()}
-                        }))));
+                        info_bar.push(text(format!("伺服器地址：{}", self.server_url.clone(),)));
+                    info_bar = info_bar.push(space().width(Length::from(14)));
+                    info_bar = info_bar.push(text(format!(
+                        "玩家識別碼：{}",
+                        (match play_state.gm_state.clone() {
+                            pmj_client_core::ccore::GMState::HomePage => {
+                                warn!("資料錯誤");
+                                "資料錯誤".to_string()
+                            }
+                            pmj_client_core::ccore::GMState::V2Better(gms_v2) => {
+                                gms_v2.player_id.to_string()
+                            }
+                        })
+                    )));
                     if play_state.is_start {
                         info_bar = info_bar.push(space().width(10)).push(text(format!(
                             "目前回合：{}",
                             match play_state.current_turn {
-                                Some(turn) => {turn.to_string()}
+                                Some(turn) => {
+                                    turn.to_string()
+                                }
                                 None => {
                                     warn!("view: play_state.current_turn => None");
                                     String::from("None")
@@ -445,14 +472,14 @@ impl Client {
                 } else {
                     {
                         let mut ctr_bar = Row::new().height(Length::FillPortion(2));
-                        let mut msg_bar = Column::new().width(Length::FillPortion(3));
-                        let mut msg_num: u16 = 1;
+                        let mut gmsg_bar = Column::new().width(Length::FillPortion(3));
+                        let mut gmsg_num: u16 = 1;
                         for msg in play_state.game_msgs.iter() {
-                            msg_bar = msg_bar
+                            gmsg_bar = gmsg_bar
                                 .push(
                                     container(
                                         Row::new()
-                                            .push(text(msg_num.to_string()).size(17).style(
+                                            .push(text(gmsg_num.to_string()).size(17).style(
                                                 |t: &iced::Theme| {
                                                     let p = t.extended_palette();
                                                     text::Style {
@@ -479,116 +506,106 @@ impl Client {
                                     ),
                                 )
                                 .push(space().height(10));
-                            msg_num += 1;
+                            gmsg_num += 1;
                         }
-                        ctr_bar = ctr_bar.push(scrollable(msg_bar));
-                        let mut card_bar = Column::new().width(Length::FillPortion(2));
-                        for card in play_state.hand_cards.iter() {
-                            card_bar = card_bar.push(space().height(5)).push(
-                                container(
-                                    Row::new()
-                                        .padding(10)
-                                        .width(Length::Fill)
-                                        .height(40)
-                                        .push(text(card.to_string()).size(24))
-                                        .push(
-                                            text(format!("第 {} 張", card.card_id.clone()))
-                                                .width(Length::Fill)
-                                                .size(15)
-                                                .align_x(alignment::Horizontal::Right),
-                                        ),
-                                )
-                                .style(|t: &iced::Theme| {
-                                    let p = t.extended_palette();
-                                    let mut style = container::Style::default();
-                                    style.border.radius = iced::border::Radius::new(10);
-                                    style.border.width = 1.2;
-                                    style.border.color = p.background.weak.color;
-                                    style.text_color = Some(p.background.base.text);
-                                    style.background =
-                                        Some(iced::Background::Color(iced::Color::TRANSPARENT));
-                                    style
-                                }),
-                            );
-                        }
-                        ctr_bar = ctr_bar.push(scrollable(card_bar));
-                        layout_play = layout_play.push(ctr_bar);
-                    }
-                    // 玩家操作
-                    {
-                        let mut controller_bar = Column::new();
-                        match play_state.game_controller {
-                            pmj_client_core::ccore::PlayerCtrl::NoCtrl => {}
-                            pmj_client_core::ccore::PlayerCtrl::ThrowCard => {
-                                controller_bar = controller_bar.push(text("選擇一張你要丟的牌"));
-                                let mut card_bar_elements: Vec<iced::Element<'_, UIMessage>> =
-                                    Vec::new();
-                                for card in play_state.hand_cards.iter() {
-                                    card_bar_elements.push(
-                                        button(
-                                            Column::new()
-                                                .width(120)
-                                                .height(160)
-                                                .push(text(card.to_string()).size(18))
-                                                .push(
-                                                    text(format!("第 {} 張", card.card_id.clone()))
-                                                        .height(Length::Fill)
-                                                        .align_y(alignment::Vertical::Bottom)
-                                                        .size(15)
-                                                        .align_x(alignment::Horizontal::Right),
-                                                ),
-                                        )
-                                        .on_press(UIMessage::Play(
-                                            PlayMsg::ThrowCard(card.clone()),
+                        ctr_bar = ctr_bar.push(scrollable(gmsg_bar));
+                        let mut rmsg_bar = Column::new().width(Length::FillPortion(2));
+                        match play_state.gm_state {
+                            pmj_client_core::ccore::GMState::HomePage => {
+                                warn!("view: warn GMState");
+                            }
+                            pmj_client_core::ccore::GMState::V2Better(ref gms_v2) => {
+                                for (rmsg_num, rmsg) in gms_v2.room_msgs.iter() {
+                                    let mut row_msg =
+                                        Row::new().push(text(rmsg_num).size(18).style(
+                                            |t: &iced::Theme| {
+                                                let p = t.extended_palette();
+                                                text::Style {
+                                                    color: Some(p.primary.base.color),
+                                                }
+                                            },
                                         ))
-                                        .style(|t: &iced::Theme, s: button::Status| {
-                                            let p = t.extended_palette();
-                                            let mut style = button::Style::default();
-                                            style.border.width = 1.2;
-                                            style.border.radius = iced::border::radius(10);
-                                            style.text_color = p.background.base.text;
-                                            match s {
-                                                button::Status::Active => {
-                                                    style.border.color = p.background.strong.color;
-                                                    style.background = None;
-                                                }
-                                                button::Status::Disabled => {
-                                                    style.background =
-                                                        Some(iced::Background::Color(
-                                                            p.background.weak.color,
-                                                        ));
-                                                }
-                                                button::Status::Hovered => {
-                                                    style.border.color = p.primary.weak.color;
-                                                    style.border.width = 1.5;
-                                                }
-                                                button::Status::Pressed => {
-                                                    style.border.color = p.primary.strong.color;
-                                                    style.border.width = 0.7;
-                                                    style.border.radius = iced::border::radius(6);
-                                                }
-                                            }
-                                            style
-                                        })
-                                        .into(),
-                                    );
-                                }
-                                let mut card_bar_y = Column::new().spacing(3).padding(5);
-                                let mut card_bar_x = Row::new().spacing(3).padding(5);
-                                let mut card_bar_count = 1;
-                                for e in card_bar_elements {
-                                    card_bar_x = card_bar_x.push(e);
-                                    card_bar_count += 1;
-                                    if card_bar_count > 9 {
-                                        card_bar_y = card_bar_y.push(card_bar_x);
-                                        card_bar_x = Row::new().spacing(3).padding(5);
-                                        card_bar_count = 1;
+                                        .push(
+                                            space().width(10)
+                                        );
+                                    match rmsg {
+                                        pmj_gamemodes::v2_better::shared::ServerRoomMsg::PlayerSay(said_player, said_text) => {
+                                            row_msg = row_msg.push(text(format!("玩家{}", said_player.to_string())).size(16));
+                                            row_msg = row_msg.push(text("\u{e5c8}").font(MATERIAL_SYMBOLS_OUTLINED).size(14));
+                                            row_msg = row_msg.push(text(said_text).size(16));
+                                        }
+                                        pmj_gamemodes::v2_better::shared::ServerRoomMsg::RootSay(said_text) => {
+                                            row_msg = row_msg.push(text("Root").size(16));
+                                            row_msg = row_msg.push(text("\u{e5c8}").font(MATERIAL_SYMBOLS_OUTLINED).size(14));
+                                            row_msg = row_msg.push(text(said_text).size(16));
+                                        }
+
                                     }
+                                    rmsg_bar=rmsg_bar.push(row_msg).push(space().height(10));
                                 }
-                                card_bar_y = card_bar_y.push(card_bar_x);
-                                controller_bar = controller_bar.push(card_bar_y);
                             }
                         }
+                        ctr_bar = ctr_bar.push(scrollable(rmsg_bar));
+                        layout_play = layout_play.push(ctr_bar);
+                    }
+                    // 卡牌
+                    {
+                        let mut controller_bar = Column::new();
+                        let mut card_bar_elements: Vec<iced::Element<'_, UIMessage>> = Vec::new();
+                        for card in play_state.hand_cards.iter() {
+                            let card_element = Column::new()
+                                .width(120)
+                                .height(160)
+                                .push(text(card.to_string()).size(18))
+                                .push(
+                                    text(format!("第 {} 張", card.card_id.clone()))
+                                        .height(Length::Fill)
+                                        .align_y(alignment::Vertical::Bottom)
+                                        .size(15)
+                                        .align_x(alignment::Horizontal::Right),
+                                );
+                            match play_state.game_controller {
+                                pmj_client_core::ccore::PlayerCtrl::NoCtrl => {card_bar_elements.push(card_element.into());}
+                              pmj_client_core::ccore::PlayerCtrl::ThrowCard=>
+                            {card_bar_elements.push(
+                                button(
+                                    card_element
+                                )
+                                .on_press(UIMessage::Play(PlayMsg::ThrowCard(card.clone())))
+                                .style(|t: &iced::Theme, s: button::Status| {
+                                    let p = t.extended_palette();
+                                    let mut style = button::Style::default();
+                                    style.border.width = 1.2;
+                                    style.border.radius = iced::border::radius(10);
+                                    style.text_color = p.background.base.text;
+                                    match s {
+                                        button::Status::Active => {
+                                            style.border.color = p.background.strong.color;
+                                            style.background = None;
+                                        }
+                                        button::Status::Disabled => {
+                                            style.background =
+                                                Some(iced::Background::Color(
+                                                    p.background.weak.color,
+                                                ));
+                                        }
+                                        button::Status::Hovered => {
+                                            style.border.color = p.primary.weak.color;
+                                            style.border.width = 1.5;
+                                        }
+                                        button::Status::Pressed => {
+                                            style.border.color = p.primary.strong.color;
+                                            style.border.width = 0.7;
+                                            style.border.radius = iced::border::radius(6);
+                                        }
+                                    }
+                                    style
+                                })
+                                .into(),
+                            );}}
+                        }
+                        let card_bar_layout = Row::new().extend(card_bar_elements);
+                        controller_bar=controller_bar.push(card_bar_layout);
                         layout_play = layout_play.push(
                             scrollable(
                                 container(controller_bar)
