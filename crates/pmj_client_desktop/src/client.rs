@@ -172,12 +172,16 @@ impl Client {
                                     match pmj_client_core::ccore::ClientCore::connect(
                                         self.server_url.clone(),
                                     ) {
-                                        Ok(ccore) => {
-                                            let gm_state = ccore.game_state();
-                                            loop{match gm_state.clone() {
+                                        Ok(mut ccore) => {
+                                            ccore.process_task();
+                                            let mut gm_state = ccore.game_state();
+                                            loop{
+                                                match gm_state.clone() {
                                                 pmj_client_core::ccore::GMState::HomePage => {
                                                     warn!("update: warn GMState");
                                                     std::thread::sleep(std::time::Duration::from_millis(500));
+                                                    ccore.process_task();
+                                                    gm_state = ccore.game_state();
                                                 }
                                                 pmj_client_core::ccore::GMState::V2Better(gms_v2) => {
                                                     self.scene = ClientScenes::Play(PlayState { is_start: false, hand_cards: Vec::new()
