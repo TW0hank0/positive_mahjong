@@ -16,7 +16,6 @@
 import datetime
 import os
 import sys
-from typing import Any
 
 import gitlab
 import requests
@@ -198,7 +197,7 @@ def release_gitlab(
     file_paths: list[str] | None = None,
     ref: str = "master",
     gitlab_url: str = "https://gitlab.com",
-) -> dict[str, Any]:
+):
     """建立 GitLab Release
 
     :param gitlab_url: GitLab 伺服器網址 (例如 'https://gitlab.com')

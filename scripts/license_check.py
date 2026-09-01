@@ -76,7 +76,7 @@ def main():
     command.append(".")
     (returncode, _stdout) = util.run_cmd(command, cwd=util.fix_path())
     if returncode != 0:
-        print(Style.DIM + ("-" * 10) + Style.NORMAL)
+        print(str(Style.DIM) + "-" * 10 + str(Style.NORMAL))
         print(f"{Fore.RED}Something Wrong!{Fore.RESET}")
         fix_command = [
             "addlicense",
@@ -89,15 +89,15 @@ def main():
         fix_command.extend(ignored.copy())
         fix_command.append(".")
         work_cwd = os.getcwd()
-        print(Fore.CYAN + "--- Fix cmmand" + Fore.RESET)
+        print(f"{Fore.CYAN}--- Fix cmmand{Fore.RESET}")
         print(
-            Back.LIGHTBLACK_EX
+            str(Back.LIGHTBLACK_EX)
             + " && ".join(
                 [f"cd {util.fix_path()}", " ".join(fix_command), f"cd {work_cwd}"]
             )
-            + Back.RESET
+            + str(Back.RESET)
         )
-        print(Style.DIM + "End of command ---" + Style.RESET_ALL)
+        print(str(Style.DIM) + "End of command ---" + str(Style.RESET_ALL))
         sys.exit(1)
     else:
         print("Check Finish.")

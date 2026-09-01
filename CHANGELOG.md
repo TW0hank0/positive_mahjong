@@ -61,6 +61,10 @@ git tag -a "版本" -m "release pmj: 版本"
 
 - ［pmj_gamemodes::v2_better::mode］玩家動作吃的邏輯
 
+**2026-9-1**
+
+- 修復 scripts 的 ty check
+
 ## [v0.1.1] - 2026-8-17
 
 修復客戶端錯誤，並改進訊息顯示。
