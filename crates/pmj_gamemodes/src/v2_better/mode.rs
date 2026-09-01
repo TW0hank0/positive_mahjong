@@ -284,39 +284,36 @@ fn write_reply(
     trace!("enter_func {{ text: {} }}", text);
     debug!("準備回覆客戶端...");
     let reply: Message = Message::Text(text.into());
-    let write_result: tungstenite::Result<()>;
     loop {
-        match websocket.write() {
+        match websocket.try_write() {
             Ok(mut guard) => {
-                write_result = guard.write(reply.clone());
-                let _ = guard.flush();
+                let write_result = guard.send(reply.clone());
                 drop(guard);
-                break;
+                match write_result {
+                    Ok(_) => {
+                        info!("成功回覆客戶端。");
+                    }
+                    Err(ref e) => {
+                        warn!("write_reply: {}", e);
+                    }
+                }
+                return write_result;
             }
             Err(e) => {
                 warn!("ws.try_write() Err: {}", e);
             }
         };
-        thread::sleep(time::Duration::from_millis(500));
+        thread::sleep(time::Duration::from_millis(1500));
     }
-    match write_result {
-        Ok(_) => {
-            info!("成功回覆客戶端。")
-        }
-        Err(_) => {
-            warn!("回覆客戶端失敗！")
-        }
-    }
-    write_result
 }
 
 // 處理單一客戶端連線的函式
 fn handle_client(tcp_stream: TcpStream, backend: sync::Arc<sync::RwLock<PositiveMahjong>>) {
     tcp_stream
-        .set_read_timeout(Some(time::Duration::from_secs(8)))
+        .set_read_timeout(Some(time::Duration::from_secs(5)))
         .ok();
     tcp_stream
-        .set_write_timeout(Some(time::Duration::from_secs(10)))
+        .set_write_timeout(Some(time::Duration::from_secs(8)))
         .ok();
     tcp_stream.set_nodelay(true).ok();
     let client_ip = tcp_stream.peer_addr().unwrap().ip();
@@ -424,7 +421,7 @@ fn handle_client(tcp_stream: TcpStream, backend: sync::Arc<sync::RwLock<Positive
                                         warn!("ping: {}", e);
                                     }
                                 }
-                                thread::sleep(time::Duration::from_secs(2));
+                                thread::sleep(time::Duration::from_secs(3));
                             }
                         }
                     }

@@ -122,6 +122,16 @@ impl Client {
                         pmj_client_core::ccore::GMState::V2Better(ref gms_v2) => {
                             play_state.current_turn = gms_v2.player_turn;
                             play_state.player_id = gms_v2.player_id;
+                            if (!play_state.is_start)&& gms_v2.game_events.iter().any(|(_, event)| {
+                                match event {
+                                    pmj_client_core::ccore::V2BetterEvents::GameStart => {
+                                        true
+                                    }
+                                    _ => {false}
+                                }
+                            }) {
+                                play_state.is_start = true;
+                            }
                         }
                     }
                     return iced::Task::done(UIMessage::CCoreProcessTask);
@@ -462,14 +472,14 @@ impl Client {
                 } else {
                     {
                         let mut ctr_bar = Row::new().height(Length::FillPortion(2));
-                        let mut msg_bar = Column::new().width(Length::FillPortion(3));
-                        let mut msg_num: u16 = 1;
+                        let mut gmsg_bar = Column::new().width(Length::FillPortion(3));
+                        let mut gmsg_num: u16 = 1;
                         for msg in play_state.game_msgs.iter() {
-                            msg_bar = msg_bar
+                            gmsg_bar = gmsg_bar
                                 .push(
                                     container(
                                         Row::new()
-                                            .push(text(msg_num.to_string()).size(17).style(
+                                            .push(text(gmsg_num.to_string()).size(17).style(
                                                 |t: &iced::Theme| {
                                                     let p = t.extended_palette();
                                                     text::Style {
@@ -496,114 +506,106 @@ impl Client {
                                     ),
                                 )
                                 .push(space().height(10));
-                            msg_num += 1;
+                            gmsg_num += 1;
                         }
-                        ctr_bar = ctr_bar.push(scrollable(msg_bar));
-                        let mut card_bar = Column::new().width(Length::FillPortion(2));
-                        for card in play_state.hand_cards.iter() {
-                            card_bar = card_bar.push(space().height(5)).push(
-                                container(
-                                    Row::new()
-                                        .padding(10)
-                                        .width(Length::Fill)
-                                        .height(40)
-                                        .push(text(card.to_string()).size(24))
+                        ctr_bar = ctr_bar.push(scrollable(gmsg_bar));
+                        let mut rmsg_bar = Column::new().width(Length::FillPortion(2));
+                        match play_state.gm_state {
+                            pmj_client_core::ccore::GMState::HomePage => {
+                                warn!("view: warn GMState");
+                            }
+                            pmj_client_core::ccore::GMState::V2Better(ref gms_v2) => {
+                                for (rmsg_num, rmsg) in gms_v2.room_msgs.iter() {
+                                    let mut row_msg =
+                                        Row::new().push(text(rmsg_num).size(18).style(
+                                            |t: &iced::Theme| {
+                                                let p = t.extended_palette();
+                                                text::Style {
+                                                    color: Some(p.primary.base.color),
+                                                }
+                                            },
+                                        ))
                                         .push(
-                                            text(format!("第 {} 張", card.card_id.clone()))
-                                                .width(Length::Fill)
-                                                .size(15)
-                                                .align_x(alignment::Horizontal::Right),
-                                        ),
-                                )
-                                .style(|t: &iced::Theme| {
-                                    let p = t.extended_palette();
-                                    let mut style = container::Style::default();
-                                    style.border.radius = iced::border::Radius::new(10);
-                                    style.border.width = 1.2;
-                                    style.border.color = p.background.weak.color;
-                                    style.text_color = Some(p.background.base.text);
-                                    style.background =
-                                        Some(iced::Background::Color(iced::Color::TRANSPARENT));
-                                    style
-                                }),
-                            );
-                        }
-                        ctr_bar = ctr_bar.push(scrollable(card_bar));
-                        layout_play = layout_play.push(ctr_bar);
-                    }
-                    // 玩家操作
-                    {
-                        let mut controller_bar = Column::new();
-                        match play_state.game_controller {
-                            pmj_client_core::ccore::PlayerCtrl::NoCtrl => {}
-                            pmj_client_core::ccore::PlayerCtrl::ThrowCard => {
-                                controller_bar = controller_bar.push(text("選擇一張你要丟的牌"));
-                                let mut card_bar_elements: Vec<iced::Element<'_, UIMessage>> =
-                                    Vec::new();
-                                for card in play_state.hand_cards.iter() {
-                                    card_bar_elements.push(
-                                        button(
-                                            Column::new()
-                                                .width(120)
-                                                .height(160)
-                                                .push(text(card.to_string()).size(18))
-                                                .push(
-                                                    text(format!("第 {} 張", card.card_id.clone()))
-                                                        .height(Length::Fill)
-                                                        .align_y(alignment::Vertical::Bottom)
-                                                        .size(15)
-                                                        .align_x(alignment::Horizontal::Right),
-                                                ),
-                                        )
-                                        .on_press(UIMessage::Play(PlayMsg::ThrowCard(card.clone())))
-                                        .style(|t: &iced::Theme, s: button::Status| {
-                                            let p = t.extended_palette();
-                                            let mut style = button::Style::default();
-                                            style.border.width = 1.2;
-                                            style.border.radius = iced::border::radius(10);
-                                            style.text_color = p.background.base.text;
-                                            match s {
-                                                button::Status::Active => {
-                                                    style.border.color = p.background.strong.color;
-                                                    style.background = None;
-                                                }
-                                                button::Status::Disabled => {
-                                                    style.background =
-                                                        Some(iced::Background::Color(
-                                                            p.background.weak.color,
-                                                        ));
-                                                }
-                                                button::Status::Hovered => {
-                                                    style.border.color = p.primary.weak.color;
-                                                    style.border.width = 1.5;
-                                                }
-                                                button::Status::Pressed => {
-                                                    style.border.color = p.primary.strong.color;
-                                                    style.border.width = 0.7;
-                                                    style.border.radius = iced::border::radius(6);
-                                                }
-                                            }
-                                            style
-                                        })
-                                        .into(),
-                                    );
-                                }
-                                let mut card_bar_y = Column::new().spacing(3).padding(5);
-                                let mut card_bar_x = Row::new().spacing(3).padding(5);
-                                let mut card_bar_count = 1;
-                                for e in card_bar_elements {
-                                    card_bar_x = card_bar_x.push(e);
-                                    card_bar_count += 1;
-                                    if card_bar_count > 9 {
-                                        card_bar_y = card_bar_y.push(card_bar_x);
-                                        card_bar_x = Row::new().spacing(3).padding(5);
-                                        card_bar_count = 1;
+                                            space().width(10)
+                                        );
+                                    match rmsg {
+                                        pmj_gamemodes::v2_better::shared::ServerRoomMsg::PlayerSay(said_player, said_text) => {
+                                            row_msg = row_msg.push(text(format!("玩家{}", said_player.to_string())).size(16));
+                                            row_msg = row_msg.push(text("\u{e5c8}").font(MATERIAL_SYMBOLS_OUTLINED).size(14));
+                                            row_msg = row_msg.push(text(said_text).size(16));
+                                        }
+                                        pmj_gamemodes::v2_better::shared::ServerRoomMsg::RootSay(said_text) => {
+                                            row_msg = row_msg.push(text("Root").size(16));
+                                            row_msg = row_msg.push(text("\u{e5c8}").font(MATERIAL_SYMBOLS_OUTLINED).size(14));
+                                            row_msg = row_msg.push(text(said_text).size(16));
+                                        }
+
                                     }
+                                    rmsg_bar=rmsg_bar.push(row_msg).push(space().height(10));
                                 }
-                                card_bar_y = card_bar_y.push(card_bar_x);
-                                controller_bar = controller_bar.push(card_bar_y);
                             }
                         }
+                        ctr_bar = ctr_bar.push(scrollable(rmsg_bar));
+                        layout_play = layout_play.push(ctr_bar);
+                    }
+                    // 卡牌
+                    {
+                        let mut controller_bar = Column::new();
+                        let mut card_bar_elements: Vec<iced::Element<'_, UIMessage>> = Vec::new();
+                        for card in play_state.hand_cards.iter() {
+                            let card_element = Column::new()
+                                .width(120)
+                                .height(160)
+                                .push(text(card.to_string()).size(18))
+                                .push(
+                                    text(format!("第 {} 張", card.card_id.clone()))
+                                        .height(Length::Fill)
+                                        .align_y(alignment::Vertical::Bottom)
+                                        .size(15)
+                                        .align_x(alignment::Horizontal::Right),
+                                );
+                            match play_state.game_controller {
+                                pmj_client_core::ccore::PlayerCtrl::NoCtrl => {card_bar_elements.push(card_element.into());}
+                              pmj_client_core::ccore::PlayerCtrl::ThrowCard=>
+                            {card_bar_elements.push(
+                                button(
+                                    card_element
+                                )
+                                .on_press(UIMessage::Play(PlayMsg::ThrowCard(card.clone())))
+                                .style(|t: &iced::Theme, s: button::Status| {
+                                    let p = t.extended_palette();
+                                    let mut style = button::Style::default();
+                                    style.border.width = 1.2;
+                                    style.border.radius = iced::border::radius(10);
+                                    style.text_color = p.background.base.text;
+                                    match s {
+                                        button::Status::Active => {
+                                            style.border.color = p.background.strong.color;
+                                            style.background = None;
+                                        }
+                                        button::Status::Disabled => {
+                                            style.background =
+                                                Some(iced::Background::Color(
+                                                    p.background.weak.color,
+                                                ));
+                                        }
+                                        button::Status::Hovered => {
+                                            style.border.color = p.primary.weak.color;
+                                            style.border.width = 1.5;
+                                        }
+                                        button::Status::Pressed => {
+                                            style.border.color = p.primary.strong.color;
+                                            style.border.width = 0.7;
+                                            style.border.radius = iced::border::radius(6);
+                                        }
+                                    }
+                                    style
+                                })
+                                .into(),
+                            );}}
+                        }
+                        let card_bar_layout = Row::new().extend(card_bar_elements);
+                        controller_bar=controller_bar.push(card_bar_layout);
                         layout_play = layout_play.push(
                             scrollable(
                                 container(controller_bar)

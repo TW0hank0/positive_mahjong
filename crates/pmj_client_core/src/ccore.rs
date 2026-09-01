@@ -360,23 +360,23 @@ impl ClientCore {
                                             let server_msg = ctr.read_ws_msg_v2.unwrap();
                                             info!("server_msg: {:?}", server_msg);
                                             match server_msg {
-                                                        pmj_gamemodes::v2_better::shared::ServerMessage::RoomMsg(room_msg) => {
-                                                            match self.gamemode_state {
-                                                                GMState::V2Better(ref mut state_v2) => {
+                                                pmj_gamemodes::v2_better::shared::ServerMessage::RoomMsg(room_msg) => {
+                                                    match self.gamemode_state {
+                                                        GMState::V2Better(ref mut state_v2) => {
                                                                     state_v2.room_msgs.push((
                                                                         (state_v2.room_msgs.len() as u64) +1,
                                                                         room_msg
                                                                     ));
                                                                 }
-                                                                GMState::HomePage => {
+                                                        GMState::HomePage => {
                                                                     error!("????????????");
                                                                     panic!("????????????");
                                                                 }
                                                             }
                                                         }
-                                                        pmj_gamemodes::v2_better::shared::ServerMessage::GameMsg(game_msg) =>{
-                                                            match self.gamemode_state {
-                                                                GMState::V2Better(ref mut state_v2) => {
+                                                pmj_gamemodes::v2_better::shared::ServerMessage::GameMsg(game_msg) =>{
+                                                    match self.gamemode_state {
+                                                        GMState::V2Better(ref mut state_v2) => {
                                                                     match game_msg {
                                                                         pmj_gamemodes::v2_better::shared::ServerGameMsg::GameStart => {
                                                                             state_v2.game_events.push(
@@ -424,6 +424,7 @@ impl ClientCore {
                                                             }
                                                         }
                                                     }
+                                            self.read_ws_msg();
                                         }
                                         CTaskKinds::SendFirstMsgReq => {
                                             self.read_first_msg_resp();
@@ -454,6 +455,7 @@ impl ClientCore {
                                                     room_msgs: Vec::new(),
                                                 });
                                             self.ping_pong_thread();
+                                            self.read_ws_msg();
                                         }
                                     },
                                     Err(e) => {
