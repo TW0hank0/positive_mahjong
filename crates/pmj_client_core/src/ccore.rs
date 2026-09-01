@@ -97,11 +97,12 @@ impl ClientCore {
             GMState::HomePage => PlayerCtrl::NoCtrl,
             GMState::V2Better(ref state) => {
                 if state.game_events.len() > 1 {
-                let (_event_num, event) = state.game_events.last().unwrap();
-                match event {
-                    V2BetterEvents::YouGetCard(_) => PlayerCtrl::ThrowCard,
-                    _ => PlayerCtrl::NoCtrl,
-                }} else {
+                    let (_event_num, event) = state.game_events.last().unwrap();
+                    match event {
+                        V2BetterEvents::YouGetCard(_) => PlayerCtrl::ThrowCard,
+                        _ => PlayerCtrl::NoCtrl,
+                    }
+                } else {
                     PlayerCtrl::NoCtrl
                 }
             }
@@ -434,7 +435,9 @@ impl ClientCore {
                                             break;
                                         }
                                         CTaskKinds::ReadFirstMsgResp => {
-                                            info!("process_task: Task(CTaskKinds::ReadFirstMsgResp) finish sucessful");
+                                            info!(
+                                                "process_task: Task(CTaskKinds::ReadFirstMsgResp) finish sucessful"
+                                            );
                                             let player_id = ctr.rfirstmsgresp_player_id.unwrap();
                                             match ctr.rfirstmsgresp_gamemode.unwrap() {
                                                 pmj_shared::shared::GameModes::V2Better => {}
