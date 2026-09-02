@@ -30,14 +30,12 @@ lyon_algorithms = { workspace = true }
 pmj_shared = { workspace = true }
 serde_json = { workspace = true }
 tungstenite = { workspace = true }
-# --- android ---
-android_logger = { workspace = true, optional = true }
 # --- wasm ---
 console_error_panic_hook = { workspace = true, optional = true }
 wasm-bindgen = { workspace = true, optional = true }
 
 [features]
-android = ["dep:android_logger"]
+android = []
 default = []
 wasm = ["dep:console_error_panic_hook", "dep:wasm-bindgen"]
 

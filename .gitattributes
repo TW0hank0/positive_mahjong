@@ -1,2 +1,4 @@
+* text=auto eol=lf
+
 crates/old_slint_client/** linguist-vendored
 crates/old_pmj_client/** linguist-vendored

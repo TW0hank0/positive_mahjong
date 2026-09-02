@@ -1,43 +1,31 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "extends": [
-        "config:recommended"
-    ],
+    "extends": ["config:recommended"],
     "ignorePaths": [
         "crates/old_pmj_client/**",
         "crates/old_slint_client/**"
     ],
     "packageRules": [
         {
-            "matchUpdateTypes": [
-                "patch"
-            ],
+            "matchUpdateTypes": ["patch"],
             "groupName": "patch dependencies",
             "groupSlug": "all-patch"
         },
         {
-            "matchUpdateTypes": [
-                "minor"
-            ],
+            "matchUpdateTypes": ["minor"],
             "groupName": "minor dependencies",
             "groupSlug": "all-minor"
         },
         {
-            "matchUpdateTypes": [
-                "major"
-            ],
+            "matchUpdateTypes": ["major"],
             "groupName": "major dependencies",
             "groupSlug": "all-major",
-            "labels": [
-                "major-update"
-            ]
+            "labels": ["major-update"]
         },
         {
             "description": "將所有未鎖定或萬用字元版本釘選到具體版本",
             "rangeStrategy": "pin",
-            "matchPackageNames": [
-                "*"
-            ]
+            "matchPackageNames": ["*"]
         }
     ],
     "timezone": "Asia/Taipei",

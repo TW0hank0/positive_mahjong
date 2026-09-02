@@ -65,10 +65,6 @@ jobs:
       - name: Lint toml file
         run: taplo lint
 
-      - name: install ruff and ty
-        run: |
-          uv tool install ruff ty
-
       - name: check scripts
         run: |
           cd scripts
@@ -76,11 +72,12 @@ jobs:
           ty check .
           cd ..
 
-      - name: Run cargo-msrv script
-        run: |
-          cd scripts
-          uv run cargo_msrv.py
-          cd ..
+      # cargo-msrv never run sucessful when rust-toolchain is nightly
+      # - name: Run cargo-msrv script
+      #   run: |
+      #     cd scripts
+      #     uv run cargo_msrv.py
+      #     cd ..
 
       - name: Run cargo-deny
         run: |

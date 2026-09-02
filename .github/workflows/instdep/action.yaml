@@ -51,11 +51,6 @@ runs:
         rustc --version
         cargo --version
 
-    - name: install rust toolchain
-      shell: pwsh
-      run: |
-        rustup update
-
     - name: install Linux build needed dep
       shell: pwsh
       if: runner.os == 'Linux'
@@ -74,8 +69,21 @@ runs:
         go install github.com/google/addlicense@latest
         echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
-    - name: use cargo to install tools
+    - name: Cache Cargo installed tools
+      uses: actions/cache@v4
+      id: cache-cargo-tools
+      with:
+        path: |
+          ~/.cargo/bin/cargo-deny
+          ~/.cargo/bin/cargo-about
+          ~/.cargo/bin/mdbook
+          ~/.cargo/bin/cargo-msrv
+          ~/.cargo/bin/taplo
+        key: ${{ runner.os }}-cargo-tools-${{ hashFiles('.github/cache-version.txt') }}
+
+    - name: Install cargo tools if not cached
       shell: pwsh
+      if: steps.cache-cargo-tools.outputs.cache-hit != 'true'
       run: |
         cargo install cargo-msrv cargo-deny taplo-cli mdbook --locked
         cargo install cargo-about --features="cli" --locked
@@ -88,6 +96,12 @@ runs:
         cargo deny --version
         taplo --version
         mdbook --version
+
+    - name: install ruff and ty using uv
+      shell: pwsh
+      run: |
+        uv tool install ruff
+        uv tool install ty
 
     # - name: install java
     #   uses: actions/setup-java@v5.7.0

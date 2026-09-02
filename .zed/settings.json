@@ -3,7 +3,14 @@
         "YAML": {
             "tab_size": 2,
         },
+        "JSON": {
+            "tab_size": 4,
+        },
+        "JSONC": {
+            "tab_size": 4,
+        },
     },
+    "line_ending": "enforce_lf",
     "lsp": {
         "rust-analyzer": {
             "initialization_options": {

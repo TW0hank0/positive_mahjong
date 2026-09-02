@@ -78,8 +78,6 @@ crossbeam = "=0.8.4"
 # --- wasm ---
 console_error_panic_hook = { version = "=0.1.7" }
 wasm-bindgen = { version = "=0.2.127" }
-# --- android ---
-android_logger = { version = "=0.15.1" }
 
 [workspace]
 members = [
