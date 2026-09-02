@@ -24,6 +24,8 @@
 
 [專案網站](https://tw0hank0.gitlab.io/positive_mahjong/)
 
+> [Github Pages](https://tw0hank0.github.io/positive_mahjong/)
+
 [KeepAndroidOpen](https://keepandroidopen.org/)
 
 > 從 2026 年 9 月起，Google 將在未經使用者同意的情況下，悄悄推送一項更新，封鎖所有未向 Google 登記、未簽署其合約、未繳費，且未提交政府核發身分證明文件的 Android 應用程式。
