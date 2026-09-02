@@ -65,10 +65,6 @@ jobs:
       - name: Lint toml file
         run: taplo lint
 
-      - name: install ruff and ty
-        run: |
-          uv tool install ruff ty
-
       - name: check scripts
         run: |
           cd scripts
