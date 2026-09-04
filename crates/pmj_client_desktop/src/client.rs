@@ -23,7 +23,6 @@ use iced::{
     },
 };
 use tracing::{error, warn};
-use tungstenite::WebSocket;
 
 use crate::{circular, easing};
 
@@ -474,7 +473,7 @@ impl Client {
                             .width(Length::Fill),
                     );
                     layout_play = layout_play.push(status_bar);
-                } else {
+                } else if play_state.is_start {
                     {
                         let mut ctr_bar = Row::new().height(Length::FillPortion(2));
                         let mut gmsg_bar = Column::new().width(Length::FillPortion(3));

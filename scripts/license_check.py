@@ -52,7 +52,7 @@ def main():
         "website_build/**",
         # `old_pmj_client` 包含第三方程式碼
         # [android-iced-example](https://github.com/ibaryshnikov/android-iced-example)
-        "crates/old_pmj_client/src/android/**",
+        "crates/old_pmj_client/**",
         # Author: [iced team](https://github.com/iced-rs/)
         # This file is from project [iced](https://github.com/iced-rs/iced/).
         "crates/pmj_client_desktop/src/easing.rs",

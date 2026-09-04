@@ -71,7 +71,7 @@ runs:
         echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
     - name: Cache Cargo installed tools
-      uses: actions/cache@v6
+      uses: actions/cache@v6.1.0
       id: cache-cargo-tools
       with:
         path: |

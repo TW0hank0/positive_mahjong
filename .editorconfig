@@ -1,7 +1,7 @@
 # Tells EditorConfig this is the root project file
 root = true
 
-# Apply LF line endings to all files
 [*]
 charset = utf-8
+# Apply LF line endings to all files
 end_of_line = lf

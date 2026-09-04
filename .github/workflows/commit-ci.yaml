@@ -67,10 +67,15 @@ jobs:
       - name: Lint toml file
         run: taplo lint
 
-      - name: check scripts
+      - name: ruff check scripts
         run: |
           cd scripts
           ruff check .
+          cd ..
+
+      - name: ty check scripts
+        run: |
+          cd scripts
           ty check .
           cd ..
 

@@ -25,7 +25,6 @@ def main():
     autogen_path = util.fix_path("auto_generated")
     if os.path.exists(autogen_path) is False:
         os.mkdir(autogen_path)
-    #
     all_commands = [
         [
             "cargo",
@@ -58,10 +57,8 @@ def main():
             util.fix_path("templates", "about_markdown.hbs"),
         ],
     ]
-    #
     for command in all_commands:
         _ = util.run_cmd(command, cwd=util.fix_path())
-    #
     print("Indenting json file...", end="")
     json_file_path = util.fix_path(
         "auto_generated",

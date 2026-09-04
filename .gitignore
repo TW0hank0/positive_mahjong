@@ -9,7 +9,8 @@
 **/.mypy_cache/**
 
 # --- Other ---
-positive_*_v*_*.zip
+positive_*-v*-*.zip
+positive_mahjong-*-v*-*.zip
 *.kra~
 pmj_server_config.json
 auto_generated/**
