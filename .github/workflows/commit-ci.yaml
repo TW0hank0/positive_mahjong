@@ -16,6 +16,8 @@
 name: commit-ci
 
 on:
+  # 支援在 GitHub 上手動點擊觸發
+  workflow_dispatch:
   push:
     branches:
       - master

@@ -35,7 +35,7 @@ def run_cmd(command: list[str], cwd: str | None = None) -> tuple[int, str]:
     start_time = time.time()
     process = subprocess.run(
         command,
-        timeout=60 * 20,
+        timeout=60 * 30,
         stderr=subprocess.PIPE,
         stdout=subprocess.PIPE,
         cwd=cwd,
