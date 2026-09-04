@@ -387,8 +387,9 @@ impl ClientCore {
                                                                         pmj_gamemodes::v2_better::shared::ServerGameMsg::ChangedTurn(player_turn) => {
                                                                             state_v2.game_events.push(
                                                                                 ((state_v2.game_events.len() as u64) +1,
-                                                                                    V2BetterEvents::ChangeTurn(player_turn))
+                                                                                    V2BetterEvents::ChangeTurn(player_turn.clone()))
                                                                             );
+                                                                            state_v2.player_turn = Some(player_turn);
                                                                         }
                                                                         pmj_gamemodes::v2_better::shared::ServerGameMsg::Error(_e) => { todo!("not support yet")}
                                                                         pmj_gamemodes::v2_better::shared::ServerGameMsg::GameFinish => {

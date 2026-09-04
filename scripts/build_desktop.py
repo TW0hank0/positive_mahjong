@@ -40,7 +40,38 @@ def main():
 
 def zip_desktop():
     version = util.get_version()
-    include_files: list[str] = []
+    include_files: list[str | tuple[str, str]] = [
+        util.fix_path("README.md"),
+        util.fix_path("LICENSE"),
+        util.fix_path(
+            "auto_generated",
+            "ThirdPartyLicense-Rust.html",
+        ),
+        util.fix_path(
+            "auto_generated",
+            "ThirdPartyLicense-Rust.json",
+        ),
+        util.fix_path(
+            "auto_generated",
+            "ThirdPartyLicense-Rust.md",
+        ),
+        (
+            util.fix_path(
+                "assets",
+                "Noto_Sans_TC",
+                "OFL.txt",
+            ),
+            "Noto_Sans_TC_OFL.txt",
+        ),
+        (
+            util.fix_path(
+                "assets",
+                "material_symbols",
+                "LICENSE",
+            ),
+            "material_symbols_LICENSE",
+        ),
+    ]
     target_path = util.fix_path(
         "target",
         "release",
@@ -70,7 +101,14 @@ def zip_desktop():
         compression=zipfile.ZIP_DEFLATED,
     ) as zipf:
         for file in include_files:
-            zipf.write(file, arcname=os.path.basename(file))
+            if type(file) is tuple:
+                zipf.write(file[0], arcname=file[1])
+            elif type(file) is str:
+                zipf.write(file, arcname=os.path.basename(file))
+            else:
+                print(
+                    "incorrect file arg type, not tuple and not str!", file=sys.stderr
+                )
     print(zip_file_name)
 
 

@@ -37,7 +37,7 @@ def main():
         version = util.get_version()
         tag = f"v{version}"
         title = f"{REPO} v{version}"
-        date = datetime.datetime.now().date()
+        date = datetime.datetime.now(datetime.UTC).date()
         notes = f"v{version} released at {date.year}/{date.month}/{date.day} by `scripts/releases.py`"
         create_release_gh(
             tag, title, notes, is_prerelease=False, owner=OWNER, repo=REPO
@@ -73,8 +73,8 @@ def main():
     else:
         print("PreRelease:", end="")
         version = util.get_version()
-        date = datetime.datetime.now().date()
-        time = datetime.datetime.now().time()
+        date = datetime.datetime.now(datetime.UTC).date()
+        time = datetime.datetime.now(datetime.UTC).time()
         tag = f"ci-v{version}+{date.month}_{date.day}-{commit_info.sha}"
         title = (
             f"PreRelease v{version}+{date.month}/{date.day}+{time.hour}:{time.minute}"

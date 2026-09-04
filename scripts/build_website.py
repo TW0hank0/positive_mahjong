@@ -220,7 +220,7 @@ def replace_var(
     html_vars["VAR_COMMIT_COMMITTER_EMAIL"] = commit_info.committer_email
     html_vars["VAR_COMMIT_AUTHOR_NAME"] = commit_info.author_name
     html_vars["VAR_COMMIT_AUTHOR_EMAIL"] = commit_info.author_email
-    #
+    # read and replace
     with open(replace_html_path, "r", encoding="utf-8") as f:
         new_html_content = f.read()
     for key in list(html_vars.keys()):

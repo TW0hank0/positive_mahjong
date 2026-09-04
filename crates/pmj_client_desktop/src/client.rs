@@ -132,6 +132,7 @@ impl Client {
                             }) {
                                 play_state.is_start = true;
                             }
+                            play_state.current_turn = gms_v2.player_turn;
                         }
                     }
                     return iced::Task::done(UIMessage::CCoreProcessTask);
