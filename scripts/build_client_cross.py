@@ -20,19 +20,19 @@ import util
 
 
 def main():
-    # [ [ export_name, rust_target_name ] ]
+    # [ [ export_name, rust_target_name, built_artifact_path ] ]
     platforms: list[tuple[str, str, str]] = [
         (
             "Android-arm64",
             "aarch64-linux-android",
-            "build/pmj_client_cross/pmj_client_cross-android-arm64.apk",
+            util.fix_path("build/pmj_client_cross/pmj_client_cross-android-arm64.apk"),
         ),
         (
             "Android-x86_64",
             "x86_64-linux-android",
-            "build/pmj_client_cross/pmj_client_cross-android-x86_64.apk",
+            util.fix_path("build/pmj_client_cross/pmj_client_cross-android-x86_64.apk"),
         ),
-        ("Web", "wasm32-unknown-unknown", "build/pmj_client_cross/web/"),
+        ("Web", "wasm32-unknown-unknown", util.fix_path("build/pmj_client_cross/web/")),
     ]
     pf_sys = platform.system()
     match pf_sys:
@@ -42,12 +42,12 @@ def main():
                     (
                         "Windows_Desktop-x86_64",
                         "x86_64-pc-windows-msvc",
-                        "build/pmj_client_cross/windows-x86_64/",
+                        util.fix_path("build/pmj_client_cross/windows-x86_64/"),
                     ),
                     (
                         "Windows_Desktop-arm64",
                         "aarch64-pc-windows-msvc",
-                        "build/pmj_client_cross/windows-arm64/",
+                        util.fix_path("build/pmj_client_cross/windows-arm64/"),
                     ),
                 ]
             )
@@ -57,12 +57,12 @@ def main():
                     (
                         "Linux-x86_64",
                         "x86_64-unknown-linux-musl",
-                        "build/pmj_client_cross/linux-x86_64",
+                        util.fix_path("build/pmj_client_cross/linux-x86_64"),
                     ),
                     (
                         "Linux-arm64",
                         "aarch64-unknown-linux-musl",
-                        "build/pmj_client_cross/linux-arm64",
+                        util.fix_path("build/pmj_client_cross/linux-arm64"),
                     ),
                 ]
             )
@@ -97,7 +97,9 @@ def main():
             ex_preset_name,
             ex_dir_path,
         ]
-        _ = util.run_cmd(export_command)
+        _ = util.run_cmd(
+            export_command, cwd=util.fix_path("crates", "pmj_client_cross", "godot")
+        )
 
 
 if __name__ == "__main__":

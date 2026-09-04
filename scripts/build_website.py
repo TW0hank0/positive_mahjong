@@ -17,6 +17,7 @@ import os
 import shutil
 
 import mistune
+from colorama import Back, Fore, Style
 
 import util
 
@@ -155,7 +156,9 @@ def process_dir(
         else:
             if os.path.isfile(full_dir_path) is True:
                 if dir.endswith(".html") is True:
-                    print(f"Found html file: {full_dir_path}")
+                    print(
+                        f"Found html file: {Back.LIGHTBLACK_EX}{full_dir_path}{Back.RESET}"
+                    )
                     with open(full_dir_path, "r", encoding="utf-8") as f:
                         orig_content = f.read()
                     new_content = replace_var(
@@ -164,7 +167,9 @@ def process_dir(
                     if new_content != orig_content:
                         with open(full_dir_path, "w", encoding="utf-8") as f:
                             _ = f.write(new_content)
-                        print(f"Wrote html file: {full_dir_path}")
+                        print(
+                            f"{Fore.GREEN}Wrote html file:{Fore.RESET} {Back.LIGHTBLACK_EX}{full_dir_path}{Back.RESET}."
+                        )
             elif os.path.isdir(full_dir_path) is True:
                 process_dir(
                     dir_path=full_dir_path,
@@ -191,7 +196,7 @@ def replace_var(
         key_fixed_name = "{{$" + key + "$}}"
         if key_fixed_name in new_template:
             new_template = new_template.replace(key_fixed_name, template_vars[key])
-            print(f"Replaced `{key}` in template.")
+            print(f"{Style.DIM}Replaced `{key}` in template.{Style.NORMAL}")
     html_vars: dict[str, str] = {}
     html_vars["VAR_NAV"] = new_template
     with open(
@@ -216,6 +221,9 @@ def replace_var(
     html_vars["VAR_COMMIT_SHORT_SHA"] = commit_info.short_sha
     html_vars["VAR_COMMIT_TIME"] = commit_info.time
     html_vars["VAR_COMMIT_MSG"] = commit_info.msg
+    html_vars["VAR_COMMIT_MSG_PREFER_HTML"] = str(
+        mistune.html(commit_info.msg.replace("<", "\\<").replace(">", "\\>"))
+    )
     html_vars["VAR_COMMIT_COMMITTER_NAME"] = commit_info.committer_name
     html_vars["VAR_COMMIT_COMMITTER_EMAIL"] = commit_info.committer_email
     html_vars["VAR_COMMIT_AUTHOR_NAME"] = commit_info.author_name
@@ -227,7 +235,9 @@ def replace_var(
         key_fixed_name = "{{$" + key + "$}}"
         if key_fixed_name in new_html_content:
             new_html_content = new_html_content.replace(key_fixed_name, html_vars[key])
-            print(f"Replaced `{key}` in file: {replace_html_path}")
+            print(
+                f"{Style.DIM}Replaced `{key}` in file: {replace_html_path}.{Style.NORMAL}"
+            )
     os.chdir(orig_work_dir)
     return new_html_content
 

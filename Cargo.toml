@@ -92,12 +92,13 @@ members = [
 resolver = "3"
 
 [profile.release]
-debug = false
+debug = true
 lto = true
 opt-level = 3
 codegen-units = 1
+incremental = false
 
 [profile.dev]
-debug = 2
+debug = true
 lto = false
 opt-level = 0

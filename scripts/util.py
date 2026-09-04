@@ -35,19 +35,24 @@ def run_cmd(command: list[str], cwd: str | None = None) -> tuple[int, str]:
     start_time = time.time()
     process = subprocess.run(
         command,
-        timeout=60 * 20,
+        timeout=60 * 25,
         stderr=subprocess.PIPE,
         stdout=subprocess.PIPE,
         cwd=cwd,
     )
     end_time = time.time()
+    process_time = end_time - start_time
+    if int(process_time) > 1:
+        process_time_str = f"({process_time:.3f} secs)"
+    else:
+        process_time_str = ""
     if process.returncode == 0:
         print(
-            f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.GREEN}Process fnished sucessful.{Fore.RESET} {Fore.LIGHTBLACK_EX}({int(end_time - start_time)} secs){Fore.RESET}"
+            f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.GREEN}Process fnished sucessful.{Fore.RESET} {Fore.LIGHTBLACK_EX}{process_time_str}{Fore.RESET}"
         )
     else:
         print(
-            f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.RED}Process exited with non-zero code{Fore.RESET} {Fore.LIGHTBLACK_EX}({process.returncode}){Fore.RESET}! {Fore.LIGHTBLACK_EX}({int(end_time - start_time)} secs){Fore.RESET}"
+            f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.RED}Process exited with non-zero code{Fore.RESET} {Fore.LIGHTBLACK_EX}({process.returncode}){Fore.RESET}! {Fore.LIGHTBLACK_EX}{process_time_str}{Fore.RESET}"
         )
         for name, data in [
             ("stdout", process.stdout.decode()),
@@ -68,7 +73,7 @@ def run_cmd(command: list[str], cwd: str | None = None) -> tuple[int, str]:
     return (process.returncode, process.stdout.decode().rstrip("\n"))
 
 
-def get_commit_info():
+def get_commit_info() -> CommitInfo:
     """return CommitInfo"""
     (_returncode, sha_stdout) = run_cmd(["git", "rev-parse", "HEAD"], cwd=fix_path())
     commit_sha = sha_stdout.replace("\n", "")
@@ -194,9 +199,21 @@ if __name__ == "__main__":
     app = typer.Typer()
 
     @app.command()
-    def main(command: Literal["get_version"]):
+    def main(
+        command: Literal[
+            "get_version", "get_datetime", "commit_sha", "commit_short_sha"
+        ],
+    ):
         match command:
             case "get_version":
                 print(get_version())
+            case "get_datetime":
+                print(get_datetime())
+            case "commit_sha":
+                commit_info = get_commit_info()
+                print(commit_info.sha)
+            case "commit_short_sha":
+                commit_info = get_commit_info()
+                print(commit_info.short_sha)
 
     app()
