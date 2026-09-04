@@ -59,7 +59,7 @@ pub struct PlayState {
     is_start: bool,
     player_id: u8,
     hand_cards: Vec<pmj_gamemodes::v2_better::shared::PMJCard>,
-    game_msgs: Vec<String>,
+    game_msgs: Vec<(u64, String)>,
     game_controller: pmj_client_core::ccore::PlayerCtrl,
     current_turn: Option<u8>,
     ccore: pmj_client_core::ccore::ClientCore,
@@ -131,7 +131,11 @@ impl Client {
                             }) {
                                 play_state.is_start = true;
                             }
-                            play_state.current_turn = gms_v2.player_turn;
+                            play_state.hand_cards = gms_v2.cards.clone();
+                            play_state.game_msgs.clear();
+                            for (msgid, gmsg) in gms_v2.game_events.clone().iter() {
+                                play_state.game_msgs.push((msgid.clone(), format!("{:?}", gmsg)));
+                            }
                         }
                     }
                     return iced::Task::done(UIMessage::CCoreProcessTask);
@@ -203,7 +207,7 @@ impl Client {
                                                     gms_v2,
                                                 ) => {
                                                     self.scene = ClientScenes::Play(PlayState { is_start: false, hand_cards: Vec::new()
-                                                        , game_msgs: Vec::new(), game_controller: pmj_client_core::ccore::PlayerCtrl::NoCtrl, current_turn: None, ccore, gm_state, player_id:gms_v2.player_id });
+                                                        , game_msgs: Vec::with_capacity(20), game_controller: pmj_client_core::ccore::PlayerCtrl::NoCtrl, current_turn: None, ccore, gm_state, player_id:gms_v2.player_id });
                                                     break;
                                                 }
                                             }
@@ -473,13 +477,12 @@ impl Client {
                     {
                         let mut ctr_bar = Row::new().height(Length::FillPortion(2));
                         let mut gmsg_bar = Column::new().width(Length::FillPortion(3));
-                        let mut gmsg_num: u16 = 1;
-                        for msg in play_state.game_msgs.iter() {
+                        for (gmsg_id, gmsg) in play_state.game_msgs.iter() {
                             gmsg_bar = gmsg_bar
                                 .push(
                                     container(
                                         Row::new()
-                                            .push(text(gmsg_num.to_string()).size(17).style(
+                                            .push(text(gmsg_id.to_string()).size(17).style(
                                                 |t: &iced::Theme| {
                                                     let p = t.extended_palette();
                                                     text::Style {
@@ -488,7 +491,7 @@ impl Client {
                                                 },
                                             ))
                                             .push(space().width(15))
-                                            .push(text(msg.clone()).size(16)),
+                                            .push(text(gmsg.clone()).size(16)),
                                     )
                                     .style(
                                         |t: &iced::Theme| {
@@ -506,7 +509,6 @@ impl Client {
                                     ),
                                 )
                                 .push(space().height(10));
-                            gmsg_num += 1;
                         }
                         ctr_bar = ctr_bar.push(scrollable(gmsg_bar));
                         let mut rmsg_bar = Column::new().width(Length::FillPortion(2));

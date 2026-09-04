@@ -23,10 +23,11 @@ runs:
     - name: Install uv
       uses: astral-sh/setup-uv@v10.0.1
 
-    - name: check uv install
+    - name: check uv install and install cpython
       shell: pwsh
       run: |
         uv self version
+        uv python install cpython-3.14
 
     - name: install rustup on Windows
       if: runner.os == 'Windows'
