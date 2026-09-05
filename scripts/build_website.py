@@ -207,6 +207,26 @@ def replace_var(
         encoding="utf-8",
     ) as f:
         html_vars["VAR_LICENSE"] = f.read()
+    html_fixed_contents = [
+        (
+            "<https://fsf.org/>",
+            '<a href="https://fsf.org/" target="_blank">&lt;https://fsf.org/&gt;</a>',
+        ),
+        (
+            """<one line to give the program's name and a brief idea of what it does.>
+    Copyright (C) <year>  <name of author>""",
+            """&lt;one line to give the program&apos;s name and a brief idea of what it does.&gt;
+    Copyright (C) &lt;year&gt;  &lt;name of author&gt;""",
+        ),
+        (
+            "<https://www.gnu.org/licenses/>",
+            '<a href="https://www.gnu.org/licenses/" target="_blank">&lt;https://www.gnu.org/licenses/&gt;</a>',
+        ),
+    ]
+    fixed_license = html_vars["VAR_LICENSE"]
+    for orig, replacement in html_fixed_contents:
+        fixed_license = fixed_license.replace(orig, replacement)
+    html_vars["VAR_FIXED_LICENSE"] = fixed_license
     with open(
         util.fix_path(
             "auto_generated",

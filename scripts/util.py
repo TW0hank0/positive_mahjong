@@ -129,14 +129,14 @@ def get_commit_info() -> CommitInfo:
 
 class CommitInfo:
     __slots__: list[str] = [
+        "author_email",
+        "author_name",
+        "committer_email",
+        "committer_name",
+        "msg",
         "sha",
         "short_sha",
         "time",
-        "msg",
-        "committer_name",
-        "committer_email",
-        "author_name",
-        "author_email",
     ]
     sha: str
     short_sha: str

@@ -65,6 +65,11 @@ git tag -a "版本" -m "release pmj: 版本"
 
 - 修復 scripts 的 ty check
 
+**2026-9-5**
+
+- 修復：網頁 license
+- 新增：［pmj_server::gui］發送房間Root訊息
+
 ## [v0.1.1] - 2026-8-17
 
 修復客戶端錯誤，並改進訊息顯示。

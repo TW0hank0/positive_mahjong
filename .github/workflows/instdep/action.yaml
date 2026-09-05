@@ -76,9 +76,10 @@ runs:
         go install github.com/google/addlicense@latest
         echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
-    - name: Cache Cargo installed tools
+    - name: Cache Cargo installed tools on Linux
       uses: actions/cache@v6.1.0
-      id: cache-cargo-tools
+      id: cache-cargo-tools-linux
+      if: runner.os == 'Linux'
       with:
         path: |
           ~/.cargo/bin/cargo-deny
@@ -88,9 +89,29 @@ runs:
           ~/.cargo/bin/taplo
         key: ${{ runner.os }}-cargo-tools-${{ hashFiles('.github/cache-version.txt') }}
 
-    - name: Install cargo tools if not cached
+    - name: Cache Cargo installed tools on Windows
+      uses: actions/cache@v6.1.0
+      id: cache-cargo-tools-windows
+      if: runner.os == 'Linux'
+      with:
+        path: |
+          ~/.cargo/bin/cargo-deny.exe
+          ~/.cargo/bin/cargo-about.exe
+          ~/.cargo/bin/mdbook.exe
+          ~/.cargo/bin/cargo-msrv.exe
+          ~/.cargo/bin/taplo.exe
+        key: ${{ runner.os }}-cargo-tools-${{ hashFiles('.github/cache-version.txt') }}
+
+    - name: Install cargo tools if not cached on Linux
       shell: pwsh
-      if: steps.cache-cargo-tools.outputs.cache-hit != 'true'
+      if: and(steps.cache-cargo-tools-linux.outputs.cache-hit != 'true', runner.os == 'Linux')
+      run: |
+        cargo install cargo-msrv cargo-deny taplo-cli mdbook --locked
+        cargo install cargo-about --features="cli" --locked
+
+    - name: Install cargo tools if not cached on Windows
+      shell: pwsh
+      if: and(steps.cache-cargo-tools-windows.outputs.cache-hit != 'true', runner.os == 'Windows')
       run: |
         cargo install cargo-msrv cargo-deny taplo-cli mdbook --locked
         cargo install cargo-about --features="cli" --locked

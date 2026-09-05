@@ -24,6 +24,7 @@ use std::{
 
 use crossbeam;
 use rand::{self, prelude::SliceRandom, seq::IndexedRandom};
+use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use tracing::{debug, error, info, trace, warn};
 use tungstenite::{Message, WebSocket, accept_with_config};
 
@@ -117,6 +118,12 @@ impl MessageMgr {
     }
 
     fn task_new(&mut self, task: MsgMgrTaskmsg) -> u64 {
+        if self.process_thread.is_finished() {
+            // Process thread in error, TODO
+            let (handle, task_sender) = MessageMgr::spawn_thread(self.players.clone());
+            self.process_thread = handle;
+            self.task_sender = task_sender;
+        }
         let (r_send, r_resv) = crossbeam::channel::bounded(2);
         self.last_task_id += 1;
         self.tasks.push((self.last_task_id, task.clone(), r_resv));
@@ -550,11 +557,12 @@ pub struct PositiveMahjong {
     /// 未被 使用/抽取 的牌
     unused_card: Vec<PMJCard>,
     msg_mgr: MessageMgr,
+    room_msgs: sync::Arc<sync::RwLock<Vec<mode_shared::ServerRoomMsg>>>,
 }
 
 impl PositiveMahjong {
     pub fn new() -> Self {
-        let mut unused_card: Vec<PMJCard> = Vec::new();
+        let mut unused_card: Vec<PMJCard> = Vec::with_capacity(200);
         //初始化`筒`
         for card_id in 1..=4 {
             for card_number in 1..=9 {
@@ -622,7 +630,50 @@ impl PositiveMahjong {
             is_game_start: false,
             unused_card,
             msg_mgr: MessageMgr::new(Vec::new()),
+            room_msgs: sync::Arc::new(sync::RwLock::new(Vec::new())),
         }
+    }
+
+    pub fn say_root_msg(&self, msg: String) {
+        let thread_rmsg = self.room_msgs.clone();
+        let root_msg = mode_shared::ServerRoomMsg::RootSay(msg);
+        loop {
+            match thread_rmsg.try_write() {
+                Ok(mut guard) => {
+                    guard.push(root_msg.clone());
+                    drop(guard);
+                    break;
+                }
+                Err(e) => {
+                    warn!("say_root_msg: {}", e);
+                    thread::sleep(time::Duration::from_millis(700));
+                }
+            }
+        }
+        self.players.par_iter().for_each(|player| {
+            let player_ws = player.player_ws.clone();
+            let msg = serde_json::to_string(&mode_shared::ServerMessage::RoomMsg(root_msg.clone()))
+                .unwrap();
+            loop {
+                match player_ws.write() {
+                    Ok(mut guard) => {
+                        match guard.send(tungstenite::Message::Text(msg.clone().into())) {
+                            Ok(_) => {
+                                break;
+                            }
+                            Err(e) => {
+                                warn!("say_root_msg: {}", e);
+                                thread::sleep(time::Duration::from_millis(700));
+                            }
+                        }
+                    }
+                    Err(e) => {
+                        warn!("say_root_msg: {}", e);
+                        thread::sleep(time::Duration::from_millis(700));
+                    }
+                }
+            }
+        });
     }
 
     pub fn get_players_info(&self) -> Vec<PMJPlayer> {
