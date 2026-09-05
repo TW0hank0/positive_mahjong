@@ -130,7 +130,9 @@ def build_files_dl(dir_path: str):
             new_name = dlfile[1]
         else:
             raise RuntimeError("type(dlfile) is not (str, tuple)")
-        print(f"{dlfile} -> {os.path.join(dir_path, new_name)}")
+        print(
+            f"{Style.DIM}{dlfile}{Style.NORMAL} -> {Style.DIM}{os.path.join(dir_path, new_name)}{Style.NORMAL}"
+        )
         _ = shutil.copy2(file_path, os.path.join(dir_path, new_name))
         summary_prepare = (
             summary_prepare
