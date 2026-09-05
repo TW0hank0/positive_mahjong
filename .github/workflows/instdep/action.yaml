@@ -104,14 +104,14 @@ runs:
 
     - name: Install cargo tools if not cached on Linux
       shell: pwsh
-      if: and(steps.cache-cargo-tools-linux.outputs.cache-hit != 'true', runner.os == 'Linux')
+      if: steps.cache-cargo-tools-linux.outputs.cache-hit != 'true' && runner.os == 'Linux'
       run: |
         cargo install cargo-msrv cargo-deny taplo-cli mdbook --locked
         cargo install cargo-about --features="cli" --locked
 
     - name: Install cargo tools if not cached on Windows
       shell: pwsh
-      if: and(steps.cache-cargo-tools-windows.outputs.cache-hit != 'true', runner.os == 'Windows')
+      if: steps.cache-cargo-tools-windows.outputs.cache-hit != 'true' && runner.os == 'Windows'
       run: |
         cargo install cargo-msrv cargo-deny taplo-cli mdbook --locked
         cargo install cargo-about --features="cli" --locked
