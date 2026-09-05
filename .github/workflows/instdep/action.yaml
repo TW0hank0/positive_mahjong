@@ -92,7 +92,7 @@ runs:
     - name: Cache Cargo installed tools on Windows
       uses: actions/cache@v6.1.0
       id: cache-cargo-tools-windows
-      if: runner.os == 'Linux'
+      if: runner.os == 'Windows'
       with:
         path: |
           ~/.cargo/bin/cargo-deny.exe
