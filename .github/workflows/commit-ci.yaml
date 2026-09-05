@@ -113,6 +113,8 @@ jobs:
           cd ..
 
       - name: use build script
+        env:
+          CARGO_BUILD_JOBS: 1 # 限制為單線程，避免OOM Killer
         run: |
           cd scripts
           uv run build_desktop.py

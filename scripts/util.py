@@ -28,49 +28,68 @@ from zoneinfo import ZoneInfo
 from colorama import Back, Fore
 
 
-def run_cmd(command: list[str], cwd: str | None = None) -> tuple[int, str]:
+def run_cmd(
+    command: list[str],
+    cwd: str | None = None,
+    timeout: int = 60 * 30,
+    stream: bool = False,
+) -> tuple[int, str]:
+    """
+    when stream is True no stdout return"""
     print(
         f"{Fore.CYAN}Running command:{Fore.RESET} {Back.LIGHTBLACK_EX}{' '.join(command)}{Back.RESET}"
     )
     start_time = time.time()
-    process = subprocess.run(
-        command,
-        timeout=60 * 30,
-        stderr=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        cwd=cwd,
-    )
-    end_time = time.time()
-    process_time = end_time - start_time
-    if int(process_time) > 1:
-        process_time_str = f"({process_time:.3f} secs)"
+    if stream is True:
+        process = subprocess.Popen(command, cwd=cwd)
     else:
-        process_time_str = ""
-    if process.returncode == 0:
-        print(
-            f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.GREEN}Process fnished sucessful.{Fore.RESET} {Fore.LIGHTBLACK_EX}{process_time_str}{Fore.RESET}"
+        process = subprocess.Popen(
+            command,
+            stderr=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            cwd=cwd,
         )
-    else:
-        print(
-            f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.RED}Process exited with non-zero code{Fore.RESET} {Fore.LIGHTBLACK_EX}({process.returncode}){Fore.RESET}! {Fore.LIGHTBLACK_EX}{process_time_str}{Fore.RESET}"
-        )
-        for name, data in [
-            ("stdout", process.stdout.decode()),
-            ("stderr", process.stderr.decode()),
-        ]:
-            if (data == "\n") or (data.strip() == ""):
-                print(f"{name} does not have any content.")
+    while True:
+        if process.poll() is not None:
+            end_time = time.time()
+            process_time = end_time - start_time
+            if process.stdout is None:
+                pstdout = ""
             else:
-                print(f"{Fore.LIGHTBLACK_EX}---{Fore.RESET} {name}")
-                line_num = 1
-                for line in data.split("\n"):
-                    print(
-                        f"{Fore.LIGHTBLACK_EX}{str(line_num).rjust(3)}|{Fore.RESET} {line}"
-                    )
-                    line_num += 1
-                print(f"{Fore.LIGHTBLACK_EX}--- end-of {name}{Fore.RESET}")
-        sys.exit(1)
-    return (process.returncode, process.stdout.decode().rstrip("\n"))
+                pstdout = str(process.stdout.read())
+            if process.stderr is None:
+                pstderr = ""
+            else:
+                pstderr = str(process.stderr.read())
+            if int(process_time) > 1:
+                process_time_str = f"({process_time:.3f} secs)"
+            else:
+                process_time_str = ""
+            if process.returncode == 0:
+                print(
+                    f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.GREEN}Process fnished sucessful.{Fore.RESET} {Fore.LIGHTBLACK_EX}{process_time_str}{Fore.RESET}"
+                )
+            else:
+                print(
+                    f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.RED}Process exited with non-zero code{Fore.RESET} {Fore.LIGHTBLACK_EX}({process.returncode}){Fore.RESET}! {Fore.LIGHTBLACK_EX}{process_time_str}{Fore.RESET}"
+                )
+                for name, data in [
+                    ("stdout", pstdout),
+                    ("stderr", pstderr),
+                ]:
+                    if (data == "\n") or (data.strip() == ""):
+                        print(f"{name} does not have any content.")
+                    else:
+                        print(f"{Fore.LIGHTBLACK_EX}---{Fore.RESET} {name}")
+                        line_num = 1
+                        for line in data.split("\n"):
+                            print(
+                                f"{Fore.LIGHTBLACK_EX}{str(line_num).rjust(3)}|{Fore.RESET} {line}"
+                            )
+                        line_num += 1
+                        print(f"{Fore.LIGHTBLACK_EX}--- end-of {name}{Fore.RESET}")
+                        sys.exit(1)
+                return (process.returncode, pstdout.rstrip("\n"))
 
 
 def get_commit_info() -> CommitInfo:

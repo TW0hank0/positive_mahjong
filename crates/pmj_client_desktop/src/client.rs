@@ -555,7 +555,7 @@ impl Client {
                         let mut controller_bar = Column::new();
                         let mut card_bar_elements: Vec<iced::Element<'_, UIMessage>> = Vec::new();
                         for card in play_state.hand_cards.iter() {
-                            let card_element = Column::new()
+                            let card_element = Column::new().padding(5)
                                 .width(120)
                                 .height(160)
                                 .push(text(card.to_string()).size(18))
@@ -567,7 +567,14 @@ impl Client {
                                         .align_x(alignment::Horizontal::Right),
                                 );
                             match play_state.game_controller {
-                                pmj_client_core::ccore::PlayerCtrl::NoCtrl => {card_bar_elements.push(card_element.into());}
+                                pmj_client_core::ccore::PlayerCtrl::NoCtrl => {card_bar_elements.push(container(card_element).style(|t:&iced::Theme| {
+                                    let p = t.extended_palette();
+                                    container::Style {
+                                        border:Border { color: p.background.strong.color, width: 1.2, radius: iced::border::radius(10) },
+                                        text_color:Some(p.background.base.text),
+                                        ..Default::default()
+                                    }
+                                }).into());}
                               pmj_client_core::ccore::PlayerCtrl::ThrowCard=>
                             {card_bar_elements.push(
                                 button(
@@ -606,8 +613,9 @@ impl Client {
                                 .into(),
                             );}}
                         }
-                        let card_bar_layout = Row::new().extend(card_bar_elements);
+                        let card_bar_layout = Row::new().extend(card_bar_elements).spacing(7).padding(5);
                         controller_bar=controller_bar.push(card_bar_layout);
+                        layout_play = layout_play.push(space().height(Length::Fill));
                         layout_play = layout_play.push(
                             scrollable(
                                 container(controller_bar)
@@ -621,9 +629,9 @@ impl Client {
                                         };
                                         style
                                     })
-                                    .height(Length::FillPortion(3)),
-                            )
-                            .height(Length::FillPortion(3))
+                                    .height(Length::Shrink),
+                            ).direction(scrollable::Direction::Horizontal(scrollable::Scrollbar::new().margin(3).spacing(5).width(3).scroller_width(6)))
+                            .height(Length::Shrink)
                             .width(Length::Fill),
                         );
                     }

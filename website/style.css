@@ -159,7 +159,10 @@ img {
 code {
     background-color: var(--code-color);
     border-radius: var(--code-radius);
-    font-family: monospace;
+    font-family:
+        "JetBrains Mono", "Menlo", "DejaVu Sans Mono",
+        "Liberation Mono", "Consolas", "Ubuntu Mono", "Courier New",
+        "andale mono", "lucida console", monospace;
 }
 
 .logo-text {

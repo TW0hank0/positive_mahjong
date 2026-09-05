@@ -1,1 +1,1 @@
-__name__ == "pmj_scripts"
+__name__ = "pmj_scripts"
