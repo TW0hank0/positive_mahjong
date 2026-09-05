@@ -81,7 +81,6 @@
     margin-top: 20px;
     .nav_item {
         margin: 7px;
-        /*color: var(--primary-text-color);*/
         color: var(--text-color);
         text-decoration: none;
         font-size: var(--text-size);
@@ -90,9 +89,8 @@
 
     .nav_item:hover {
         color: var(--secondary-text-color);
-        margin: 14px;
-        font-size: max(calc(var(--text-size) + 7), 24px);
-        transition-duration: 200ms;
+        font-size: calc(var(--text-size) + 2px);
+        transition-duration: 275ms;
         cursor: pointer;
     }
 }
@@ -256,4 +254,8 @@ code {
 
 .t-style-dim {
     color: gray;
+}
+
+.md-to-html {
+    line-height: 1%;
 }

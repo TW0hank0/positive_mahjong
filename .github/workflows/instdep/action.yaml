@@ -63,7 +63,7 @@ runs:
       shell: pwsh
       if: runner.os == 'Windows'
       run: |
-        winget install --id LLVM.LLVM
+        winget install --id LLVM.LLVM --accept-source-agreements --accept-package-agreements
 
     - name: install go
       uses: actions/setup-go@v7.0.0

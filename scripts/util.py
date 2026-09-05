@@ -51,45 +51,50 @@ def run_cmd(
         )
     while True:
         if process.poll() is not None:
-            end_time = time.time()
-            process_time = end_time - start_time
-            if process.stdout is None:
-                pstdout = ""
+            break
+        elif int(time.time() - start_time) > timeout:
+            raise subprocess.TimeoutExpired(cmd=command, timeout=timeout)
+        else:
+            time.sleep(0.00001)
+    end_time = time.time()
+    process_time = end_time - start_time
+    if process.stdout is None:
+        pstdout = ""
+    else:
+        pstdout = process.stdout.read().decode()
+    if process.stderr is None:
+        pstderr = ""
+    else:
+        pstderr = process.stderr.read().decode()
+    if int(process_time) > 1:
+        process_time_str = f"({process_time:.3f} secs)"
+    else:
+        process_time_str = ""
+    if process.returncode == 0:
+        print(
+            f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.GREEN}Process fnished sucessful.{Fore.RESET} {Fore.LIGHTBLACK_EX}{process_time_str}{Fore.RESET}"
+        )
+    else:
+        print(
+            f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.RED}Process exited with non-zero code{Fore.RESET} {Fore.LIGHTBLACK_EX}({process.returncode}){Fore.RESET}! {Fore.LIGHTBLACK_EX}{process_time_str}{Fore.RESET}"
+        )
+        for name, data in [
+            ("stdout", pstdout),
+            ("stderr", pstderr),
+        ]:
+            if (data == "\n") or (data.strip() == ""):
+                print(f"{name} does not have any content.")
             else:
-                pstdout = str(process.stdout.read())
-            if process.stderr is None:
-                pstderr = ""
-            else:
-                pstderr = str(process.stderr.read())
-            if int(process_time) > 1:
-                process_time_str = f"({process_time:.3f} secs)"
-            else:
-                process_time_str = ""
-            if process.returncode == 0:
-                print(
-                    f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.GREEN}Process fnished sucessful.{Fore.RESET} {Fore.LIGHTBLACK_EX}{process_time_str}{Fore.RESET}"
-                )
-            else:
-                print(
-                    f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.RED}Process exited with non-zero code{Fore.RESET} {Fore.LIGHTBLACK_EX}({process.returncode}){Fore.RESET}! {Fore.LIGHTBLACK_EX}{process_time_str}{Fore.RESET}"
-                )
-                for name, data in [
-                    ("stdout", pstdout),
-                    ("stderr", pstderr),
-                ]:
-                    if (data == "\n") or (data.strip() == ""):
-                        print(f"{name} does not have any content.")
-                    else:
-                        print(f"{Fore.LIGHTBLACK_EX}---{Fore.RESET} {name}")
-                        line_num = 1
-                        for line in data.split("\n"):
-                            print(
-                                f"{Fore.LIGHTBLACK_EX}{str(line_num).rjust(3)}|{Fore.RESET} {line}"
-                            )
-                        line_num += 1
-                        print(f"{Fore.LIGHTBLACK_EX}--- end-of {name}{Fore.RESET}")
-                        sys.exit(1)
-                return (process.returncode, pstdout.rstrip("\n"))
+                print(f"{Fore.LIGHTBLACK_EX}---{Fore.RESET} {name}")
+                line_num = 1
+                for line in data.split("\n"):
+                    print(
+                        f"{Fore.LIGHTBLACK_EX}{str(line_num).rjust(3)}|{Fore.RESET} {line}"
+                    )
+                line_num += 1
+                print(f"{Fore.LIGHTBLACK_EX}--- end-of {name}{Fore.RESET}")
+                sys.exit(1)
+    return (process.returncode, pstdout.rstrip("\n"))
 
 
 def get_commit_info() -> CommitInfo:
