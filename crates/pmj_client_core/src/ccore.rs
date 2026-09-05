@@ -407,8 +407,9 @@ impl ClientCore {
                                                                         pmj_gamemodes::v2_better::shared::ServerGameMsg::HandCardChange(hand_card) => {
                                                                             state_v2.game_events.push(
                                                                                 ((state_v2.game_events.len() as u64) +1,
-                                                                                    V2BetterEvents::YouHandCardChange(hand_card))
+                                                                                    V2BetterEvents::YouHandCardChange(hand_card.clone()))
                                                                             );
+                                                                            state_v2.cards = hand_card;
                                                                         }
                                                                         pmj_gamemodes::v2_better::shared::ServerGameMsg::PlayerAction(player, action) => {
                                                                             state_v2.game_events.push(

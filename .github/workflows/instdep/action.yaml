@@ -59,6 +59,12 @@ runs:
         sudo apt-get update
         sudo apt-get install libfontconfig1-dev pkg-config mold gcc eza -y
 
+    - name: install Windows needed dep
+      shell: pwsh
+      if: runner.os == 'Windows'
+      run: |
+        winget install --id LLVM.LLVM
+
     - name: install go
       uses: actions/setup-go@v7.0.0
       with:

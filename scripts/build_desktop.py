@@ -19,6 +19,7 @@ import sys
 import zipfile
 from typing import Literal
 
+import build_license
 import util
 
 INCLUDE_FILES_MATCH_TYPE: Literal["exe_split", "inclue_all_files"] = "exe_split"
@@ -34,7 +35,10 @@ def main():
             "--locked",
         ],
         cwd=util.fix_path(),
+        timeout=60 * 70,  # 70分鐘
+        stream=True,
     )
+    build_license.main()
     zip_desktop()
 
 
