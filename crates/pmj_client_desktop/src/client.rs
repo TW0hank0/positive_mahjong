@@ -13,7 +13,7 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-use std::{self, net::TcpStream};
+use std::{self};
 
 use iced::{
     self, Border, Color, Element, Length, Pixels, alignment, task,
@@ -121,20 +121,20 @@ impl Client {
                         pmj_client_core::ccore::GMState::V2Better(ref gms_v2) => {
                             play_state.current_turn = gms_v2.player_turn;
                             play_state.player_id = gms_v2.player_id;
-                            if (!play_state.is_start)&& gms_v2.game_events.iter().any(|(_, event)| {
-                                match event {
-                                    pmj_client_core::ccore::V2BetterEvents::GameStart => {
-                                        true
-                                    }
-                                    _ => {false}
-                                }
-                            }) {
+                            if (!play_state.is_start)
+                                && gms_v2.game_events.iter().any(|(_, event)| match event {
+                                    pmj_client_core::ccore::V2BetterEvents::GameStart => true,
+                                    _ => false,
+                                })
+                            {
                                 play_state.is_start = true;
                             }
                             play_state.hand_cards = gms_v2.cards.clone();
                             play_state.game_msgs.clear();
                             for (msgid, gmsg) in gms_v2.game_events.clone().iter() {
-                                play_state.game_msgs.push((msgid.clone(), format!("{:?}", gmsg)));
+                                play_state
+                                    .game_msgs
+                                    .push((msgid.clone(), format!("{:?}", gmsg)));
                             }
                         }
                     }
@@ -462,21 +462,11 @@ impl Client {
                     }
                     layout_play = layout_play.push(info_bar)
                 }
-                if !play_state.is_start {
-                    let mut status_bar = Column::new();
-                    status_bar = status_bar.push(
-                        text("等待遊戲開始")
-                            .size(30)
-                            .align_x(alignment::Horizontal::Center)
-                            .align_y(alignment::Vertical::Center)
-                            .height(Length::Fill)
-                            .width(Length::Fill),
-                    );
-                    layout_play = layout_play.push(status_bar);
-                } else if play_state.is_start {
-                    {
-                        let mut ctr_bar = Row::new().height(Length::FillPortion(2));
-                        let mut gmsg_bar = Column::new().width(Length::FillPortion(3));
+                // ctr_bar
+                {
+                    let mut ctr_bar = Row::new().height(Length::FillPortion(2));
+                    let mut gmsg_bar = Column::new().width(Length::FillPortion(3));
+                    if play_state.is_start {
                         for (gmsg_id, gmsg) in play_state.game_msgs.iter() {
                             gmsg_bar = gmsg_bar
                                 .push(
@@ -510,52 +500,95 @@ impl Client {
                                 )
                                 .push(space().height(10));
                         }
-                        ctr_bar = ctr_bar.push(scrollable(gmsg_bar));
-                        let mut rmsg_bar = Column::new().width(Length::FillPortion(2));
-                        match play_state.gm_state {
-                            pmj_client_core::ccore::GMState::HomePage => {
-                                warn!("view: warn GMState");
-                            }
-                            pmj_client_core::ccore::GMState::V2Better(ref gms_v2) => {
-                                for (rmsg_num, rmsg) in gms_v2.room_msgs.iter() {
-                                    let mut row_msg =
-                                        Row::new().push(text(rmsg_num).size(18).style(
-                                            |t: &iced::Theme| {
-                                                let p = t.extended_palette();
-                                                text::Style {
-                                                    color: Some(p.primary.base.color),
-                                                }
-                                            },
-                                        ))
-                                        .push(
-                                            space().width(10)
+                        ctr_bar = ctr_bar.push(
+                            scrollable(gmsg_bar).direction(scrollable::Direction::Vertical(
+                                scrollable::Scrollbar::new()
+                                    .margin(3)
+                                    .spacing(5)
+                                    .width(3)
+                                    .scroller_width(6),
+                            )),
+                        );
+                    } else {
+                        ctr_bar = ctr_bar.push(space().width(Length::FillPortion(3)));
+                    }
+                    let mut rmsg_bar = Column::new().width(Length::FillPortion(2));
+                    match play_state.gm_state {
+                        pmj_client_core::ccore::GMState::HomePage => {
+                            warn!("view: warn GMState");
+                        }
+                        pmj_client_core::ccore::GMState::V2Better(ref gms_v2) => {
+                            for (rmsg_num, rmsg) in gms_v2.room_msgs.iter() {
+                                let mut row_msg = Row::new()
+                                    .push(text(rmsg_num).size(18).style(|t: &iced::Theme| {
+                                        let p = t.extended_palette();
+                                        text::Style {
+                                            color: Some(p.primary.base.color),
+                                        }
+                                    }))
+                                    .push(space().width(10));
+                                match rmsg {
+                                    pmj_gamemodes::v2_better::shared::ServerRoomMsg::PlayerSay(
+                                        said_player,
+                                        said_text,
+                                    ) => {
+                                        row_msg = row_msg.push(
+                                            text(format!("玩家{}", said_player.to_string()))
+                                                .size(16),
                                         );
-                                    match rmsg {
-                                        pmj_gamemodes::v2_better::shared::ServerRoomMsg::PlayerSay(said_player, said_text) => {
-                                            row_msg = row_msg.push(text(format!("玩家{}", said_player.to_string())).size(16));
-                                            row_msg = row_msg.push(text("\u{e5c8}").font(MATERIAL_SYMBOLS_OUTLINED).size(14));
-                                            row_msg = row_msg.push(text(said_text).size(16));
-                                        }
-                                        pmj_gamemodes::v2_better::shared::ServerRoomMsg::RootSay(said_text) => {
-                                            row_msg = row_msg.push(text("Root").size(16));
-                                            row_msg = row_msg.push(text("\u{e5c8}").font(MATERIAL_SYMBOLS_OUTLINED).size(14));
-                                            row_msg = row_msg.push(text(said_text).size(16));
-                                        }
-
+                                        row_msg = row_msg.push(
+                                            text("\u{e5c8}")
+                                                .font(MATERIAL_SYMBOLS_OUTLINED)
+                                                .size(14),
+                                        );
+                                        row_msg = row_msg.push(text(said_text).size(16));
                                     }
-                                    rmsg_bar=rmsg_bar.push(row_msg).push(space().height(10));
+                                    pmj_gamemodes::v2_better::shared::ServerRoomMsg::RootSay(
+                                        said_text,
+                                    ) => {
+                                        row_msg = row_msg.push(text("Root").size(16));
+                                        row_msg = row_msg.push(
+                                            text("\u{e5c8}")
+                                                .font(MATERIAL_SYMBOLS_OUTLINED)
+                                                .size(14),
+                                        );
+                                        row_msg = row_msg.push(text(said_text).size(16));
+                                    }
                                 }
+                                rmsg_bar = rmsg_bar.push(row_msg).push(space().height(10));
                             }
                         }
-                        ctr_bar = ctr_bar.push(scrollable(rmsg_bar));
-                        layout_play = layout_play.push(ctr_bar);
                     }
+                    ctr_bar = ctr_bar.push(
+                        scrollable(rmsg_bar).direction(scrollable::Direction::Vertical(
+                            scrollable::Scrollbar::new()
+                                .margin(3)
+                                .spacing(5)
+                                .width(3)
+                                .scroller_width(6),
+                        )),
+                    );
+                    layout_play = layout_play.push(ctr_bar);
+                }
+                if !play_state.is_start {
+                    let mut status_bar = Column::new();
+                    status_bar = status_bar.push(
+                        text("等待遊戲開始")
+                            .size(30)
+                            .align_x(alignment::Horizontal::Center)
+                            .align_y(alignment::Vertical::Center)
+                            .height(Length::Fill)
+                            .width(Length::Fill),
+                    );
+                    layout_play = layout_play.push(status_bar);
+                } else if play_state.is_start {
                     // 卡牌
                     {
                         let mut controller_bar = Column::new();
                         let mut card_bar_elements: Vec<iced::Element<'_, UIMessage>> = Vec::new();
                         for card in play_state.hand_cards.iter() {
-                            let card_element = Column::new().padding(5)
+                            let card_element = Column::new()
+                                .padding(5)
                                 .width(120)
                                 .height(160)
                                 .push(text(card.to_string()).size(18))
@@ -567,54 +600,69 @@ impl Client {
                                         .align_x(alignment::Horizontal::Right),
                                 );
                             match play_state.game_controller {
-                                pmj_client_core::ccore::PlayerCtrl::NoCtrl => {card_bar_elements.push(container(card_element).style(|t:&iced::Theme| {
-                                    let p = t.extended_palette();
-                                    container::Style {
-                                        border:Border { color: p.background.strong.color, width: 1.2, radius: iced::border::radius(10) },
-                                        text_color:Some(p.background.base.text),
-                                        ..Default::default()
-                                    }
-                                }).into());}
-                              pmj_client_core::ccore::PlayerCtrl::ThrowCard=>
-                            {card_bar_elements.push(
-                                button(
-                                    card_element
-                                )
-                                .on_press(UIMessage::Play(PlayMsg::ThrowCard(card.clone())))
-                                .style(|t: &iced::Theme, s: button::Status| {
-                                    let p = t.extended_palette();
-                                    let mut style = button::Style::default();
-                                    style.border.width = 1.2;
-                                    style.border.radius = iced::border::radius(10);
-                                    style.text_color = p.background.base.text;
-                                    match s {
-                                        button::Status::Active => {
-                                            style.border.color = p.background.strong.color;
-                                            style.background = None;
-                                        }
-                                        button::Status::Disabled => {
-                                            style.background =
-                                                Some(iced::Background::Color(
-                                                    p.background.weak.color,
-                                                ));
-                                        }
-                                        button::Status::Hovered => {
-                                            style.border.color = p.primary.weak.color;
-                                            style.border.width = 1.5;
-                                        }
-                                        button::Status::Pressed => {
-                                            style.border.color = p.primary.strong.color;
-                                            style.border.width = 0.7;
-                                            style.border.radius = iced::border::radius(6);
-                                        }
-                                    }
-                                    style
-                                })
-                                .into(),
-                            );}}
+                                pmj_client_core::ccore::PlayerCtrl::NoCtrl => {
+                                    card_bar_elements.push(
+                                        container(card_element)
+                                            .style(|t: &iced::Theme| {
+                                                let p = t.extended_palette();
+                                                container::Style {
+                                                    border: Border {
+                                                        color: p.background.strong.color,
+                                                        width: 1.2,
+                                                        radius: iced::border::radius(10),
+                                                    },
+                                                    text_color: Some(p.background.base.text),
+                                                    ..Default::default()
+                                                }
+                                            })
+                                            .into(),
+                                    );
+                                }
+                                pmj_client_core::ccore::PlayerCtrl::ThrowCard => {
+                                    card_bar_elements.push(
+                                        button(card_element)
+                                            .on_press(UIMessage::Play(PlayMsg::ThrowCard(
+                                                card.clone(),
+                                            )))
+                                            .style(|t: &iced::Theme, s: button::Status| {
+                                                let p = t.extended_palette();
+                                                let mut style = button::Style::default();
+                                                style.border.width = 1.2;
+                                                style.border.radius = iced::border::radius(10);
+                                                style.text_color = p.background.base.text;
+                                                match s {
+                                                    button::Status::Active => {
+                                                        style.border.color =
+                                                            p.background.strong.color;
+                                                        style.background = None;
+                                                    }
+                                                    button::Status::Disabled => {
+                                                        style.background =
+                                                            Some(iced::Background::Color(
+                                                                p.background.weak.color,
+                                                            ));
+                                                    }
+                                                    button::Status::Hovered => {
+                                                        style.border.color = p.primary.weak.color;
+                                                        style.border.width = 1.5;
+                                                    }
+                                                    button::Status::Pressed => {
+                                                        style.border.color = p.primary.strong.color;
+                                                        style.border.width = 0.7;
+                                                        style.border.radius =
+                                                            iced::border::radius(6);
+                                                    }
+                                                }
+                                                style
+                                            })
+                                            .into(),
+                                    );
+                                }
+                            }
                         }
-                        let card_bar_layout = Row::new().extend(card_bar_elements).spacing(7).padding(5);
-                        controller_bar=controller_bar.push(card_bar_layout);
+                        let card_bar_layout =
+                            Row::new().extend(card_bar_elements).spacing(7).padding(5);
+                        controller_bar = controller_bar.push(card_bar_layout);
                         layout_play = layout_play.push(space().height(Length::Fill));
                         layout_play = layout_play.push(
                             scrollable(
@@ -630,7 +678,14 @@ impl Client {
                                         style
                                     })
                                     .height(Length::Shrink),
-                            ).direction(scrollable::Direction::Horizontal(scrollable::Scrollbar::new().margin(3).spacing(5).width(3).scroller_width(6)))
+                            )
+                            .direction(scrollable::Direction::Horizontal(
+                                scrollable::Scrollbar::new()
+                                    .margin(3)
+                                    .spacing(5)
+                                    .width(3)
+                                    .scroller_width(6),
+                            ))
                             .height(Length::Shrink)
                             .width(Length::Fill),
                         );

@@ -18,12 +18,12 @@
 use std::{
     net,
     sync::{self, Arc, RwLock},
-    thread,
+    thread, time,
 };
 
 use iced::{
-    self, Border,
-    widget::{Column, Row, button, container, scrollable, space, text},
+    self, Border, Length,
+    widget::{Column, Row, button, container, scrollable, space, text, text_input},
 };
 use tracing::{error, info, warn};
 
@@ -68,11 +68,13 @@ pub fn main() -> iced::Result {
         .run()
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 enum GUIMessages {
     StartGame,
     FetchPlayerInfo,
     CopyIp,
+    SendRoomMsg,
+    RoomMsgChange(String),
 }
 
 #[derive(Debug)]
@@ -83,6 +85,7 @@ struct ServerGUI {
     msg: String,
     is_start: bool,
     players: Vec<mode_shared::PMJPlayer>,
+    ti_room_msg: String,
 }
 
 impl ServerGUI {
@@ -100,6 +103,7 @@ impl ServerGUI {
             msg: String::new(),
             is_start: false,
             players: Vec::new(),
+            ti_room_msg: String::new(),
         }
     }
 
@@ -155,6 +159,28 @@ impl ServerGUI {
             GUIMessages::CopyIp => {
                 // TODO: handle task
                 return iced::clipboard::write::<GUIMessages>(self.local_ipv6_address.to_string());
+            }
+            GUIMessages::SendRoomMsg => {
+                let thread_backend = self.backend.clone();
+                let msg = self.ti_room_msg.clone();
+                self.ti_room_msg.clear();
+                thread::spawn(move || {
+                    loop {
+                        match thread_backend.try_read() {
+                            Ok(guard) => {
+                                guard.say_root_msg(msg);
+                                break;
+                            }
+                            Err(e) => {
+                                warn!("update: {}", e);
+                                thread::sleep(time::Duration::from_millis(700));
+                            }
+                        }
+                    }
+                });
+            }
+            GUIMessages::RoomMsgChange(msg) => {
+                self.ti_room_msg = msg;
             }
         }
         iced::Task::none()
@@ -279,6 +305,20 @@ impl ServerGUI {
                     .background(ex_palette.background.strong.color)
             }),
         );
+        {
+            let mut msg_bar_layout = Row::new().padding(7).spacing(3);
+            msg_bar_layout = msg_bar_layout
+                .push(
+                    text_input("say room msg as root", &self.ti_room_msg)
+                        .size(16)
+                        .on_input(GUIMessages::RoomMsgChange),
+                )
+                .width(Length::Fill);
+            msg_bar_layout=msg_bar_layout.push(space().width(3));
+            msg_bar_layout = msg_bar_layout
+                .push(button(text("Send").size(16)).on_press(GUIMessages::SendRoomMsg));
+            layout = layout.push(msg_bar_layout);
+        }
         layout = layout.push(
             container(scrollable(
                 text(self.msg.clone())
