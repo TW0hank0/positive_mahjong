@@ -28,7 +28,7 @@ pmj_shared = { path = "crates/pmj_shared" }
 pmj_client_core = { path = "crates/pmj_client_core" }
 positive_mahjong = { path = "." }
 # --- shared ---
-dirs = "=6.0.0"
+dirs = "=7.0.0"
 godot = { version = "=0.5.5", features = ["api-4-6"] }
 iced = { version = "=0.14.0", features = [
     "advanced",
