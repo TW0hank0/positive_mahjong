@@ -27,28 +27,44 @@ def main():
     nav_template_path = os.path.join(website_root_path, "nav.html.template")
     with open(nav_template_path, "r", encoding="utf-8") as f:
         nav_template_content = f.read()
-    ignored: list[str] = ["docs", ".git", "__pycache__", "__pypy_cache__"]
+    ignored_paths: list[str] = ["docs", ".git", "__pycache__", "__pypy_cache__"]
+    with open(util.fix_path("website", ".gitignore"), "r", encoding="utf-8") as f:
+        ignored_paths.extend(f.read().split("\n"))
     build_root = util.fix_path("website_build")
     if os.path.exists(build_root) is True:
-        remove_dir(build_root)
-    _ = shutil.copytree(website_root_path, build_root)
-    os.makedirs(os.path.join(build_root, "files"), exist_ok=True)
+        shutil.rmtree(build_root)
+    _ = copytree_and_ignore(website_root_path, build_root, ignored_paths)
+    os.mkdir(build_root)
+    os.mkdir(os.path.join(build_root, "files"))
     build_files_dl(os.path.join(build_root, "files"))
     process_dir(
         dir_path=build_root,
-        ignored=ignored,
+        ignored=ignored_paths,
         nav_template=nav_template_content,
         website_root_path=build_root,
     )
 
 
-def remove_dir(path: str):
-    for dir in os.listdir(path):
-        if os.path.isfile(os.path.join(path, dir)) is True:
-            os.remove(os.path.join(path, dir))
+def copytree_and_ignore(src: str, dst: str, ignore: list[str]):
+    if os.path.exists(dst) is True:
+        raise FileExistsError(f"copytree_and_ignore: path already exists {dst}")
+    for file in os.listdir(src):
+        file_path = os.path.join(src, file)
+        if (os.path.relpath(file_path, start=dst) in ignore) or (
+            os.path.basename(file_path) in ignore
+        ):
+            print(f"copytree_and_ignore: ignored {file_path}")
         else:
-            remove_dir(os.path.join(path, dir))
-    os.rmdir(path)
+            if os.path.isfile(file_path) is True:
+                shutil.copy2(file_path, dst)
+            elif os.path.isdir(file_path) is True:
+                copytree_and_ignore(
+                    file_path, os.path.join(dst, os.path.basename(file_path)), ignore
+                )
+            else:
+                raise RuntimeError(
+                    f"copytree_and_ignore: not file not dir: {file_path}"
+                )
 
 
 def build_files_dl(dir_path: str):

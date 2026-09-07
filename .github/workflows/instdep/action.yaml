@@ -87,7 +87,7 @@ runs:
           ~/.cargo/bin/mdbook
           ~/.cargo/bin/cargo-msrv
           ~/.cargo/bin/taplo
-        key: ${{ runner.os }}-cargo-tools-${{ hashFiles('.github/cache-version.txt') }}
+        key: ${{ runner.os }}-cargo-tools-${{ hashFiles('.github/cache-version.json') }}
 
     - name: Cache Cargo installed tools on Windows
       uses: actions/cache@v6.1.0
@@ -100,7 +100,7 @@ runs:
           ~/.cargo/bin/mdbook.exe
           ~/.cargo/bin/cargo-msrv.exe
           ~/.cargo/bin/taplo.exe
-        key: ${{ runner.os }}-cargo-tools-${{ hashFiles('.github/cache-version.txt') }}
+        key: ${{ runner.os }}-cargo-tools-${{ hashFiles('.github/cache-version.json') }}
 
     - name: Install cargo tools if not cached on Linux
       shell: pwsh

@@ -21,22 +21,20 @@ import util
 
 def main():
     os.chdir(os.path.join(os.path.dirname(os.path.dirname(__file__)), "docs"))
-    util.run_cmd(["mdbook", "build"])
-    shutil.copytree(
-        os.path.join(os.path.dirname(os.path.dirname(__file__)), "docs", "book"),
-        os.path.join(os.path.dirname(os.path.dirname(__file__)), "website", "docs"),
+    _ = util.run_cmd(["mdbook", "build"])
+    if os.path.exists(util.fix_path("website", "docs")) is True:
+        shutil.rmtree(util.fix_path("website", "docs"))
+    _ = shutil.copytree(
+        util.fix_path("docs", "book"),
+        util.fix_path("website", "docs"),
     )
-    shutil.copy2(
-        os.path.join(
-            os.path.dirname(os.path.dirname(__file__)), "assets", "icon", "icon.png"
-        ),
-        os.path.join(os.path.dirname(os.path.dirname(__file__)), "website", "icon.png"),
+    _ = shutil.copy2(
+        util.fix_path("assets", "icon", "icon.png"),
+        util.fix_path("website", "icon.png"),
     )
-    shutil.copy2(
-        os.path.join(
-            os.path.dirname(os.path.dirname(__file__)), "assets", "icon", "icon.svg"
-        ),
-        os.path.join(os.path.dirname(os.path.dirname(__file__)), "website", "icon.svg"),
+    _ = shutil.copy2(
+        util.fix_path("assets", "icon", "icon.svg"),
+        util.fix_path("website", "icon.svg"),
     )
 
 

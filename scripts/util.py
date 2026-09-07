@@ -211,7 +211,8 @@ def list_files(path: str) -> list[str]:
         if os.path.isfile(file_path) is True:
             files.append(file_path)
         elif os.path.isdir(file_path) is True:
-            files.extend(list_files(file_path))
+            rfiles = list_files(file_path)
+            files.extend(rfiles)
         else:
             print(f"???? not file not dir: {file_path}")
     return files
