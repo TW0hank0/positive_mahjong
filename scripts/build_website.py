@@ -21,20 +21,25 @@ from colorama import Back, Fore, Style
 
 import util
 
+ignored_paths: list[str] = ["docs", ".git", "__pycache__", "__pypy_cache__"]
+
 
 def main():
     website_root_path = util.fix_path("website")
     nav_template_path = os.path.join(website_root_path, "nav.html.template")
     with open(nav_template_path, "r", encoding="utf-8") as f:
         nav_template_content = f.read()
-    ignored_paths: list[str] = ["docs", ".git", "__pycache__", "__pypy_cache__"]
     with open(util.fix_path("website", ".gitignore"), "r", encoding="utf-8") as f:
         ignored_paths.extend(f.read().split("\n"))
     build_root = util.fix_path("website_build")
     if os.path.exists(build_root) is True:
-        shutil.rmtree(build_root)
-    _ = copytree_and_ignore(website_root_path, build_root, ignored_paths)
-    os.mkdir(build_root)
+        if os.path.isdir(build_root) is True:
+            shutil.rmtree(build_root)
+        elif os.path.isfile(build_root) is True:
+            os.remove(build_root)
+        else:
+            print("build_root already exists and is not file or dir!")
+    shutil.copytree(website_root_path, build_root, ignore=copytree_ignore)
     os.mkdir(os.path.join(build_root, "files"))
     build_files_dl(os.path.join(build_root, "files"))
     process_dir(
@@ -45,26 +50,20 @@ def main():
     )
 
 
-def copytree_and_ignore(src: str, dst: str, ignore: list[str]):
-    if os.path.exists(dst) is True:
-        raise FileExistsError(f"copytree_and_ignore: path already exists {dst}")
-    for file in os.listdir(src):
-        file_path = os.path.join(src, file)
-        if (os.path.relpath(file_path, start=dst) in ignore) or (
-            os.path.basename(file_path) in ignore
-        ):
-            print(f"copytree_and_ignore: ignored {file_path}")
+def copytree_ignore(src: str, names: list[str], /) -> list[str]:
+    ignored_names = []
+    for name in names:
+        if name in ignored_paths:
+            ignored_names.append(name)
         else:
-            if os.path.isfile(file_path) is True:
-                shutil.copy2(file_path, dst)
-            elif os.path.isdir(file_path) is True:
-                copytree_and_ignore(
-                    file_path, os.path.join(dst, os.path.basename(file_path)), ignore
-                )
-            else:
-                raise RuntimeError(
-                    f"copytree_and_ignore: not file not dir: {file_path}"
-                )
+            full_name = os.path.join(src, name)
+            rel_name = os.path.relpath(full_name, start=util.fix_path()).replace(
+                "\\",
+                "/",  # 處理 windows 路徑問題
+            )
+            if rel_name in ignored_paths:
+                ignored_names.append(name)
+    return ignored_names
 
 
 def build_files_dl(dir_path: str):
