@@ -131,6 +131,16 @@ runs:
         uv tool install ruff
         uv tool install ty
 
+    - name: list files with pwsh
+      shell: pwsh
+      run: |
+        Get-ChildItem . -Recurse
+
+    - name: list files with eza
+      shell: pwsh
+      run: |
+        eza --tree .
+
     # - name: install java
     #   uses: actions/setup-java@v5.7.0
     #   with:

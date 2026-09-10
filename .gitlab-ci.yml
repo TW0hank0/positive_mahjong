@@ -77,7 +77,7 @@ pages:
     - cargo install mdbook --locked
     - curl -LsSf https://astral.sh/uv/install.sh | sh
     - source $HOME/.local/bin/env
-    - uv python install cpython-3.14
+    - uv python install cpython
     - cd scripts
     - uv venv
     - uv sync
@@ -85,6 +85,5 @@ pages:
   script:
     - cd scripts
     - uv run build_license.py
-    - uv run copy_website_dep.py
     - uv run build_website.py
     - cd ..

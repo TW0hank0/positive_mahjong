@@ -42,8 +42,7 @@ jobs:
           # Github Pat
           RENOVATE_GITHUB_COM_TOKEN: ${{ secrets.GH_TOKEN }}
           # 指定目標 GitLab 專案
-          # 若有多個專案可用空格隔開，如 'org/repo1 org/repo2'
+          # 若有多個專案可用空格隔開，如 'owner/repo1 owner/repo2'
           RENOVATE_REPOSITORIES: "TW0hank0/positive_mahjong"
         with:
-          # 明確指定與 Action 版本相容的 Renovate 版本
-          renovate-version: "44"
+          renovate-version: full

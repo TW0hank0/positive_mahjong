@@ -21,7 +21,13 @@ from colorama import Back, Fore, Style
 
 import util
 
-ignored_paths: list[str] = ["docs", ".git", "__pycache__", "__pypy_cache__"]
+ignored_paths: list[str] = [
+    ".git",
+    "__pycache__",
+    "__pypy_cache__",
+    ".ruff_cache",
+    ".venv",
+]
 
 
 def main():
@@ -29,8 +35,8 @@ def main():
     nav_template_path = os.path.join(website_root_path, "nav.html.template")
     with open(nav_template_path, "r", encoding="utf-8") as f:
         nav_template_content = f.read()
-    with open(util.fix_path("website", ".gitignore"), "r", encoding="utf-8") as f:
-        ignored_paths.extend(f.read().split("\n"))
+    # with open(util.fix_path("website", ".gitignore"), "r", encoding="utf-8") as f:
+    #     ignored_paths.extend(f.read().split("\n"))
     build_root = util.fix_path("website_build")
     if os.path.exists(build_root) is True:
         if os.path.isdir(build_root) is True:
@@ -48,6 +54,7 @@ def main():
         nav_template=nav_template_content,
         website_root_path=build_root,
     )
+    copy_website_dep(build_root)
 
 
 def copytree_ignore(src: str, names: list[str], /) -> list[str]:
@@ -277,6 +284,27 @@ def replace_var(
             )
     os.chdir(orig_work_dir)
     return new_html_content
+
+
+def copy_website_dep(build_root: str):
+    orig_cwd = os.getcwd()
+    os.chdir(util.fix_path("docs"))
+    _ = util.run_cmd(["mdbook", "build"])
+    if os.path.exists(os.path.join(build_root, "docs")) is True:
+        shutil.rmtree(os.path.join(build_root, "docs"))
+    _ = shutil.copytree(
+        util.fix_path("docs", "book"),
+        os.path.join(build_root, "docs"),
+    )
+    _ = shutil.copy2(
+        util.fix_path("assets", "icon", "icon.png"),
+        os.path.join(build_root, "icon.png"),
+    )
+    _ = shutil.copy2(
+        util.fix_path("assets", "icon", "icon.svg"),
+        os.path.join(build_root, "icon.svg"),
+    )
+    os.chdir(orig_cwd)
 
 
 if __name__ == "__main__":

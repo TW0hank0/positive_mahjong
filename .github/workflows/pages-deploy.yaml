@@ -44,12 +44,6 @@ jobs:
           uv run build_license.py
           cd ..
 
-      - name: Copy webiste dep
-        run: |
-          cd scripts
-          uv run copy_website_dep.py
-          cd ..
-
       - name: Build doc and website
         run: |
           cd scripts

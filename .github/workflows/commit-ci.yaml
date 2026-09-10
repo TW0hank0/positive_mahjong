@@ -36,64 +36,11 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
     steps:
-      - name: install rustup on Windows
-        if: runner.os == 'Windows'
-        run: |
-          Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
-          ls
-          .\rustup-init.exe -y
+      - name: Checkout code
+        uses: actions/checkout@v7.0.1
 
-      - name: install rustup on Linux
-        if: runner.os == 'Linux'
-        run: |
-          curl https://sh.rustup.rs -o rust-init.sh
-          sh rust-init.sh -y
-
-      - name: Cache Cargo installed tools on Linux
-        uses: actions/cache@v6.1.0
-        id: cache-cargo-tools-linux
-        if: runner.os == 'Linux'
-        with:
-          path: |
-            ~/.cargo/bin/cargo-deny
-            ~/.cargo/bin/cargo-about
-            ~/.cargo/bin/mdbook
-            ~/.cargo/bin/cargo-msrv
-            ~/.cargo/bin/taplo
-          key: ${{ runner.os }}-cargo-tools-${{ hashFiles('.github/cache-version.json') }}
-
-      - name: Cache Cargo installed tools on Windows
-        uses: actions/cache@v6.1.0
-        id: cache-cargo-tools-windows
-        if: runner.os == 'Windows'
-        with:
-          path: |
-            ~/.cargo/bin/cargo-deny.exe
-            ~/.cargo/bin/cargo-about.exe
-            ~/.cargo/bin/mdbook.exe
-            ~/.cargo/bin/cargo-msrv.exe
-            ~/.cargo/bin/taplo.exe
-            key: ${{ runner.os }}-cargo-tools-${{ hashFiles('.github/cache-version.json') }}
-
-      - name: Install cargo tools if not cached on Linux
-        if: steps.cache-cargo-tools-linux.outputs.cache-hit != 'true' && runner.os == 'Linux'
-        run: |
-          cargo install cargo-msrv cargo-deny taplo-cli mdbook --locked
-          cargo install cargo-about --features="cli" --locked
-
-      - name: Install cargo tools if not cached on Windows
-        if: steps.cache-cargo-tools-windows.outputs.cache-hit != 'true' && runner.os == 'Windows'
-        run: |
-          cargo install cargo-msrv cargo-deny taplo-cli mdbook --locked
-          cargo install cargo-about --features="cli" --locked
-
-      - name: check tools installion
-        run: |
-          cargo about --version
-          cargo msrv --version
-          cargo deny --version
-          taplo --version
-          mdbook --version
+      - name: Install Dep
+        uses: ./.github/workflows/instdep
 
   check:
     runs-on: ${{ matrix.os }}
@@ -329,12 +276,6 @@ jobs:
         run: |
           cd scripts
           uv run build_license.py
-          cd ..
-
-      - name: Copy webiste dep
-        run: |
-          cd scripts
-          uv run copy_website_dep.py
           cd ..
 
       - name: Build doc and website

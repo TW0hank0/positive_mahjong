@@ -13,19 +13,17 @@
 # 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-import os
-
 import util
 
 
 def main():
     util.run_cmd(
         ["cargo", "msrv", "find", "--", "--workspace"],
-        cwd=os.path.dirname(os.path.dirname(__file__)),
+        cwd=util.fix_path(),
     )
     util.run_cmd(
         ["cargo", "msrv", "verify", "--", "--workspace"],
-        cwd=os.path.dirname(os.path.dirname(__file__)),
+        cwd=util.fix_path(),
     )
 
 
