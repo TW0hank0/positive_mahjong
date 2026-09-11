@@ -36,5 +36,4 @@ crossbeam = { workspace = true }
 rayon = { workspace = true }
 
 [lib]
-name = "pmj_gamemodes"
 path = "src/lib.rs"

@@ -26,7 +26,6 @@ version = "0.1.1"
 pmj_gamemodes = { path = "crates/pmj_gamemodes" }
 pmj_shared = { path = "crates/pmj_shared" }
 pmj_client_core = { path = "crates/pmj_client_core" }
-positive_mahjong = { path = "." }
 # --- shared ---
 dirs = "=7.0.0"
 godot = { version = "=0.5.5", features = ["api-4-6"] }
@@ -98,6 +97,7 @@ lto = true
 opt-level = 3
 codegen-units = 1
 incremental = false
+split-debuginfo = "unpacked"
 
 [profile.dev]
 debug = true
