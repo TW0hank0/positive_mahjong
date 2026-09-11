@@ -226,7 +226,11 @@ if __name__ == "__main__":
     @app.command()
     def main(
         command: Literal[
-            "get_version", "get_datetime", "commit_sha", "commit_short_sha"
+            "get_version",
+            "get_datetime",
+            "commit_sha",
+            "commit_short_sha",
+            "get_commit_msg",
         ],
     ):
         match command:
@@ -240,5 +244,8 @@ if __name__ == "__main__":
             case "commit_short_sha":
                 commit_info = get_commit_info()
                 print(commit_info.short_sha)
+            case "get_commit_msg":
+                commit_info = get_commit_info()
+                print(commit_info.msg)
 
     app()

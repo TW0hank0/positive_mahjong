@@ -17,11 +17,11 @@ import util
 
 
 def main():
-    util.run_cmd(
+    _ = util.run_cmd(
         ["cargo", "msrv", "find", "--", "--workspace"],
         cwd=util.fix_path(),
     )
-    util.run_cmd(
+    _ = util.run_cmd(
         ["cargo", "msrv", "verify", "--", "--workspace"],
         cwd=util.fix_path(),
     )
