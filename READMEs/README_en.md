@@ -1,20 +1,17 @@
 # positive_mahjong
 
-![icon](./assets/icon/icon.png)
+![icon](../assets/icon/icon.png)
 
 [繁體中文](../README.md) | **English**
 
 ![GitLab Stars](https://img.shields.io/gitlab/stars/TW0hank0%2Fpositive_mahjong?style=for-the-badge&color=green)
-![Deps.rs Repository Dependencies](https://img.shields.io/deps-rs/repo/gitlab/TW0hank0/positive_mahjong?style=for-the-badge&color=green)
 ![Gitlab Pipeline Status](https://img.shields.io/gitlab/pipeline-status/TW0hank0%2Fpositive_mahjong?branch=master&style=for-the-badge&label=Gitlab%20Pipeline&color=green)
 ![GitLab License](https://img.shields.io/gitlab/license/TW0hank0%2Fpositive_mahjong?style=for-the-badge&color=green)
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/TW0hank0/positive_mahjong/commit-build.yaml?branch=master&style=for-the-badge&label=Github%20Action&color=green)
-
-**Still in devlopment, not finish!**
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/TW0hank0/positive_mahjong/commit-ci.yaml?branch=master&style=for-the-badge&label=Github%20Action&color=green)
 
 ### Futures
 
-Built with Rust, tungstenite and iced, support linux and windows.
+Built with Rust tungstenite and iced, support linux and windows systems.
 
 ### Links
 
@@ -24,7 +21,9 @@ Built with Rust, tungstenite and iced, support linux and windows.
 
 [Github CI Repo](https://github.com/TW0hank0/positive_mahjong/)
 
-[Project Website](https://tw0hank0.gitlab.io/positive_mahjong/)
+[Project website](https://tw0hank0.gitlab.io/positive_mahjong/)
+
+> [Github Pages](https://tw0hank0.github.io/positive_mahjong/)
 
 [KeepAndroidOpen](https://keepandroidopen.org/)
 
@@ -38,19 +37,32 @@ Built with Rust, tungstenite and iced, support linux and windows.
 
 Not finish yet...
 
-See: [project documents](https://tw0hank0.gitlab.io/positive_mahjong/docs/)
+See: [project docs](https://tw0hank0.gitlab.io/positive_mahjong/docs/)
 
-### 授權與聲明
+### License
 
-版權所有 (C) 2026 TW0hank0
+Copyright (C) 2026 TW0hank0
 
-本程式基於 GNU Affero General Public License v3 （僅此版本） 授權
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License version 3 as published
+by the Free Software Foundation.
 
-完整全文請見 [LICENSE](./LICENSE) 檔案
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+Full License see [LICENSE](./LICENSE) file.
 
 #### 第三方模組庫授權
 
-見：[ThirdPartyLicense-Rust.md](https://tw0hank0.gitlab.io/positive_mahjong/docs/license/ThirdPartyLicense-Rust.md)
+See:
+[ThirdPartyLicense-Rust.md](https://tw0hank0.gitlab.io/positive_mahjong/files/ThirdPartyLicense-Rust.md)
+[ThirdPartyLicense-Rust.html](https://tw0hank0.gitlab.io/positive_mahjong/files/ThirdPartyLicense-Rust.html)
+[ThirdPartyLicense-Rust.json](https://tw0hank0.gitlab.io/positive_mahjong/files/ThirdPartyLicense-Rust.json)
 
 #### 第三方專案聲明
 
