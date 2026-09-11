@@ -23,7 +23,6 @@ import sys
 import time
 import tomllib
 from typing import Literal
-from zoneinfo import ZoneInfo
 
 from colorama import Back, Fore
 
@@ -200,8 +199,7 @@ def get_version(
 
 
 def get_datetime():
-    tz = ZoneInfo("Asia/Taipei")
-    return datetime.datetime.now(tz).strftime("%Y-%m-%d_%H-%M-%S")
+    return datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d_%H-%M-%S")
 
 
 def list_files(path: str) -> list[str]:
@@ -226,7 +224,12 @@ if __name__ == "__main__":
     @app.command()
     def main(
         command: Literal[
-            "get_version", "get_datetime", "commit_sha", "commit_short_sha"
+            "get_version",
+            "get_datetime",
+            "commit_sha",
+            "commit_short_sha",
+            "get_commit_msg",
+            "msrv",
         ],
     ):
         match command:
@@ -240,5 +243,17 @@ if __name__ == "__main__":
             case "commit_short_sha":
                 commit_info = get_commit_info()
                 print(commit_info.short_sha)
+            case "get_commit_msg":
+                commit_info = get_commit_info()
+                print(commit_info.msg)
+            case "msrv":
+                _ = run_cmd(
+                    ["cargo", "msrv", "find", "--", "--workspace"],
+                    cwd=fix_path(),
+                )
+                _ = run_cmd(
+                    ["cargo", "msrv", "verify", "--", "--workspace"],
+                    cwd=fix_path(),
+                )
 
     app()

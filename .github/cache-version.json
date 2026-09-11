@@ -3,5 +3,6 @@
 	"mdbook": "0.5.4",
 	"cargo-about": "0.9.2",
 	"cargo-msrv": "0.19.3",
-	"taplo-cli": "0.10.0"
+	"taplo-cli": "0.10.0",
+	"eza": "0.23.5"
 }

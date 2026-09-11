@@ -56,10 +56,6 @@
             src="https://img.shields.io/gitlab/stars/TW0hank0%2Fpositive_mahjong?style=for-the-badge&color=green"
         />
         <img
-            alt="Deps.rs Repository Dependencies"
-            src="https://img.shields.io/deps-rs/repo/gitlab/TW0hank0/positive_mahjong?style=for-the-badge&color=green"
-        />
-        <img
             alt="Gitlab Pipeline Status"
             src="https://img.shields.io/gitlab/pipeline-status/TW0hank0%2Fpositive_mahjong?branch=master&style=for-the-badge&label=Gitlab%20Pipeline&color=green"
         />

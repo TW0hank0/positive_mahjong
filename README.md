@@ -5,7 +5,6 @@
 **繁體中文** | [English (outdated)](READMEs/README_en.md)
 
 ![GitLab Stars](https://img.shields.io/gitlab/stars/TW0hank0%2Fpositive_mahjong?style=for-the-badge&color=green)
-![Deps.rs Repository Dependencies](https://img.shields.io/deps-rs/repo/gitlab/TW0hank0/positive_mahjong?style=for-the-badge&color=green)
 ![Gitlab Pipeline Status](https://img.shields.io/gitlab/pipeline-status/TW0hank0%2Fpositive_mahjong?branch=master&style=for-the-badge&label=Gitlab%20Pipeline&color=green)
 ![GitLab License](https://img.shields.io/gitlab/license/TW0hank0%2Fpositive_mahjong?style=for-the-badge&color=green)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/TW0hank0/positive_mahjong/commit-ci.yaml?branch=master&style=for-the-badge&label=Github%20Action&color=green)
@@ -44,9 +43,16 @@
 
 版權所有 (C) 2026 TW0hank0
 
-本程式基於 GNU Affero General Public License v3 （僅此版本） 授權
+本程式為自由軟體：您可以根據自由軟體基金會發佈的 GNU Affero 通用公共授權條款
+第 3 版（僅此版本）重新發佈及/或修改本程式。
 
-完整全文請見 [LICENSE](./LICENSE) 檔案
+本程式的發佈是希望它能發揮功用，但不提供任何擔保；
+甚至沒有隱含的適銷性或特定目的適用性擔保。詳見 GNU Affero 通用公共授權條款。
+
+您應該已經收到一份 GNU Affero 通用公共授權條款副本。
+如果沒有，請參見 <https://www.gnu.org/licenses/>。
+
+完整全文請見 [LICENSE](./LICENSE) 檔案。
 
 #### 第三方模組庫授權
 

@@ -15,7 +15,7 @@
 
 [package]
 authors = { workspace = true }
-default-run = "pmj_server"
+default-run = "pmj-server"
 edition = { workspace = true }
 license = { workspace = true }
 name = "pmj_server"
@@ -37,9 +37,9 @@ tracing = { workspace = true }
 tungstenite = { workspace = true }
 
 [[bin]]
-name = "pmj_server"
+name = "pmj-server"
 path = "src/main.rs"
 
 [[bin]]
-name = "pmj_server_gui"
+name = "pmj-server-gui"
 path = "src/gui/gui_main.rs"

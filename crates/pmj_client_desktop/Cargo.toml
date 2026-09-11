@@ -38,5 +38,5 @@ url = { workspace = true }
 default = []
 
 [[bin]]
-name = "pmj_client_desktop"
+name = "pmj-client-desktop"
 path = "src/main.rs"

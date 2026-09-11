@@ -19,3 +19,6 @@ secret/**
 secure_files/**
 .secure_files/**
 website_build/**
+
+# IDE
+.vscode/**
