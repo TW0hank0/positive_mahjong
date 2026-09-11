@@ -93,11 +93,12 @@ jobs:
           ty check .
           cd ..
 
-      # cargo-msrv never run sucessful when rust-toolchain is nightly
-      # - name: Run cargo-msrv script
+      # comment cause by:
+      #  cargo-msrv never run sucessful when rust-toolchain is nightly
+      # - name: Run util msrv script
       #   run: |
       #     cd scripts
-      #     uv run cargo_msrv.py
+      #     uv run util.py msrv
       #     cd ..
 
       - name: Run cargo-deny
