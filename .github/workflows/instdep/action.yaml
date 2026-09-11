@@ -87,6 +87,7 @@ runs:
           ~/.cargo/bin/mdbook
           ~/.cargo/bin/cargo-msrv
           ~/.cargo/bin/taplo
+          ~/.cargo/bin/eza
         key: ${{ runner.os }}-cargo-tools-${{ hashFiles('.github/cache-version.json') }}
 
     - name: Cache Cargo installed tools on Windows
@@ -100,20 +101,21 @@ runs:
           ~/.cargo/bin/mdbook.exe
           ~/.cargo/bin/cargo-msrv.exe
           ~/.cargo/bin/taplo.exe
+          ~/.cargo/bin/eza.exe
         key: ${{ runner.os }}-cargo-tools-${{ hashFiles('.github/cache-version.json') }}
 
     - name: Install cargo tools if not cached on Linux
       shell: pwsh
       if: steps.cache-cargo-tools-linux.outputs.cache-hit != 'true' && runner.os == 'Linux'
       run: |
-        cargo install cargo-msrv cargo-deny taplo-cli mdbook --locked
+        cargo install cargo-msrv cargo-deny taplo-cli mdbook eza --locked
         cargo install cargo-about --features="cli" --locked
 
     - name: Install cargo tools if not cached on Windows
       shell: pwsh
       if: steps.cache-cargo-tools-windows.outputs.cache-hit != 'true' && runner.os == 'Windows'
       run: |
-        cargo install cargo-msrv cargo-deny taplo-cli mdbook --locked
+        cargo install cargo-msrv cargo-deny taplo-cli mdbook eza --locked
         cargo install cargo-about --features="cli" --locked
 
     - name: check tools installion
@@ -124,6 +126,7 @@ runs:
         cargo deny --version
         taplo --version
         mdbook --version
+        eza --version
 
     - name: install ruff and ty using uv
       shell: pwsh
