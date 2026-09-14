@@ -15,7 +15,7 @@
 
 name: Renovate GitLab Projects
 
-on:
+"on":
   # 設定定時觸發（每天早上 10 點 UTC）
   schedule:
     - cron: "0 10 * * *"

@@ -25,40 +25,26 @@ def main():
     autogen_path = util.fix_path("auto_generated")
     if os.path.exists(autogen_path) is False:
         os.mkdir(autogen_path)
-    all_commands = [
-        [
-            "cargo",
-            "about",
-            "generate",
-            "--output-file",
-            os.path.join(autogen_path, "ThirdPartyLicense-Rust.html"),
-            "--threshold",
-            "1.0",
-            util.fix_path("templates", "about_html.hbs"),
-        ],
-        [
-            "cargo",
-            "about",
-            "generate",
-            "--threshold",
-            "1.0",
-            "--output-file",
-            os.path.join(autogen_path, "ThirdPartyLicense-Rust.json"),
-            util.fix_path("templates", "about_json.hbs"),
-        ],
-        [
-            "cargo",
-            "about",
-            "generate",
-            "--output-file",
-            os.path.join(autogen_path, "ThirdPartyLicense-Rust.md"),
-            "--threshold",
-            "1.0",
-            util.fix_path("templates", "about_markdown.hbs"),
-        ],
+    # (output_file, template_path)
+    licenses_info = [
+        ("ThirdPartyLicense-Rust.html", util.fix_path("templates", "about_html.hbs")),
+        ("ThirdPartyLicense-Rust.json", util.fix_path("templates", "about_json.hbs")),
+        ("ThirdPartyLicense-Rust.md", util.fix_path("templates", "about_markdown.hbs")),
     ]
-    for command in all_commands:
-        _ = util.run_cmd(command, cwd=util.fix_path())
+    for output_file, template_path in licenses_info:
+        _ = util.run_cmd(
+            [
+                "cargo",
+                "about",
+                "generate",
+                "--output-file",
+                output_file,
+                "--threshold",
+                "1.0",
+                template_path,
+            ],
+            cwd=util.fix_path(),
+        )
     print("Indenting json file...", end="")
     json_file_path = util.fix_path(
         "auto_generated",

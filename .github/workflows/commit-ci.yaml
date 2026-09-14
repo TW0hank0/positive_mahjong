@@ -123,8 +123,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
 
-      - name: Install Dep
-        uses: ./.github/workflows/instdep
+      - uses: ./.github/workflows/instdep
 
       - name: Prepare venv
         run: |
@@ -250,6 +249,34 @@ jobs:
           cd ..
 
   deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7.0.1
+
+      - uses: ./.github/workflows/instdep/
+
+      - name: Build license
+        run: |
+          cd scripts
+          uv run build_license.py
+          cd ..
+
+      - name: Build doc and website
+        run: |
+          cd scripts
+          uv run build_website.py
+          cd ..
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v5.0.0
+        with:
+          path: ./website_build/
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v5.0.1
+
+  deploy_with_artifacts:
     needs:
       - build_client_desktop
     runs-on: ubuntu-latest
@@ -257,8 +284,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
 
-      - name: Install Dep
-        uses: ./.github/workflows/instdep/
+      - uses: ./.github/workflows/instdep/
 
       - name: download all artifacts
         uses: actions/download-artifact@v8.0.1
