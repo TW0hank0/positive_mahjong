@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-# 著作權所有 (C) 2026 TW0hank0
+# 版權所有 (C) 2026 TW0hank0
 #
 # 本檔案屬於 positive_mahjong 專案的一部分。
 # 專案儲存庫：https://gitlab.com/TW0hank0/positive_mahjong
@@ -32,12 +32,19 @@ def run_cmd(
     cwd: str | None = None,
     timeout: int = 60 * 30,
     stream: bool = False,
+    exit_on_failed: bool = True,
 ) -> tuple[int, str]:
     """
     when stream is True no stdout return"""
     print(
-        f"{Fore.CYAN}Running command:{Fore.RESET} {Back.LIGHTBLACK_EX}{' '.join(command)}{Back.RESET}"
+        f"{Fore.CYAN}Running command:{Fore.RESET}",
+        end="",
     )
+    if cwd is None:
+        print()
+    else:
+        print(f"{Fore.LIGHTBLACK_EX} (at {cwd}){Fore.RESET}")
+    print(f"{Back.LIGHTBLACK_EX}{' '.join(command)}{Back.RESET}")
     start_time = time.time()
     if stream is True:
         process = subprocess.Popen(command, cwd=cwd)
@@ -82,7 +89,7 @@ def run_cmd(
             ("stderr", pstderr),
         ]:
             if (data == "\n") or (data.strip() == ""):
-                print(f"{name} does not have any content.")
+                print(f"{Fore.MAGENTA}{name} does not have any content.{Fore.RESET}")
             else:
                 print(f"{Fore.LIGHTBLACK_EX}---{Fore.RESET} {name}")
                 line_num = 1
@@ -90,9 +97,10 @@ def run_cmd(
                     print(
                         f"{Fore.LIGHTBLACK_EX}{str(line_num).rjust(3)}|{Fore.RESET} {line}"
                     )
-                line_num += 1
+                    line_num += 1
                 print(f"{Fore.LIGHTBLACK_EX}--- end-of {name}{Fore.RESET}")
-                sys.exit(1)
+        if exit_on_failed is True:
+            sys.exit(process.returncode)
     return (process.returncode, pstdout.rstrip("\n"))
 
 

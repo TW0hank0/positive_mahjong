@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-# 著作權所有 (C) 2026 TW0hank0
+# 版權所有 (C) 2026 TW0hank0
 #
 # 本檔案屬於 positive_mahjong 專案的一部分。
 # 專案儲存庫：https://gitlab.com/TW0hank0/positive_mahjong
@@ -52,14 +52,14 @@ def main():
         "website_build/**",
         # `old_pmj_client` 包含第三方程式碼
         # [android-iced-example](https://github.com/ibaryshnikov/android-iced-example)
-        "crates/old_pmj_client/**",
+        "crates/old_pmj_client/src/android/**",
         # Author: [iced team](https://github.com/iced-rs/)
         # This file is from project [iced](https://github.com/iced-rs/iced/).
         "crates/pmj_client_desktop/src/easing.rs",
         # Author: [iced team](https://github.com/iced-rs/)
         # This file is from project [iced](https://github.com/iced-rs/iced/).
         "crates/pmj_client_desktop/src/circular.rs",
-        "crates/old_slint_client/**",
+        "crates/old_slint_client/material/**",
         "supply-chain/**",
         "scripts/**/__init__.py",
     ]
@@ -74,7 +74,9 @@ def main():
     ]
     command.extend(ignored.copy())
     command.append(".")
-    (returncode, _stdout) = util.run_cmd(command, cwd=util.fix_path())
+    (returncode, _stdout) = util.run_cmd(
+        command, cwd=util.fix_path(), exit_on_failed=False
+    )
     if returncode != 0:
         print(str(Style.DIM) + "-" * 10 + str(Style.NORMAL))
         print(f"{Fore.RED}Something Wrong!{Fore.RESET}")
@@ -88,13 +90,15 @@ def main():
         ]
         fix_command.extend(ignored.copy())
         fix_command.append(".")
-        work_cwd = os.getcwd()
-        print(f"{Fore.CYAN}--- Fix cmmand{Fore.RESET}")
+        cwd_now = os.getcwd()
+        print(f"{Fore.CYAN}--- Fix command{Fore.RESET}")
         print(
             str(Back.LIGHTBLACK_EX)
-            + " && ".join(
-                [f"cd {util.fix_path()}", " ".join(fix_command), f"cd {work_cwd}"]
-            )
+            + f"cd {util.fix_path()}"
+            + " && "
+            + " ".join(fix_command)
+            + " && "
+            + f"cd {cwd_now}"
             + str(Back.RESET)
         )
         print(str(Style.DIM) + "End of command ---" + str(Style.RESET_ALL))
