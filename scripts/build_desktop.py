@@ -19,6 +19,8 @@ import sys
 import zipfile
 from typing import Literal
 
+from colorama import Fore
+
 import build_license
 import util
 
@@ -26,23 +28,26 @@ INCLUDE_FILES_MATCH_TYPE: Literal["exe_split", "inclue_all_files"] = "exe_split"
 
 
 def main():
-    print("-" * 10, "cargo build", "-" * 10)
-    _ = util.run_cmd(
-        [
-            "cargo",
-            "build",
-            "--release",
-            "--locked",
-        ],
-        cwd=util.fix_path(),
-        timeout=60 * 70,  # 70分鐘
-        stream=True,
-    )
+    targets = []
+    match platform.system():
+        case "Linux":
+            targets.extend(["x86_64-unknown-linux-musl", "x86_64-unknown-linux-gnu"])
+        case "Windows":
+            targets.append("x86_64-pc-windows-msvc")
+    print(f"target: {targets}")
+    for target in targets:
+        print(f"{Fore.CYAN}Building release for target {target}...{Fore.RESET}")
+        _ = util.run_cmd(
+            ["cargo", "build", "--release", "--locked", "--target", target],
+            cwd=util.fix_path(),
+            timeout=60 * 75,  # 75分鐘
+            stream=True,
+        )
     build_license.main()
-    zip_desktop()
+    zip_desktop(targets)
 
 
-def zip_desktop():
+def zip_desktop(targets: list[str]):
     version = util.get_version()
     include_files: list[str | tuple[str, str]] = [
         util.fix_path("README.md"),
@@ -76,44 +81,55 @@ def zip_desktop():
             "material_symbols_LICENSE",
         ),
     ]
-    target_path = util.fix_path(
-        "target",
-        "release",
-    )
-    for file in os.listdir(target_path):
-        full_file_path = os.path.join(target_path, file)
-        if os.path.isfile(full_file_path) is True:
-            if INCLUDE_FILES_MATCH_TYPE == "inclue_all_files":
-                include_files.append(full_file_path)
-            elif INCLUDE_FILES_MATCH_TYPE == "exe_split":
-                match platform.system():
-                    case "Linux":
-                        if len(file.split(".")) == 1:
-                            include_files.append(full_file_path)
-                    case "Windows":
-                        if (file.split(".")[1] == "exe") and (len(file.split(".")) > 1):
-                            include_files.append(full_file_path)
-                    case _:
-                        raise RuntimeError("Not support system!")
-            else:
-                print(f"unmatched type: {INCLUDE_FILES_MATCH_TYPE}", file=sys.stderr)
-    pf = platform.system().lower()
-    zip_file_name = util.fix_path(f"positive_mahjong-desktop-v{version}-{pf}.zip")
-    with zipfile.ZipFile(
-        zip_file_name,
-        mode="w",
-        compression=zipfile.ZIP_DEFLATED,
-    ) as zipf:
-        for file in include_files:
-            if type(file) is tuple:
-                zipf.write(file[0], arcname=file[1])
-            elif type(file) is str:
-                zipf.write(file, arcname=os.path.basename(file))
-            else:
-                print(
-                    "incorrect file arg type, not tuple and not str!", file=sys.stderr
-                )
-    print(zip_file_name)
+    for target in targets:
+        target_path = util.fix_path(
+            "target",
+            target,
+            "release",
+        )
+        for file in os.listdir(target_path):
+            full_file_path = os.path.join(target_path, file)
+            if os.path.isfile(full_file_path) is True:
+                if INCLUDE_FILES_MATCH_TYPE == "inclue_all_files":
+                    include_files.append(full_file_path)
+                elif INCLUDE_FILES_MATCH_TYPE == "exe_split":
+                    match platform.system():
+                        case "Linux":
+                            if len(file.split(".")) == 1:
+                                include_files.append(full_file_path)
+                        case "Windows":
+                            if (file.split(".")[1] == "exe") and (
+                                len(file.split(".")) > 1
+                            ):
+                                include_files.append(full_file_path)
+                        case _:
+                            raise RuntimeError("Not support system!")
+                else:
+                    print(
+                        f"unmatched type: {INCLUDE_FILES_MATCH_TYPE}", file=sys.stderr
+                    )
+        artifacts_path = util.fix_path("artifacts")
+        if os.path.exists(artifacts_path) is False:
+            os.mkdir(artifacts_path)
+        zip_file_path = os.path.join(
+            artifacts_path, f"positive_mahjong-desktop-v{version}-{target}.zip"
+        )
+        with zipfile.ZipFile(
+            zip_file_path,
+            mode="w",
+            compression=zipfile.ZIP_DEFLATED,
+        ) as zipf:
+            for file in include_files:
+                if type(file) is tuple:
+                    zipf.write(file[0], arcname=file[1])
+                elif type(file) is str:
+                    zipf.write(file, arcname=os.path.basename(file))
+                else:
+                    print(
+                        "incorrect file arg type, not tuple and not str!",
+                        file=sys.stderr,
+                    )
+        print(zip_file_path)
 
 
 if __name__ == "__main__":
