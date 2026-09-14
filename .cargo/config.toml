@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-# 著作權所有 (C) 2026 TW0hank0
+# 版權所有 (C) 2026 TW0hank0
 #
 # 本檔案屬於 positive_mahjong 專案的一部分。
 # 專案儲存庫：https://gitlab.com/TW0hank0/positive_mahjong
@@ -49,11 +49,11 @@ linker = "lld-link"
 
 [target.x86_64-unknown-linux-gnu]
 linker = "gcc"
-# use fast linker
-rustflags = ["-C", "link-arg=-fuse-ld=mold"]
+# use fast elf linker
+rustflags = ["-C", "link-arg=--ld-path=wild"]
 
 # GUI is NOT able in musl env currently!
 # So this target can not run sucessful :(
 [target.x86_64-unknown-linux-musl]
 linker = "musl-gcc"
-rustflags = ["-C", "link-arg=-fuse-ld=mold"]
+rustflags = ["-C", "link-arg=--ld-path=wild"]

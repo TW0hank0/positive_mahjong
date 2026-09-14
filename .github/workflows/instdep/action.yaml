@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-# 著作權所有 (C) 2026 TW0hank0
+# 版權所有 (C) 2026 TW0hank0
 #
 # 本檔案屬於 positive_mahjong 專案的一部分。
 # 專案儲存庫：https://gitlab.com/TW0hank0/positive_mahjong
@@ -57,7 +57,7 @@ runs:
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update
-        sudo apt-get install libfontconfig1-dev pkg-config mold gcc eza -y
+        sudo apt-get install -y libfontconfig1-dev pkg-config mold gcc
 
     - name: install Windows needed dep
       shell: pwsh
@@ -88,6 +88,7 @@ runs:
           ~/.cargo/bin/cargo-msrv
           ~/.cargo/bin/taplo
           ~/.cargo/bin/eza
+          ~/.cargo/bin/wild
         key: ${{ runner.os }}-cargo-tools-${{ hashFiles('.github/cache-version.json') }}
 
     - name: Cache Cargo installed tools on Windows
@@ -108,15 +109,15 @@ runs:
       shell: pwsh
       if: steps.cache-cargo-tools-linux.outputs.cache-hit != 'true' && runner.os == 'Linux'
       run: |
-        cargo install cargo-msrv cargo-deny taplo-cli mdbook eza --locked
-        cargo install cargo-about --features="cli" --locked
+        cargo +stable install --locked cargo-msrv cargo-deny taplo-cli mdbook eza wild-linker
+        cargo +stable install --locked cargo-about --features="cli"
 
     - name: Install cargo tools if not cached on Windows
       shell: pwsh
       if: steps.cache-cargo-tools-windows.outputs.cache-hit != 'true' && runner.os == 'Windows'
       run: |
-        cargo install cargo-msrv cargo-deny taplo-cli mdbook eza --locked
-        cargo install cargo-about --features="cli" --locked
+        cargo +stable install --locked cargo-msrv cargo-deny taplo-cli mdbook eza
+        cargo +stable install --locked cargo-about --features="cli"
 
     - name: check tools installion
       shell: pwsh

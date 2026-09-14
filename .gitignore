@@ -9,8 +9,6 @@
 **/.mypy_cache/**
 
 # --- Other ---
-positive_*-v*-*.zip
-positive_mahjong-*-v*-*.zip
 *.kra~
 pmj_server_config.json
 auto_generated/**
@@ -19,6 +17,7 @@ secret/**
 secure_files/**
 .secure_files/**
 website_build/**
+artifacts/**
 
 # IDE
 .vscode/**

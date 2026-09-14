@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-// 著作權所有 (C) 2026 TW0hank0
+// 版權所有 (C) 2026 TW0hank0
 //
 // 本檔案屬於 positive_mahjong 專案的一部分。
 // 專案儲存庫：https://gitlab.com/TW0hank0/positive_mahjong
@@ -314,7 +314,7 @@ impl ServerGUI {
                         .on_input(GUIMessages::RoomMsgChange),
                 )
                 .width(Length::Fill);
-            msg_bar_layout=msg_bar_layout.push(space().width(3));
+            msg_bar_layout = msg_bar_layout.push(space().width(3));
             msg_bar_layout = msg_bar_layout
                 .push(button(text("Send").size(16)).on_press(GUIMessages::SendRoomMsg));
             layout = layout.push(msg_bar_layout);
