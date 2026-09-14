@@ -38,7 +38,7 @@ def main():
                 "about",
                 "generate",
                 "--output-file",
-                output_file,
+                os.path.join(autogen_path, output_file),
                 "--threshold",
                 "1.0",
                 template_path,
