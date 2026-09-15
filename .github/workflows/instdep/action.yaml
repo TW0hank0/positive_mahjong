@@ -123,8 +123,10 @@ runs:
       shell: pwsh
       if: runner.os == 'Linux'
       run: |
-        echo 'create link for wild'
-        sudo ln -s ~/.cargo/bin/wild /usr/bin/ld.wild
+        # 創建 ld.wild 符號連結
+        sudo ln -sf ~/.cargo/bin/wild /usr/bin/ld.wild
+        # 驗證 wild 可執行
+        ld.wild --version || true
 
     - name: check tools installion
       shell: pwsh
