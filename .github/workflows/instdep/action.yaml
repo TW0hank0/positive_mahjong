@@ -21,6 +21,20 @@ runs:
     - name: Install uv
       uses: astral-sh/setup-uv@v10.1.0
 
+    - name: install Linux build needed dep
+      shell: bash
+      if: runner.os == 'Linux'
+      run: |
+        sudo dnf upgrade -y
+        sudo dnf install -y fontconfig-devel pkg-config mold gcc musl-gcc
+        sudo dnf install -y https://github.com/PowerShell/PowerShell/releases/download/v7.6.6/powershell-7.6.6-1.rh.x86_64.rpm
+
+    - name: install Windows needed dep
+      shell: pwsh
+      if: runner.os == 'Windows'
+      run: |
+        winget install --id LLVM.LLVM --accept-source-agreements --accept-package-agreements
+
     - name: check uv install and install cpython
       shell: pwsh
       run: |
@@ -49,20 +63,6 @@ runs:
         rustup --version
         rustc --version
         cargo --version
-
-    - name: install Linux build needed dep
-      shell: bash
-      if: runner.os == 'Linux'
-      run: |
-        sudo dnf upgrade -y
-        sudo dnf install -y fontconfig-devel pkg-config mold gcc musl-gcc
-        sudo dnf install -y https://github.com/PowerShell/PowerShell/releases/download/v7.6.6/powershell-7.6.6-1.rh.x86_64.rpm
-
-    - name: install Windows needed dep
-      shell: pwsh
-      if: runner.os == 'Windows'
-      run: |
-        winget install --id LLVM.LLVM --accept-source-agreements --accept-package-agreements
 
     - name: install go
       uses: actions/setup-go@v7.0.0
