@@ -37,7 +37,7 @@ jobs:
           - windows-latest
         include:
           - os: ubuntu-latest
-            container: fedora:42
+            container: fedora:latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
@@ -83,7 +83,7 @@ jobs:
           - windows-latest
         include:
           - os: ubuntu-latest
-            container: fedora:42
+            container: fedora:latest
 
     steps:
       - name: Checkout code
@@ -145,7 +145,7 @@ jobs:
           - windows-latest
         include:
           - os: ubuntu-latest
-            container: fedora:42
+            container: fedora:latest
 
     steps:
       - name: Checkout code

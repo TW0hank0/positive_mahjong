@@ -56,6 +56,7 @@ runs:
       run: |
         sudo dnf upgrade -y
         sudo dnf install -y fontconfig-devel pkg-config mold gcc musl-gcc
+        sudo dnf install -y https://github.com/PowerShell/PowerShell/releases/download/v7.6.6/powershell-7.6.6-1.rh.x86_64.rpm
 
     - name: install Windows needed dep
       shell: pwsh
