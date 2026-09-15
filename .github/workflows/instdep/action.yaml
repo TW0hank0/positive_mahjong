@@ -128,7 +128,7 @@ runs:
       if: runner.os == 'Linux'
       run: |
         echo 'create link for wild'
-        sudo ln -s /usr/bin/ld.wild ~/.cargo/bin/wild
+        sudo ln -s ~/.cargo/bin/wild /usr/bin/ld.wild
         echo 'verify link'
         ls -l wild
 
