@@ -186,8 +186,8 @@ impl MessageMgr {
                     Ok((task, result_sender)) => match task.msg_kind.clone() {
                         MsgMgrTaskKinds::Write => {
                             let (task_player, task_content) = task.kind_write.unwrap();
+                            let mut index = 0;
                             loop {
-                                let mut index = 0;
                                 let p = players.get(index).unwrap();
                                 if p.player_id == task_player {
                                     let ws = p.player_ws.clone();
@@ -226,13 +226,12 @@ impl MessageMgr {
                         }
                         MsgMgrTaskKinds::AddPlayer => {
                             players = task.kind_add_player.unwrap();
-                            return MsgMgrThreadResult { is_error: false };
                         }
                         MsgMgrTaskKinds::Ping => {}
                         MsgMgrTaskKinds::Read => {
                             let task_player = task.kind_read.unwrap();
+                            let mut index = 0;
                             loop {
-                                let mut index = 0;
                                 let p = players.get(index).unwrap();
                                 if p.player_id == task_player {
                                     let ws = p.player_ws.clone();
@@ -562,7 +561,33 @@ pub struct PositiveMahjong {
 
 impl PositiveMahjong {
     pub fn new() -> Self {
-        let mut unused_card: Vec<PMJCard> = Vec::with_capacity(200);
+        let mut unused_card: Vec<PMJCard> = Vec::with_capacity(
+            const {
+                9 * 4 * 3
+                    + 8
+                    + [
+                        PMJCardWordsType::East,
+                        PMJCardWordsType::GreenDragon,
+                        PMJCardWordsType::North,
+                        PMJCardWordsType::RedDragon,
+                        PMJCardWordsType::South,
+                        PMJCardWordsType::West,
+                        PMJCardWordsType::WhiteDragon,
+                    ]
+                    .len()
+                    + [
+                        PMJCardWordsType::East,
+                        PMJCardWordsType::GreenDragon,
+                        PMJCardWordsType::North,
+                        PMJCardWordsType::RedDragon,
+                        PMJCardWordsType::South,
+                        PMJCardWordsType::West,
+                        PMJCardWordsType::WhiteDragon,
+                    ]
+                    .len()
+                        * 4
+            },
+        );
         //初始化`筒`
         for card_id in 1..=4 {
             for card_number in 1..=9 {
@@ -920,6 +945,7 @@ impl PositiveMahjong {
                                         }
                                     }
                                     mode_shared::ClientMessage::RoomMsg(_crm) => {
+                                        // TODO: catch at msgmgr
                                         todo!("unsupport yet!");
                                     }
                                 }
@@ -941,6 +967,411 @@ impl PositiveMahjong {
                 }
             }
             match current_action {
+            PlayerGameActions::ExposedKong { with: (ref with1, ref with2, ref with3), ref kong_card } => {
+                for card in [with1.clone(), with2.clone(), with3.clone()] {
+                    let p = self.players.get(current_turn_player_id as usize).unwrap();
+                    if !p.player_hand_cards.contains(&card) {
+                        warn!(
+                            "玩家({})無此牌: {}",
+                            current_turn_player_id.clone(),
+                            card.clone()
+                        );
+                        current_turn_player_id = last_turn_player_id + 1;
+                        continue 'game;
+                    } else if card.card_type != kong_card.card_type {
+                        warn!("玩家 ExposedKong 的卡牌類型不相同！");
+                        current_turn_player_id = last_turn_player_id + 1;
+                        continue 'game;
+                    } else if card.card_type.is_flower() || card.card_type.is_words() {
+                        warn!("花字不可杠！");
+                        current_turn_player_id = last_turn_player_id + 1;
+                        continue 'game;
+                    }
+                }
+                let with1_card_num = match with1.card_type {
+                    mode_shared::PMJCardType::Dots(num) => {
+                        num
+                    }
+                    mode_shared::PMJCardType::Line(num ) => {
+                        num
+                    }
+                    mode_shared::PMJCardType::TenThousand(num) => {
+                        num
+                    }
+                    mode_shared::PMJCardType::Flower(ref _flower_type) => {
+                        panic!("????: 上個 if 應該處理！");
+                    }
+                    mode_shared::PMJCardType::Words(ref word_type) => {
+                        match word_type {
+                            mode_shared::PMJCardWordsType::East => {1}
+                            mode_shared::PMJCardWordsType::GreenDragon => {2}
+                            mode_shared::PMJCardWordsType::North => {3}
+                            mode_shared::PMJCardWordsType::RedDragon => {4}
+                            mode_shared::PMJCardWordsType::South => {5}
+                            mode_shared::PMJCardWordsType::West => {
+                                6
+                            }
+                            mode_shared::PMJCardWordsType::WhiteDragon => {7}
+                        }
+                    }
+                };
+                let with2_card_num = match with2.card_type {
+                    mode_shared::PMJCardType::Dots(num) => {
+                        num
+                    }
+                    mode_shared::PMJCardType::Line(num ) => {
+                        num
+                    }
+                    mode_shared::PMJCardType::TenThousand(num) => {
+                        num
+                    }
+                    mode_shared::PMJCardType::Flower(ref _flower_type) => {
+                        panic!("????: 上個 if 應該處理！");
+                    }
+                    mode_shared::PMJCardType::Words(ref word_type) => {
+                        match word_type {
+                            mode_shared::PMJCardWordsType::East => {1}
+                            mode_shared::PMJCardWordsType::GreenDragon => {2}
+                            mode_shared::PMJCardWordsType::North => {3}
+                            mode_shared::PMJCardWordsType::RedDragon => {4}
+                            mode_shared::PMJCardWordsType::South => {5}
+                            mode_shared::PMJCardWordsType::West => {
+                                6
+                            }
+                            mode_shared::PMJCardWordsType::WhiteDragon => {7}
+                        }
+                    }
+                };
+                let with3_card_num = match with3.card_type {
+                    mode_shared::PMJCardType::Dots(num) => {
+                        num
+                    }
+                    mode_shared::PMJCardType::Line(num ) => {
+                        num
+                    }
+                    mode_shared::PMJCardType::TenThousand(num) => {
+                        num
+                    }
+                    mode_shared::PMJCardType::Flower(ref _flower_type) => {
+                        panic!("????: 上個 if 應該處理！");
+                    }
+                    mode_shared::PMJCardType::Words(ref word_type) => {
+                        match word_type {
+                            mode_shared::PMJCardWordsType::East => {1}
+                            mode_shared::PMJCardWordsType::GreenDragon => {2}
+                            mode_shared::PMJCardWordsType::North => {3}
+                            mode_shared::PMJCardWordsType::RedDragon => {4}
+                            mode_shared::PMJCardWordsType::South => {5}
+                            mode_shared::PMJCardWordsType::West => {
+                                6
+                            }
+                            mode_shared::PMJCardWordsType::WhiteDragon => {7}
+                        }
+                    }
+                };
+                let kong_card_num = match kong_card.card_type {
+                    mode_shared::PMJCardType::Dots(num) => {
+                        num
+                    }
+                    mode_shared::PMJCardType::Line(num ) => {
+                        num
+                    }
+                    mode_shared::PMJCardType::TenThousand(num) => {
+                        num
+                    }
+                    mode_shared::PMJCardType::Flower(ref _flower_type) => {
+                        panic!("????: 上個 if 應該處理！");
+                    }
+                    mode_shared::PMJCardType::Words(ref word_type) => {
+                        match word_type {
+                            mode_shared::PMJCardWordsType::East => {1}
+                            mode_shared::PMJCardWordsType::GreenDragon => {2}
+                            mode_shared::PMJCardWordsType::North => {3}
+                            mode_shared::PMJCardWordsType::RedDragon => {4}
+                            mode_shared::PMJCardWordsType::South => {5}
+                            mode_shared::PMJCardWordsType::West => {
+                                6
+                            }
+                            mode_shared::PMJCardWordsType::WhiteDragon => {7}
+                        }
+                    }
+                };
+                if with1_card_num == with2_card_num && with2_card_num == with3_card_num && with3_card_num == kong_card_num {
+                    last_action_need_throw = false;
+                    let player = self
+                        .players
+                        .get_mut(current_turn_player_id as usize)
+                        .unwrap();
+                    player.player_used_cards.push((
+                        vec![with1.clone(), with2.clone(), with3.clone(), kong_card.clone()],
+                        mode_shared::GameActions::ExposedKong,
+                    ));
+                    for card in [with1.clone(), with2.clone(), with3.clone()] {
+                        let mut cindex = 0;
+                        loop {
+                            let c = player.player_hand_cards.get(cindex).unwrap();
+                            if c == &card {
+                                break;
+                            } else {
+                                cindex += 1;
+                            }
+                        }
+                        player.player_hand_cards.remove(cindex);
+                    }
+                    {
+                            let got_card = self.unused_card.choose(&mut rng).unwrap();
+
+                                let mut index = 0;
+                                'find_index: for i in self.unused_card.iter() {
+                                    if i == got_card {
+                                        break 'find_index;
+                                    } else {
+                                        index += 1;
+                                    }
+                                }
+                                let player_card = self.unused_card.remove(index);
+                                player.player_hand_cards.push(player_card.clone());
+
+
+
+                    }
+                    {
+                        {
+                            let msg =
+                                serde_json::to_string(&mode_shared::ServerMessage::GameMsg(
+                                    mode_shared::ServerGameMsg::HandCardChange(
+                                        player.player_hand_cards.clone(),
+                                    ),
+                                ))
+                                .unwrap();
+                            let _ = write_reply(msg, player.player_ws.clone());
+                        }
+                        {
+                            let msg =
+                                serde_json::to_string(&mode_shared::ServerMessage::GameMsg(
+                                    mode_shared::ServerGameMsg::PlayerAction(
+                                        player.player_id,
+                                        PlayerGameActions::ExposedKong { with: (with1.clone(), with2.clone(), with3.clone()), kong_card: kong_card.clone() } ,
+                                    ),
+                                ))
+                                .unwrap();
+                            for p in self.players.iter() {
+                                let _ = write_reply(msg.clone(), p.player_ws.clone());
+                            }
+                        }
+                    }
+                }
+            }
+            PlayerGameActions::ReplaceFlower(ref flower_card) => {
+                for card in [flower_card.clone()] {
+                    let p = self.players.get(current_turn_player_id as usize).unwrap();
+                    if !p.player_hand_cards.contains(&card) {
+                        warn!(
+                            "玩家({})無此牌: {}",
+                            current_turn_player_id.clone(),
+                            card.clone()
+                        );
+                        current_turn_player_id = last_turn_player_id + 1;
+                        continue 'game;
+                    } else if !card.card_type.is_flower() {
+                        warn!("玩家 Triplet 的卡牌類型不相同！");
+                        current_turn_player_id = last_turn_player_id + 1;
+                        continue 'game;
+                    }
+                }
+                let player = self
+                    .players
+                    .get_mut(current_turn_player_id as usize)
+                    .unwrap();
+                for card in [flower_card.clone()] {
+                    let mut cindex = 0;
+                    loop {
+                        let c = player.player_hand_cards.get(cindex).unwrap();
+                        if c == &card {
+                            break;
+                        } else {
+                            cindex += 1;
+                        }
+                    }
+                    player.player_hand_cards.remove(cindex);
+                }
+                'choose_card: loop {
+                    let got_card = self.unused_card.choose(&mut rng).unwrap();
+                    if !got_card.card_type.is_flower() {
+                        let mut index = 0;
+                        'find_index: for i in self.unused_card.iter() {
+                            if i == got_card {
+                                break 'find_index;
+                            } else {
+                                index += 1;
+                            }
+                        }
+                        let player_card = self.unused_card.remove(index);
+                        player.player_hand_cards.push(player_card.clone());
+                        let client_msg =
+                            serde_json::to_string(&mode_shared::ServerMessage::GameMsg(
+                                mode_shared::ServerGameMsg::HandCardChange(player.player_hand_cards.clone()),
+                            ))
+                            .unwrap();
+                        write_reply(client_msg, player.player_ws.clone()).ok();
+                        break 'choose_card;
+                    }
+                }
+
+            last_action_need_throw = true;
+            threw_card = None;
+            }
+            PlayerGameActions::Triplet { with: (ref with1, ref with2), ref triplet_card } => {
+                for card in [with1.clone(), with2.clone()] {
+                    let p = self.players.get(current_turn_player_id as usize).unwrap();
+                    if !p.player_hand_cards.contains(&card) {
+                        warn!(
+                            "玩家({})無此牌: {}",
+                            current_turn_player_id.clone(),
+                            card.clone()
+                        );
+                        current_turn_player_id = last_turn_player_id + 1;
+                        continue 'game;
+                    } else if card.card_type != triplet_card.card_type {
+                        warn!("玩家 Triplet 的卡牌類型不相同！");
+                        current_turn_player_id = last_turn_player_id + 1;
+                        continue 'game;
+                    } else if card.card_type.is_flower() || card.card_type.is_words() {
+                        warn!("花字不可碰！");
+                        current_turn_player_id = last_turn_player_id + 1;
+                        continue 'game;
+                    }
+                }
+                let with1_card_num = match with1.card_type {
+                    mode_shared::PMJCardType::Dots(num) => {
+                        num
+                    }
+                    mode_shared::PMJCardType::Line(num ) => {
+                        num
+                    }
+                    mode_shared::PMJCardType::TenThousand(num) => {
+                        num
+                    }
+                    mode_shared::PMJCardType::Flower(ref _flower_type) => {
+                        panic!("????: 上個 if 應該處理！");
+                    }
+                    mode_shared::PMJCardType::Words(ref word_type) => {
+                        match word_type {
+                            mode_shared::PMJCardWordsType::East => {1}
+                            mode_shared::PMJCardWordsType::GreenDragon => {2}
+                            mode_shared::PMJCardWordsType::North => {3}
+                            mode_shared::PMJCardWordsType::RedDragon => {4}
+                            mode_shared::PMJCardWordsType::South => {5}
+                            mode_shared::PMJCardWordsType::West => {
+                                6
+                            }
+                            mode_shared::PMJCardWordsType::WhiteDragon => {7}
+                        }
+                    }
+                };
+                let with2_card_num = match with2.card_type {
+                    mode_shared::PMJCardType::Dots(num) => {
+                        num
+                    }
+                    mode_shared::PMJCardType::Line(num ) => {
+                        num
+                    }
+                    mode_shared::PMJCardType::TenThousand(num) => {
+                        num
+                    }
+                    mode_shared::PMJCardType::Flower(ref _flower_type) => {
+                        panic!("????: 上個 if 應該處理！");
+                    }
+                    mode_shared::PMJCardType::Words(ref word_type) => {
+                        match word_type {
+                            mode_shared::PMJCardWordsType::East => {1}
+                            mode_shared::PMJCardWordsType::GreenDragon => {2}
+                            mode_shared::PMJCardWordsType::North => {3}
+                            mode_shared::PMJCardWordsType::RedDragon => {4}
+                            mode_shared::PMJCardWordsType::South => {5}
+                            mode_shared::PMJCardWordsType::West => {
+                                6
+                            }
+                            mode_shared::PMJCardWordsType::WhiteDragon => {7}
+                        }
+                    }
+                };
+                let triplet_card_num = match triplet_card.card_type {
+                    mode_shared::PMJCardType::Dots(num) => {
+                        num
+                    }
+                    mode_shared::PMJCardType::Line(num ) => {
+                        num
+                    }
+                    mode_shared::PMJCardType::TenThousand(num) => {
+                        num
+                    }
+                    mode_shared::PMJCardType::Flower(ref _flower_type) => {
+                        panic!("????: 上個 if 應該處理！");
+                    }
+                    mode_shared::PMJCardType::Words(ref word_type) => {
+                        match word_type {
+                            mode_shared::PMJCardWordsType::East => {1}
+                            mode_shared::PMJCardWordsType::GreenDragon => {2}
+                            mode_shared::PMJCardWordsType::North => {3}
+                            mode_shared::PMJCardWordsType::RedDragon => {4}
+                            mode_shared::PMJCardWordsType::South => {5}
+                            mode_shared::PMJCardWordsType::West => {
+                                6
+                            }
+                            mode_shared::PMJCardWordsType::WhiteDragon => {7}
+                        }
+                    }
+                };
+                if with1_card_num == with2_card_num && with2_card_num == triplet_card_num {
+                    last_action_need_throw = true;
+                    let player = self
+                        .players
+                        .get_mut(current_turn_player_id as usize)
+                        .unwrap();
+                    player.player_used_cards.push((
+                        vec![with1.clone(), with2.clone(), triplet_card.clone()],
+                        mode_shared::GameActions::Triplet,
+                    ));
+                    for card in [with1.clone(), with2.clone()] {
+                        let mut cindex = 0;
+                        loop {
+                            let c = player.player_hand_cards.get(cindex).unwrap();
+                            if c == &card {
+                                break;
+                            } else {
+                                cindex += 1;
+                            }
+                        }
+                        player.player_hand_cards.remove(cindex);
+                    }
+                    {
+                        {
+                            let msg =
+                                serde_json::to_string(&mode_shared::ServerMessage::GameMsg(
+                                    mode_shared::ServerGameMsg::HandCardChange(
+                                        player.player_hand_cards.clone(),
+                                    ),
+                                ))
+                                .unwrap();
+                            let _ = write_reply(msg, player.player_ws.clone());
+                        }
+                        {
+                            let msg =
+                                serde_json::to_string(&mode_shared::ServerMessage::GameMsg(
+                                    mode_shared::ServerGameMsg::PlayerAction(
+                                        player.player_id,
+                                        PlayerGameActions::Triplet { with: (with1.clone(), with2.clone()), triplet_card: triplet_card.clone() } ,
+                                    ),
+                                ))
+                                .unwrap();
+                            for p in self.players.iter() {
+                                let _ = write_reply(msg.clone(), p.player_ws.clone());
+                            }
+                        }
+                    }
+                }
+            }
                 PlayerGameActions::Eat {
                     with: (ref with1, ref with2),
                     ref eat_card,

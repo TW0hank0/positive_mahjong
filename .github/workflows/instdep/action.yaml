@@ -123,6 +123,15 @@ runs:
         cargo +stable install --locked cargo-msrv cargo-deny taplo-cli mdbook eza
         cargo +stable install --locked cargo-about --features="cli"
 
+    - name: Create soft link for wild
+      shell: pwsh
+      if: runner.os == 'Linux'
+      run: |
+        echo 'create link for wild'
+        sudo ln -s /usr/bin/ld.wild ~/.cargo/bin/wild
+        echo 'verify link'
+        ls -l wild
+
     - name: check tools installion
       shell: pwsh
       run: |

@@ -28,17 +28,37 @@ INCLUDE_FILES_MATCH_TYPE: Literal["exe_split", "inclue_all_files"] = "exe_split"
 
 
 def main():
-    targets = []
+    build_info: list[tuple[str, str | None | list[str]]] = []
     match platform.system():
         case "Linux":
-            targets.extend(["x86_64-unknown-linux-musl", "x86_64-unknown-linux-gnu"])
+            build_info.extend(
+                [
+                    ("x86_64-unknown-linux-musl", ["pmj_server", "pmj_client_desktop"]),
+                    ("x86_64-unknown-linux-gnu", None),
+                ]
+            )
         case "Windows":
-            targets.append("x86_64-pc-windows-msvc")
-    print(f"target: {targets}")
-    for target in targets:
-        print(f"{Fore.CYAN}Building release for target {target}...{Fore.RESET}")
+            build_info.append(("x86_64-pc-windows-msvc", None))
+    print(f"target: {build_info}")
+    targets = []
+    for target, pkg in build_info:
+        targets.append(target)
+        print(f"{Fore.CYAN}Building release for target {target}...{Fore.RESET}", end="")
+        cmd = ["cargo", "build", "--release", "--locked", "--target", target]
+        if pkg is None:
+            cmd.append("--workspace")
+            print()
+        elif type(pkg) is str:
+            cmd.extend(("--package", pkg))
+            print(f"{Fore.LIGHTBLACK_EX} (package: {pkg}){Fore.RESET}")
+        elif type(pkg) is list:
+            for p in pkg:
+                cmd.extend(("--package", p))
+            print(f"{Fore.LIGHTBLACK_EX} (packages: {' ,'.join(pkg)}){Fore.RESET}")
+        else:
+            print("Error: pkg not None, str or list!")
         _ = util.run_cmd(
-            ["cargo", "build", "--release", "--locked", "--target", target],
+            cmd,
             cwd=util.fix_path(),
             timeout=60 * 75,  # 75分鐘
             stream=True,
