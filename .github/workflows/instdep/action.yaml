@@ -169,7 +169,6 @@ runs:
 
     - name: Save Cache Cargo installed tools on Linux
       uses: actions/cache/save@v5
-      id: cache-cargo-tools-linux
       if: "${{ inputs.save-cache }} == 'true' && runner.os == 'Linux' && steps.cache-cargo-tools-linux.outputs.cache-hit != 'true'"
       with:
         path: |
@@ -184,7 +183,6 @@ runs:
 
     - name: Save Cache Cargo installed tools on Windows
       uses: actions/cache/save@v5
-      id: cache-cargo-tools-windows
       if: "${{ inputs.save-cache }} == 'true' && runner.os == 'Windows' && steps.cache-cargo-tools-windows.outputs.cache-hit != 'true'"
       with:
         path: |
