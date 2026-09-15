@@ -6,7 +6,7 @@
 		{
 			"description": "Monitor cargo tools versions in cache-version.json",
 			"customType": "regex",
-			"fileMatch": ["^\\.github/cache-version\\.json$"],
+			"fileMatch": ["^cache-version\\.json$"],
 			"matchStrings": [
 				"\"(?<depName>[a-z0-9-]+)\":\\s*\"(?<currentValue>[\\d\\.]+)\""
 			],
