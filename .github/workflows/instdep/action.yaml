@@ -14,7 +14,6 @@
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 name: Install Dep
-
 description: Install dep that workflows need
 runs:
   using: composite
@@ -37,7 +36,7 @@ runs:
         .\rustup-init.exe -y
 
     - name: install rustup on Linux
-      shell: pwsh
+      shell: bash
       if: runner.os == 'Linux'
       run: |
         curl https://sh.rustup.rs -o rust-init.sh
@@ -52,11 +51,11 @@ runs:
         cargo --version
 
     - name: install Linux build needed dep
-      shell: pwsh
+      shell: bash
       if: runner.os == 'Linux'
       run: |
-        sudo apt-get update
-        sudo apt-get install -y libfontconfig1-dev pkg-config mold gcc
+        sudo dnf upgrade -y
+        sudo dnf install -y fontconfig-devel pkg-config mold gcc musl-gcc
 
     - name: install Windows needed dep
       shell: pwsh
@@ -71,7 +70,7 @@ runs:
         cache: false
 
     - name: use go to install addlicense tool
-      shell: pwsh
+      shell: bash
       run: |
         go install github.com/google/addlicense@latest
         echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
@@ -120,13 +119,11 @@ runs:
         cargo +stable install --locked cargo-about --features="cli"
 
     - name: Create soft link for wild
-      shell: pwsh
+      shell: bash
       if: runner.os == 'Linux'
       run: |
-        # 創建 ld.wild 符號連結
-        sudo ln -sf ~/.cargo/bin/wild /usr/bin/ld.wild
-        # 驗證 wild 可執行
-        ld.wild --version || true
+        echo 'create link for wild'
+        sudo ln -s ~/.cargo/bin/wild /usr/bin/ld.wild
 
     - name: check tools installion
       shell: pwsh
@@ -153,12 +150,3 @@ runs:
       shell: pwsh
       run: |
         eza --tree .
-
-    # - name: install java
-    #   uses: actions/setup-java@v5.7.0
-    #   with:
-    #     distribution: "temurin" # See 'Supported distributions' for available options
-    #     java-version: "21"
-
-    # - name: Setup Android
-    #   uses: android-actions/setup-android@v4.0.1
