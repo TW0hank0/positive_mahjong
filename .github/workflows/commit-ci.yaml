@@ -55,7 +55,7 @@ jobs:
             ~/.cargo/bin/taplo
             ~/.cargo/bin/eza
             ~/.cargo/bin/wild
-          key: ${{ runner.os }}-cargo-tools-${{ hashFiles('.github/cache-version.json') }}
+          key: ${{ runner.os }}-cargo-tools-${{ hashFiles('ci-cache-version.json') }}
 
       - name: Save Cache Cargo installed tools on Windows
         uses: actions/cache/save@v5
@@ -68,7 +68,7 @@ jobs:
             ~/.cargo/bin/cargo-msrv.exe
             ~/.cargo/bin/taplo.exe
             ~/.cargo/bin/eza.exe
-            key: ${{ runner.os }}-cargo-tools-${{ hashFiles('.github/cache-version.json') }}
+            key: ${{ runner.os }}-cargo-tools-${{ hashFiles('ci-cache-version.json') }}
 
   check:
     runs-on: ${{ matrix.os }}
