@@ -50,10 +50,10 @@ linker = "lld-link"
 [target.x86_64-unknown-linux-gnu]
 linker = "gcc"
 # use fast elf linker
-rustflags = ["-C", "link-arg=--ld-path=wild"]
+rustflags = ["-C", "link-arg=--fuse-ld=wild"]
 
 # GUI is NOT able in musl env currently!
 # So this target can not run sucessful :(
 [target.x86_64-unknown-linux-musl]
 linker = "musl-gcc"
-rustflags = ["-C", "link-arg=--ld-path=wild"]
+rustflags = ["-C", "link-arg=--fuse-ld=wild"]
