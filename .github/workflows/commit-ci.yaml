@@ -44,7 +44,7 @@ jobs:
         uses: ./.github/workflows/instdep
 
       - name: Save Cache Cargo installed tools on Linux
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         if: "${{ inputs.save-cache }} == 'true' && runner.os == 'Linux' && steps.cache-cargo-tools-linux.outputs.cache-hit != 'true'"
         with:
           path: |
@@ -58,7 +58,7 @@ jobs:
           key: ${{ runner.os }}-cargo-tools-${{ hashFiles('ci-cache-version.json') }}
 
       - name: Save Cache Cargo installed tools on Windows
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         if: "${{ inputs.save-cache }} == 'true' && runner.os == 'Windows' && steps.cache-cargo-tools-windows.outputs.cache-hit != 'true'"
         with:
           path: |
