@@ -14,14 +14,12 @@
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 name: commit-ci
-
 "on":
   # 支援在 GitHub 上手動點擊觸發
   workflow_dispatch:
   push:
     branches:
       - master
-
 permissions:
   contents: write
   pages: write
@@ -30,12 +28,16 @@ permissions:
 jobs:
   make-cache:
     runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
     strategy:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-latest
+          - ubuntu-latest # 這裡保留 ubuntu-latest 作為 Runner 宿主，但實際操作在容器中
           - windows-latest
+        include:
+          - os: ubuntu-latest
+            container: fedora:42
     steps:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
@@ -68,16 +70,20 @@ jobs:
             ~/.cargo/bin/cargo-msrv.exe
             ~/.cargo/bin/taplo.exe
             ~/.cargo/bin/eza.exe
-            key: ${{ runner.os }}-cargo-tools-${{ hashFiles('ci-cache-version.json') }}
+          key: ${{ runner.os }}-cargo-tools-${{ hashFiles('ci-cache-version.json') }}
 
   check:
     runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
     strategy:
       fail-fast: false
       matrix:
         os:
           - ubuntu-latest
           - windows-latest
+        include:
+          - os: ubuntu-latest
+            container: fedora:42
 
     steps:
       - name: Checkout code
@@ -123,14 +129,6 @@ jobs:
           ty check .
           cd ..
 
-      # comment cause by:
-      #  cargo-msrv never run sucessful when rust-toolchain is nightly
-      # - name: Run util msrv script
-      #   run: |
-      #     cd scripts
-      #     uv run util.py msrv
-      #     cd ..
-
       - name: Run cargo-deny
         run: |
           cargo deny fetch
@@ -138,12 +136,16 @@ jobs:
 
   build_client_desktop:
     runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
     strategy:
       fail-fast: false
       matrix:
         os:
           - ubuntu-latest
           - windows-latest
+        include:
+          - os: ubuntu-latest
+            container: fedora:42
 
     steps:
       - name: Checkout code
@@ -190,55 +192,9 @@ jobs:
           name: artifacts
           path: artifacts
 
-  # build_android:
-  #     runs-on: ${{ matrix.os }}
-  #     strategy:
-  #         fail-fast: false
-  #         matrix:
-  #             os: [ubuntu-latest]
-  #     steps:
-  #         - name: Checkout Repository
-  #           uses: actions/checkout@v6
-  #         - name: Checkout Secret
-  #           uses: actions/checkout@v6
-  #           with:
-  #               repository: ${{ secrets.SECRET_REPO }} # Android Keystore Repo
-  #               ssh-key: ${{ secrets.SECRET_REPO_TOKEN }} # Repo ssh-key
-  #               path: .secret
-  #         - name: Install Dep
-  #           uses: ./.github/workflows/instdep
-  #         - name: install java
-  #           uses: actions/setup-java@v5
-  #           with:
-  #               distribution: "temurin" # See 'Supported distributions' for available options
-  #               java-version: "21"
-  #         - name: install android target
-  #           run: |
-  #               rustup target add aarch64-linux-android
-  #               rustup update
-  #         - name: build apk
-  #           env:
-  #               CARGO_APK_RELEASE_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-  #           run: |
-  #               uv run scripts/build_android.py --ci
-  #         - name: Get package get_version
-  #           id: get_version
-  #           run: |
-  #               version=$(uv run scripts/ci/get_version.py)
-  #               echo "version=$version" >> $GITHUB_OUTPUT
-  #         - name: Rename apk file
-  #           run: |
-  #               uv run scripts/ci/rename_apk.py ${{ steps.get_version.outputs.version }}
-  #         - name: Upload apk artifact
-  #           uses: actions/upload-artifact@v6
-  #           with:
-  #               name: pmj_client_${{ steps.get_version.outputs.version }}.apk
-  #               path: target/release/apk/pmj_client_${{ steps.get_version.outputs.version }}.apk
-
   release_artifacts:
     needs:
       - build_client_desktop
-      #- build_android
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -266,9 +222,9 @@ jobs:
 
       - name: release and upload artifacts
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Github Action Token
-          CODEBERG_PAT_TOKEN: ${{ secrets.CODEBERG_PAT_TOKEN }} # PAT
-          GITLAB_PAT_TOKEN: ${{ secrets.GL_PAT }} # PAT
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CODEBERG_PAT_TOKEN: ${{ secrets.CODEBERG_PAT_TOKEN }}
+          GITLAB_PAT_TOKEN: ${{ secrets.GL_PAT }}
         run: |
           cd scripts
           uv run releases.py
