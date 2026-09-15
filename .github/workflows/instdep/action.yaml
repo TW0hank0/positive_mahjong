@@ -55,7 +55,7 @@ runs:
       if: runner.os == 'Linux'
       run: |
         sudo dnf upgrade -y
-        sudo dnf install -y fontconfig-devel pkg-config mold gcc
+        sudo dnf install -y fontconfig-devel pkg-config mold gcc musl-gcc
 
     - name: install Windows needed dep
       shell: pwsh
