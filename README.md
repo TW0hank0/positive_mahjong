@@ -41,6 +41,7 @@
 
 ### 授權與聲明
 
+```
 版權所有 (C) 2026 TW0hank0
 
 本程式為自由軟體：您可以根據自由軟體基金會發佈的 GNU Affero 通用公共授權條款
@@ -51,6 +52,7 @@
 
 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 如果沒有，請參見 <https://www.gnu.org/licenses/>。
+```
 
 完整全文請見 [LICENSE](./LICENSE) 檔案。
 

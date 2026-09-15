@@ -11,37 +11,36 @@
 ### v0.2.0 - [2026/8/16~]
 
 - [V2Better 玩法](<./TODO.md#V2Better 玩法>)
-    - 包含 房間(room) 遊戲結束返回
-    - 丟牌 吃 碰 杠
+  - 包含 房間(room) 遊戲結束返回
+  - 丟牌 吃 碰 杠
 - 重寫客戶端以支援 V2
-    - 遊戲時退出向玩家確認
-    - 遊戲時退出向伺服主確認
+  - 遊戲時退出向玩家確認
+  - 遊戲時退出向伺服主確認
 - 重寫伺服器GUI以支援V2
-    - 顯示遊戲狀態
+  - 顯示遊戲狀態
 
 ### v0.3.0
 
-- （暫定）pmj_client_core 供 pmj_client_desktop 與 pmj_client_cross 使用
-- （暫定）讓 pmj_client_desktop 可在網頁使用
+- 開發 pmj_client_core 供 pmj_client_desktop 與 pmj_client_cross 使用
 
 ### v0.4.0
 
-- （暫定）開發 pmj_client_cross
+- （暫定）[更穩定的電腦伺服器端](./TODO.md#更穩定的電腦伺服器端)
 
 ### v0.5.0
 
-- [更穩定的電腦伺服器端](./TODO.md#更穩定的電腦伺服器端)
+- （暫定）開發 pmj_client_cross
 
 ### v0.6.0
 
-- （暫定）伺服器GUI優化
+- 伺服器GUI優化
 
 ### v0.7.0
 
 - [V3Private 玩法](<./TODO.md#V3Private 玩法>)
-    - 資料傳輸加密
-    - 資料完整性檢查 (blake3)
-    - 資料超時檢查 (資料帶時間)
+  - 資料傳輸加密
+  - 資料完整性檢查 (blake3)
+  - 資料超時檢查 (資料帶時間)
 
 ### v0.8.0
 

@@ -23,7 +23,7 @@ use iced::{
     },
 };
 use tracing::{debug, error, info, trace, warn};
-use tungstenite::{Message, WebSocket, stream::NoDelay};
+use tungstenite::{Message, WebSocket};
 
 use crate::{circular, easing};
 
@@ -1256,34 +1256,6 @@ impl Client {
     }
 }
 
-fn transparent_button(t: &iced::Theme, s: button::Status) -> button::Style {
-    let p = t.extended_palette();
-    let mut style = button::Style::default();
-    style.border = Border {
-        color: p.background.strong.color,
-        width: 2.0,
-        radius: iced::border::radius(10),
-    };
-    style.text_color = p.primary.base.text;
-    match s {
-        button::Status::Active => {
-            style.background = None;
-        }
-        button::Status::Hovered => {
-            style.background = Some(iced::Background::Color(iced::Color::from_rgba(
-                1.0, 1.0, 1.0, 0.6,
-            )));
-        }
-        button::Status::Disabled => {
-            style.background = Some(iced::Background::Color(p.background.weak.color));
-        }
-        button::Status::Pressed => {
-            style.text_color = p.secondary.base.color;
-        }
-    }
-    style
-}
-
 fn rounded_primary_button(t: &iced::Theme, s: button::Status) -> button::Style {
     let p = t.extended_palette();
     let mut style = button::Style::default();
@@ -1306,39 +1278,4 @@ fn rounded_primary_button(t: &iced::Theme, s: button::Status) -> button::Style {
     }
     style.border = border;
     style
-}
-
-fn write_reply(
-    text: String,
-    websocket: sync::Arc<sync::RwLock<WebSocket<tungstenite::stream::MaybeTlsStream<TcpStream>>>>,
-) -> Result<(), tungstenite::error::Error> {
-    trace!(type= "enter_func", arg_text = ?text);
-    let reply: Message = Message::Text(text.into());
-    let write_result: tungstenite::Result<()>;
-    loop {
-        match websocket.try_write() {
-            Ok(mut guard) => {
-                write_result = guard.write(reply.clone());
-                let _ = guard.flush();
-                drop(guard);
-                break;
-            }
-            Err(sync::TryLockError::WouldBlock) => {
-                warn!("websocket鎖 => TryLockError::WouldBlock");
-            }
-            Err(e) => {
-                warn!("ws.try_write() => {}", e);
-            }
-        };
-        thread::sleep(time::Duration::from_millis(800));
-    }
-    match write_result {
-        Ok(_) => {
-            info!("成功回覆。")
-        }
-        Err(_) => {
-            warn!("回覆失敗！")
-        }
-    }
-    write_result
 }
