@@ -77,7 +77,7 @@ runs:
         echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
     - name: Cache Cargo installed tools on Linux
-      uses: actions/cache/restore@v5
+      uses: actions/cache/restore@v6
       id: cache-cargo-tools-linux
       if: runner.os == 'Linux'
       with:
@@ -92,7 +92,7 @@ runs:
         key: ${{ runner.os }}-cargo-tools-${{ hashFiles('.github/cache-version.json') }}
 
     - name: Cache Cargo installed tools on Windows
-      uses: actions/cache/restore@v5
+      uses: actions/cache/restore@v6
       id: cache-cargo-tools-windows
       if: runner.os == 'Windows'
       with:
