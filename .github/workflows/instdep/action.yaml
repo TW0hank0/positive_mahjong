@@ -16,10 +16,6 @@
 name: Install Dep
 
 description: Install dep that workflows need
-input:
-  save-cache:
-    default: "false"
-    required: false
 runs:
   using: composite
   steps:
@@ -166,30 +162,3 @@ runs:
 
     # - name: Setup Android
     #   uses: android-actions/setup-android@v4.0.1
-
-    - name: Save Cache Cargo installed tools on Linux
-      uses: actions/cache/save@v5
-      if: "${{ inputs.save-cache }} == 'true' && runner.os == 'Linux' && steps.cache-cargo-tools-linux.outputs.cache-hit != 'true'"
-      with:
-        path: |
-          ~/.cargo/bin/cargo-deny
-          ~/.cargo/bin/cargo-about
-          ~/.cargo/bin/mdbook
-          ~/.cargo/bin/cargo-msrv
-          ~/.cargo/bin/taplo
-          ~/.cargo/bin/eza
-          ~/.cargo/bin/wild
-        key: ${{ runner.os }}-cargo-tools-${{ hashFiles('.github/cache-version.json') }}
-
-    - name: Save Cache Cargo installed tools on Windows
-      uses: actions/cache/save@v5
-      if: "${{ inputs.save-cache }} == 'true' && runner.os == 'Windows' && steps.cache-cargo-tools-windows.outputs.cache-hit != 'true'"
-      with:
-        path: |
-          ~/.cargo/bin/cargo-deny.exe
-          ~/.cargo/bin/cargo-about.exe
-          ~/.cargo/bin/mdbook.exe
-          ~/.cargo/bin/cargo-msrv.exe
-          ~/.cargo/bin/taplo.exe
-          ~/.cargo/bin/eza.exe
-        key: ${{ runner.os }}-cargo-tools-${{ hashFiles('.github/cache-version.json') }}
