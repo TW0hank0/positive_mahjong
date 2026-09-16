@@ -25,18 +25,18 @@ runs:
       shell: bash
       if: runner.os == 'Linux'
       run: |
-        sudo dnf upgrade -y
-        sudo dnf install -y fontconfig-devel pkg-config mold gcc musl-gcc
-        sudo dnf install -y https://github.com/PowerShell/PowerShell/releases/download/v7.6.6/powershell-7.6.6-1.rh.x86_64.rpm
+        sudo apt-get update
+        sudo apt-get upgrade -y
+        sudo apt-get install -y libfontconfig1-dev pkg-config mold gcc musl-tools clang
 
     - name: install Windows needed dep
-      shell: pwsh
+      shell: bash
       if: runner.os == 'Windows'
       run: |
         winget install --id LLVM.LLVM --accept-source-agreements --accept-package-agreements
 
     - name: check uv install and install cpython
-      shell: pwsh
+      shell: bash
       run: |
         uv self version
         uv python install cpython-3.14
@@ -55,11 +55,12 @@ runs:
       run: |
         curl https://sh.rustup.rs -o rust-init.sh
         sh rust-init.sh -y
-        . "$HOME/.cargo/env"     # For sh/ash/dash/pdksh
-        rustup target add x86_64-unknown-linux-musl
+        . "$HOME/.cargo/env"
+
+    - run: rustup target add x86_64-unknown-linux-musl
 
     - name: check rust Install
-      shell: pwsh
+      shell: bash
       run: |
         rustup --version
         rustc --version
@@ -107,14 +108,14 @@ runs:
         key: ${{ runner.os }}-cargo-tools-${{ hashFiles('ci-cache-version.json') }}
 
     - name: Install cargo tools if not cached on Linux
-      shell: pwsh
+      shell: bash
       if: steps.cache-cargo-tools-linux.outputs.cache-hit != 'true' && runner.os == 'Linux'
       run: |
         cargo +stable install --locked cargo-msrv cargo-deny taplo-cli mdbook eza wild-linker
         cargo +stable install --locked cargo-about --features="cli"
 
     - name: Install cargo tools if not cached on Windows
-      shell: pwsh
+      shell: bash
       if: steps.cache-cargo-tools-windows.outputs.cache-hit != 'true' && runner.os == 'Windows'
       run: |
         cargo +stable install --locked cargo-msrv cargo-deny taplo-cli mdbook eza
@@ -128,7 +129,7 @@ runs:
         sudo ln -s ~/.cargo/bin/wild /usr/bin/ld.wild
 
     - name: check tools installion
-      shell: pwsh
+      shell: bash
       run: |
         cargo about --version
         cargo msrv --version
@@ -138,17 +139,12 @@ runs:
         eza --version
 
     - name: install ruff and ty using uv
-      shell: pwsh
+      shell: bash
       run: |
         uv tool install ruff
         uv tool install ty
 
-    - name: list files with pwsh
-      shell: pwsh
-      run: |
-        Get-ChildItem . -Recurse
-
     - name: list files with eza
-      shell: pwsh
+      shell: bash
       run: |
         eza --tree .
