@@ -4,9 +4,9 @@
 	"ignorePaths": ["crates/old_pmj_client/**", "crates/old_slint_client/**"],
 	"customManagers": [
 		{
-			"description": "Monitor cargo tools versions in cache-version.json",
+			"description": "Monitor cargo tools versions in ci-cache-version.json",
 			"customType": "regex",
-			"fileMatch": ["^cache-version\\.json$"],
+			"fileMatch": ["^ci-cache-version\\.json$"],
 			"matchStrings": [
 				"\"(?<depName>[a-z0-9-]+)\":\\s*\"(?<currentValue>[\\d\\.]+)\""
 			],
