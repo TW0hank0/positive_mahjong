@@ -28,16 +28,12 @@ permissions:
 jobs:
   make-cache:
     runs-on: ${{ matrix.os }}
-    container: ${{ matrix.container }}
     strategy:
       fail-fast: false
       matrix:
         os:
           - ubuntu-latest
           - windows-latest
-        include:
-          - os: ubuntu-latest
-            container: fedora:latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
@@ -74,16 +70,12 @@ jobs:
 
   check:
     runs-on: ${{ matrix.os }}
-    container: ${{ matrix.container }}
     strategy:
       fail-fast: false
       matrix:
         os:
           - ubuntu-latest
           - windows-latest
-        include:
-          - os: ubuntu-latest
-            container: fedora:latest
 
     steps:
       - name: Checkout code
@@ -136,16 +128,12 @@ jobs:
 
   build_client_desktop:
     runs-on: ${{ matrix.os }}
-    container: ${{ matrix.container }}
     strategy:
       fail-fast: false
       matrix:
         os:
           - ubuntu-latest
           - windows-latest
-        include:
-          - os: ubuntu-latest
-            container: fedora:latest
 
     steps:
       - name: Checkout code
@@ -196,14 +184,10 @@ jobs:
     needs:
       - build_client_desktop
     runs-on: ${{ matrix.os }}
-    container: ${{ matrix.container }}
     strategy:
       matrix:
         os:
           - ubuntu-latest
-        include:
-          - os: ubuntu-latest
-            container: fedora:latest
     permissions:
       contents: write
     steps:
@@ -240,14 +224,10 @@ jobs:
 
   deploy:
     runs-on: ${{ matrix.os }}
-    container: ${{ matrix.container }}
     strategy:
       matrix:
         os:
           - ubuntu-latest
-        include:
-          - os: ubuntu-latest
-            container: fedora:latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
@@ -278,14 +258,10 @@ jobs:
     needs:
       - build_client_desktop
     runs-on: ${{ matrix.os }}
-    container: ${{ matrix.container }}
     strategy:
       matrix:
         os:
           - ubuntu-latest
-        include:
-          - os: ubuntu-latest
-            container: fedora:latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
