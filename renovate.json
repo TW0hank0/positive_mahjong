@@ -6,7 +6,9 @@
 		{
 			"description": "Monitor cargo tools versions in ci-cache-version.json",
 			"customType": "regex",
-			"fileMatch": ["^ci-cache-version\\.json$"],
+			"managerFilePatterns": [
+				"/^ci-cache-version\\.json$/"
+			],
 			"matchStrings": [
 				"\"(?<depName>[a-z0-9-]+)\":\\s*\"(?<currentValue>[\\d\\.]+)\""
 			],
