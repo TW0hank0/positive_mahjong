@@ -43,7 +43,7 @@ jobs:
 
       - name: Save Cache Cargo installed tools on Linux
         uses: actions/cache/save@v6.1.0
-        if: "${{ inputs.save-cache }} == 'true' && runner.os == 'Linux' && steps.cache-cargo-tools-linux.outputs.cache-hit != 'true'"
+        if: "runner.os == 'Linux'"
         with:
           path: |
             ~/.cargo/bin/cargo-deny
@@ -57,7 +57,7 @@ jobs:
 
       - name: Save Cache Cargo installed tools on Windows
         uses: actions/cache/save@v6.1.0
-        if: "${{ inputs.save-cache }} == 'true' && runner.os == 'Windows' && steps.cache-cargo-tools-windows.outputs.cache-hit != 'true'"
+        if: "runner.os == 'Windows'"
         with:
           path: |
             ~/.cargo/bin/cargo-deny.exe
