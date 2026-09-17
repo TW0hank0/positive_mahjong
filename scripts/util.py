@@ -78,7 +78,7 @@ def run_cmd(
         process_time_str = ""
     if process.returncode == 0:
         print(
-            f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.GREEN}Process fnished sucessful.{Fore.RESET} {Fore.LIGHTBLACK_EX}{process_time_str}{Fore.RESET}"
+            f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.GREEN}Process finished sucessful.{Fore.RESET} {Fore.LIGHTBLACK_EX}{process_time_str}{Fore.RESET}"
         )
     else:
         print(
