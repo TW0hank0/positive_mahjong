@@ -23,17 +23,17 @@ rust-version.workspace = true
 version = { workspace = true }
 
 [dependencies]
+crossbeam = { workspace = true }
 image = { workspace = true }
 local-ip-address = { workspace = true }
 pmj_shared = { workspace = true }
 rand = { workspace = true }
+rayon = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tracing = { workspace = true }
 tungstenite = { workspace = true }
 url = { workspace = true }
-crossbeam = { workspace = true }
-rayon = { workspace = true }
 
 [lib]
 path = "src/lib.rs"

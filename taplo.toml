@@ -15,6 +15,7 @@
 
 exclude = [
     "**/.venv/**",
+    ".cargo/config.toml",
     "auto_generated/**",
     "crates/old_pmj_client/**",
     "crates/old_slint_client/**",
@@ -23,7 +24,6 @@ exclude = [
     "target/**",
     "website/**",
     "website_build/**",
-    ".cargo/config.toml",
 ]
 
 include = ["**/*.toml", "**/Cargo.toml", "Cargo.toml"]
