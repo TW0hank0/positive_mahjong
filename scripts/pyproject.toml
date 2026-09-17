@@ -14,15 +14,15 @@
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 [project]
-name = "pmj_scripts"
-version = "0.1.1"
+dependencies = [
+    "colorama==0.4.6",
+    "mistune==3.3.4",
+    "python-gitlab==8.5.0",
+    "requests==2.34.2",
+    "typer==0.27.2",
+]
 description = "Add your description here"
+name = "pmj_scripts"
 readme = "README.md"
 requires-python = "==3.14.7"
-dependencies = [
-    "typer==0.27.2",
-    "mistune==3.3.4",
-    "colorama==0.4.6",
-    "requests==2.34.2",
-    "python-gitlab==8.5.0",
-]
+version = "0.1.1"
