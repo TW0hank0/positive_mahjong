@@ -12,7 +12,6 @@
 #
 # 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
-
 name: Install Dep
 description: Install dep that workflows need
 runs:
@@ -70,15 +69,13 @@ runs:
     - name: install go
       uses: actions/setup-go@v7.0.0
       with:
-        go-version: "stable"
+        go-version: stable
         cache: false
-
     - name: use go to install addlicense tool
       shell: bash
       run: |
         go install github.com/google/addlicense@latest
         echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
-
     - name: Cache Cargo installed tools on Linux
       uses: actions/cache/restore@v6.1.0
       id: cache-cargo-tools-linux
@@ -93,7 +90,6 @@ runs:
           ~/.cargo/bin/eza
           ~/.cargo/bin/wild
         key: ${{ runner.os }}-cargo-tools-${{ hashFiles('ci-cache-version.json') }}
-
     - name: Cache Cargo installed tools on Windows
       uses: actions/cache/restore@v6.1.0
       id: cache-cargo-tools-windows
@@ -107,28 +103,24 @@ runs:
           ~/.cargo/bin/taplo.exe
           ~/.cargo/bin/eza.exe
         key: ${{ runner.os }}-cargo-tools-${{ hashFiles('ci-cache-version.json') }}
-
     - name: Install cargo tools if not cached on Linux
       shell: bash
       if: steps.cache-cargo-tools-linux.outputs.cache-hit != 'true' && runner.os == 'Linux'
       run: |
         cargo +stable install --locked cargo-msrv cargo-deny taplo-cli mdbook eza wild-linker
         cargo +stable install --locked cargo-about --features="cli"
-
     - name: Install cargo tools if not cached on Windows
       shell: bash
       if: steps.cache-cargo-tools-windows.outputs.cache-hit != 'true' && runner.os == 'Windows'
       run: |
         cargo +stable install --locked cargo-msrv cargo-deny taplo-cli mdbook eza
         cargo +stable install --locked cargo-about --features="cli"
-
     - name: Create soft link for wild
       shell: bash
       if: runner.os == 'Linux'
       run: |
         echo 'create link for wild'
         sudo ln -s ~/.cargo/bin/wild /usr/bin/ld.wild
-
     - name: check tools installion
       shell: bash
       run: |
@@ -138,13 +130,12 @@ runs:
         taplo --version
         mdbook --version
         eza --version
-
-    - name: install ruff and ty using uv
+    - name: install reuse-tool, ruff and ty using uv
       shell: bash
       run: |
         uv tool install ruff
         uv tool install ty
-
+        uv tool install reuse[charset-normalizer]
     - name: list files with eza
       shell: bash
       run: |

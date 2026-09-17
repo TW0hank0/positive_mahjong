@@ -1,0 +1,204 @@
+version = 1
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
+path = ".editorconfig"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
+path = ".gitattributes"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
+path = ".gitignore"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
+path = "Cargo.lock"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
+path = "ci-cache-version.json"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
+path = "TODO.md"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
+path = "CHANGELOG.md"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
+path = "renovate.json"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
+path = "supply-chain/*"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
+path = "ROADMAP.md"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
+path = "about.toml"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
+path = "taplo.toml"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
+path = "deny.toml"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
+path = "rust-toolchain.toml"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
+path = "READMEs/**"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
+path = "Cargo.toml"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
+path = "docs/**"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
+path = "README.md"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
+path = ".zed/**"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
+path = "scripts/**"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
+path = "templates/*"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
+path = ".gitlab/**"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
+path = ".gitlab-ci.yml"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
+path = ".cargo/*"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
+path = ".github/**"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
+path = "crates/**"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
+path = "website/**"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
+path = "assets/icon/*"
+precedence = "override"
+
+# Third Party
+
+[[annotations]]
+SPDX-FileCopyrightText = "2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'"
+SPDX-License-Identifier = "OFL-1.1"
+path = "assets/Noto_Sans_TC/**"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2022-2026 Google LLC"
+SPDX-License-Identifier = "Apache-2.0"
+path = "assets/material_symbols/*"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2019 Héctor Ramón, Iced contributors"
+SPDX-License-Identifier = "MIT"
+path = "crates/pmj_client_desktop/src/circular.rs"
+precedence = "override"
+[[annotations]]
+SPDX-FileCopyrightText = "2019 Héctor Ramón, Iced contributors"
+SPDX-License-Identifier = "MIT"
+path = "crates/pmj_client_desktop/src/easing.rs"
+precedence = "override"
+[[annotations]]
+SPDX-FileCopyrightText = "2019 Héctor Ramón, Iced contributors"
+SPDX-License-Identifier = "MIT"
+path = "crates/pmj_client_desktop_base/src/circular.rs"
+precedence = "override"
+[[annotations]]
+SPDX-FileCopyrightText = "2019 Héctor Ramón, Iced contributors"
+SPDX-License-Identifier = "MIT"
+path = "crates/pmj_client_desktop_base/src/easing.rs"
+precedence = "override"

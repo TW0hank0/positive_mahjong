@@ -22,6 +22,17 @@ import util
 
 
 def main():
+    print(f"{Fore.LIGHTBLACK_EX}addlicense check{Fore.RESET}")
+    addlicense_check()
+    print(f"{Fore.LIGHTBLACK_EX}reuse check{Fore.RESET}")
+    reuse_check()
+
+
+def reuse_check():
+    _ = util.run_cmd(["reuse", "lint"], cwd=util.fix_path())
+
+
+def addlicense_check():
     ignore_dir = [
         "**/.git/**",
         "**/.venv/**",
@@ -31,7 +42,7 @@ def main():
         "build/**",
         "**/__pycache__/**",
         "**/*.lock",
-        "/.python-version",
+        "**/.python-version",
         "**/*.png",
         "**/*.kra",
         "**/*.ttf",
@@ -50,15 +61,18 @@ def main():
         # website
         "website/docs/**",
         "website_build/**",
-        # `old_pmj_client` 包含第三方程式碼
-        # [android-iced-example](https://github.com/ibaryshnikov/android-iced-example)
-        "crates/old_pmj_client/src/android/**",
         # Author: [iced team](https://github.com/iced-rs/)
         # This file is from project [iced](https://github.com/iced-rs/iced/).
         "crates/pmj_client_desktop/src/easing.rs",
         # Author: [iced team](https://github.com/iced-rs/)
         # This file is from project [iced](https://github.com/iced-rs/iced/).
         "crates/pmj_client_desktop/src/circular.rs",
+        # Author: [iced team](https://github.com/iced-rs/)
+        # This file is from project [iced](https://github.com/iced-rs/iced/).
+        "crates/pmj_client_desktop_base/src/easing.rs",
+        # Author: [iced team](https://github.com/iced-rs/)
+        # This file is from project [iced](https://github.com/iced-rs/iced/).
+        "crates/pmj_client_desktop_base/src/circular.rs",
         "crates/old_slint_client/material/**",
         "supply-chain/**",
         "scripts/**/__init__.py",
