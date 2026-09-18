@@ -8,9 +8,12 @@
 **/.ruff_cache/**
 **/.mypy_cache/**
 
+# -- CI ---
+rust-init.sh
+rust-init.exe
+
 # --- Other ---
 *.kra~
-pmj_server_config.json
 auto_generated/**
 secret/**
 .secrets/**
