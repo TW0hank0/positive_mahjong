@@ -114,7 +114,12 @@ def build_files_dl(dir_path: str):
         ),
     ]
     if os.path.exists(util.fix_path("artifacts")) is True:
-        dlable_files.extend(util.list_files(util.fix_path("artifacts")))
+        pre_dlable_files = util.list_files(util.fix_path("artifacts"))
+        for file in pre_dlable_files:
+            if os.path.basename(file) != "github-pages":
+                dlable_files.append(file)
+            else:
+                print(f"  {Fore.LIGHTBLACK_EX}ignored {file}")
     files_summary_template = """\
 <!doctype html>
     <html lang="zh-TW">
