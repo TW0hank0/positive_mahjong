@@ -120,6 +120,10 @@ def build_files_dl(dir_path: str):
                 dlable_files.append(file)
             else:
                 print(f"  {Fore.LIGHTBLACK_EX}ignored {file}")
+    for license_file in util.list_files(util.fix_path("LICENSES")):
+        dlable_files.append(
+            (license_file, f"LICENSES_{os.path.basename(license_file)}")
+        )
     files_summary_template = """\
 <!doctype html>
     <html lang="zh-TW">
