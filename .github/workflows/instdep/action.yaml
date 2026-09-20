@@ -89,7 +89,7 @@ runs:
           ~/.cargo/bin/taplo
           ~/.cargo/bin/eza
           ~/.cargo/bin/wild
-        key: ${{ runner.os }}-cargo-tools-${{ hashFiles('ci-cache-version.json') }}
+        key: ${{ runner.os }}-${{ runner.arch }}-cargo-tools-${{ hashFiles('ci-cache-version.json') }}
     - name: Cache Cargo installed tools on Windows
       uses: actions/cache/restore@v6.1.0
       id: cache-cargo-tools-windows
@@ -102,7 +102,7 @@ runs:
           ~/.cargo/bin/cargo-msrv.exe
           ~/.cargo/bin/taplo.exe
           ~/.cargo/bin/eza.exe
-        key: ${{ runner.os }}-cargo-tools-${{ hashFiles('ci-cache-version.json') }}
+        key: ${{ runner.os }}-${{ runner.arch}}-cargo-tools-${{ hashFiles('ci-cache-version.json') }}
     - name: Install cargo tools if not cached on Linux
       shell: bash
       if: steps.cache-cargo-tools-linux.outputs.cache-hit != 'true' && runner.os == 'Linux'
