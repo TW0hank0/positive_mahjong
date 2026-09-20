@@ -35,7 +35,7 @@ def main():
     files = []
     pre_dlable_files = util.list_files(util.fix_path("artifacts"))
     for file in pre_dlable_files:
-        if os.path.basename(file) != "github-pages":
+        if os.path.basename(os.path.dirname(file)) != "github-pages":
             files.append(file)
         else:
             print(f"  {Fore.LIGHTBLACK_EX}ignored {file}")
