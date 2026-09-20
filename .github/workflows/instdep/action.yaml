@@ -28,11 +28,11 @@ runs:
         sudo apt-get upgrade -y
         sudo apt-get install -y libfontconfig1-dev pkg-config mold gcc musl-tools clang
 
-    - name: install Windows needed dep
-      shell: bash
-      if: runner.os == 'Windows'
-      run: |
-        winget install --id LLVM.LLVM --accept-source-agreements --accept-package-agreements
+    # - name: install Windows needed dep
+    #   shell: bash
+    #   if: runner.os == 'Windows'
+    #   run: |
+    #     winget install --id LLVM.LLVM --accept-source-agreements --accept-package-agreements
 
     - name: check uv install and install cpython
       shell: bash
