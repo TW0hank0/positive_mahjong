@@ -46,6 +46,7 @@ def run_cmd(
         print(f"{Fore.LIGHTBLACK_EX} (at {cwd}){Fore.RESET}")
     print(f"{Back.LIGHTBLACK_EX}{' '.join(command)}{Back.RESET}")
     start_time = time.time()
+    sys.stdout.flush()
     if stream is True:
         process = subprocess.Popen(command, cwd=cwd)
     else:
