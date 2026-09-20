@@ -28,11 +28,11 @@ runs:
         sudo apt-get upgrade -y
         sudo apt-get install -y libfontconfig1-dev pkg-config mold gcc musl-tools clang
 
-    - name: install Windows needed dep
-      shell: bash
-      if: runner.os == 'Windows'
-      run: |
-        winget install --id LLVM.LLVM --accept-source-agreements --accept-package-agreements
+    # - name: install Windows needed dep
+    #   shell: bash
+    #   if: runner.os == 'Windows'
+    #   run: |
+    #     winget install --id LLVM.LLVM --accept-source-agreements --accept-package-agreements
 
     - name: check uv install and install cpython
       shell: bash
@@ -52,8 +52,8 @@ runs:
       shell: bash
       if: runner.os == 'Linux'
       run: |
-        curl https://sh.rustup.rs -o rust-init.sh
-        sh rust-init.sh -y
+        curl https://sh.rustup.rs -o rustup-init.sh
+        sh rustup-init.sh -y
         . "$HOME/.cargo/env"
 
     - run: rustup target add x86_64-unknown-linux-musl
@@ -89,7 +89,7 @@ runs:
           ~/.cargo/bin/taplo
           ~/.cargo/bin/eza
           ~/.cargo/bin/wild
-        key: ${{ runner.os }}-cargo-tools-${{ hashFiles('ci-cache-version.json') }}
+        key: ${{ runner.os }}-${{ runner.arch }}-cargo-tools-${{ hashFiles('ci-cache-version.json') }}
     - name: Cache Cargo installed tools on Windows
       uses: actions/cache/restore@v6.1.0
       id: cache-cargo-tools-windows
@@ -102,7 +102,7 @@ runs:
           ~/.cargo/bin/cargo-msrv.exe
           ~/.cargo/bin/taplo.exe
           ~/.cargo/bin/eza.exe
-        key: ${{ runner.os }}-cargo-tools-${{ hashFiles('ci-cache-version.json') }}
+        key: ${{ runner.os }}-${{ runner.arch}}-cargo-tools-${{ hashFiles('ci-cache-version.json') }}
     - name: Install cargo tools if not cached on Linux
       shell: bash
       if: steps.cache-cargo-tools-linux.outputs.cache-hit != 'true' && runner.os == 'Linux'

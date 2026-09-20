@@ -13,7 +13,7 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-use std::{self};
+use std;
 
 use iced::{
     self, Border, Color, Element, Length, Pixels, alignment, task,
@@ -30,7 +30,7 @@ use pmj_shared::shared::{
     self, FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES, FONT_NOTO_SANS_REG_BYTES, PROJECT_NAME,
 };
 
-pub const FONT_NOTO_SANS_REG: iced::font::Font = iced::font::Font::with_name("Noto Sans TC");
+// pub const FONT_NOTO_SANS_REG: iced::font::Font = iced::font::Font::with_name("Noto Sans TC");
 pub const MATERIAL_SYMBOLS_OUTLINED: iced::font::Font =
     iced::font::Font::with_name("Material Symbols Outlined");
 
@@ -420,7 +420,7 @@ impl Client {
                     });
                     layout_home =
                         widget::column([
-                            stack([scrollable(layout_home).into(), content.into()]).into()
+                            stack([widget::opaque(scrollable(layout_home)).into(), content.into()]).into()
                         ]);
                     layout = layout.push(layout_home);
                 } else {
