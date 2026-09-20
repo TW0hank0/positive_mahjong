@@ -31,14 +31,37 @@ def main():
     build_info: list[tuple[str, str | None | list[str]]] = []
     match platform.system():
         case "Linux":
-            build_info.extend(
-                [
-                    ("x86_64-unknown-linux-musl", ["pmj_server", "pmj_client_desktop"]),
-                    ("x86_64-unknown-linux-gnu", None),
-                ]
-            )
+            if platform.machine() in ["AMD64", "x86_64"]:
+                build_info.extend(
+                    [
+                        ("x86_64-unknown-linux-gnu", None),
+                        (
+                            "x86_64-unknown-linux-musl",
+                            ["pmj_server", "pmj_client_desktop"],
+                        ),
+                    ]
+                )
+            elif platform.machine() in ["arm64", "aarch64"]:
+                build_info.extend(
+                    [
+                        ("aarch64-unknown-linux-gnu", None),
+                        (
+                            "aarch64-unknown-linux-musl",
+                            ["pmj_server", "pmj_client_desktop"],
+                        ),
+                    ]
+                )
+            else:
+                print(f"{Fore.RED}Unsupport machine(arch)!{Fore.RESET}")
         case "Windows":
-            build_info.append(("x86_64-pc-windows-msvc", None))
+            if platform.machine() in ["AMD64", "x86_64"]:
+                build_info.append(("x86_64-pc-windows-msvc", None))
+            elif platform.machine() in ["arm64", "aarch64"]:
+                build_info.append(("aarch64-pc-windows-msvc", None))
+            else:
+                print(f"{Fore.RED}Unsupport machine(arch)!{Fore.RESET}")
+        case _:
+            print(f"{Fore.RED}Unsupport system!{Fore.RESET}")
     print(f"target: {build_info}")
     targets = []
     for target, pkg in build_info:
