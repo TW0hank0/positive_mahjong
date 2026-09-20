@@ -9,8 +9,8 @@
 **/.mypy_cache/**
 
 # -- CI ---
-rust-init.sh
-rust-init.exe
+rustup-init.sh
+rustup-init.exe
 
 # --- Other ---
 *.kra~
