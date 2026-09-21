@@ -20,23 +20,26 @@
 		{
 			"matchUpdateTypes": ["patch"],
 			"groupName": "patch dependencies",
-			"groupSlug": "all-patch"
+			"groupSlug": "all-patch",
+			"labels": ["dep-update"]
 		},
 		{
 			"matchUpdateTypes": ["minor"],
 			"groupName": "minor dependencies",
-			"groupSlug": "all-minor"
+			"groupSlug": "all-minor",
+			"labels": ["dep-update"]
 		},
 		{
 			"matchUpdateTypes": ["major"],
 			"groupName": "major dependencies",
 			"groupSlug": "all-major",
-			"labels": ["major-update"]
+			"labels": ["dep-update"]
 		},
 		{
 			"description": "將所有未鎖定或萬用字元版本釘選到具體版本",
 			"rangeStrategy": "pin",
-			"matchPackageNames": ["*"]
+			"matchPackageNames": ["*"],
+			"labels": ["dep-update"]
 		}
 	],
 	"timezone": "Asia/Taipei",
