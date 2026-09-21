@@ -114,12 +114,12 @@ def build_files_dl(dir_path: str):
         ),
     ]
     if os.path.exists(util.fix_path("artifacts")) is True:
-        pre_dlable_files = util.list_files(util.fix_path("artifacts"))
-        for file in pre_dlable_files:
-            if os.path.basename(os.path.dirname(file)) != "github-pages":
-                dlable_files.append(file)
-            else:
-                print(f"  {Fore.LIGHTBLACK_EX}ignored {file}")
+        dlable_files.extend(
+            util.list_files(
+                util.fix_path("artifacts"),
+                ignores=[util.IGNORE_GH_PAGES, util.IGNORE_GH_PAGES_WITH_ARTIFACTS],
+            )
+        )
     for license_file in util.list_files(util.fix_path("LICENSES")):
         dlable_files.append(
             (license_file, f"LICENSES_{os.path.basename(license_file)}")
