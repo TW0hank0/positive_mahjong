@@ -158,7 +158,7 @@ jobs:
       - name: Upload desktop artifact
         uses: actions/upload-artifact@v7.0.1
         with:
-          name: client_desktop-${{ runner.os }}
+          name: client_desktop-${{ runner.os }}-${{ runner.arch }}
           path: artifacts
   release_artifacts:
     needs:

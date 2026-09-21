@@ -211,17 +211,33 @@ def get_datetime():
     return datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d_%H-%M-%S")
 
 
-def list_files(path: str) -> list[str]:
+IGNORE_GH_PAGES = fix_path("artifacts", "github-pages")
+IGNORE_GH_PAGES_WITH_ARTIFACTS = fix_path(
+    "artifacts", "github-pages", "pages-with-artifacts"
+)
+
+
+def list_files(
+    path: str,
+    ignores: list[str] | None = None,
+) -> list[str]:
     files: list[str] = []
     for file in os.listdir(path):
         file_path = os.path.join(path, file)
-        if os.path.isfile(file_path) is True:
-            files.append(file_path)
-        elif os.path.isdir(file_path) is True:
-            rfiles = list_files(file_path)
-            files.extend(rfiles)
+        if ignores is not None and (
+            file in ignores
+            or os.path.relpath(file, start=fix_path()) in ignores
+            or file_path in ignores
+        ):
+            print(f"{Fore.LIGHTBLACK_EX}ignored {file}.{Fore.RESET}")
         else:
-            print(f"???? not file not dir: {file_path}")
+            if os.path.isfile(file_path) is True:
+                files.append(file_path)
+            elif os.path.isdir(file_path) is True:
+                rfiles = list_files(file_path)
+                files.extend(rfiles)
+            else:
+                print(f"???? not file not dir: {file_path}")
     return files
 
 

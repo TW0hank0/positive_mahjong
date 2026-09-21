@@ -32,13 +32,10 @@ app = typer.Typer()
 @app.command()
 def main():
     commit_info = util.get_commit_info()
-    files = []
-    pre_dlable_files = util.list_files(util.fix_path("artifacts"))
-    for file in pre_dlable_files:
-        if os.path.basename(file) != "github-pages":
-            files.append(file)
-        else:
-            print(f"  {Fore.LIGHTBLACK_EX}ignored {file}")
+    files = util.list_files(
+        util.fix_path("artifacts"),
+        ignores=[util.IGNORE_GH_PAGES, util.IGNORE_GH_PAGES_WITH_ARTIFACTS],
+    )
     if "release pmj:" in commit_info.msg.lower():
         print("Release PMJ:")
         version = util.get_version()
