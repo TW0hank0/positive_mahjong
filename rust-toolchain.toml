@@ -14,7 +14,7 @@
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 [toolchain]
-channel = "nightly-2026-09-20"
+channel = "nightly-2026-09-21"
 components = ["clippy"]
 targets = [
     "aarch64-linux-android",
