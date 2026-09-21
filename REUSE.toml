@@ -153,6 +153,12 @@ precedence = "override"
 [[annotations]]
 SPDX-FileCopyrightText = "2026 TW0hank0"
 SPDX-License-Identifier = "AGPL-3.0-only"
+path = ".forgejo/**"
+precedence = "override"
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 TW0hank0"
+SPDX-License-Identifier = "AGPL-3.0-only"
 path = "crates/**"
 precedence = "override"
 
