@@ -27,7 +27,7 @@ use iced::{
 };
 use tracing::{error, info, warn};
 
-use pmj_gamemodes::v2_better::{mode, shared as mode_shared};
+use pmj_gamemodes::{self, v2_better::{mode, shared as mode_shared}};
 use pmj_shared::shared::{FONT_NOTO_SANS_REG_BYTES, ICON_PNG_BYTES, PROJECT_NAME};
 
 pub const FONT_NOTO_SANS_REG: iced::font::Font = iced::font::Font::with_name("Noto Sans TC");
@@ -70,269 +70,172 @@ pub fn main() -> iced::Result {
 
 #[derive(Debug, Clone)]
 enum GUIMessages {
-    StartGame,
-    FetchPlayerInfo,
-    CopyIp,
+    Home(HomeMsg),
+    V2Better(V2BetterMsg),
+    CopyToClipboard(String),
+}
+
+#[derive(Debug, Clone)]
+pub enum V2BetterMsg {
     SendRoomMsg,
-    RoomMsgChange(String),
+    TInputRoomMsgChange(String),
+    StartGame,
+    FetchPlayer,
+}
+
+#[derive(Debug, Clone)]
+pub enum HomeMsg {
+    StartServer,
+}
+
+#[derive(Debug)]
+pub enum ServerScene {
+    Home,
+    V2BetterServer(V2BetterState),
+}
+
+#[derive(Debug)]
+pub enum GameStatus {
+    Room,
+    InGame,
+}
+
+#[derive(Debug)]
+pub struct V2BetterState {
+    backend: Arc<RwLock<pmj_gamemodes::v2_better::mode::PositiveMahjong>>,
+    game_status: GameStatus,
+    tinput_room_msg: String,
+    local_ipv4_address: net::IpAddr,
+    local_ipv6_address: net::IpAddr,
+    ip_port: u16,
+    players: Vec<pmj_gamemodes::v2_better::shared::PMJPlayer>,
 }
 
 #[derive(Debug)]
 struct ServerGUI {
-    backend: Arc<RwLock<mode::PositiveMahjong>>,
-    local_ipv4_address: net::IpAddr,
-    local_ipv6_address: net::IpAddr,
+    scene: ServerScene,
     msg: String,
-    is_start: bool,
-    players: Vec<mode_shared::PMJPlayer>,
-    ti_room_msg: String,
 }
 
 impl ServerGUI {
     fn new() -> Self {
-        let ipv4_address = local_ip_address::local_ip().unwrap();
-        let ipv6_address = local_ip_address::local_ipv6().unwrap();
-        info!("第四代網路地址：{}", ipv4_address.to_string());
-        info!("第六代網路地址：{}", ipv6_address.to_string());
-        info!("端口：{}", pmj_shared::shared::SERVER_PORT);
-        let backend = mode::main_v2_better(true).unwrap();
         Self {
-            backend,
-            local_ipv4_address: ipv4_address,
-            local_ipv6_address: ipv6_address,
+            scene:ServerScene::Home,
             msg: String::new(),
-            is_start: false,
-            players: Vec::new(),
-            ti_room_msg: String::new(),
         }
     }
 
     fn update(&mut self, msg: GUIMessages) -> iced::Task<GUIMessages> {
         match msg {
-            GUIMessages::StartGame => {
-                match self.backend.try_read() {
-                    Ok(backend) => {
-                        self.players = backend.get_players_info();
+            GUIMessages::Home(home_msg) => {
+                match self.scene {
+                    ServerScene::Home => {
+                        match home_msg {
+                            HomeMsg::StartServer => {
+                                let backend = pmj_gamemodes::v2_better::mode::main_v2_better(true).unwrap();
+                                let ipv4_address = local_ip_address::local_ip().unwrap();
+                                let ipv6_address = local_ip_address::local_ipv6().unwrap();
+                                let ip_port = pmj_shared::shared::SERVER_PORT;
+                                info!("第四代網路地址：{}", ipv4_address.to_string());
+                                info!("第六代網路地址：{}", ipv6_address.to_string());
+                                info!("端口：{}", pmj_shared::shared::SERVER_PORT);
+                                self.scene = ServerScene::V2BetterServer(V2BetterState { backend:backend, game_status: GameStatus::Room, tinput_room_msg: String::new() ,local_ipv4_address:ipv4_address,
+                                 local_ipv6_address:ipv6_address, ip_port:ip_port, players:Vec::new()})
+                            }
+                        }
                     }
-                    Err(e) => {
-                        warn!("FetchPlayerInfo error: {}", e);
-                        return iced::task::Task::done(GUIMessages::StartGame);
+                    ServerScene::V2BetterServer(ref _v2_state) => {
+                        warn!("update: warn scene");
                     }
                 }
-                if self.players.is_empty() {
-                    warn!("至少需要一位玩家！");
-                    self.msg.push_str("至少需要一位玩家！");
-                } else {
-                    self.is_start = true;
-                    match self.backend.try_read() {
-                        Ok(backend) => {
-                            self.players = backend.get_players_info();
-                            drop(backend);
-                        }
-                        Err(e) => {
-                            warn!("FetchPlayerInfo error: {}", e);
+            }
+            GUIMessages::V2Better(v2_msg) => {
+                match self.scene {
+                    ServerScene::Home => {
+                        warn!("update: warn scene");
+                    }
+                    ServerScene::V2BetterServer(ref mut v2_state) => {
+                match v2_msg {
+                    V2BetterMsg::FetchPlayer => {
+                        match v2_state.backend.try_read() {
+                            Ok(guard) => {
+                                v2_state.players=guard.get_players_info();
+                            }
+                            Err(e)=>{
+                                warn!("update: {}", e);
+                            }
                         }
                     }
-                    let thread_backend = sync::Arc::clone(&self.backend);
-                    let _handle = thread::spawn(move || {
-                        match thread_backend.try_write() {
+                    V2BetterMsg::StartGame => {
+                        match v2_state.backend.try_write() {
                             Ok(mut guard) => {
                                 guard.start_game();
-                                info!("game finished.");
+                                v2_state.game_status = GameStatus::InGame;
                             }
-                            Err(e) => {
-                                error!("Fail to start game: {}", e);
-                            }
-                        };
-                    });
-                }
-            }
-            GUIMessages::FetchPlayerInfo => match self.backend.try_read() {
-                Ok(backend) => {
-                    self.players = backend.get_players_info();
-                }
-                Err(e) => {
-                    warn!("FetchPlayerInfo error: {}", e);
-                    return iced::task::Task::done(GUIMessages::FetchPlayerInfo);
-                }
-            },
-            GUIMessages::CopyIp => {
-                // TODO: handle task
-                return iced::clipboard::write::<GUIMessages>(self.local_ipv6_address.to_string());
-            }
-            GUIMessages::SendRoomMsg => {
-                let thread_backend = self.backend.clone();
-                let msg = self.ti_room_msg.clone();
-                self.ti_room_msg.clear();
-                thread::spawn(move || {
-                    loop {
-                        match thread_backend.try_read() {
-                            Ok(guard) => {
-                                guard.say_root_msg(msg);
-                                break;
-                            }
-                            Err(e) => {
+                            Err(e)=>{
                                 warn!("update: {}", e);
-                                thread::sleep(time::Duration::from_millis(700));
                             }
                         }
                     }
-                });
+                    V2BetterMsg::TInputRoomMsgChange(room_msg_draft) => {
+                        v2_state.tinput_room_msg = room_msg_draft;
+                    }
+                    V2BetterMsg::SendRoomMsg => {
+                        let thread_backend = v2_state.backend.clone();
+                        let msg = v2_state.tinput_room_msg.clone();
+                        thread::spawn(move || {
+                            loop {
+                                match thread_backend.try_read() {
+                                    Ok(guard) => {
+                                        guard.say_root_msg(msg);
+                                        break;
+                                    }
+                                    Err(e) => {
+                                        warn!("update: {}", e);
+                                        thread::sleep(time::Duration::from_millis(750));
+                                    }
+                                }
+                            }
+                        });
+                        v2_state.tinput_room_msg.clear();
+                    }
+                }}}
             }
-            GUIMessages::RoomMsgChange(msg) => {
-                self.ti_room_msg = msg;
+            GUIMessages::CopyToClipboard(content) => {
+                // TODO: handle task
+                    return iced::clipboard::write(content);
             }
         }
         iced::Task::none()
     }
 
     fn view(&self) -> iced::widget::Column<'_, GUIMessages> {
-        let mut layout: iced::widget::Column<'_, GUIMessages> = Column::new().spacing(30);
-        {
-            let mut ip_bar_layout = Column::new().spacing(30);
-            ip_bar_layout = ip_bar_layout.push(
-                text(format!("Ipv4: {}", self.local_ipv4_address))
-                    .size(28)
-                    .style(|theme: &iced::Theme| {
-                        let ex_palette = theme.extended_palette();
-                        let mut style = text::Style::default();
-                        style.color = Some(ex_palette.secondary.base.text);
-                        style
-                    }),
-            );
-            ip_bar_layout = ip_bar_layout.spacing(40);
-            ip_bar_layout = ip_bar_layout.push(
-                Row::new()
-                    .push(
-                        text(format!("Ipv6: {}", self.local_ipv6_address))
-                            .size(iced::Pixels::from(28))
-                            .style(|theme: &iced::Theme| {
-                                let ex_palette = theme.extended_palette();
-                                let mut style = text::Style::default();
-                                style.color = Some(ex_palette.secondary.base.text);
-                                style
-                            }),
-                    )
-                    .push(space().width(10))
-                    .push(
-                        button("複製")
-                            .on_press(GUIMessages::CopyIp)
-                            .style(transparent_button),
-                    ),
-            );
-            let ip_bar_container = container(ip_bar_layout).style(|theme: &iced::Theme| {
-                let ex_palette = theme.extended_palette();
-                let mut style = iced::widget::container::Style::default();
-                style = style
-                    .background(ex_palette.secondary.base.color)
-                    .border(iced::border::Border::default().rounded(iced::border::radius(10.0)));
-                style
-            });
-            layout = layout.push(ip_bar_container).spacing(80);
-        }
-        if !self.is_start {
-            let start_button = button(text("開始").size(30))
-                .on_press(GUIMessages::StartGame)
-                .style(rounded_primary_button);
-            layout = layout.push(start_button);
-        } else {
-            layout = layout.push(text("遊戲已開始").size(30).style(|theme: &iced::Theme| {
-                let ex_palette = theme.extended_palette();
-                let mut style = text::Style::default();
-                style.color = Some(ex_palette.background.strong.text);
-                style
-            }))
-        }
-        layout = layout.spacing(50);
-        //
-        layout = layout.push(
-            button(text("重新整理").size(30))
-                .on_press(GUIMessages::FetchPlayerInfo)
-                .style(rounded_primary_button),
-        );
-        let mut player_info = Column::new();
-        if !self.players.is_empty() {
-            for player in self.players.iter() {
-                let mut info_bar = Row::new();
-                info_bar = info_bar
-                    .push(
-                        text(player.player_id)
-                            .size(20)
-                            .style(|theme: &iced::Theme| {
-                                let ex_palette = theme.extended_palette();
-                                let mut style = text::Style::default();
-                                style.color = Some(ex_palette.primary.base.text);
-                                style
-                            }),
-                    )
-                    .spacing(50);
-                info_bar = info_bar.push(text(player.player_ip_addr.to_string()).size(20).style(
-                    |theme: &iced::Theme| {
-                        let ex_palette = theme.extended_palette();
-                        let mut style = text::Style::default();
-                        style.color = Some(ex_palette.primary.weak.text);
-                        style
-                    },
-                ));
-                player_info = player_info.push(container(info_bar).style(|theme: &iced::Theme| {
-                    let ex_palette = theme.extended_palette();
-                    container::Style::default()
-                        .border(iced::Border::default().rounded(8))
-                        .background(ex_palette.primary.base.color)
-                }));
+        let mut layout: iced::widget::Column<'_, GUIMessages> = Column::new().spacing(5);
+        match self.scene {
+            ServerScene::Home => {
+                let mut home_layout = Column::new().spacing(5);
+                {
+                    home_layout=home_layout.push(button(text("Start Server")).on_press(GUIMessages::Home(HomeMsg::StartServer)));
+                }
+                layout=layout.push(home_layout);
             }
-        } else {
-            player_info = player_info.push(
-                container(text("無人連線").size(22).style(|theme: &iced::Theme| {
-                    let ex_palette = theme.extended_palette();
-                    let mut style = text::Style::default();
-                    style.color = Some(ex_palette.primary.base.text);
-                    style
-                }))
-                .style(|theme: &iced::Theme| {
-                    let ex_palette = theme.extended_palette();
-                    container::Style::default()
-                        .border(iced::Border::default().rounded(8))
-                        .background(ex_palette.primary.base.color)
-                }),
-            );
+            ServerScene::V2BetterServer(ref v2_state) =>{
+                let mut v2_layout = Column::new().spacing(5);
+                {
+                    let mut msg_bar_layout = Row::new().padding(7).spacing(3).width(Length::Fill);
+                    msg_bar_layout=msg_bar_layout
+                        .push(
+                            text_input("say room msg as root", &v2_state.tinput_room_msg)
+                                .size(16)
+                                .on_input(|content|{GUIMessages::V2Better(V2BetterMsg::TInputRoomMsgChange(content))}).on_submit(GUIMessages::V2Better(V2BetterMsg::SendRoomMsg)),
+                        )
+                        .push(space().width(3))
+                        .push(button(text("Send").size(16)).on_press(GUIMessages::V2Better(V2BetterMsg::SendRoomMsg)));
+                    v2_layout=v2_layout.push(msg_bar_layout);
+                }
+                layout=layout.push(v2_layout);
+            }
         }
-        layout = layout.push(
-            container(scrollable(player_info)).style(|theme: &iced::Theme| {
-                let ex_palette = theme.extended_palette();
-                container::Style::default()
-                    .border(iced::border::Border::default().rounded(12))
-                    .background(ex_palette.background.strong.color)
-            }),
-        );
-        {
-            let mut msg_bar_layout = Row::new().padding(7).spacing(3);
-            msg_bar_layout = msg_bar_layout
-                .push(
-                    text_input("say room msg as root", &self.ti_room_msg)
-                        .size(16)
-                        .on_input(GUIMessages::RoomMsgChange),
-                )
-                .width(Length::Fill);
-            msg_bar_layout = msg_bar_layout.push(space().width(3));
-            msg_bar_layout = msg_bar_layout
-                .push(button(text("Send").size(16)).on_press(GUIMessages::SendRoomMsg));
-            layout = layout.push(msg_bar_layout);
-        }
-        layout = layout.push(
-            container(scrollable(
-                text(self.msg.clone())
-                    .size(14)
-                    .wrapping(text::Wrapping::WordOrGlyph),
-            ))
-            .style(|theme: &iced::Theme| {
-                let ex_palette = theme.extended_palette();
-                container::Style::default()
-                    .background(ex_palette.background.weak.color)
-                    .border(iced::border::Border::default().rounded(12))
-            }),
-        );
-        //
         layout
     }
 
