@@ -74,8 +74,14 @@ jobs:
       fail-fast: false
       matrix:
         os:
+          # x86_64
           - ubuntu-latest
+          # arm64
+          - ubuntu-26.04-arm
+          # x86_64
           - windows-latest
+          # arm64
+          - windows-11-arm
     steps:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
@@ -120,8 +126,14 @@ jobs:
       fail-fast: false
       matrix:
         os:
+          # x86_64
           - ubuntu-latest
+          # arm64
+          - ubuntu-26.04-arm
+          # x86_64
           - windows-latest
+          # arm64
+          - windows-11-arm
     steps:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
