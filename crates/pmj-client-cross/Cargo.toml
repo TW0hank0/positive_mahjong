@@ -15,31 +15,31 @@
 
 [package]
 authors = { workspace = true }
-default-run = "pmj-server"
 edition = { workspace = true }
 license = { workspace = true }
-name = "pmj_server"
+name = "pmj-client-cross"
 repository = { workspace = true }
 rust-version.workspace = true
 version = { workspace = true }
 
 [dependencies]
-clap = { workspace = true }
-iced = { workspace = true }
+# --- shared ---
+godot = { workspace = true }
 image = { workspace = true }
-local-ip-address = { workspace = true }
-pmj_gamemodes = { workspace = true }
-pmj_shared = { workspace = true }
-rand = { workspace = true }
-serde = { workspace = true }
+lyon_algorithms = { workspace = true }
+pmj-shared = { workspace = true }
 serde_json = { workspace = true }
-tracing = { workspace = true }
 tungstenite = { workspace = true }
+# --- wasm ---
+console_error_panic_hook = { workspace = true, optional = true }
+wasm-bindgen = { workspace = true, optional = true }
 
-[[bin]]
-name = "pmj-server"
-path = "src/main.rs"
+[features]
+android = []
+default = []
+wasm = ["dep:console_error_panic_hook", "dep:wasm-bindgen"]
 
-[[bin]]
-name = "pmj-server-gui"
-path = "src/gui/gui_main.rs"
+[lib]
+crate-type = ["cdylib"]
+name = "pmj_client_cross_lib"
+path = "rust/src/lib.rs"
