@@ -43,23 +43,23 @@ def addlicense_check():
         "**/__pycache__/**",
         "**/*.lock",
         "**/.python-version",
-        "**/*.png",
-        "**/*.kra",
-        "**/*.ttf",
-        "**/*.otf",
+        # "**/*.png",
+        # "**/*.kra",
+        # "**/*.ttf",
+        # "**/*.otf",
         "assets/**",
-        "**/*.json",
+        # "**/*.json",
         # auto generated license info
         "**/ThirdPartyLicense-Rust.*",
         "**/ThirdPartyLicense-Python.*",
         "auto_generated/**",
-        "**/*.icon",
-        "**/*.ico",
-        "docs/book/**",
+        # "**/*.icon",
+        # "**/*.ico",
+        "**/docs/book/**",
         # for ci
-        "**/rust-init.sh",
-        # website
-        "website/docs/**",
+        "**/rustup-init.sh",
+        # for ci
+        "**/rustup-init.exe",
         "website_build/**",
         # Author: [iced team](https://github.com/iced-rs/)
         # This file is from project [iced](https://github.com/iced-rs/iced/).
@@ -73,7 +73,6 @@ def addlicense_check():
         # Author: [iced team](https://github.com/iced-rs/)
         # This file is from project [iced](https://github.com/iced-rs/iced/).
         "crates/pmj_client_desktop_base/src/circular.rs",
-        "crates/old_slint_client/material/**",
         "supply-chain/**",
         "scripts/**/__init__.py",
     ]

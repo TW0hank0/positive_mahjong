@@ -3587,11 +3587,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b4596b6d070b27117e987119b4dac604f3c58cfb0b191112e24771b2faeac1a6"
 
 [[package]]
-name = "pmj_client_core"
+name = "pmj-client-core"
 version = "0.1.1"
 dependencies = [
- "pmj_gamemodes",
- "pmj_shared",
+ "pmj-gamemodes",
+ "pmj-shared",
  "serde_json",
  "tracing",
  "tungstenite",
@@ -3599,29 +3599,29 @@ dependencies = [
 ]
 
 [[package]]
-name = "pmj_client_cross"
+name = "pmj-client-cross"
 version = "0.1.1"
 dependencies = [
  "console_error_panic_hook",
  "godot",
  "image",
  "lyon_algorithms",
- "pmj_shared",
+ "pmj-shared",
  "serde_json",
  "tungstenite",
  "wasm-bindgen",
 ]
 
 [[package]]
-name = "pmj_client_desktop"
+name = "pmj-client-desktop"
 version = "0.1.1"
 dependencies = [
  "iced",
  "image",
  "lyon_algorithms",
- "pmj_client_core",
- "pmj_gamemodes",
- "pmj_shared",
+ "pmj-client-core",
+ "pmj-gamemodes",
+ "pmj-shared",
  "serde_json",
  "tracing",
  "tungstenite",
@@ -3629,14 +3629,14 @@ dependencies = [
 ]
 
 [[package]]
-name = "pmj_client_desktop_base"
+name = "pmj-client-desktop-base"
 version = "0.1.1"
 dependencies = [
  "iced",
  "image",
  "lyon_algorithms",
- "pmj_gamemodes",
- "pmj_shared",
+ "pmj-gamemodes",
+ "pmj-shared",
  "serde_json",
  "tracing",
  "tungstenite",
@@ -3644,13 +3644,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "pmj_gamemodes"
+name = "pmj-gamemodes"
 version = "0.1.1"
 dependencies = [
  "crossbeam",
  "image",
  "local-ip-address",
- "pmj_shared",
+ "pmj-shared",
  "rand 0.10.3",
  "rayon",
  "serde",
@@ -3661,15 +3661,15 @@ dependencies = [
 ]
 
 [[package]]
-name = "pmj_server"
+name = "pmj-server-desktop"
 version = "0.1.1"
 dependencies = [
  "clap",
  "iced",
  "image",
  "local-ip-address",
- "pmj_gamemodes",
- "pmj_shared",
+ "pmj-gamemodes",
+ "pmj-shared",
  "rand 0.10.3",
  "serde",
  "serde_json",
@@ -3678,7 +3678,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "pmj_shared"
+name = "pmj-shared"
 version = "0.1.1"
 dependencies = [
  "dirs",

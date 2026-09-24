@@ -16,8 +16,7 @@
 use clap::{self, Parser};
 use tracing::{debug, error, info};
 
-mod base;
-mod v2_better;
+mod gui;
 
 #[derive(clap::Parser)]
 #[command(
@@ -43,8 +42,10 @@ fn main() {
 
     info!("args.command = {:?}", args.command);
     let iced_result: iced::Result = match args.command {
-        SubCmds::Base => base::main(),
-        SubCmds::V2Better => v2_better::main(),
+        SubCmds::Base => {
+            todo!("unsupport yet!");
+        },
+        SubCmds::V2Better => gui::main(),
     };
     match iced_result {
         Ok(_) => {

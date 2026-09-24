@@ -23,9 +23,9 @@ version = "0.1.1"
 
 [workspace.dependencies]
 # --- local ---
-pmj_client_core = { path = "crates/pmj_client_core" }
-pmj_gamemodes = { path = "crates/pmj_gamemodes" }
-pmj_shared = { path = "crates/pmj_shared" }
+pmj-client-core = { path = "crates/pmj-client-core" }
+pmj-gamemodes = { path = "crates/pmj-gamemodes" }
+pmj-shared = { path = "crates/pmj-shared" }
 # --- shared ---
 clap = { version = "=4.6.7", features = ["derive"] }
 crossbeam = "=0.8.5"
@@ -81,13 +81,7 @@ wasm-bindgen = { version = "=0.2.128" }
 
 [workspace]
 members = [
-    "crates/pmj_client_core",
-    "crates/pmj_client_cross/rust",
-    "crates/pmj_client_desktop",
-    "crates/pmj_client_desktop_base",
-    "crates/pmj_gamemodes",
-    "crates/pmj_server",
-    "crates/pmj_shared",
+    "crates/*"
 ]
 resolver = "3"
 

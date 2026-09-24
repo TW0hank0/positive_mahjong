@@ -17,7 +17,7 @@ import os
 import shutil
 
 import mistune
-from colorama import Back, Fore, Style
+from colorama import Back, Fore
 
 import util
 
@@ -162,7 +162,7 @@ def build_files_dl(dir_path: str):
         else:
             raise RuntimeError("type(dlfile) is not (str, tuple)")
         print(
-            f"{Style.DIM}{dlfile}{Style.NORMAL} -> {Style.DIM}{os.path.join(dir_path, new_name)}{Style.NORMAL}"
+            f"{Fore.LIGHTBLACK_EX}{dlfile}{Fore.RESET} -> {Fore.LIGHTBLACK_EX}{os.path.join(dir_path, new_name)}{Fore.RESET}"
         )
         _ = shutil.copy2(file_path, os.path.join(dir_path, new_name))
         summary_prepare = (
@@ -229,7 +229,7 @@ def replace_var(
         key_fixed_name = "{{$" + key + "$}}"
         if key_fixed_name in new_template:
             new_template = new_template.replace(key_fixed_name, template_vars[key])
-            print(f"{Style.DIM}Replaced `{key}` in template.{Style.NORMAL}")
+            print(f"{Fore.LIGHTBLACK_EX}Replaced `{key}` in template.{Fore.RESET}")
     html_vars: dict[str, str] = {}
     html_vars["VAR_NAV"] = new_template
     with open(
@@ -289,7 +289,7 @@ def replace_var(
         if key_fixed_name in new_html_content:
             new_html_content = new_html_content.replace(key_fixed_name, html_vars[key])
             print(
-                f"{Style.DIM}Replaced `{key}` in file: {replace_html_path}.{Style.NORMAL}"
+                f"{Fore.LIGHTBLACK_EX}Replaced `{key}` in file: {replace_html_path}.{Fore.RESET}"
             )
     os.chdir(orig_work_dir)
     return new_html_content
@@ -298,7 +298,7 @@ def replace_var(
 def copy_website_dep(build_root: str):
     orig_cwd = os.getcwd()
     os.chdir(util.fix_path("docs"))
-    _ = util.run_cmd(["mdbook", "build"])
+    _ = util.run_cmd(["mdbook", "build"], cwd=util.fix_path("docs"))
     if os.path.exists(os.path.join(build_root, "docs")) is True:
         shutil.rmtree(os.path.join(build_root, "docs"))
     _ = shutil.copytree(

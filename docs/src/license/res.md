@@ -14,7 +14,7 @@
 
 ### loading_spinners
 
-本專案使用的 `loading_spinners` 依據 [Apache License Version 2.0](https://tw0hank0.gitlab.io/positive_mahjong/files/LICENSES_Apache-2.0.txt) 授權，作者為 \[Héctor Ramón 與 Iced contributors\]。
+本專案使用的 `loading_spinners` 依據 [MIT License](https://tw0hank0.gitlab.io/positive_mahjong/files/LICENSES_iced.txt) 授權，作者為 \[Héctor Ramón 與 Iced contributors\]。
 
 路徑：
 

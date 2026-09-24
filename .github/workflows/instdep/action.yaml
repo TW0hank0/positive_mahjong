@@ -56,8 +56,11 @@ runs:
         sh rustup-init.sh -y
         . "$HOME/.cargo/env"
 
-    - run: rustup target add x86_64-unknown-linux-musl
+    - name: Rustup update
       shell: bash
+      env:
+        RUSTUP_AUTO_INSTALL: "0"
+      run: rustup update
 
     - name: check rust Install
       shell: bash
@@ -138,5 +141,4 @@ runs:
         uv tool install reuse[charset-normalizer]
     - name: list files with eza
       shell: bash
-      run: |
-        eza --tree .
+      run: eza --tree .

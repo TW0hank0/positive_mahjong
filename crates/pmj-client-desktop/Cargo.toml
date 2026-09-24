@@ -17,23 +17,26 @@
 authors = { workspace = true }
 edition = { workspace = true }
 license = { workspace = true }
-name = "pmj_gamemodes"
+name = "pmj-client-desktop"
 repository = { workspace = true }
 rust-version.workspace = true
 version = { workspace = true }
 
 [dependencies]
-crossbeam = { workspace = true }
+iced = { workspace = true }
 image = { workspace = true }
-local-ip-address = { workspace = true }
-pmj_shared = { workspace = true }
-rand = { workspace = true }
-rayon = { workspace = true }
-serde = { workspace = true }
+lyon_algorithms = { workspace = true }
+pmj-client-core = { workspace = true }
+pmj-gamemodes = { workspace = true }
+pmj-shared = { workspace = true }
 serde_json = { workspace = true }
 tracing = { workspace = true }
 tungstenite = { workspace = true }
 url = { workspace = true }
 
-[lib]
-path = "src/lib.rs"
+[features]
+default = []
+
+[[bin]]
+name = "pmj-client-desktop"
+path = "src/main.rs"

@@ -14,32 +14,19 @@
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 [package]
-authors = { workspace = true }
-edition = { workspace = true }
+authors.workspace = true
+edition.workspace = true
 license = { workspace = true }
-name = "pmj_client_cross"
-repository = { workspace = true }
+name = "pmj-shared"
+repository.workspace = true
 rust-version.workspace = true
-version = { workspace = true }
+version.workspace = true
 
 [dependencies]
-# --- shared ---
-godot = { workspace = true }
+dirs = { workspace = true }
 image = { workspace = true }
-lyon_algorithms = { workspace = true }
-pmj_shared = { workspace = true }
+positive_tool_rs = { workspace = true }
+serde = { workspace = true }
 serde_json = { workspace = true }
-tungstenite = { workspace = true }
-# --- wasm ---
-console_error_panic_hook = { workspace = true, optional = true }
-wasm-bindgen = { workspace = true, optional = true }
-
-[features]
-android = []
-default = []
-wasm = ["dep:console_error_panic_hook", "dep:wasm-bindgen"]
-
-[lib]
-crate-type = ["cdylib"]
-name = "pmj_client_cross_lib"
-path = "src/lib.rs"
+tracing = { workspace = true }
+tracing-appender = { workspace = true }
