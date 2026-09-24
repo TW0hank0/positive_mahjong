@@ -6,9 +6,7 @@
 		{
 			"description": "Monitor cargo tools versions in ci-cache-version.json",
 			"customType": "regex",
-			"managerFilePatterns": [
-				"/^ci-cache-version\\.json$/"
-			],
+			"managerFilePatterns": ["/^ci-cache-version\\.json$/"],
 			"matchStrings": [
 				"\"(?<depName>[a-z0-9-]+)\":\\s*\"(?<currentValue>[\\d\\.]+)\""
 			],
@@ -27,19 +25,19 @@
 			"matchUpdateTypes": ["minor"],
 			"groupName": "minor dependencies",
 			"groupSlug": "all-minor",
-			"labels": ["dep-update"]
+			"labels": ["it-is::dep-update"]
 		},
 		{
 			"matchUpdateTypes": ["major"],
 			"groupName": "major dependencies",
 			"groupSlug": "all-major",
-			"labels": ["dep-update"]
+			"labels": ["it-is::dep-update"]
 		},
 		{
 			"description": "將所有未鎖定或萬用字元版本釘選到具體版本",
 			"rangeStrategy": "pin",
 			"matchPackageNames": ["*"],
-			"labels": ["dep-update"]
+			"labels": ["it-is::dep-update"]
 		}
 	],
 	"timezone": "Asia/Taipei",
