@@ -31,7 +31,7 @@ def main():
     build_info: list[tuple[str, str | None | list[str]]] = []
     match platform.system():
         case "Linux":
-            if platform.machine() in ["AMD64", "x86_64"]:
+            if platform.machine().lower() in ["amd64", "x86_64"]:
                 build_info.extend(
                     [
                         ("x86_64-unknown-linux-gnu", None),
@@ -41,7 +41,7 @@ def main():
                         ),
                     ]
                 )
-            elif platform.machine() in ["arm64", "aarch64"]:
+            elif platform.machine().lower() in ["arm64", "aarch64"]:
                 build_info.extend(
                     [
                         ("aarch64-unknown-linux-gnu", None),
@@ -52,11 +52,13 @@ def main():
                     ]
                 )
             else:
-                print(f"{Fore.RED}Unsupport machine(arch)!{Fore.RESET}")
+                print(
+                    f"{Fore.RED}Unsupport machine(arch): {platform.machine()}!{Fore.RESET}"
+                )
         case "Windows":
-            if platform.machine() in ["AMD64", "x86_64"]:
+            if platform.machine().lower() in ["amd64", "x86_64"]:
                 build_info.append(("x86_64-pc-windows-msvc", None))
-            elif platform.machine() in ["arm64", "aarch64"]:
+            elif platform.machine().lower() in ["arm64", "aarch64"]:
                 build_info.append(("aarch64-pc-windows-msvc", None))
             else:
                 print(f"{Fore.RED}Unsupport machine(arch)!{Fore.RESET}")
@@ -66,6 +68,7 @@ def main():
     targets = []
     for target, pkg in build_info:
         targets.append(target)
+        _ = util.run_cmd(["rustup", "target", "add", target])
         print(f"{Fore.CYAN}Building release for target {target}...{Fore.RESET}", end="")
         cmd = ["cargo", "build", "--release", "--locked", "--target", target]
         if pkg is None:

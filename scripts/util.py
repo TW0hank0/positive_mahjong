@@ -18,6 +18,7 @@
 import datetime
 import json
 import os
+import shutil
 import subprocess
 import sys
 import time
@@ -25,6 +26,34 @@ import tomllib
 from typing import Literal
 
 from colorama import Back, Fore
+
+
+def show_cmd(
+    command: list[str],
+    prefix: str = "  ",
+    first_prefix: str = "| ",
+    suffix: str = " \\ ",
+):
+    (twidth, _theight) = shutil.get_terminal_size()
+    resplit_command = []
+    last_command: str = " ".join(command)
+    while True:
+        time_prefix = first_prefix if len(resplit_command) <= 0 else prefix
+        if (len(last_command) + len(time_prefix) + len(suffix)) < twidth:
+            resplit_command.append(last_command)
+            break
+        else:
+            resplit_command.append(
+                last_command[: twidth - len(time_prefix) - len(suffix)]
+            )
+            last_command = last_command[twidth - len(time_prefix) - len(suffix) :]
+    return (
+        f"{Fore.LIGHTBLACK_EX}{first_prefix}{Fore.RESET}{Back.LIGHTBLACK_EX}"
+        + f"{suffix}{Back.RESET}\n{str(Fore.LIGHTBLACK_EX) + prefix + str(Fore.RESET)}{Back.LIGHTBLACK_EX}".join(
+            resplit_command
+        )
+        + str(Back.RESET)
+    )
 
 
 def run_cmd(
@@ -44,7 +73,7 @@ def run_cmd(
         print()
     else:
         print(f"{Fore.LIGHTBLACK_EX} (at {cwd}){Fore.RESET}")
-    print(f"{Back.LIGHTBLACK_EX}{' '.join(command)}{Back.RESET}")
+    print(show_cmd(command))
     start_time = time.time()
     sys.stdout.flush()
     if stream is True:
@@ -119,10 +148,18 @@ def get_commit_info() -> CommitInfo:
     (_returncode, commit_msg) = run_cmd(
         ["git", "log", "-1", "--format=%B"], cwd=fix_path()
     )
-    (_, commit_committer_name) = run_cmd(["git", "log", "-1", "--format=%cn"])
-    (_, commit_committer_email) = run_cmd(["git", "log", "-1", "--format=%ce"])
-    (_, commit_author_name) = run_cmd(["git", "log", "-1", "--format=%an"])
-    (_, commit_author_email) = run_cmd(["git", "log", "-1", "--format=%ae"])
+    (_, commit_committer_name) = run_cmd(
+        ["git", "log", "-1", "--format=%cn"], cwd=fix_path()
+    )
+    (_, commit_committer_email) = run_cmd(
+        ["git", "log", "-1", "--format=%ce"], cwd=fix_path()
+    )
+    (_, commit_author_name) = run_cmd(
+        ["git", "log", "-1", "--format=%an"], cwd=fix_path()
+    )
+    (_, commit_author_email) = run_cmd(
+        ["git", "log", "-1", "--format=%ae"], cwd=fix_path()
+    )
     return CommitInfo(
         commit_sha,
         commit_short_sha,
