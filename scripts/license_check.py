@@ -63,16 +63,16 @@ def addlicense_check():
         "website_build/**",
         # Author: [iced team](https://github.com/iced-rs/)
         # This file is from project [iced](https://github.com/iced-rs/iced/).
-        "crates/pmj_client_desktop/src/easing.rs",
+        "crates/pmj-client-desktop/src/easing.rs",
         # Author: [iced team](https://github.com/iced-rs/)
         # This file is from project [iced](https://github.com/iced-rs/iced/).
-        "crates/pmj_client_desktop/src/circular.rs",
+        "crates/pmj-client-desktop/src/circular.rs",
         # Author: [iced team](https://github.com/iced-rs/)
         # This file is from project [iced](https://github.com/iced-rs/iced/).
-        "crates/pmj_client_desktop_base/src/easing.rs",
+        "crates/pmj-client-desktop-base/src/easing.rs",
         # Author: [iced team](https://github.com/iced-rs/)
         # This file is from project [iced](https://github.com/iced-rs/iced/).
-        "crates/pmj_client_desktop_base/src/circular.rs",
+        "crates/pmj-client-desktop-base/src/circular.rs",
         "supply-chain/**",
         "scripts/**/__init__.py",
     ]
