@@ -12,7 +12,6 @@
 #
 # 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
-
 name: 錯誤回報（Bug report）
 description: 回報非預期行為
 title: "[Bug] "
@@ -31,14 +30,12 @@ body:
   - type: textarea
     attributes:
       label: 觸發步驟
-      description: "如何觸發這個錯誤"
-      placeholder: "type something here."
-
+      description: 如何觸發這個錯誤
+      placeholder: type something here.
   - type: textarea
     attributes:
-      label: 應為何樣：
+      label: 應為何樣
       description: |
         正確的行為
-      placeholder: "type something here."
     validations:
       required: true

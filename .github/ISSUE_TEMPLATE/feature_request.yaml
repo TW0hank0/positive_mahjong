@@ -12,9 +12,8 @@
 #
 # 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
-
 name: 功能請求（Feature request）
-description: 為這個專案提供建議
+description: 提供建議
 title: "[Feature] "
 labels:
   - enhancement
@@ -22,8 +21,8 @@ labels:
 body:
   - type: textarea
     attributes:
-      label: 你想要什麼新功能？
+      label: 功能描述
       description: |
-        你想要什麼新功能？
+        type something here.
     validations:
       required: true
