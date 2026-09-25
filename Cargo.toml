@@ -77,7 +77,7 @@ tungstenite = { version = "=0.30.0", features = [
 url = "=2.5.8"
 # --- wasm ---
 console_error_panic_hook = { version = "=0.1.7" }
-wasm-bindgen = { version = "=0.2.128" }
+wasm-bindgen = { version = "=0.2.129" }
 
 [workspace]
 members = [
