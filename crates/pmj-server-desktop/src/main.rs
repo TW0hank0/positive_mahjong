@@ -44,7 +44,7 @@ fn main() {
     let iced_result: iced::Result = match args.command {
         SubCmds::Base => {
             todo!("unsupport yet!");
-        },
+        }
         SubCmds::V2Better => gui::main(),
     };
     match iced_result {
