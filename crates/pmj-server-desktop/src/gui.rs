@@ -52,7 +52,7 @@ pub fn main() -> iced::Result {
     };
     let app_settings = iced::Settings {
         id: Some(format!("{} - pmj_server::gui", PROJECT_NAME)),
-        default_text_size: iced::Pixels::from(24),
+        default_text_size: iced::Pixels::from(22),
         default_font: FONT_NOTO_SANS_REG,
         vsync: true,
         fonts: vec![std::borrow::Cow::from(FONT_NOTO_SANS_REG_BYTES)],
@@ -226,7 +226,7 @@ impl ServerGUI {
                     let mut ip_bar = Vec::new();
                     ip_bar.push(button(text(format!("Ipv4: {}", v2_state.local_ipv4_address))).on_press(GUIMessages::CopyToClipboard(v2_state.local_ipv4_address.to_string())).into());
                     ip_bar.push(space().height(Length::from(4)).into());
-                    ip_bar.push(rule::horizontal(iced::Pixels::from(1)).into());
+                    ip_bar.push(rule::horizontal(iced::Pixels::from(1.5)).into());
                     ip_bar.push(space().height(Length::from(4)).into());
                     ip_bar.push(button(text(format!("Ipv6: {}", v2_state.local_ipv6_address))).on_press(GUIMessages::CopyToClipboard(v2_state.local_ipv6_address.to_string())).into());
                     v2_layout.push(container(Column::from_vec(ip_bar)).style(primary_outlined_container).padding(10).into());
@@ -236,17 +236,16 @@ impl ServerGUI {
                     msg_bar_layout
                         .push(
                             text_input("say room msg as root", &v2_state.tinput_room_msg)
-                                .size(16)
                                 .on_input(|content|{GUIMessages::V2Better(V2BetterMsg::TInputRoomMsgChange(content))}).on_submit(GUIMessages::V2Better(V2BetterMsg::SendRoomMsg)).width(Length::Fill).into(),
                                 );
                     msg_bar_layout.push(space().width(3).into());
-                    msg_bar_layout.push(button(text("Send").size(16)).on_press(GUIMessages::V2Better(V2BetterMsg::SendRoomMsg)).width(Length::Shrink).into());
+                    msg_bar_layout.push(button(text("Send")).on_press(GUIMessages::V2Better(V2BetterMsg::SendRoomMsg)).width(Length::Shrink).into());
                     v2_layout.push(Row::from_vec(msg_bar_layout).spacing(3).width(Length::Fill).into());
                 }
-                layout.push(Column::from_vec(v2_layout).spacing(5).padding(3).into());
+                layout.push(Column::from_vec(v2_layout).spacing(5).into());
             }
         }
-        Column::from_vec(layout).into()
+        Column::from_vec(layout).padding(3).into()
     }
 
     pub fn title(&self) -> String {
