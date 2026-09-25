@@ -281,41 +281,61 @@ def list_files(
 if __name__ == "__main__":
     import typer
 
-    app = typer.Typer()
+    app = typer.Typer(name="util")
+    app_get = typer.Typer(name="get")
+    app.add_typer(app_get)
+    app_run = typer.Typer(name="run")
+    app.add_typer(app_run)
 
-    @app.command()
-    def main(
-        command: Literal[
-            "get_version",
-            "get_datetime",
-            "commit_sha",
-            "commit_short_sha",
-            "get_commit_msg",
-            "msrv",
-        ],
-    ):
-        match command:
-            case "get_version":
-                print(get_version())
-            case "get_datetime":
-                print(get_datetime())
-            case "commit_sha":
-                commit_info = get_commit_info()
-                print(commit_info.sha)
-            case "commit_short_sha":
-                commit_info = get_commit_info()
-                print(commit_info.short_sha)
-            case "get_commit_msg":
-                commit_info = get_commit_info()
-                print(commit_info.msg)
-            case "msrv":
-                _ = run_cmd(
-                    ["cargo", "msrv", "find", "--", "--workspace"],
-                    cwd=fix_path(),
-                )
-                _ = run_cmd(
-                    ["cargo", "msrv", "verify", "--", "--workspace"],
-                    cwd=fix_path(),
-                )
+    @app_run.command("cmd")
+    def util_run_cmd(
+        command: str,
+        args: list[str] | None = None,
+        project_root_cwd: bool = False,
+        stream: bool = False,
+    ) -> None:
+        if project_root_cwd is True:
+            cwd = fix_path()
+        else:
+            cwd = os.getcwd()
+        if args is None:
+            mixed_args: list[str] = []
+        else:
+            mixed_args = args
+        run_cmd([command, *mixed_args], cwd=cwd, stream=stream)
+
+    @app_run.command("msrv")
+    def util_run_msrv() -> None:
+        _ = run_cmd(
+            ["cargo", "msrv", "find", "--", "--workspace"],
+            cwd=fix_path(),
+        )
+        _ = run_cmd(
+            ["cargo", "msrv", "verify", "--", "--workspace"],
+            cwd=fix_path(),
+        )
+
+    @app_get.command("version")
+    def util_get_version():
+        print(get_version())
+
+    @app_get.command("commit_msg")
+    def util_get_commit_msg() -> None:
+        commit_info = get_commit_info()
+        print(commit_info.msg)
+
+    @app_get.command("commit_short_sha")
+    def util_get_commit_short_sha() -> None:
+        commit_info = get_commit_info()
+        print(commit_info.short_sha)
+
+    @app_get.command("datetime")
+    def util_get_datetime() -> None:
+        print(get_datetime())
+
+    @app_get.command("commit_sha")
+    def util_get_commit_sha() -> None:
+        commit_info = get_commit_info()
+        print(commit_info.sha)
 
     app()
