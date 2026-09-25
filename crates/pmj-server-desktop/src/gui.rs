@@ -17,17 +17,16 @@
 
 use std::{
     net,
-    sync::{self, Arc, RwLock},
+    sync::{Arc, RwLock},
     thread, time,
 };
 
 use iced::{
-    self, Border, Length,
-    widget::{Column, Row, button, container, scrollable, space, text, text_input},
+    self, Border, Length, widget::{Column, Row, rule, button, container, scrollable, space, text, text_input},
 };
 use tracing::{error, info, warn};
 
-use pmj_gamemodes::{self, v2_better::{mode, shared as mode_shared}};
+use pmj_gamemodes;
 use pmj_shared::shared::{FONT_NOTO_SANS_REG_BYTES, ICON_PNG_BYTES, PROJECT_NAME};
 
 pub const FONT_NOTO_SANS_REG: iced::font::Font = iced::font::Font::with_name("Noto Sans TC");
@@ -115,6 +114,7 @@ pub struct V2BetterState {
 struct ServerGUI {
     scene: ServerScene,
     msg: String,
+    theme: iced::Theme,
 }
 
 impl ServerGUI {
@@ -122,6 +122,7 @@ impl ServerGUI {
         Self {
             scene:ServerScene::Home,
             msg: String::new(),
+            theme: iced::Theme::TokyoNight ,
         }
     }
 
@@ -209,34 +210,41 @@ impl ServerGUI {
         iced::Task::none()
     }
 
-    fn view(&self) -> iced::widget::Column<'_, GUIMessages> {
-        let mut layout: iced::widget::Column<'_, GUIMessages> = Column::new().spacing(5);
+    fn view(&self) -> iced::Element<'_, GUIMessages> {
+        let mut layout = Vec::new();
         match self.scene {
             ServerScene::Home => {
-                let mut home_layout = Column::new().spacing(5);
+                let mut home_layout = Vec::new();
                 {
-                    home_layout=home_layout.push(button(text("Start Server")).on_press(GUIMessages::Home(HomeMsg::StartServer)));
+                    home_layout.push(button(text("Start Server")).on_press(GUIMessages::Home(HomeMsg::StartServer)).into());
                 }
-                layout=layout.push(home_layout);
+                layout.push(Column::from_vec(home_layout).spacing(5).into());
             }
             ServerScene::V2BetterServer(ref v2_state) =>{
-                let mut v2_layout = Column::new().spacing(5);
+                let mut v2_layout = Vec::new();
                 {
-                    let mut msg_bar_layout = Row::new().padding(7).spacing(3).width(Length::Fill);
-                    msg_bar_layout=msg_bar_layout
+                    let mut ip_bar = Vec::new();
+                    ip_bar.push(button(text(format!("Ipv4: {}", v2_state.local_ipv4_address))).on_press(GUIMessages::CopyToClipboard(v2_state.local_ipv4_address.to_string())).into());
+                    ip_bar.push(rule::horizontal(iced::Pixels::from(10)).into());
+                    ip_bar.push(button(text(format!("Ipv6: {}", v2_state.local_ipv6_address))).on_press(GUIMessages::CopyToClipboard(v2_state.local_ipv6_address.to_string())).into());
+                    v2_layout.push(container(Column::from_vec(ip_bar)).style(primary_outlined_container).into());
+                }
+                {
+                    let mut msg_bar_layout = Vec::new();
+                    msg_bar_layout
                         .push(
                             text_input("say room msg as root", &v2_state.tinput_room_msg)
                                 .size(16)
-                                .on_input(|content|{GUIMessages::V2Better(V2BetterMsg::TInputRoomMsgChange(content))}).on_submit(GUIMessages::V2Better(V2BetterMsg::SendRoomMsg)),
-                        )
-                        .push(space().width(3))
-                        .push(button(text("Send").size(16)).on_press(GUIMessages::V2Better(V2BetterMsg::SendRoomMsg)));
-                    v2_layout=v2_layout.push(msg_bar_layout);
+                                .on_input(|content|{GUIMessages::V2Better(V2BetterMsg::TInputRoomMsgChange(content))}).on_submit(GUIMessages::V2Better(V2BetterMsg::SendRoomMsg)).into(),
+                                );
+                    msg_bar_layout.push(space().width(3).into());
+                    msg_bar_layout.push(button(text("Send").size(16)).on_press(GUIMessages::V2Better(V2BetterMsg::SendRoomMsg)).into());
+                    v2_layout.push(Row::from_vec(msg_bar_layout).padding(7).spacing(3).width(Length::Fill).into());
                 }
-                layout=layout.push(v2_layout);
+                layout.push(Column::from_vec(v2_layout).spacing(5).into());
             }
         }
-        layout
+        Column::from_vec(layout).into()
     }
 
     pub fn title(&self) -> String {
@@ -244,7 +252,7 @@ impl ServerGUI {
     }
 
     pub fn theme(&self) -> iced::Theme {
-        iced::Theme::TokyoNight
+        self.theme.clone()
     }
 
     pub fn subscription(&self) -> iced::Subscription<GUIMessages> {
@@ -302,4 +310,9 @@ fn rounded_primary_button(t: &iced::Theme, s: button::Status) -> button::Style {
     }
     style.border = border;
     style
+}
+
+pub fn primary_outlined_container(theme: &iced::Theme) -> container::Style {
+    let p = theme.extended_palette();
+    container::Style { border:Border { color: p.primary.base.color, width: 0.7, radius: iced::border::radius(8) },..Default::default() }
 }
