@@ -156,7 +156,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           cd scripts
-          file=$(uv run util.py get_version)
+          file=$(uv run util.py get version)
           echo "version=$file" >> $GITHUB_OUTPUT
           cd ..
       - name: get version on Windows
@@ -164,7 +164,7 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           cd scripts
-          $file = (uv run util.py get_version)
+          $file = (uv run util.py get version)
           echo "version=$file" >> $env:GITHUB_OUTPUT
           cd ..
       - name: Upload desktop artifact
