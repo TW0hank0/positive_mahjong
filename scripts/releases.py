@@ -20,7 +20,6 @@ import sys
 import gitlab
 import requests
 import typer
-from colorama import Fore
 
 import util
 
