@@ -37,7 +37,7 @@ def main():
                         ("x86_64-unknown-linux-gnu", None),
                         (
                             "x86_64-unknown-linux-musl",
-                            ["pmj_server", "pmj_client_desktop"],
+                            ["pmj-server-desktop", "pmj_client-desktop"],
                         ),
                     ]
                 )
@@ -47,7 +47,7 @@ def main():
                         ("aarch64-unknown-linux-gnu", None),
                         (
                             "aarch64-unknown-linux-musl",
-                            ["pmj_server", "pmj_client_desktop"],
+                            ["pmj-server-desktop", "pmj-client-desktop"],
                         ),
                     ]
                 )
