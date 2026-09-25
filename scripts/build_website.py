@@ -152,6 +152,8 @@ def build_files_dl(dir_path: str):
         </body>
     </html>\n"""
     summary_prepare = ""
+    # list[tuple[path, name]]
+    strict_dlable_files: list[tuple[str, str]] = []
     for dlfile in dlable_files:
         if type(dlfile) is str:
             file_path = dlfile
@@ -161,15 +163,18 @@ def build_files_dl(dir_path: str):
             new_name = dlfile[1]
         else:
             raise RuntimeError("type(dlfile) is not (str, tuple)")
+        strict_dlable_files.append((file_path, new_name))
+    strict_dlable_files.sort()
+    for path, name in strict_dlable_files:
         print(
-            f"{Fore.LIGHTBLACK_EX}{dlfile}{Fore.RESET} -> {Fore.LIGHTBLACK_EX}{os.path.join(dir_path, new_name)}{Fore.RESET}"
+            f"{Fore.LIGHTBLACK_EX}{path}{Fore.RESET} -> {Fore.LIGHTBLACK_EX}{os.path.join(dir_path, name)}{Fore.RESET}"
         )
-        _ = shutil.copy2(file_path, os.path.join(dir_path, new_name))
+        _ = shutil.copy2(path, os.path.join(dir_path, name))
         summary_prepare = (
             summary_prepare
             + f"""
         <div class="dlable-file">
-          <a href="./{new_name}" target="_blank" download>{new_name}</a>
+          <a href="./{name}" target="_blank" download>{name}</a>
         </div>"""
         )
     files_summary = files_summary_template.replace(

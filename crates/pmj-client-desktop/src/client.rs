@@ -418,10 +418,11 @@ impl Client {
                         style = style.border(Border::default().width(0));
                         style
                     });
-                    layout_home =
-                        widget::column([
-                            stack([widget::opaque(scrollable(layout_home)).into(), content.into()]).into()
-                        ]);
+                    layout_home = widget::column([stack([
+                        widget::opaque(scrollable(layout_home)).into(),
+                        content.into(),
+                    ])
+                    .into()]);
                     layout = layout.push(layout_home);
                 } else {
                     layout = layout.push(scrollable(layout_home));
