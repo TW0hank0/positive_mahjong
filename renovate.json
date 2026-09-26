@@ -19,13 +19,17 @@
 																																		],
 																																										"packageRules": [
 																																												{
-																																															"matchPackagePatterns": ["*"],
-																																																		"automerge": false
+																																																		"automerge": false,
+																																															"matchPackageNames": [
+																																																"*"
+																																														]
 																																																				},
 																																																						{
 																																																									"description": "將所有未鎖定或萬用字元版本釘選到具體版本",
-																																																												"matchPackagePatterns": ["*"],
-																																																															"rangeStrategy": "pin"
+																																																															"rangeStrategy": "pin",
+																																																									"matchPackageNames": [
+																																																																														"*"
+																																																																		]
 																																																																	}
 																																																																		],
 																																																																			"timezone": "Asia/Taipei"}
