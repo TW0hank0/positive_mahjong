@@ -15,9 +15,7 @@
 
 use tracing::{debug, error};
 
-mod circular;
 mod client;
-mod easing;
 
 use pmj_shared::shared::{self, FONT_NOTO_SANS_REG_BYTES, ICON_PNG_BYTES, PROJECT_NAME};
 

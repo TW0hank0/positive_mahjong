@@ -26,6 +26,7 @@ version = "0.1.1"
 pmj-client-core = { path = "crates/pmj-client-core" }
 pmj-gamemodes = { path = "crates/pmj-gamemodes" }
 pmj-shared = { path = "crates/pmj-shared" }
+pmj-desktop = { path = "crates/pmj-desktop" }
 # --- shared ---
 clap = { version = "=4.6.7", features = ["derive"] }
 crossbeam = "=0.8.5"

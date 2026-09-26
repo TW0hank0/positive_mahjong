@@ -25,7 +25,7 @@ use iced::{
 use tracing::{debug, error, info, trace, warn};
 use tungstenite::{Message, WebSocket};
 
-use crate::{circular, easing};
+use pmj_desktop::{circular, easing};
 
 use pmj_shared::shared::{
     self, FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES, FONT_NOTO_SANS_REG_BYTES, PROJECT_NAME,
