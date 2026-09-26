@@ -22,14 +22,14 @@ use std::{
 };
 
 use iced::{
-    self, Border, Length,alignment,
-    widget::{Column, Row, rule, button, container, scrollable, space, text, text_input},
+    self, Border, Length, alignment,
+    widget::{Column, Row, button, container, rule, scrollable, space, text, text_input},
 };
 use tracing::{error, info, warn};
 
+use pmj_desktop::shared::ContainerStyles;
 use pmj_gamemodes;
 use pmj_shared::shared::{FONT_NOTO_SANS_REG_BYTES, ICON_PNG_BYTES, PROJECT_NAME};
-use pmj_desktop::shared::ContainerStyles;
 
 pub const FONT_NOTO_SANS_REG: iced::font::Font = iced::font::Font::with_name("Noto Sans TC");
 
@@ -134,7 +134,8 @@ impl ServerGUI {
                 ServerScene::Home => match home_msg {
                     HomeMsg::StartServer => {
                         let ip_port = pmj_shared::shared::SERVER_PORT;
-                        let backend = pmj_gamemodes::v2_better::mode::main_v2_better(true, ip_port).unwrap();
+                        let backend =
+                            pmj_gamemodes::v2_better::mode::main_v2_better(true, ip_port).unwrap();
                         let ipv4_address = local_ip_address::local_ip().unwrap();
                         let ipv6_address = local_ip_address::local_ipv6().unwrap();
                         info!("第四代網路地址：{}", ipv4_address.to_string());
@@ -216,10 +217,38 @@ impl ServerGUI {
                 let mut home_layout = Vec::new();
                 {
                     let mut title_bar = Vec::new();
-                    title_bar.push(text("positive_mahjong").size(28).align_y(alignment::Vertical::Bottom).into());
-                    title_bar.push(container(text("pmj-server-desktop").size(20).align_y(alignment::Vertical::Bottom)).style(ContainerStyles::PrimaryOutlined.style()).into());
-                    title_bar.push(text(format!("v{}", pmj_shared::shared::PROJECT_VERSION)).size(20).align_y(alignment::Vertical::Bottom).into());
-                    home_layout.push(Column::new().push(Row::from_vec(title_bar).spacing(3).align_y(alignment::Vertical::Bottom)).push(rule::horizontal(0.5)).spacing(5).into());
+                    title_bar.push(
+                        text("positive_mahjong")
+                            .size(28)
+                            .align_y(alignment::Vertical::Bottom)
+                            .into(),
+                    );
+                    title_bar.push(
+                        container(
+                            text("pmj-server-desktop")
+                                .size(20)
+                                .align_y(alignment::Vertical::Bottom),
+                        )
+                        .style(ContainerStyles::PrimaryOutlined.style())
+                        .into(),
+                    );
+                    title_bar.push(
+                        text(format!("v{}", pmj_shared::shared::PROJECT_VERSION))
+                            .size(20)
+                            .align_y(alignment::Vertical::Bottom)
+                            .into(),
+                    );
+                    home_layout.push(
+                        Column::new()
+                            .push(
+                                Row::from_vec(title_bar)
+                                    .spacing(3)
+                                    .align_y(alignment::Vertical::Bottom),
+                            )
+                            .push(rule::horizontal(0.5))
+                            .spacing(5)
+                            .into(),
+                    );
                 }
                 {
                     home_layout.push(
@@ -235,21 +264,29 @@ impl ServerGUI {
                 {
                     let mut ip_bar = Vec::new();
                     ip_bar.push(
-                        button(text(format!("Ipv4: {}:{}", v2_state.local_ipv4_address, v2_state.ip_port)))
-                            .on_press(GUIMessages::CopyToClipboard(
-                                format!("{}:{}", v2_state.local_ipv4_address, v2_state.ip_port),
-                            ))
-                            .into(),
+                        button(text(format!(
+                            "Ipv4: {}:{}",
+                            v2_state.local_ipv4_address, v2_state.ip_port
+                        )))
+                        .on_press(GUIMessages::CopyToClipboard(format!(
+                            "{}:{}",
+                            v2_state.local_ipv4_address, v2_state.ip_port
+                        )))
+                        .into(),
                     );
                     ip_bar.push(space().height(Length::from(4)).into());
                     ip_bar.push(rule::horizontal(iced::Pixels::from(1.5)).into());
                     ip_bar.push(space().height(Length::from(4)).into());
                     ip_bar.push(
-                        button(text(format!("Ipv6: [{}]:{}", v2_state.local_ipv6_address, v2_state.ip_port)))
-                            .on_press(GUIMessages::CopyToClipboard(
-                                format!("[{}]:{}", v2_state.local_ipv6_address, v2_state.ip_port),
-                            ))
-                            .into(),
+                        button(text(format!(
+                            "Ipv6: [{}]:{}",
+                            v2_state.local_ipv6_address, v2_state.ip_port
+                        )))
+                        .on_press(GUIMessages::CopyToClipboard(format!(
+                            "[{}]:{}",
+                            v2_state.local_ipv6_address, v2_state.ip_port
+                        )))
+                        .into(),
                     );
                     v2_layout.push(
                         container(Column::from_vec(ip_bar))

@@ -141,99 +141,105 @@ impl Client {
                     return iced::Task::done(UIMessage::CCoreProcessTask);
                 }
             },
-            UIMessage::Home(home_message) => {
-                match home_message {
-                    HomeMessage::InputServerIpChanged(server_ip) => match self.scene {
-                        ClientScenes::Home(ref mut home_state) => {
-                            if home_state.try_connecting_server {
-                                home_state
-                                    .msgs
-                                    .push(String::from("已有正在嘗試連接的伺服器！"));
+            UIMessage::Home(home_message) => match home_message {
+                HomeMessage::InputServerIpChanged(server_ip) => match self.scene {
+                    ClientScenes::Home(ref mut home_state) => {
+                        if home_state.try_connecting_server {
+                            home_state
+                                .msgs
+                                .push(String::from("已有正在嘗試連接的伺服器！"));
+                        } else {
+                            self.server_url = server_ip;
+                        }
+                    }
+                    ClientScenes::Play(ref _play_state) => {
+                        warn!("update: warn scene");
+                    }
+                },
+                HomeMessage::VSoftKeyBoardInput(key) => match self.scene {
+                    ClientScenes::Home(ref mut home_state) => {
+                        if home_state.try_connecting_server {
+                            let msg = String::from("已有正在嘗試連接的伺服器！");
+                            home_state.msgs.push(msg.clone());
+                            warn!("update: {}", msg);
+                        } else {
+                            if key == "backspace" || key == "\u{e14a}" {
+                                self.server_url.pop();
                             } else {
-                                self.server_url = server_ip;
+                                self.server_url.push_str(&key);
                             }
                         }
-                        ClientScenes::Play(ref _play_state) => {
-                            warn!("update: warn scene");
-                        }
-                    },
-                    HomeMessage::VSoftKeyBoardInput(key) => match self.scene {
-                        ClientScenes::Home(ref mut home_state) => {
-                            if home_state.try_connecting_server {
-                                let msg = String::from("已有正在嘗試連接的伺服器！");
-                                home_state.msgs.push(msg.clone());
-                                warn!("update: {}", msg);
-                            } else {
-                                if key == "backspace" || key == "\u{e14a}" {
-                                    self.server_url.pop();
-                                } else {
-                                    self.server_url.push_str(&key);
-                                }
-                            }
-                        }
-                        ClientScenes::Play(ref _play_state) => {
-                            warn!("update: warn scene");
-                        }
-                    },
-                    HomeMessage::ConnectServer => match self.scene {
-                        ClientScenes::Home(ref mut home_state) => {
-                            if self.server_url.is_empty() {
-                                let msg = String::from("未輸入伺服器地址！");
-                                home_state.msgs.push(msg.clone());
-                                warn!("update: {}", msg);
-                            } else if home_state.try_connecting_server {
-                                let msg = String::from("已有正在嘗試連接的伺服器！");
-                                home_state.msgs.push(msg.clone());
-                                warn!("update: {}", msg);
-                            } else {
-                                home_state.try_connecting_server = true;
-                                match pmj_client_core::ccore::ClientCore::connect(
-                                    self.server_url.clone(),
-                                ) {
-                                    Ok(mut ccore) => {
-                                        ccore.process_task();
-                                        let mut gm_state = ccore.game_state();
-                                        loop {
-                                            match gm_state.clone() {
-                                                pmj_client_core::ccore::GMState::HomePage => {
-                                                    warn!("update: warn GMState");
-                                                    std::thread::sleep(
-                                                        std::time::Duration::from_millis(500),
-                                                    );
-                                                    ccore.process_task();
-                                                    gm_state = ccore.game_state();
-                                                }
-                                                pmj_client_core::ccore::GMState::V2Better(
-                                                    gms_v2,
-                                                ) => {
-                                                    self.scene = ClientScenes::Play(PlayState { is_start: false, hand_cards: Vec::new()
-                                                        , game_msgs: Vec::with_capacity(20), game_controller: Vec::new(), current_turn: None, ccore, gm_state, player_id:gms_v2.player_id });
-                                                    break;
-                                                }
+                    }
+                    ClientScenes::Play(ref _play_state) => {
+                        warn!("update: warn scene");
+                    }
+                },
+                HomeMessage::ConnectServer => match self.scene {
+                    ClientScenes::Home(ref mut home_state) => {
+                        if self.server_url.is_empty() {
+                            let msg = String::from("未輸入伺服器地址！");
+                            home_state.msgs.push(msg.clone());
+                            warn!("update: {}", msg);
+                        } else if home_state.try_connecting_server {
+                            let msg = String::from("已有正在嘗試連接的伺服器！");
+                            home_state.msgs.push(msg.clone());
+                            warn!("update: {}", msg);
+                        } else {
+                            home_state.try_connecting_server = true;
+                            match pmj_client_core::ccore::ClientCore::connect(
+                                self.server_url.clone(),
+                            ) {
+                                Ok(mut ccore) => {
+                                    ccore.process_task();
+                                    let mut gm_state = ccore.game_state();
+                                    loop {
+                                        match gm_state.clone() {
+                                            pmj_client_core::ccore::GMState::HomePage => {
+                                                warn!("update: warn GMState");
+                                                std::thread::sleep(
+                                                    std::time::Duration::from_millis(500),
+                                                );
+                                                ccore.process_task();
+                                                gm_state = ccore.game_state();
+                                            }
+                                            pmj_client_core::ccore::GMState::V2Better(gms_v2) => {
+                                                self.scene = ClientScenes::Play(PlayState {
+                                                    is_start: false,
+                                                    hand_cards: Vec::new(),
+                                                    game_msgs: Vec::with_capacity(20),
+                                                    game_controller: Vec::new(),
+                                                    current_turn: None,
+                                                    ccore,
+                                                    gm_state,
+                                                    player_id: gms_v2.player_id,
+                                                });
+                                                break;
                                             }
                                         }
-                                        return task::Task::done(UIMessage::CCoreProcessTask);
                                     }
-                                    Err(e) => {
-                                        error!("update: {}", e);
-                                        home_state.msgs.push(format!("update: {}", e));
-                                    }
+                                    return task::Task::done(UIMessage::CCoreProcessTask);
+                                }
+                                Err(e) => {
+                                    error!("update: {}", e);
+                                    home_state.msgs.push(format!("update: {}", e));
                                 }
                             }
                         }
-                        ClientScenes::Play(ref _play_state) => {
-                            warn!("update: warn scene");
-                        }
-                    },
-                }
-            }
+                    }
+                    ClientScenes::Play(ref _play_state) => {
+                        warn!("update: warn scene");
+                    }
+                },
+            },
             UIMessage::Play(play_base_message) => match play_base_message {
                 PlayMsg::ThrowCard(card) => match self.scene {
                     ClientScenes::Home(ref _home_state) => {
                         warn!("update: warn scene");
                     }
                     ClientScenes::Play(ref mut play_state) => {
-                        play_state.ccore.player_game_action(pmj_gamemodes::v2_better::shared::PlayerGameActions::ThrowCard(card));
+                        play_state.ccore.player_game_action(
+                            pmj_gamemodes::v2_better::shared::PlayerGameActions::ThrowCard(card),
+                        );
                     }
                 },
             },
@@ -540,7 +546,8 @@ impl Client {
                                         row_msg = row_msg.push(
                                             text("\u{e5c8}")
                                                 .font(MATERIAL_SYMBOLS_OUTLINED)
-                                                .size(14).align_y(alignment::Vertical::Center),
+                                                .size(14)
+                                                .align_y(alignment::Vertical::Center),
                                         );
                                         row_msg = row_msg.push(text(said_text).size(16));
                                     }
@@ -551,7 +558,8 @@ impl Client {
                                         row_msg = row_msg.push(
                                             text("\u{e5c8}")
                                                 .font(MATERIAL_SYMBOLS_OUTLINED)
-                                                .size(14).align_y(alignment::Vertical::Center),
+                                                .size(14)
+                                                .align_y(alignment::Vertical::Center),
                                         );
                                         row_msg = row_msg.push(text(said_text).size(16));
                                     }
@@ -600,47 +608,45 @@ impl Client {
                                         .size(15)
                                         .align_x(alignment::Horizontal::Right),
                                 );
-                            if play_state.game_controller.contains(&pmj_client_core::ccore::PlayerCtrl::ThrowCard) {
-                                    card_bar_elements.push(
-                                        button(card_element)
-                                            .on_press(UIMessage::Play(PlayMsg::ThrowCard(
-                                                card.clone(),
-                                            )))
-                                            .style(|t: &iced::Theme, s: button::Status| {
-                                                let p = t.extended_palette();
-                                                let mut style = button::Style::default();
-                                                style.border.width = 1.2;
-                                                style.border.radius = iced::border::radius(10);
-                                                style.text_color = p.background.base.text;
-                                                match s {
-                                                    button::Status::Active => {
-                                                        style.border.color =
-                                                            p.background.strong.color;
-                                                        style.background = None;
-                                                    }
-                                                    button::Status::Disabled => {
-                                                        style.background =
-                                                            Some(iced::Background::Color(
-                                                                p.background.weak.color,
-                                                            ));
-                                                    }
-                                                    button::Status::Hovered => {
-                                                        style.border.color = p.primary.weak.color;
-                                                        style.border.width = 1.5;
-                                                    }
-                                                    button::Status::Pressed => {
-                                                        style.border.color = p.primary.strong.color;
-                                                        style.border.width = 0.7;
-                                                        style.border.radius =
-                                                            iced::border::radius(6);
-                                                    }
+                            if play_state
+                                .game_controller
+                                .contains(&pmj_client_core::ccore::PlayerCtrl::ThrowCard)
+                            {
+                                card_bar_elements.push(
+                                    button(card_element)
+                                        .on_press(UIMessage::Play(PlayMsg::ThrowCard(card.clone())))
+                                        .style(|t: &iced::Theme, s: button::Status| {
+                                            let p = t.extended_palette();
+                                            let mut style = button::Style::default();
+                                            style.border.width = 1.2;
+                                            style.border.radius = iced::border::radius(10);
+                                            style.text_color = p.background.base.text;
+                                            match s {
+                                                button::Status::Active => {
+                                                    style.border.color = p.background.strong.color;
+                                                    style.background = None;
                                                 }
-                                                style
-                                            })
-                                            .into(),
-                                    );
-                                }
-
+                                                button::Status::Disabled => {
+                                                    style.background =
+                                                        Some(iced::Background::Color(
+                                                            p.background.weak.color,
+                                                        ));
+                                                }
+                                                button::Status::Hovered => {
+                                                    style.border.color = p.primary.weak.color;
+                                                    style.border.width = 1.5;
+                                                }
+                                                button::Status::Pressed => {
+                                                    style.border.color = p.primary.strong.color;
+                                                    style.border.width = 0.7;
+                                                    style.border.radius = iced::border::radius(6);
+                                                }
+                                            }
+                                            style
+                                        })
+                                        .into(),
+                                );
+                            }
                         }
                         let card_bar_layout =
                             Row::new().extend(card_bar_elements).spacing(7).padding(5);

@@ -95,7 +95,7 @@ impl ClientCore {
     pub fn current_ctrl(&self) -> Vec<PlayerCtrl> {
         let mut able_action = Vec::new();
         match self.gamemode_state {
-            GMState::HomePage => {},
+            GMState::HomePage => {}
             GMState::V2Better(ref state) => {
                 if state.game_events.len() > 1 {
                     let (_event_num, event) = state.game_events.last().unwrap();
@@ -103,18 +103,19 @@ impl ClientCore {
                         V2BetterEvents::YouGetCard(_) => able_action.push(PlayerCtrl::ThrowCard),
                         V2BetterEvents::ChangeTurn(turn_player) => {
                             if turn_player == &state.player_id {
-                                let (_event_num, event2) = state.game_events.get(state.game_events.len() - 2).unwrap();
-                               match event2 {
+                                let (_event_num, event2) =
+                                    state.game_events.get(state.game_events.len() - 2).unwrap();
+                                match event2 {
                                     V2BetterEvents::PlayerAction(e2p, e2pga) => {
                                         if e2p != &state.player_id {
                                             able_action.push(PlayerCtrl::GetCard);
                                         }
                                     }
-                                    _ =>{}
+                                    _ => {}
                                 }
                             }
                         }
-                        _ => {},
+                        _ => {}
                     }
                 }
             }
@@ -314,44 +315,44 @@ impl ClientCore {
         });
     }
 
-    pub fn player_game_action(&mut self, game_action: pmj_gamemodes::v2_better::shared::PlayerGameActions) {
+    pub fn player_game_action(
+        &mut self,
+        game_action: pmj_gamemodes::v2_better::shared::PlayerGameActions,
+    ) {
         let thread_ws = self.ws.clone();
-            let thread_action = game_action.clone();
-            let handle = thread::spawn(move || {
-                let req_text =
-                    serde_json::to_string(&pmj_gamemodes::v2_better::shared::ClientMessage::GameMsg(
-                        pmj_gamemodes::v2_better::shared::ClientGameMsg::Pga(
-                            thread_action
-                        ),
-                    ))
-                    .unwrap();
-                match thread_ws.lock() {
-                    Ok(mut guard) => match guard.send(tungstenite::Message::Text(req_text.into())) {
-                        Ok(_) => {
-                            drop(guard);
-                            Result::Ok(CTaskResult::default())
-                        }
-                        Err(e) => {
-                            drop(guard);
-                            warn!("error: {}", e);
-                            Result::Err(error::CCError {
-                                kind: error::CCErrKinds::Other,
-                            })
-                        }
-                    },
+        let thread_action = game_action.clone();
+        let handle = thread::spawn(move || {
+            let req_text =
+                serde_json::to_string(&pmj_gamemodes::v2_better::shared::ClientMessage::GameMsg(
+                    pmj_gamemodes::v2_better::shared::ClientGameMsg::Pga(thread_action),
+                ))
+                .unwrap();
+            match thread_ws.lock() {
+                Ok(mut guard) => match guard.send(tungstenite::Message::Text(req_text.into())) {
+                    Ok(_) => {
+                        drop(guard);
+                        Result::Ok(CTaskResult::default())
+                    }
                     Err(e) => {
-                        warn!("player_game_action: {}", e);
+                        drop(guard);
+                        warn!("error: {}", e);
                         Result::Err(error::CCError {
                             kind: error::CCErrKinds::Other,
                         })
                     }
+                },
+                Err(e) => {
+                    warn!("player_game_action: {}", e);
+                    Result::Err(error::CCError {
+                        kind: error::CCErrKinds::Other,
+                    })
                 }
-            });
-            self.tasks.push(ClientTask {
-                kind: CTaskKinds::DoPlayerGameAction(game_action),
-                handle,
-            });
-
+            }
+        });
+        self.tasks.push(ClientTask {
+            kind: CTaskKinds::DoPlayerGameAction(game_action),
+            handle,
+        });
     }
 
     pub fn process_task(&mut self) {
@@ -367,7 +368,7 @@ impl ClientCore {
                             match task.handle.join() {
                                 Ok(task_result) => match task_result {
                                     Ok(ctr) => match task.kind {
-                                    CTaskKinds::DoPlayerGameAction(pga) => {
+                                        CTaskKinds::DoPlayerGameAction(pga) => {
                                             info!("process_task: PGA sucessful: {:?}", pga);
                                         }
                                         CTaskKinds::ReadWsMsg => {

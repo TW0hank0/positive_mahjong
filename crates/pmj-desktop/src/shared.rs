@@ -54,22 +54,22 @@ impl ButtonStyles {
                 button::Style {
                     background: Some(iced::Background::Color(p.primary.base.color)),
                     text_color: p.primary.base.text,
-                    border: Border { width: 2.0, radius: match status {
-                        button::Status::Active | button::Status::Disabled => {
-                            border::radius(8)
-                        }
-                        button::Status::Hovered => {
-                            border::radius(12)
-                        }
-                        button::Status::Pressed => {
-                            border::radius(16)
-                        }
-                    },color: match status {
-                        button::Status::Active | button::Status::Disabled => {
-                            iced::Color::TRANSPARENT
-                        }
-                        button::Status::Hovered|button::Status::Pressed=>{p.primary.strong.color}
-                    } },
+                    border: Border {
+                        width: 2.0,
+                        radius: match status {
+                            button::Status::Active | button::Status::Disabled => border::radius(8),
+                            button::Status::Hovered => border::radius(12),
+                            button::Status::Pressed => border::radius(16),
+                        },
+                        color: match status {
+                            button::Status::Active | button::Status::Disabled => {
+                                iced::Color::TRANSPARENT
+                            }
+                            button::Status::Hovered | button::Status::Pressed => {
+                                p.primary.strong.color
+                            }
+                        },
+                    },
                     ..Default::default()
                 }
             },

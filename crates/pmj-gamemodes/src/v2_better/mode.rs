@@ -460,7 +460,10 @@ fn handle_client(tcp_stream: TcpStream, backend: sync::Arc<sync::RwLock<Positive
     }
 }
 
-pub fn main_v2_better(return_backend: bool, server_port: u16) -> Option<Arc<RwLock<PositiveMahjong>>> {
+pub fn main_v2_better(
+    return_backend: bool,
+    server_port: u16,
+) -> Option<Arc<RwLock<PositiveMahjong>>> {
     let backend = sync::Arc::new(sync::RwLock::new(PositiveMahjong::new()));
     let server_addr_ipv4 = std::net::SocketAddr::V4(std::net::SocketAddrV4::new(
         std::net::Ipv4Addr::UNSPECIFIED,
