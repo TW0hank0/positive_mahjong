@@ -73,8 +73,14 @@ def addlicense_check():
         # Author: [iced team](https://github.com/iced-rs/)
         # This file is from project [iced](https://github.com/iced-rs/iced/).
         "crates/pmj-client-desktop-base/src/circular.rs",
+        # Author: [iced team](https://github.com/iced-rs/)
+        # This file is from project [iced](https://github.com/iced-rs/iced/).
+        "crates/pmj-desktop/src/easing.rs",
+        # Author: [iced team](https://github.com/iced-rs/)
+        # This file is from project [iced](https://github.com/iced-rs/iced/).
+        "crates/pmj-desktop/src/circular.rs",
         "supply-chain/**",
-        "scripts/**/__init__.py",
+        "scripts/pylock.toml",
     ]
     ignored: list[str] = []
     for dir in ignore_dir:
