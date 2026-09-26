@@ -1,46 +1,37 @@
 {
-	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
-	"extends": ["config:recommended"],
-	"ignorePaths": ["crates/old_pmj_client/**", "crates/old_slint_client/**"],
-	"customManagers": [
-		{
-			"description": "Monitor cargo tools versions in ci-cache-version.json",
-			"customType": "regex",
-			"managerFilePatterns": ["/^ci-cache-version\\.json$/"],
-			"matchStrings": [
-				"\"(?<depName>[a-z0-9-]+)\":\\s*\"(?<currentValue>[\\d\\.]+)\""
-			],
-			"datasourceTemplate": "crate",
-			"versioningTemplate": "semver"
-		}
-	],
-	"packageRules": [
-		{
-			"matchUpdateTypes": ["patch"],
-			"groupName": "patch dependencies",
-			"groupSlug": "all-patch",
-			"labels": ["dep-update"]
-		},
-		{
-			"matchUpdateTypes": ["minor"],
-			"groupName": "minor dependencies",
-			"groupSlug": "all-minor",
-			"labels": ["it-is::dep-update"]
-		},
-		{
-			"matchUpdateTypes": ["major"],
-			"groupName": "major dependencies",
-			"groupSlug": "all-major",
-			"labels": ["it-is::dep-update"]
-		},
-		{
-			"description": "將所有未鎖定或萬用字元版本釘選到具體版本",
-			"rangeStrategy": "pin",
-			"matchPackageNames": ["*"],
-			"labels": ["it-is::dep-update"]
-		}
-	],
-	"timezone": "Asia/Taipei",
-	"prHourlyLimit": 0,
-	"prConcurrentLimit": 10
+		"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+			"extends": [
+					"config:recommended",
+							"group:none"
+								],
+									"automerge": false,
+										"labels": ["it-is::dep-update"],
+											"customManagers": [
+													{
+																"description": "Monitor cargo tools versions in ci-cache-version.json",
+																			"customType": "regex",
+																						"managerFilePatterns": ["/^ci-cache-version\\.json$/"],
+																									"matchStrings": [
+																													"\"(?<depName>[a-z0-9-]+)\":\\s*\"(?<currentValue>[\\d\\.]+)\""
+																																],
+																																			"datasourceTemplate": "crate",
+																																						"versioningTemplate": "semver"
+																																								}
+																																									],
+																																										"packageRules": [
+																																												{
+																																															"matchPackagePatterns": ["*"],
+																																																		"automerge": false
+																																																				},
+																																																						{
+																																																									"description": "將所有未鎖定或萬用字元版本釘選到具體版本",
+																																																												"matchPackagePatterns": ["*"],
+																																																															"rangeStrategy": "pin"
+																																																																	}
+																																																																		],
+																																																																			"timezone": "Asia/Taipei",
+																																																																				"prHourlyLimit": 0,
+																																																																					"prConcurrentLimit": 10
+																																																																					}
+																																																																					
 }
