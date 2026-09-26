@@ -85,7 +85,5 @@
 
 路徑：
 
-- crates/pmj_client_desktop/src/circular.rs
-- crates/pmj_client_desktop_base/src/circular.rs
-- crates/pmj_client_desktop/src/easing.rs
-- crates/pmj_client_desktop_base/src/easing.rs
+- crates/pmj-desktop/src/circular.rs
+- crates/pmj-desktop/src/easing.rs

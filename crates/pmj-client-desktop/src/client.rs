@@ -24,7 +24,7 @@ use iced::{
 };
 use tracing::{error, warn};
 
-use crate::{circular, easing};
+use pmj_desktop::{circular, easing};
 
 use pmj_shared::shared::{
     self, FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES, FONT_NOTO_SANS_REG_BYTES, PROJECT_NAME,
@@ -95,7 +95,7 @@ impl Client {
         let _ = iced::font::load(FONT_NOTO_SANS_REG_BYTES);
         let _ = iced::font::load(FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES);
         Self {
-            server_url: String::new(),
+            server_url: String::from("ws://"),
             scene: ClientScenes::Home(HomeState {
                 try_connecting_server: false,
                 msgs: Vec::new(),
@@ -540,7 +540,7 @@ impl Client {
                                         row_msg = row_msg.push(
                                             text("\u{e5c8}")
                                                 .font(MATERIAL_SYMBOLS_OUTLINED)
-                                                .size(14),
+                                                .size(14).align_y(alignment::Vertical::Center),
                                         );
                                         row_msg = row_msg.push(text(said_text).size(16));
                                     }
@@ -551,7 +551,7 @@ impl Client {
                                         row_msg = row_msg.push(
                                             text("\u{e5c8}")
                                                 .font(MATERIAL_SYMBOLS_OUTLINED)
-                                                .size(14),
+                                                .size(14).align_y(alignment::Vertical::Center),
                                         );
                                         row_msg = row_msg.push(text(said_text).size(16));
                                     }

@@ -29,6 +29,7 @@ image = { workspace = true }
 local-ip-address = { workspace = true }
 pmj-gamemodes = { workspace = true }
 pmj-shared = { workspace = true }
+pmj-desktop = { workspace = true }
 rand = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }

@@ -1,30 +1,31 @@
 {
-    "languages": {
-        "JSON": {
-            "tab_size": 4,
-        },
-        "JSONC": {
-            "tab_size": 4,
-        },
-    },
-    "line_ending": "enforce_lf",
-    "lsp": {
-        "rust-analyzer": {
-            "initialization_options": {
-                "cargo": {
-                    "features": [],
-                    "extraArgs": [],
-                },
-            },
-        },
-    },
-    "ensure_final_newline_on_save": true,
-    "file_scan_exclusions": [
-        "**/.git",
-        "**/.svn",
-        "**/.hg",
-        "**/.jj",
-        "**/.DS_Store",
-        "**/Thumbs.db",
-    ],
+	"languages": {
+		"JSON": {
+			"tab_size": 4
+		},
+		"JSONC": {
+			"tab_size": 4
+		}
+	},
+	"line_ending": "enforce_lf",
+	"lsp": {
+		"rust-analyzer": {
+			"initialization_options": {
+				"cargo": {
+					"features": [],
+					"extraArgs": []
+				}
+			},
+			"excludeGlobs": ["**/*.md"]
+		}
+	},
+	"ensure_final_newline_on_save": true,
+	"file_scan_exclusions": [
+		"**/.git",
+		"**/.svn",
+		"**/.hg",
+		"**/.jj",
+		"**/.DS_Store",
+		"**/Thumbs.db"
+	]
 }

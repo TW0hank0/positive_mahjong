@@ -3620,6 +3620,7 @@ dependencies = [
  "image",
  "lyon_algorithms",
  "pmj-client-core",
+ "pmj-desktop",
  "pmj-gamemodes",
  "pmj-shared",
  "serde_json",
@@ -3635,12 +3636,25 @@ dependencies = [
  "iced",
  "image",
  "lyon_algorithms",
+ "pmj-desktop",
  "pmj-gamemodes",
  "pmj-shared",
  "serde_json",
  "tracing",
  "tungstenite",
  "url",
+]
+
+[[package]]
+name = "pmj-desktop"
+version = "0.1.1"
+dependencies = [
+ "iced",
+ "image",
+ "lyon_algorithms",
+ "pmj-shared",
+ "serde_json",
+ "tracing",
 ]
 
 [[package]]
@@ -3668,6 +3682,7 @@ dependencies = [
  "iced",
  "image",
  "local-ip-address",
+ "pmj-desktop",
  "pmj-gamemodes",
  "pmj-shared",
  "rand 0.10.3",
