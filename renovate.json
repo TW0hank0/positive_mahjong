@@ -1,23 +1,23 @@
 {
-		"$schema": "https://docs.renovatebot.com/renovate-schema.json",
-			"extends": [
-					"config:recommended",
-							"group:none"
-								],
-									"automerge": false,
-										"labels": ["it-is::dep-update"],
-											"customManagers": [
-													{
-																"description": "Monitor cargo tools versions in ci-cache-version.json",
-																			"customType": "regex",
-																						"managerFilePatterns": ["/^ci-cache-version\\.json$/"],
-																									"matchStrings": [
-																													"\"(?<depName>[a-z0-9-]+)\":\\s*\"(?<currentValue>[\\d\\.]+)\""
-																																],
-																																			"datasourceTemplate": "crate",
-																																						"versioningTemplate": "semver"
-																																								}
-																																									],
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": [
+		"config:recommended",
+		"group:none"
+	],
+	"automerge": false,
+	"labels": ["it-is::dep-update"],
+	"customManagers": [
+		{
+			"description": "Monitor cargo tools versions in ci-cache-version.json",
+			"customType": "regex",
+			"managerFilePatterns": ["/^ci-cache-version\\.json$/"],
+			"matchStrings": [
+	    		"\"(?<depName>[a-z0-9-]+)\":\\s*\"(?<currentValue>[\\d\\.]+)\""
+			],
+			"datasourceTemplate": "crate",
+			"versioningTemplate": "semver"
+		}
+																																		],
 																																										"packageRules": [
 																																												{
 																																															"matchPackagePatterns": ["*"],
@@ -29,9 +29,4 @@
 																																																															"rangeStrategy": "pin"
 																																																																	}
 																																																																		],
-																																																																			"timezone": "Asia/Taipei",
-																																																																				"prHourlyLimit": 0,
-																																																																					"prConcurrentLimit": 10
-																																																																					}
-																																																																					
-}
+																																																																			"timezone": "Asia/Taipei"}
