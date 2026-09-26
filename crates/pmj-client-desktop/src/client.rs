@@ -24,7 +24,7 @@ use iced::{
 };
 use tracing::{error, warn};
 
-use pmj_desktop::{circular, easing};
+use pmj_desktop::{circular, easing, shared::ButtonStyles};
 
 use pmj_shared::shared::{
     self, FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES, FONT_NOTO_SANS_REG_BYTES, PROJECT_NAME,
@@ -60,7 +60,7 @@ pub struct PlayState {
     player_id: u8,
     hand_cards: Vec<pmj_gamemodes::v2_better::shared::PMJCard>,
     game_msgs: Vec<(u64, String)>,
-    game_controller: pmj_client_core::ccore::PlayerCtrl,
+    game_controller: Vec<pmj_client_core::ccore::PlayerCtrl>,
     current_turn: Option<u8>,
     ccore: pmj_client_core::ccore::ClientCore,
     gm_state: pmj_client_core::ccore::GMState,
@@ -207,7 +207,7 @@ impl Client {
                                                     gms_v2,
                                                 ) => {
                                                     self.scene = ClientScenes::Play(PlayState { is_start: false, hand_cards: Vec::new()
-                                                        , game_msgs: Vec::with_capacity(20), game_controller: pmj_client_core::ccore::PlayerCtrl::NoCtrl, current_turn: None, ccore, gm_state, player_id:gms_v2.player_id });
+                                                        , game_msgs: Vec::with_capacity(20), game_controller: Vec::new(), current_turn: None, ccore, gm_state, player_id:gms_v2.player_id });
                                                     break;
                                                 }
                                             }
@@ -233,7 +233,7 @@ impl Client {
                         warn!("update: warn scene");
                     }
                     ClientScenes::Play(ref mut play_state) => {
-                        play_state.ccore.throw_card(card);
+                        play_state.ccore.player_game_action(pmj_gamemodes::v2_better::shared::PlayerGameActions::ThrowCard(card));
                     }
                 },
             },
@@ -289,7 +289,7 @@ impl Client {
                     server_ip_input_bar = server_ip_input_bar.push(
                         button(text("連線").size(24))
                             .on_press(UIMessage::Home(HomeMessage::ConnectServer))
-                            .style(rounded_primary_button),
+                            .style(ButtonStyles::PrimaryRounded.style()),
                     );
                     layout_home = layout_home.push(server_ip_input_bar).spacing(35);
                 }
@@ -600,26 +600,7 @@ impl Client {
                                         .size(15)
                                         .align_x(alignment::Horizontal::Right),
                                 );
-                            match play_state.game_controller {
-                                pmj_client_core::ccore::PlayerCtrl::NoCtrl => {
-                                    card_bar_elements.push(
-                                        container(card_element)
-                                            .style(|t: &iced::Theme| {
-                                                let p = t.extended_palette();
-                                                container::Style {
-                                                    border: Border {
-                                                        color: p.background.strong.color,
-                                                        width: 1.2,
-                                                        radius: iced::border::radius(10),
-                                                    },
-                                                    text_color: Some(p.background.base.text),
-                                                    ..Default::default()
-                                                }
-                                            })
-                                            .into(),
-                                    );
-                                }
-                                pmj_client_core::ccore::PlayerCtrl::ThrowCard => {
+                            if play_state.game_controller.contains(&pmj_client_core::ccore::PlayerCtrl::ThrowCard) {
                                     card_bar_elements.push(
                                         button(card_element)
                                             .on_press(UIMessage::Play(PlayMsg::ThrowCard(
@@ -659,7 +640,7 @@ impl Client {
                                             .into(),
                                     );
                                 }
-                            }
+
                         }
                         let card_bar_layout =
                             Row::new().extend(card_bar_elements).spacing(7).padding(5);
@@ -725,7 +706,7 @@ impl Client {
         .on_press(UIMessage::Home(HomeMessage::VSoftKeyBoardInput(
             key.to_string(),
         )))
-        .style(rounded_primary_button)
+        .style(ButtonStyles::PrimaryRounded.style())
     }
 
     pub fn title(&self) -> String {
@@ -735,56 +716,4 @@ impl Client {
     pub fn theme(&self) -> iced::theme::Theme {
         self.theme.clone()
     }
-}
-
-fn transparent_button(t: &iced::Theme, s: button::Status) -> button::Style {
-    let p = t.extended_palette();
-    let mut style = button::Style::default();
-    style.border = Border {
-        color: p.background.strong.color,
-        width: 2.0,
-        radius: iced::border::radius(10),
-    };
-    style.text_color = p.primary.base.text;
-    match s {
-        button::Status::Active => {
-            style.background = None;
-        }
-        button::Status::Hovered => {
-            style.background = Some(iced::Background::Color(iced::Color::from_rgba(
-                1.0, 1.0, 1.0, 0.6,
-            )));
-        }
-        button::Status::Disabled => {
-            style.background = Some(iced::Background::Color(p.background.weak.color));
-        }
-        button::Status::Pressed => {
-            style.text_color = p.secondary.base.color;
-        }
-    }
-    style
-}
-
-fn rounded_primary_button(t: &iced::Theme, s: button::Status) -> button::Style {
-    let p = t.extended_palette();
-    let mut style = button::Style::default();
-    style.background = Some(iced::Background::Color(p.primary.base.color));
-    style.text_color = p.primary.base.text;
-    let mut border = iced::Border::default().rounded(14).width(2);
-    match s {
-        button::Status::Active => {
-            border = border.color(iced::Color::TRANSPARENT);
-        }
-        button::Status::Disabled => {
-            style.background = Some(iced::Background::Color(p.background.weak.color));
-        }
-        button::Status::Hovered => {
-            border = border.color(p.primary.strong.color);
-        }
-        button::Status::Pressed => {
-            style.text_color = p.secondary.base.color;
-        }
-    }
-    style.border = border;
-    style
 }

@@ -329,39 +329,3 @@ fn transparent_button(t: &iced::Theme, s: button::Status) -> button::Style {
     }
     style
 }
-
-fn rounded_primary_button(t: &iced::Theme, s: button::Status) -> button::Style {
-    let p = t.extended_palette();
-    let mut style = button::Style::default();
-    style.background = Some(iced::Background::Color(p.primary.base.color));
-    style.text_color = p.primary.base.text;
-    let mut border = iced::Border::default().rounded(14).width(2);
-    match s {
-        button::Status::Active => {
-            border = border.color(iced::Color::TRANSPARENT);
-        }
-        button::Status::Disabled => {
-            style.background = Some(iced::Background::Color(p.background.weak.color));
-        }
-        button::Status::Hovered => {
-            border = border.color(p.primary.strong.color);
-        }
-        button::Status::Pressed => {
-            style.text_color = p.secondary.base.color;
-        }
-    }
-    style.border = border;
-    style
-}
-
-pub fn primary_outlined_container(theme: &iced::Theme) -> container::Style {
-    let p = theme.extended_palette();
-    container::Style {
-        border: Border {
-            color: p.primary.base.color,
-            width: 0.7,
-            radius: iced::border::radius(8),
-        },
-        ..Default::default()
-    }
-}

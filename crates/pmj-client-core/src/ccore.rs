@@ -41,7 +41,7 @@ enum CTaskKinds {
     ReadFirstMsgResp,
     PingPong,
     ReadWsMsg,
-    ThrowCard(pmj_gamemodes::v2_better::shared::PMJCard),
+    DoPlayerGameAction(pmj_gamemodes::v2_better::shared::PlayerGameActions),
 }
 #[derive(Debug, Clone, Default)]
 struct CTaskResult {
@@ -84,7 +84,7 @@ pub enum V2BetterEvents {
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum PlayerCtrl {
-    NoCtrl,
+    GetCard,
     ThrowCard,
 }
 
@@ -92,21 +92,34 @@ impl ClientCore {
     pub fn game_state(&self) -> GMState {
         self.gamemode_state.clone()
     }
-    pub fn current_ctrl(&self) -> PlayerCtrl {
+    pub fn current_ctrl(&self) -> Vec<PlayerCtrl> {
+        let mut able_action = Vec::new();
         match self.gamemode_state {
-            GMState::HomePage => PlayerCtrl::NoCtrl,
+            GMState::HomePage => {},
             GMState::V2Better(ref state) => {
                 if state.game_events.len() > 1 {
                     let (_event_num, event) = state.game_events.last().unwrap();
                     match event {
-                        V2BetterEvents::YouGetCard(_) => PlayerCtrl::ThrowCard,
-                        _ => PlayerCtrl::NoCtrl,
+                        V2BetterEvents::YouGetCard(_) => able_action.push(PlayerCtrl::ThrowCard),
+                        V2BetterEvents::ChangeTurn(turn_player) => {
+                            if turn_player == &state.player_id {
+                                let (_event_num, event2) = state.game_events.get(state.game_events.len() - 2).unwrap();
+                               match event2 {
+                                    V2BetterEvents::PlayerAction(e2p, e2pga) => {
+                                        if e2p != &state.player_id {
+                                            able_action.push(PlayerCtrl::GetCard);
+                                        }
+                                    }
+                                    _ =>{}
+                                }
+                            }
+                        }
+                        _ => {},
                     }
-                } else {
-                    PlayerCtrl::NoCtrl
                 }
             }
         }
+        able_action
     }
     pub fn connect(server_url: String) -> Result<Self, error::CCError> {
         let uri: url::Url = url::Url::parse(&server_url).unwrap();
@@ -301,43 +314,44 @@ impl ClientCore {
         });
     }
 
-    pub fn throw_card(&mut self, card: pmj_gamemodes::v2_better::shared::PMJCard) {
+    pub fn player_game_action(&mut self, game_action: pmj_gamemodes::v2_better::shared::PlayerGameActions) {
         let thread_ws = self.ws.clone();
-        let thread_card = card.clone();
-        let handle = thread::spawn(move || {
-            let req_text =
-                serde_json::to_string(&pmj_gamemodes::v2_better::shared::ClientMessage::GameMsg(
-                    pmj_gamemodes::v2_better::shared::ClientGameMsg::Pga(
-                        pmj_gamemodes::v2_better::shared::PlayerGameActions::ThrowCard(thread_card),
-                    ),
-                ))
-                .unwrap();
-            match thread_ws.lock() {
-                Ok(mut guard) => match guard.send(tungstenite::Message::Text(req_text.into())) {
-                    Ok(_) => {
-                        drop(guard);
-                        Result::Ok(CTaskResult::default())
-                    }
+            let thread_action = game_action.clone();
+            let handle = thread::spawn(move || {
+                let req_text =
+                    serde_json::to_string(&pmj_gamemodes::v2_better::shared::ClientMessage::GameMsg(
+                        pmj_gamemodes::v2_better::shared::ClientGameMsg::Pga(
+                            thread_action
+                        ),
+                    ))
+                    .unwrap();
+                match thread_ws.lock() {
+                    Ok(mut guard) => match guard.send(tungstenite::Message::Text(req_text.into())) {
+                        Ok(_) => {
+                            drop(guard);
+                            Result::Ok(CTaskResult::default())
+                        }
+                        Err(e) => {
+                            drop(guard);
+                            warn!("error: {}", e);
+                            Result::Err(error::CCError {
+                                kind: error::CCErrKinds::Other,
+                            })
+                        }
+                    },
                     Err(e) => {
-                        drop(guard);
-                        warn!("error: {}", e);
+                        warn!("player_game_action: {}", e);
                         Result::Err(error::CCError {
                             kind: error::CCErrKinds::Other,
                         })
                     }
-                },
-                Err(e) => {
-                    warn!("throw_card: {}", e);
-                    Result::Err(error::CCError {
-                        kind: error::CCErrKinds::Other,
-                    })
                 }
-            }
-        });
-        self.tasks.push(ClientTask {
-            kind: CTaskKinds::ThrowCard(card),
-            handle,
-        });
+            });
+            self.tasks.push(ClientTask {
+                kind: CTaskKinds::DoPlayerGameAction(game_action),
+                handle,
+            });
+
     }
 
     pub fn process_task(&mut self) {
@@ -353,8 +367,8 @@ impl ClientCore {
                             match task.handle.join() {
                                 Ok(task_result) => match task_result {
                                     Ok(ctr) => match task.kind {
-                                        CTaskKinds::ThrowCard(card) => {
-                                            info!("threw {} sucessful.", card);
+                                    CTaskKinds::DoPlayerGameAction(pga) => {
+                                            info!("process_task: PGA sucessful: {:?}", pga);
                                         }
                                         CTaskKinds::ReadWsMsg => {
                                             let server_msg = ctr.read_ws_msg_v2.unwrap();
@@ -463,8 +477,8 @@ impl ClientCore {
                                     Err(e) => {
                                         error!("task {:?}: {}", task.kind, e);
                                         match task.kind {
-                                            CTaskKinds::ThrowCard(card) => {
-                                                self.throw_card(card);
+                                            CTaskKinds::DoPlayerGameAction(pga) => {
+                                                self.player_game_action(pga);
                                                 break;
                                             }
                                             CTaskKinds::ReadWsMsg => {
@@ -489,8 +503,8 @@ impl ClientCore {
                                 Err(e) => {
                                     error!("task {:?}: {:?}", task.kind, e);
                                     match task.kind {
-                                        CTaskKinds::ThrowCard(card) => {
-                                            self.throw_card(card);
+                                        CTaskKinds::DoPlayerGameAction(pga) => {
+                                            self.player_game_action(pga);
                                             task_index += 1;
                                         }
                                         CTaskKinds::ReadWsMsg => {
