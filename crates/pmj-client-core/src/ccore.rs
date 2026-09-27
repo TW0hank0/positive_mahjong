@@ -92,6 +92,7 @@ impl ClientCore {
     pub fn game_state(&self) -> GMState {
         self.gamemode_state.clone()
     }
+    /// TODO
     pub fn current_ctrl(&self) -> Vec<PlayerCtrl> {
         let mut able_action = Vec::new();
         match self.gamemode_state {
@@ -106,7 +107,7 @@ impl ClientCore {
                                 let (_event_num, event2) =
                                     state.game_events.get(state.game_events.len() - 2).unwrap();
                                 match event2 {
-                                    V2BetterEvents::PlayerAction(e2p, e2pga) => {
+                                    V2BetterEvents::PlayerAction(e2p, _e2pga) => {
                                         if e2p != &state.player_id {
                                             able_action.push(PlayerCtrl::GetCard);
                                         }

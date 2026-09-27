@@ -18,13 +18,13 @@ use std;
 use iced::{
     self, Border, Color, Element, Length, Pixels, alignment, task,
     widget::{
-        self, Column, Grid, Row, button, container, grid, scrollable, space, stack, text,
+        self, Column, Grid, Row, button, container, scrollable, space, stack, text,
         text_input,
     },
 };
 use tracing::{error, warn};
 
-use pmj_desktop::{circular, easing, shared::ButtonStyles};
+use pmj_desktop::{circular, easing, shared::{ButtonStyles, ContainerStyles}};
 
 use pmj_shared::shared::{
     self, FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES, FONT_NOTO_SANS_REG_BYTES, PROJECT_NAME,
@@ -82,6 +82,7 @@ pub enum HomeMessage {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PlayMsg {
+    GetCard,
     ThrowCard(pmj_gamemodes::v2_better::shared::PMJCard),
 }
 
@@ -232,6 +233,16 @@ impl Client {
                 },
             },
             UIMessage::Play(play_base_message) => match play_base_message {
+                PlayMsg::GetCard =>match self.scene {
+                    ClientScenes::Home(ref _home_state) => {
+                        warn!("update: warn scene");
+                    }
+                    ClientScenes::Play(ref mut play_state) => {
+                        play_state.ccore.player_game_action(
+                            pmj_gamemodes::v2_better::shared::PlayerGameActions::GetCard,
+                        );
+                    }
+                },
                 PlayMsg::ThrowCard(card) => match self.scene {
                     ClientScenes::Home(ref _home_state) => {
                         warn!("update: warn scene");
@@ -248,34 +259,31 @@ impl Client {
     }
 
     pub fn view(&self) -> Element<'_, UIMessage, iced::Theme, iced::Renderer> {
-        let mut layout: Column<'_, UIMessage, iced::Theme, iced::Renderer> = Column::new()
-            .align_x(alignment::Horizontal::Left)
-            .padding(10);
-        //
+        let mut layout:Vec<iced::Element<'_, UIMessage>> = Vec::new();
         match self.scene {
             ClientScenes::Home(ref home_state) => {
-                let mut layout_home = Column::new();
+                let mut layout_home:Vec<iced::Element<'_, UIMessage>> = Vec::new();
                 // 標題欄
                 {
-                    let mut title_bar = Row::new().align_y(alignment::Vertical::Center);
-                    title_bar = title_bar.push(
+                    let mut title_bar = Vec::new();
+                    title_bar.push(
                         text(shared::PROJECT_NAME.to_string())
                             .height(Length::Shrink)
-                            .size(Pixels::from(26)),
+                            .size(Pixels::from(26)).into(),
                     );
-                    title_bar = title_bar.spacing(25);
-                    title_bar = title_bar.push(
+                    title_bar.push(space().width(20).into());
+                    title_bar.push(
                         text(format!("v{}", shared::PROJECT_VERSION))
                             .height(Length::Shrink)
-                            .size(Pixels::from(22)),
+                            .size(Pixels::from(22)).into(),
                     );
-                    layout_home = layout_home.push(title_bar);
+                    layout_home.push(Row::from_vec(title_bar).align_y(alignment::Vertical::Center).into());
                 }
-                layout_home = layout_home.push(space().height(5));
+                layout_home.push(space().height(5).into());
                 // 伺服器地址輸入處理
                 {
-                    let mut server_ip_input_bar = Row::new();
-                    server_ip_input_bar = server_ip_input_bar
+                    let mut server_ip_input_bar = Vec::new();
+                    server_ip_input_bar
                         .push(
                             text_input("輸入伺服器地址...", &self.server_url)
                                 .on_input(|content| {
@@ -289,63 +297,58 @@ impl Client {
                                     let mut style = text_input::default(t, s);
                                     style.border.radius = iced::border::radius(6);
                                     style
-                                }),
-                        )
-                        .spacing(15);
-                    server_ip_input_bar = server_ip_input_bar.push(
+                                }).into()
+                        );
+                    server_ip_input_bar.push(
                         button(text("連線").size(24))
                             .on_press(UIMessage::Home(HomeMessage::ConnectServer))
-                            .style(ButtonStyles::PrimaryRounded.style()),
+                            .style(ButtonStyles::PrimaryRounded.style()).into(),
                     );
-                    layout_home = layout_home.push(server_ip_input_bar).spacing(35);
+                    layout_home.push(Row::from_vec(server_ip_input_bar).width(Length::Fill).into());
+                    layout_home.push(space().height(10).into());
                 }
                 // 虛擬鍵盤
                 {
-                    let mut vsoft_keyboard = Grid::new()
-                        .height(grid::Sizing::EvenlyDistribute(Length::Shrink))
-                        .columns(8);
+                    let mut vsoft_keyboard = Vec::new();
                     for key in 0..=9 {
-                        vsoft_keyboard = vsoft_keyboard
-                            .push(self.home_create_vsoft_key(format!("{}", key)))
-                            .spacing(10);
+                        vsoft_keyboard
+                            .push(self.home_create_vsoft_key(format!("{}", key)).into());
+                        vsoft_keyboard.push(space().width(10).into());
                     }
                     for key in ALPHABET {
-                        vsoft_keyboard = vsoft_keyboard
-                            .push(self.home_create_vsoft_key(format!("{}", key).to_lowercase()))
-                            .spacing(10);
+                        vsoft_keyboard
+                            .push(self.home_create_vsoft_key(format!("{}", key).to_lowercase()).into());
+                        vsoft_keyboard.push(space().width(10).into());
                     }
                     for key in [":", "[", "]", ".", "/", "backspace"] {
-                        vsoft_keyboard = vsoft_keyboard
-                            .push(self.home_create_vsoft_key(key.to_string()))
-                            .spacing(10);
+                        vsoft_keyboard
+                            .push(self.home_create_vsoft_key(key.to_string()).into())
+                            ;
+                        vsoft_keyboard.push(space().width(10).into());
                     }
-                    layout_home = layout_home.push(vsoft_keyboard);
+                    layout_home.push(scrollable(Row::from_vec(vsoft_keyboard)).direction(scrollable::Direction::Horizontal(scrollable::Scrollbar::new()))
+                    .into());
                 }
-                layout_home = layout_home.push(space().height(20));
+                layout_home.push(space().height(20).into());
                 // 訊息顯示
                 {
-                    let mut msg_area = Column::new();
-                    msg_area = msg_area.spacing(5);
+                    let mut msg_area = Vec::new();
                     let mut msg_number: u64 = 1;
                     for msg in home_state.msgs.iter() {
                         let ex_palette = self.theme.extended_palette();
-                        let mut msg_row = Row::new();
-                        msg_row = msg_row.spacing(3);
-                        msg_row = msg_row.push(text(msg_number.to_string()).size(20).style(
+                        let mut msg_row = Vec::new();
+                        msg_row.push(text(msg_number.to_string()).size(20).style(
                             move |_theme| text::Style {
                                 color: Some(ex_palette.secondary.strong.text),
                             },
-                        ));
-                        msg_row = msg_row.spacing(3);
-                        msg_row =
-                            msg_row.push(text(msg).size(20).style(move |_theme| text::Style {
+                        ).into());
+                        msg_row.push(text(msg).size(20).style(move |_theme| text::Style {
                                 color: Some(ex_palette.secondary.base.text),
-                            }));
-                        msg_row = msg_row.spacing(3);
-                        msg_area = msg_area.push(msg_row).spacing(1);
+                            }).into());
+                       msg_area.push(Row::from_vec(msg_row).spacing(3).into());
                         msg_number += 1;
                     }
-                    layout_home = layout_home.push(container(msg_area).style(
+                    layout_home.push(container(Column::from_vec(msg_area)).style(
                         |theme: &iced::theme::Theme| {
                             let ex_palette = theme.extended_palette();
                             let mut style = container::Style::default();
@@ -358,18 +361,18 @@ impl Client {
                             };
                             style
                         },
-                    ));
+                    ).into());
                 }
-                layout_home = layout_home.push(space().height(5));
+                layout_home.push(space().height(5).into());
                 //
                 if home_state.try_connecting_server {
-                    let mut content_column = Column::new().padding(5).spacing(2);
-                    content_column = content_column.push(
+                    let mut content_column = Vec::new();
+                    content_column.push(
                         circular::Circular::new()
                             .easing(&easing::STANDARD)
-                            .size(54.0),
+                            .size(54.0).into(),
                     );
-                    content_column = content_column
+                    content_column
                         .push(
                             text("連線中...")
                                 .size(28)
@@ -379,10 +382,9 @@ impl Client {
                                         color: Some(ex_palette.secondary.base.text),
                                     }
                                 })
-                                .align_x(alignment::Horizontal::Center),
-                        )
-                        .spacing(2);
-                    content_column = content_column.push(
+                                .align_x(alignment::Horizontal::Center).into(),
+                        );
+                    content_column.push(
                         text(
                             home_state
                                 .connect_msg
@@ -392,9 +394,9 @@ impl Client {
                         .style(|_t: &iced::Theme| text::Style {
                             color: Some(iced::Color::from_rgb8(56, 56, 56)),
                         })
-                        .size(22),
+                        .size(22).into(),
                     );
-                    let content = container(container(content_column).style(
+                    let content = container(container(Column::from_vec(content_column).padding(10).spacing(3)).style(
                         move |theme: &iced::theme::Theme| {
                             let ex_palette = theme.extended_palette();
                             let mut style = container::Style::default();
@@ -424,37 +426,32 @@ impl Client {
                         style = style.border(Border::default().width(0));
                         style
                     });
-                    layout_home = widget::column([stack([
-                        widget::opaque(scrollable(layout_home)).into(),
-                        content.into(),
-                    ])
-                    .into()]);
-                    layout = layout.push(layout_home);
+                    layout.push(stack([widget::opaque(scrollable(Column::from_vec(layout_home).width(Length::Fill).padding(10))).into(),content.into()]).into());
                 } else {
-                    layout = layout.push(scrollable(layout_home));
+                    layout.push(scrollable(Column::from_vec(layout_home).width(Length::Fill).height(Length::Fill).padding(10)).into());
                 }
             }
             ClientScenes::Play(ref play_state) => {
-                let mut layout_play = Column::new();
+                let mut layout_play: Vec<iced::Element<'_, UIMessage>> = Vec::new();
                 {
-                    let mut info_bar = Row::new().padding(iced::Padding::new(8.0));
-                    info_bar =
-                        info_bar.push(text(format!("伺服器地址：{}", self.server_url.clone(),)));
-                    info_bar = info_bar.push(space().width(Length::from(14)));
-                    info_bar = info_bar.push(text(format!(
+                    let mut info_bar = Vec::new();
+                    info_bar.push(text(format!("伺服器地址：{}", self.server_url.clone())).into());
+                    info_bar.push(space().width(15).into());
+                    info_bar.push(text(format!(
                         "玩家識別碼：{}",
                         (match play_state.gm_state.clone() {
                             pmj_client_core::ccore::GMState::HomePage => {
-                                warn!("資料錯誤");
+                                warn!("view: 資料錯誤");
                                 "資料錯誤".to_string()
                             }
                             pmj_client_core::ccore::GMState::V2Better(gms_v2) => {
                                 gms_v2.player_id.to_string()
                             }
                         })
-                    )));
+                    )).into());
                     if play_state.is_start {
-                        info_bar = info_bar.push(space().width(10)).push(text(format!(
+                        info_bar.push(space().width(15).into());
+                        info_bar.push(text(format!(
                             "目前回合：{}",
                             match play_state.current_turn {
                                 Some(turn) => {
@@ -465,17 +462,17 @@ impl Client {
                                     String::from("None")
                                 }
                             }
-                        )));
+                        )).into());
                     }
-                    layout_play = layout_play.push(info_bar)
+                    layout_play.push(Row::from_vec(info_bar).width(Length::Fill).padding(8).into());
                 }
                 // ctr_bar
                 {
-                    let mut ctr_bar = Row::new().height(Length::FillPortion(2));
-                    let mut gmsg_bar = Column::new().width(Length::FillPortion(3));
+                    let mut ctr_bar:Vec<iced::Element<'_, UIMessage>> = Vec::new();
+                    let mut gmsg_bar = Vec::new();
                     if play_state.is_start {
                         for (gmsg_id, gmsg) in play_state.game_msgs.iter() {
-                            gmsg_bar = gmsg_bar
+                            gmsg_bar
                                 .push(
                                     container(
                                         Row::new()
@@ -503,85 +500,72 @@ impl Client {
                                             ));
                                             style
                                         },
-                                    ),
-                                )
-                                .push(space().height(10));
+                                    ).into(),
+                                );
+                            gmsg_bar.push(space().height(10).into());
                         }
-                        ctr_bar = ctr_bar.push(
-                            scrollable(gmsg_bar).direction(scrollable::Direction::Vertical(
+                        ctr_bar.push(
+                            scrollable(Column::from_vec(gmsg_bar).height(Length::Fill).width(Length::FillPortion(3))).direction(scrollable::Direction::Vertical(
                                 scrollable::Scrollbar::new()
                                     .margin(3)
                                     .spacing(5)
                                     .width(3)
                                     .scroller_width(6),
-                            )),
+                            )).into(),
                         );
                     } else {
-                        ctr_bar = ctr_bar.push(space().width(Length::FillPortion(3)));
+                        ctr_bar.push(space().width(Length::FillPortion(3)).into());
                     }
-                    let mut rmsg_bar = Column::new().width(Length::FillPortion(2));
+                    let mut rmsg_bar = Vec::new();
                     match play_state.gm_state {
                         pmj_client_core::ccore::GMState::HomePage => {
                             warn!("view: warn GMState");
                         }
                         pmj_client_core::ccore::GMState::V2Better(ref gms_v2) => {
                             for (rmsg_num, rmsg) in gms_v2.room_msgs.iter() {
-                                let mut row_msg = Row::new()
-                                    .push(text(rmsg_num).size(18).style(|t: &iced::Theme| {
+                                let mut row_msg = Vec::new();
+                                row_msg.push(text(rmsg_num).size(18).style(|t: &iced::Theme| {
                                         let p = t.extended_palette();
                                         text::Style {
                                             color: Some(p.primary.base.color),
                                         }
-                                    }))
-                                    .push(space().width(10));
-                                match rmsg {
-                                    pmj_gamemodes::v2_better::shared::ServerRoomMsg::PlayerSay(
-                                        said_player,
-                                        said_text,
-                                    ) => {
-                                        row_msg = row_msg.push(
-                                            text(format!("玩家{}", said_player.to_string()))
-                                                .size(16),
-                                        );
-                                        row_msg = row_msg.push(
-                                            text("\u{e5c8}")
-                                                .font(MATERIAL_SYMBOLS_OUTLINED)
-                                                .size(14)
-                                                .align_y(alignment::Vertical::Center),
-                                        );
-                                        row_msg = row_msg.push(text(said_text).size(16));
-                                    }
-                                    pmj_gamemodes::v2_better::shared::ServerRoomMsg::RootSay(
-                                        said_text,
-                                    ) => {
-                                        row_msg = row_msg.push(text("Root").size(16));
-                                        row_msg = row_msg.push(
-                                            text("\u{e5c8}")
-                                                .font(MATERIAL_SYMBOLS_OUTLINED)
-                                                .size(14)
-                                                .align_y(alignment::Vertical::Center),
-                                        );
-                                        row_msg = row_msg.push(text(said_text).size(16));
-                                    }
-                                }
-                                rmsg_bar = rmsg_bar.push(row_msg).push(space().height(10));
+                                    }).into());
+                                    row_msg.push(space().width(10).into());
+                                    let (said_player, said_text)=match rmsg {
+                                            pmj_gamemodes::v2_better::shared::ServerRoomMsg::PlayerSay(
+                                                said_player,
+                                                said_text,
+                                            ) => {(format!("玩家@{}", said_player), said_text)
+                                            }
+                                            pmj_gamemodes::v2_better::shared::ServerRoomMsg::RootSay(
+                                                said_text,
+                                            ) => {(String::from("Root"), said_text)
+                                            }
+                                        };
+                                    row_msg.push(text(said_player).size(16).into());
+                                    row_msg.push(text("\u{e5c8}")
+                                        .font(MATERIAL_SYMBOLS_OUTLINED)
+                                        .size(14)
+                                        .align_y(alignment::Vertical::Center).into(),);
+                                    row_msg.push(text(said_text).size(16).into());
+                                rmsg_bar.push(Row::from_vec(row_msg).into());
+                                rmsg_bar.push(space().height(10).into());
                             }
                         }
                     }
-                    ctr_bar = ctr_bar.push(
-                        scrollable(rmsg_bar).direction(scrollable::Direction::Vertical(
+                    ctr_bar.push(
+                        scrollable(Column::from_vec(rmsg_bar).height(Length::Fill).width(Length::FillPortion(2))).direction(scrollable::Direction::Vertical(
                             scrollable::Scrollbar::new()
                                 .margin(3)
                                 .spacing(5)
                                 .width(3)
                                 .scroller_width(6),
-                        )),
+                        )).into(),
                     );
-                    layout_play = layout_play.push(ctr_bar);
+                    layout_play.push(Row::from_vec(ctr_bar).width(Length::Fill).height(Length::FillPortion(2)).into());
                 }
                 if !play_state.is_start {
-                    let mut status_bar = Column::new();
-                    status_bar = status_bar.push(
+                    let status_bar = Column::new().width(Length::Fill).push(
                         text("等待遊戲開始")
                             .size(30)
                             .align_x(alignment::Horizontal::Center)
@@ -589,11 +573,19 @@ impl Client {
                             .height(Length::Fill)
                             .width(Length::Fill),
                     );
-                    layout_play = layout_play.push(status_bar);
-                } else if play_state.is_start {
+                    layout_play.push(status_bar.into());
+                } else {
+                    let mut controller_bar = Vec::new();
+                    {
+                        // pga
+                        let mut pga_bar = Vec::new();
+                        if play_state.game_controller.contains(&pmj_client_core::ccore::PlayerCtrl::GetCard){
+                            pga_bar.push(button(text("GetCard")).on_press(UIMessage::Play(PlayMsg::GetCard)).into());
+                        }
+                        controller_bar.push(Row::from_vec(pga_bar).width(Length::Fill).into());
+                    }
                     // 卡牌
                     {
-                        let mut controller_bar = Column::new();
                         let mut card_bar_elements: Vec<iced::Element<'_, UIMessage>> = Vec::new();
                         for card in play_state.hand_cards.iter() {
                             let card_element = Column::new()
@@ -646,15 +638,15 @@ impl Client {
                                         })
                                         .into(),
                                 );
+                            } else {
+                                card_bar_elements.push(container(card_element).style(ContainerStyles::PrimaryOutlined.style()).into());
                             }
                         }
-                        let card_bar_layout =
-                            Row::new().extend(card_bar_elements).spacing(7).padding(5);
-                        controller_bar = controller_bar.push(card_bar_layout);
-                        layout_play = layout_play.push(space().height(Length::Fill));
-                        layout_play = layout_play.push(
+                        controller_bar.push(Row::new().extend(card_bar_elements).spacing(7).padding(5).into());
+                        //layout_play.push(space().height(Length::Fill).into());
+                        layout_play.push(
                             scrollable(
-                                container(controller_bar)
+                                container(Column::from_vec(controller_bar).width(Length::Fill).height(Length::Fill).spacing(7))
                                     .style(|t: &iced::Theme| {
                                         let p = t.extended_palette();
                                         let mut style = container::Style::default();
@@ -675,14 +667,14 @@ impl Client {
                                     .scroller_width(6),
                             ))
                             .height(Length::Shrink)
-                            .width(Length::Fill),
+                            .width(Length::Fill).into(),
                         );
                     }
                 }
-                layout = layout.push(layout_play);
+                layout.push(Column::from_vec(layout_play).width(Length::Fill).height(Length::Fill).into());
             }
         }
-        layout.into()
+        Column::from_vec(layout).height(Length::Fill).width(Length::Fill).padding(10).into()
     }
 
     fn home_create_vsoft_key<'a>(
@@ -700,12 +692,7 @@ impl Client {
             .width(Length::Fill)
             .align_x(text::Alignment::Center)
             .align_y(alignment::Vertical::Center)
-            .style(|theme: &iced::theme::Theme| {
-                let ex_palette = theme.extended_palette();
-                let mut style = text::Style::default();
-                style.color = Some(ex_palette.primary.base.text);
-                style
-            }),
+            .style(text::primary),
         )
         .height(Length::Shrink)
         .width(Length::Shrink)
