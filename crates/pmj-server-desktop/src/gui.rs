@@ -22,14 +22,14 @@ use std::{
 };
 
 use iced::{
-    self, Border, Length,alignment,
-    widget::{Column, Row, rule, button, container, scrollable, space, text, text_input},
+    self, Border, Length, alignment,
+    widget::{Column, Row, button, container, rule, scrollable, space, text, text_input},
 };
 use tracing::{error, info, warn};
 
+use pmj_desktop::shared::ContainerStyles;
 use pmj_gamemodes;
 use pmj_shared::shared::{FONT_NOTO_SANS_REG_BYTES, ICON_PNG_BYTES, PROJECT_NAME};
-use pmj_desktop::shared::ContainerStyles;
 
 pub const FONT_NOTO_SANS_REG: iced::font::Font = iced::font::Font::with_name("Noto Sans TC");
 
@@ -115,7 +115,6 @@ pub struct V2BetterState {
 #[derive(Debug)]
 struct ServerGUI {
     scene: ServerScene,
-    msg: String,
     theme: iced::Theme,
 }
 
@@ -123,7 +122,6 @@ impl ServerGUI {
     fn new() -> Self {
         Self {
             scene: ServerScene::Home,
-            msg: String::new(),
             theme: iced::Theme::TokyoNight,
         }
     }
@@ -134,7 +132,8 @@ impl ServerGUI {
                 ServerScene::Home => match home_msg {
                     HomeMsg::StartServer => {
                         let ip_port = pmj_shared::shared::SERVER_PORT;
-                        let backend = pmj_gamemodes::v2_better::mode::main_v2_better(true, ip_port).unwrap();
+                        let backend =
+                            pmj_gamemodes::v2_better::mode::main_v2_better(true, ip_port).unwrap();
                         let ipv4_address = local_ip_address::local_ip().unwrap();
                         let ipv6_address = local_ip_address::local_ipv6().unwrap();
                         info!("第四代網路地址：{}", ipv4_address.to_string());
@@ -168,15 +167,19 @@ impl ServerGUI {
                             warn!("update: {}", e);
                         }
                     },
-                    V2BetterMsg::StartGame => match v2_state.backend.try_write() {
-                        Ok(mut guard) => {
-                            guard.start_game();
-                            v2_state.game_status = GameStatus::InGame;
-                        }
-                        Err(e) => {
-                            warn!("update: {}", e);
-                        }
-                    },
+                    V2BetterMsg::StartGame => {
+                        let thread_backend = v2_state.backend.clone();
+                        thread::spawn(move || match thread_backend.try_write() {
+                            Ok(mut guard) => {
+                                guard.start_game();
+                            }
+                            Err(e) => {
+                                warn!("update: {}", e);
+                            }
+                        });
+                        //TODO
+                        v2_state.game_status = GameStatus::InGame
+                    }
                     V2BetterMsg::TInputRoomMsgChange(room_msg_draft) => {
                         v2_state.tinput_room_msg = room_msg_draft;
                     }
@@ -216,10 +219,38 @@ impl ServerGUI {
                 let mut home_layout = Vec::new();
                 {
                     let mut title_bar = Vec::new();
-                    title_bar.push(text("positive_mahjong").size(28).align_y(alignment::Vertical::Bottom).into());
-                    title_bar.push(container(text("pmj-server-desktop").size(20).align_y(alignment::Vertical::Bottom)).style(ContainerStyles::PrimaryOutlined.style()).into());
-                    title_bar.push(text(format!("v{}", pmj_shared::shared::PROJECT_VERSION)).size(20).align_y(alignment::Vertical::Bottom).into());
-                    home_layout.push(Column::new().push(Row::from_vec(title_bar).spacing(3).align_y(alignment::Vertical::Bottom)).push(rule::horizontal(0.5)).spacing(5).into());
+                    title_bar.push(
+                        text("positive_mahjong")
+                            .size(28)
+                            .align_y(alignment::Vertical::Bottom)
+                            .into(),
+                    );
+                    title_bar.push(
+                        container(
+                            text("pmj-server-desktop")
+                                .size(20)
+                                .align_y(alignment::Vertical::Bottom),
+                        )
+                        .style(ContainerStyles::PrimaryOutlined.style())
+                        .into(),
+                    );
+                    title_bar.push(
+                        text(format!("v{}", pmj_shared::shared::PROJECT_VERSION))
+                            .size(20)
+                            .align_y(alignment::Vertical::Bottom)
+                            .into(),
+                    );
+                    home_layout.push(
+                        Column::new()
+                            .push(
+                                Row::from_vec(title_bar)
+                                    .spacing(3)
+                                    .align_y(alignment::Vertical::Bottom),
+                            )
+                            .push(rule::horizontal(0.5))
+                            .spacing(5)
+                            .into(),
+                    );
                 }
                 {
                     home_layout.push(
@@ -235,21 +266,29 @@ impl ServerGUI {
                 {
                     let mut ip_bar = Vec::new();
                     ip_bar.push(
-                        button(text(format!("Ipv4: {}:{}", v2_state.local_ipv4_address, v2_state.ip_port)))
-                            .on_press(GUIMessages::CopyToClipboard(
-                                format!("{}:{}", v2_state.local_ipv4_address, v2_state.ip_port),
-                            ))
-                            .into(),
+                        button(text(format!(
+                            "Ipv4: {}:{}",
+                            v2_state.local_ipv4_address, v2_state.ip_port
+                        )))
+                        .on_press(GUIMessages::CopyToClipboard(format!(
+                            "{}:{}",
+                            v2_state.local_ipv4_address, v2_state.ip_port
+                        )))
+                        .into(),
                     );
                     ip_bar.push(space().height(Length::from(4)).into());
                     ip_bar.push(rule::horizontal(iced::Pixels::from(1.5)).into());
                     ip_bar.push(space().height(Length::from(4)).into());
                     ip_bar.push(
-                        button(text(format!("Ipv6: [{}]:{}", v2_state.local_ipv6_address, v2_state.ip_port)))
-                            .on_press(GUIMessages::CopyToClipboard(
-                                format!("[{}]:{}", v2_state.local_ipv6_address, v2_state.ip_port),
-                            ))
-                            .into(),
+                        button(text(format!(
+                            "Ipv6: [{}]:{}",
+                            v2_state.local_ipv6_address, v2_state.ip_port
+                        )))
+                        .on_press(GUIMessages::CopyToClipboard(format!(
+                            "[{}]:{}",
+                            v2_state.local_ipv6_address, v2_state.ip_port
+                        )))
+                        .into(),
                     );
                     v2_layout.push(
                         container(Column::from_vec(ip_bar))
@@ -280,6 +319,13 @@ impl ServerGUI {
                         Row::from_vec(msg_bar_layout)
                             .spacing(3)
                             .width(Length::Fill)
+                            .into(),
+                    );
+                }
+                {
+                    v2_layout.push(
+                        button(text("開始遊戲"))
+                            .on_press(GUIMessages::V2Better(V2BetterMsg::StartGame))
                             .into(),
                     );
                 }
@@ -328,40 +374,4 @@ fn transparent_button(t: &iced::Theme, s: button::Status) -> button::Style {
         }
     }
     style
-}
-
-fn rounded_primary_button(t: &iced::Theme, s: button::Status) -> button::Style {
-    let p = t.extended_palette();
-    let mut style = button::Style::default();
-    style.background = Some(iced::Background::Color(p.primary.base.color));
-    style.text_color = p.primary.base.text;
-    let mut border = iced::Border::default().rounded(14).width(2);
-    match s {
-        button::Status::Active => {
-            border = border.color(iced::Color::TRANSPARENT);
-        }
-        button::Status::Disabled => {
-            style.background = Some(iced::Background::Color(p.background.weak.color));
-        }
-        button::Status::Hovered => {
-            border = border.color(p.primary.strong.color);
-        }
-        button::Status::Pressed => {
-            style.text_color = p.secondary.base.color;
-        }
-    }
-    style.border = border;
-    style
-}
-
-pub fn primary_outlined_container(theme: &iced::Theme) -> container::Style {
-    let p = theme.extended_palette();
-    container::Style {
-        border: Border {
-            color: p.primary.base.color,
-            width: 0.7,
-            radius: iced::border::radius(8),
-        },
-        ..Default::default()
-    }
 }

@@ -13,27 +13,70 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-use iced::{self, widget::container, Border, border};
+use iced::{
+    self, Border, border,
+    widget::{button, container},
+};
 
 #[derive(Debug)]
 pub enum ContainerStyles {
-    PrimaryOutlined
+    PrimaryOutlined,
 }
 
 impl ContainerStyles {
-    pub fn style(&self) -> impl Fn(&iced::Theme) -> container::Style{
+    pub fn style(&self) -> impl Fn(&iced::Theme) -> container::Style {
         match self {
-            Self::PrimaryOutlined => {
-                |theme: &iced::Theme| {let p = theme.extended_palette();
+            Self::PrimaryOutlined => |theme: &iced::Theme| {
+                let p = theme.extended_palette();
                 container::Style {
-                        border: Border {
-                            color: p.primary.base.color,
-                            width: 0.7,
-                            radius: border::radius(8),
+                    border: Border {
+                        color: p.primary.base.color,
+                        width: 0.7,
+                        radius: border::radius(8),
+                    },
+                    ..Default::default()
+                }
+            },
+        }
+    }
+}
+
+#[derive(Debug)]
+pub enum ButtonStyles {
+    PrimaryRounded,
+}
+
+impl ButtonStyles {
+    pub fn style(&self) -> impl Fn(&iced::Theme, button::Status) -> button::Style {
+        match self {
+            Self::PrimaryRounded => |theme: &iced::Theme, status: button::Status| {
+                let p = theme.extended_palette();
+                button::Style {
+                    background: Some(iced::Background::Color(p.primary.base.color)),
+                    text_color: p.primary.base.text,
+                    border: Border {
+                        width: 2.0,
+                        radius: match status {
+                            button::Status::Active | button::Status::Disabled => border::radius(8),
+                            button::Status::Hovered => border::radius(12),
+                            button::Status::Pressed => border::radius(16),
                         },
+                        color: match status {
+                            button::Status::Active | button::Status::Disabled => {
+                                iced::Color::TRANSPARENT
+                            }
+                            button::Status::Hovered | button::Status::Pressed => {
+                                p.primary.strong.color
+                            }
+                        },
+                    },
+                    shadow: iced::Shadow {
+                        color: iced::Color::TRANSPARENT,
                         ..Default::default()
-                    }}
-            }
+                    },
+                    ..Default::default()
+                }
+            },
         }
     }
 }

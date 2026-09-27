@@ -17,16 +17,27 @@ exclude = [
     "**/.venv/**",
     ".cargo/config.toml",
     "auto_generated/**",
-    "crates/old_pmj_client/**",
-    "crates/old_slint_client/**",
     "docs/book/**",
+    "scripts/pylock.toml",
     "supply-chain/**",
     "target/**",
-    "website/**",
     "website_build/**",
 ]
 
-include = ["**/*.toml", "**/Cargo.toml", "Cargo.toml"]
+include = [
+    "**/*.toml",
+    "**/Cargo.toml",
+    "Cargo.toml",
+    "about.toml",
+    "crates/pmj-client-core/Cargo.toml",
+    "crates/pmj-client-cross/Cargo.toml",
+    "crates/pmj-client-desktop/Cargo.toml",
+    "crates/pmj-desktop/Cargo.toml",
+    "crates/pmj-gamemodes/Cargo.toml",
+    "crates/pmj-server-desktop/Cargo.toml",
+    "deny.toml",
+    "rust-toolchain.toml",
+]
 
 [formatting]
 align_comments = true

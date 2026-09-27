@@ -1,8 +1,6 @@
 {
 	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
-	"extends": [
-		"config:recommended"
-	],
+	"extends": ["config:recommended"],
 	"automerge": false,
 	"labels": ["it-is::dep-update"],
 	"customManagers": [
@@ -11,25 +9,22 @@
 			"customType": "regex",
 			"managerFilePatterns": ["/^ci-cache-version\\.json$/"],
 			"matchStrings": [
-	    		"\"(?<depName>[a-z0-9-]+)\":\\s*\"(?<currentValue>[\\d\\.]+)\""
+				"\"(?<depName>[a-z0-9-]+)\":\\s*\"(?<currentValue>[\\d\\.]+)\""
 			],
 			"datasourceTemplate": "crate",
 			"versioningTemplate": "semver"
 		}
-																																		],
-																																										"packageRules": [
-																																												{
-																																																		"automerge": false,
-																																															"matchPackageNames": [
-																																																"*"
-																																														]
-																																																				},
-																																																						{
-																																																									"description": "將所有未鎖定或萬用字元版本釘選到具體版本",
-																																																															"rangeStrategy": "pin",
-																																																									"matchPackageNames": [
-																																																																														"*"
-																																																																		]
-																																																																	}
-																																																																		],
-																																																																			"timezone": "Asia/Taipei"}
+	],
+	"packageRules": [
+		{
+			"automerge": false,
+			"matchPackageNames": ["*"]
+		},
+		{
+			"description": "將所有未鎖定或萬用字元版本釘選到具體版本",
+			"rangeStrategy": "pin",
+			"matchPackageNames": ["*"]
+		}
+	],
+	"timezone": "Asia/Taipei"
+}
