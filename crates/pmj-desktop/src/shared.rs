@@ -70,7 +70,10 @@ impl ButtonStyles {
                             }
                         },
                     },
-                    shadow: iced::Shadow {color:iced::Color::TRANSPARENT,..Default::default()},
+                    shadow: iced::Shadow {
+                        color: iced::Color::TRANSPARENT,
+                        ..Default::default()
+                    },
                     ..Default::default()
                 }
             },

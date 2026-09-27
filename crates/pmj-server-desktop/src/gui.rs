@@ -22,7 +22,8 @@ use std::{
 };
 
 use iced::{
-    self, Border, Length, alignment, widget::{Column, Row, button, container, rule, scrollable, space, text, text_input},
+    self, Border, Length, alignment,
+    widget::{Column, Row, button, container, rule, scrollable, space, text, text_input},
 };
 use tracing::{error, info, warn};
 
@@ -168,16 +169,17 @@ impl ServerGUI {
                     },
                     V2BetterMsg::StartGame => {
                         let thread_backend = v2_state.backend.clone();
-                        thread::spawn(move||{match thread_backend.try_write() {
-                        Ok(mut guard) => {
-                            guard.start_game();
-                        }
-                        Err(e) => {
-                            warn!("update: {}", e);
-                        }
-                    }});
+                        thread::spawn(move || match thread_backend.try_write() {
+                            Ok(mut guard) => {
+                                guard.start_game();
+                            }
+                            Err(e) => {
+                                warn!("update: {}", e);
+                            }
+                        });
                         //TODO
-                        v2_state.game_status=GameStatus::InGame},
+                        v2_state.game_status = GameStatus::InGame
+                    }
                     V2BetterMsg::TInputRoomMsgChange(room_msg_draft) => {
                         v2_state.tinput_room_msg = room_msg_draft;
                     }
@@ -322,7 +324,9 @@ impl ServerGUI {
                 }
                 {
                     v2_layout.push(
-                        button(text("開始遊戲")).on_press(GUIMessages::V2Better(V2BetterMsg::StartGame)).into()
+                        button(text("開始遊戲"))
+                            .on_press(GUIMessages::V2Better(V2BetterMsg::StartGame))
+                            .into(),
                     );
                 }
                 layout.push(Column::from_vec(v2_layout).spacing(5).into());
