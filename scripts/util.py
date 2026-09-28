@@ -26,6 +26,9 @@ import tomllib
 from typing import Literal
 
 from colorama import Back, Fore
+from rich import traceback as rtb
+
+rtb.install()
 
 
 def show_cmd(
@@ -169,6 +172,7 @@ def get_commit_info() -> CommitInfo:
         commit_committer_email,
         commit_author_name,
         commit_author_email,
+        is_release=("release pmj" in commit_msg.lower()),
     )
 
 
@@ -178,6 +182,7 @@ class CommitInfo:
         "author_name",
         "committer_email",
         "committer_name",
+        "is_release",
         "msg",
         "sha",
         "short_sha",
@@ -191,6 +196,7 @@ class CommitInfo:
     committer_email: str
     author_name: str
     author_email: str
+    is_release: bool
 
     def __init__(
         self,
@@ -202,6 +208,7 @@ class CommitInfo:
         committer_email: str,
         author_name: str,
         author_email: str,
+        is_release: bool,
     ) -> None:
         self.sha = commit_sha
         self.short_sha = commit_short_sha
@@ -211,6 +218,7 @@ class CommitInfo:
         self.committer_email = committer_email
         self.author_name = author_name
         self.author_email = author_email
+        self.is_release = is_release
 
 
 def fix_path(*p: str) -> str:

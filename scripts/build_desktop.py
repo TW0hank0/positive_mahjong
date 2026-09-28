@@ -94,7 +94,10 @@ def main():
 
 
 def zip_desktop(targets: list[str]):
-    version = util.get_version()
+    if util.get_commit_info().is_release is False:
+        version = util.get_version() + "+" + util.get_commit_info().short_sha
+    else:
+        version = util.get_version()
     include_files: list[str | tuple[str, str]] = [
         util.fix_path("README.md"),
         util.fix_path("LICENSE"),
