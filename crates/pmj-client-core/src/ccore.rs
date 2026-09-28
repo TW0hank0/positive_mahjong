@@ -112,7 +112,7 @@ impl ClientCore {
                                             able_action.push(PlayerCtrl::GetCard);
                                         }
                                     }
-                                    _ => {}
+                                    _ => {able_action.push(PlayerCtrl::GetCard);}
                                 }
                             }
                         }
