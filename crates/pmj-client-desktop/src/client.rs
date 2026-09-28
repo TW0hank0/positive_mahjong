@@ -18,7 +18,7 @@ use std;
 use iced::{
     self, Border, Color, Element, Length, Pixels, alignment, task,
     widget::{
-        self, Column, Grid, Row, button, container, scrollable, space, stack, text, text_input,
+        self, Column, Row, button, container, scrollable, space, stack, text, text_input,
     },
 };
 use tracing::{error, warn};
@@ -315,7 +315,7 @@ impl Client {
                     );
                     layout_home.push(
                         Row::from_vec(server_ip_input_bar)
-                            .width(Length::Fill)
+                            .width(Length::Fill).spacing(5)
                             .into(),
                     );
                     layout_home.push(space().height(10).into());
@@ -323,28 +323,31 @@ impl Client {
                 // 虛擬鍵盤
                 {
                     let mut vsoft_keyboard = Vec::new();
-                    for key in 0..=9 {
+                    vsoft_keyboard.push((0..=9).fold(Row::new(), |layout, i|layout.push(self.home_create_vsoft_key(i.to_string()))).into());
+                    /* for key in 0..=9 {
                         vsoft_keyboard.push(self.home_create_vsoft_key(format!("{}", key)).into());
-                        vsoft_keyboard.push(space().width(10).into());
-                    }
-                    for key in ALPHABET {
+                    } */
+                    vsoft_keyboard.push(
+                        ALPHABET.iter().fold(Row::new(), |layout, i|layout.push(self.home_create_vsoft_key(i.to_string()))).into()
+                    );
+                    /* for key in ALPHABET {
                         vsoft_keyboard.push(
                             self.home_create_vsoft_key(format!("{}", key).to_lowercase())
                                 .into(),
                         );
-                        vsoft_keyboard.push(space().width(10).into());
-                    }
-                    for key in [":", "[", "]", ".", "/", "backspace"] {
+                    } */
+                    vsoft_keyboard.push(
+                        [":", "[", "]", ".", "/", "backspace"].iter().fold(Row::new(), |layout, i|layout.push(self.home_create_vsoft_key(i.to_string()))).into()
+                    );
+                    /* for key in [":", "[", "]", ".", "/", "backspace"] {
                         vsoft_keyboard.push(self.home_create_vsoft_key(key.to_string()).into());
-                        vsoft_keyboard.push(space().width(10).into());
-                    }
+                    } */
                     layout_home.push(
-                        Grid::from_vec(vsoft_keyboard)
-                            .columns(8)
+                        Column::from_vec(vsoft_keyboard).spacing(4).align_x(alignment::Horizontal::Center)
                             .into(),
                     );
+                    layout_home.push(space().height(20).into());
                 }
-                layout_home.push(space().height(20).into());
                 // 訊息顯示
                 {
                     let mut msg_area = Vec::new();
@@ -771,8 +774,6 @@ impl Client {
                 text(key.clone())
             }
             .size(Pixels::from(28))
-            .height(Length::Fill)
-            .width(Length::Fill)
             .align_x(text::Alignment::Center)
             .align_y(alignment::Vertical::Center)
         )

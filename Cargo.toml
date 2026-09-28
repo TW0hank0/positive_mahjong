@@ -76,6 +76,8 @@ tungstenite = { version = "=0.30.0", features = [
     "rustls-tls-webpki-roots",
 ] }
 url = "=2.5.8"
+zip-extensions = "0.14.1"
+zip = "9.0.0-pre3"
 # --- wasm ---
 console_error_panic_hook = { version = "=0.1.7" }
 wasm-bindgen = { version = "=0.2.129" }

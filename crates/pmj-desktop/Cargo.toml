@@ -21,6 +21,7 @@ name = "pmj-desktop"
 repository = { workspace = true }
 rust-version.workspace = true
 version = { workspace = true }
+build = "build.rs"
 
 [dependencies]
 iced = { workspace = true }
@@ -29,6 +30,17 @@ lyon_algorithms = { workspace = true }
 pmj-shared = { workspace = true }
 serde_json = { workspace = true }
 tracing = { workspace = true }
+zip = { workspace = true }
+zip-extensions = { workspace = true }
+dirs = { workspace = true }
+
+[build-dependencies]
+zip = { workspace = true }
+zip-extensions = { workspace = true }
 
 [features]
 default = []
+
+[[bin]]
+name = "pmj-desktop-installer"
+path = "src/installer.rs"
