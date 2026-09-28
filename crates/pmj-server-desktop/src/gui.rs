@@ -347,31 +347,3 @@ impl ServerGUI {
         iced::Subscription::none()
     }
 }
-
-fn transparent_button(t: &iced::Theme, s: button::Status) -> button::Style {
-    let p = t.extended_palette();
-    let mut style = button::Style::default();
-    style.border = Border {
-        color: p.background.strong.color,
-        width: 2.0,
-        radius: iced::border::radius(10),
-    };
-    style.text_color = p.primary.base.text;
-    match s {
-        button::Status::Active => {
-            style.background = None;
-        }
-        button::Status::Hovered => {
-            style.background = Some(iced::Background::Color(iced::Color::from_rgba(
-                1.0, 1.0, 1.0, 0.6,
-            )));
-        }
-        button::Status::Disabled => {
-            style.background = Some(iced::Background::Color(p.background.weak.color));
-        }
-        button::Status::Pressed => {
-            style.text_color = p.secondary.base.color;
-        }
-    }
-    style
-}
