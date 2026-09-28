@@ -143,6 +143,8 @@ def build_download_page(build_root: str):
             break
         else:
             lasest_stable_version_num = str(int(lasest_stable_version_num) - 1)
+            if int(lasest_stable_version_num) < 0:
+                return  # happend when no release artifacts gen yet
     dl_link_template = '<a href="/files/{}" class="dl-button">{}</a>'
     dl_links = []
     for target, filename in artifacts_list[lasest_stable_version_num][
