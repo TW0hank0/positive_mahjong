@@ -13,10 +13,13 @@
 # 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
+import json
 import os
 import shutil
+from typing import Literal
 
 import mistune
+import requests
 from colorama import Back, Fore
 
 import util
@@ -27,6 +30,27 @@ ignored_paths: list[str] = [
     "__pypy_cache__",
     ".ruff_cache",
     ".venv",
+]
+
+SKIP_PREV_ARTIFACTS: bool = True
+GH_PAGES_BASE_URL: str = "https://tw0hank0.github.io/positive_mahjong/"
+ARTIFACTS_LIST_FILE: str = "releases-artifacts-list.json"
+SCHEME_ARTIFACTS_LIST = dict[
+    str,
+    dict[
+        Literal[
+            "is_released", "release_artifacts", "ci_test_artifacts", "release_name"
+        ],
+        bool | dict[str, str] | dict[str, dict] | str,
+    ],
+]
+RUST_TARGETS = [
+    "aarch64-pc-windows-msvc",
+    "x86_64-pc-windows-msvc",
+    "x86_64-unknown-linux-gnu",
+    "x86_64-unknown-linux-musl",
+    "aarch64-unknown-linux-musl",
+    "aarch64-unknown-linux-gnu",
 ]
 
 
@@ -47,6 +71,11 @@ def main():
             print("build_root already exists and is not file or dir!")
     shutil.copytree(website_root_path, build_root, ignore=copytree_ignore)
     os.mkdir(os.path.join(build_root, "files"))
+    if os.path.exists(util.fix_path("artifacts")) is False:
+        os.mkdir(util.fix_path("artifacts"))
+    artifacts_list()
+    if SKIP_PREV_ARTIFACTS is False:
+        build_download_page(build_root)
     build_files_dl(os.path.join(build_root, "files"))
     process_dir(
         dir_path=build_root,
@@ -55,6 +84,150 @@ def main():
         website_root_path=build_root,
     )
     copy_website_dep(build_root)
+
+
+def build_download_page(build_root: str):
+    download_page = """<!doctype html>
+    <!--
+     SPDX-License-Identifier: AGPL-3.0-only
+     著作權所有 (C) 2026 TW0hank0
+
+     本檔案屬於 positive_mahjong 專案的一部分。
+     專案儲存庫：https://gitlab.com/TW0hank0/positive_mahjong
+
+     本程式為自由軟體：您可以根據自由軟體基金會發佈的 GNU Affero 通用公共授權條款
+     第 3 版（僅此版本）重新發佈及/或修改本程式。
+
+     本程式的發佈是希望它能發揮功用，但不提供任何擔保；
+     甚至沒有隱含的適銷性或特定目的適用性擔保。詳見 GNU Affero 通用公共授權條款。
+
+     您應該已經收到一份 GNU Affero 通用公共授權條款副本。
+     如果沒有，請參見 <https://www.gnu.org/licenses/>。
+    -->
+
+    <html lang="zh-TW">
+        <head>
+            <meta charset="UTF-8" />
+            <meta
+                name="viewport"
+                content="width=device-width, initial-scale=1.0"
+            />
+            <meta
+                name="description"
+                content="positive_mahjong project website"
+            />
+            <title>positive_mahjong —— 下載</title>
+            <link rel="stylesheet" href="style.css" />
+            <link rel="icon" href="icon.svg" />
+            <link rel="shortcut icon" href="icon.png" />
+        </head>
+        <body>
+            <header>
+                <nav>{{$VAR_NAV$}}</nav>
+            </header>
+            <section class="content">
+                <h2>穩定版 v{{$DY_VAR_VERSION$}}</h2>
+                {{$DY_VAR_DOWNLOAD_LINKS$}}
+            </section>
+        </body>
+    </html>
+"""
+    dy_vars = {}
+    dy_vars["VERSION"] = util.get_version()
+    with open(util.fix_path("artifacts", ARTIFACTS_LIST_FILE), "r") as f:
+        artifacts_list: dict[str, dict] = json.load(f)
+    print(f"artifacts_list={artifacts_list}")
+    lasest_stable_version_num = str(max(list(artifacts_list.keys())))
+    while True:
+        if artifacts_list[lasest_stable_version_num]["is_released"] is True:
+            break
+        else:
+            lasest_stable_version_num = str(int(lasest_stable_version_num) - 1)
+            if int(lasest_stable_version_num) < 0:
+                return  # happend when no release artifacts gen yet
+    dl_link_template = '<a href="/files/{}" class="dl-button">{}</a>'
+    dl_links = []
+    for target, filename in artifacts_list[lasest_stable_version_num][
+        "release_artifacts"
+    ].items():
+        dl_links.append(dl_link_template.format(filename, target))
+    for dy_var in list(dy_vars.keys()):
+        download_page = download_page.replace(
+            "{{$DY_VAR_" + dy_var + "$}}", dy_vars[dy_var]
+        )
+    with open(os.path.join(build_root, "download.html"), "r") as f:
+        f.write(download_page)
+
+
+def artifacts_list():
+    # download prev
+    if SKIP_PREV_ARTIFACTS is False:
+        prev_artifacts_list = requests.get(
+            f"{GH_PAGES_BASE_URL}files/{ARTIFACTS_LIST_FILE}"
+        )
+        prev_artifacts_list.raise_for_status()
+        prev_list = prev_artifacts_list.json()
+        list(prev_list.keys()).sort()
+        print(f"prev_list={prev_list}")
+        for arelease_num in prev_list:
+            arelease = prev_list[arelease_num]
+            if arelease["is_released"] is True:
+                arelease_artifcats: dict = arelease["release_artifacts"]
+                for ara_filename in arelease_artifcats.values():
+                    ara_file_resp = requests.get(
+                        f"{GH_PAGES_BASE_URL}files/{ara_filename}"
+                    )
+                    ara_file_resp.raise_for_status()
+                    with open(util.fix_path("artifacts", "history", ara_filename)) as f:
+                        shutil.copyfileobj(ara_file_resp.raw, f)
+            arelease_ci_artifacts: dict = arelease["ci_test"]
+            for aca_id in arelease_ci_artifacts.values():
+                for aca_filename in aca_id.values():
+                    ara_file_resp = requests.get(
+                        f"{GH_PAGES_BASE_URL}files/{aca_filename}"
+                    )
+                    ara_file_resp.raise_for_status()
+                    with open(
+                        util.fix_path("artifacts", "history", "ci_test", ara_filename)
+                    ) as f:
+                        shutil.copyfileobj(ara_file_resp.raw, f)
+    # gen new list
+    version = util.get_version()
+    if SKIP_PREV_ARTIFACTS is True:
+        new_list = {"1": {"is_released": False, "release_name": version, "ci_test": {}}}
+    else:
+        new_list = prev_list
+    # prepare file list
+    files_list = {}
+    for file in util.list_files(
+        util.fix_path("artifacts"), ignores=[util.fix_path("artifacts", "history")]
+    ):
+        for target in RUST_TARGETS:
+            if target in file:
+                files_list[target] = file
+                break
+        else:
+            print(f"unknown target: {file}")
+    lastest_num = max(list(new_list.keys()))
+    if new_list[lastest_num]["is_released"] is True:
+        new_list[str(int(lastest_num) + 1)] = {
+            "is_released": False,
+            "release_name": version,
+            "ci_test": {},
+        }
+        lastest_num = str(int(lastest_num) + 1)
+    commit_info = util.get_commit_info()
+    if commit_info.is_release is False:
+        ci_test_id = f"{commit_info.time.replace(' ', '_')}-_-_-{commit_info.sha}"
+        new_list[lastest_num]["ci_test"][ci_test_id] = files_list  # ty: ignore[invalid-assignment]
+    else:
+        new_list[lastest_num]["is_released"] = True
+        new_list[lastest_num]["release_artifacts"] = files_list
+    print(f"new_list={new_list}")
+    with open(
+        util.fix_path("artifacts", ARTIFACTS_LIST_FILE), "w", encoding="utf-8"
+    ) as f:
+        json.dump(new_list, f, indent=4)
 
 
 def copytree_ignore(src: str, names: list[str], /) -> list[str]:

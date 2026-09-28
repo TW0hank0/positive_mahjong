@@ -19,6 +19,7 @@ dependencies = [
     "mistune==3.3.4",
     "python-gitlab==8.5.0",
     "requests==2.34.2",
+    "rich>=14.3.1",
     "typer==0.27.2",
 ]
 description = "Add your description here"
