@@ -3588,7 +3588,7 @@ checksum = "b4596b6d070b27117e987119b4dac604f3c58cfb0b191112e24771b2faeac1a6"
 
 [[package]]
 name = "pmj-client-core"
-version = "0.1.1"
+version = "0.2.0-dev"
 dependencies = [
  "pmj-gamemodes",
  "pmj-shared",
@@ -3600,7 +3600,7 @@ dependencies = [
 
 [[package]]
 name = "pmj-client-cross"
-version = "0.1.1"
+version = "0.2.0-dev"
 dependencies = [
  "console_error_panic_hook",
  "godot",
@@ -3614,7 +3614,7 @@ dependencies = [
 
 [[package]]
 name = "pmj-client-desktop"
-version = "0.1.1"
+version = "0.2.0-dev"
 dependencies = [
  "iced",
  "image",
@@ -3631,7 +3631,7 @@ dependencies = [
 
 [[package]]
 name = "pmj-client-desktop-base"
-version = "0.1.1"
+version = "0.2.0-dev"
 dependencies = [
  "iced",
  "image",
@@ -3647,7 +3647,7 @@ dependencies = [
 
 [[package]]
 name = "pmj-desktop"
-version = "0.1.1"
+version = "0.2.0-dev"
 dependencies = [
  "iced",
  "image",
@@ -3659,7 +3659,7 @@ dependencies = [
 
 [[package]]
 name = "pmj-gamemodes"
-version = "0.1.1"
+version = "0.2.0-dev"
 dependencies = [
  "crossbeam",
  "image",
@@ -3676,7 +3676,7 @@ dependencies = [
 
 [[package]]
 name = "pmj-server-desktop"
-version = "0.1.1"
+version = "0.2.0-dev"
 dependencies = [
  "clap",
  "iced",
@@ -3694,7 +3694,7 @@ dependencies = [
 
 [[package]]
 name = "pmj-shared"
-version = "0.1.1"
+version = "0.2.0-dev"
 dependencies = [
  "dirs",
  "image",
