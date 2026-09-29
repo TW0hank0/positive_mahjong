@@ -149,7 +149,7 @@ requires-dist = [
     { name = "mistune", specifier = "==3.3.4" },
     { name = "python-gitlab", specifier = "==8.5.0" },
     { name = "requests", specifier = "==2.34.2" },
-    { name = "rich", specifier = ">=14.3.1" },
+    { name = "rich", specifier = "==14.3.1" },
     { name = "typer", specifier = "==0.27.2" },
 ]
 
