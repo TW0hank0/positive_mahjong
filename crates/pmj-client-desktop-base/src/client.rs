@@ -34,7 +34,7 @@ use pmj_shared::shared::{
 /// 自定義型別別名，避開 MaybeTlsStream
 type WsConn = WebSocket<TcpStream>;
 
-pub const FONT_NOTO_SANS_REG: iced::font::Font = iced::font::Font::with_name("Noto Sans TC");
+// pub const FONT_NOTO_SANS_REG: iced::font::Font = iced::font::Font::with_name("Noto Sans TC");
 pub const MATERIAL_SYMBOLS_OUTLINED: iced::font::Font =
     iced::font::Font::with_name("Material Symbols Outlined");
 

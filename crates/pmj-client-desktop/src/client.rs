@@ -18,7 +18,7 @@ use std;
 use iced::{
     self, Border, Color, Element, Length, Pixels, alignment, task,
     widget::{
-        self, Column, Grid, Row, button, container, scrollable, space, stack, text, text_input,
+        self, Column, Row, button, container, scrollable, space, stack, text, text_input,
     },
 };
 use tracing::{error, warn};
@@ -315,7 +315,7 @@ impl Client {
                     );
                     layout_home.push(
                         Row::from_vec(server_ip_input_bar)
-                            .width(Length::Fill)
+                            .width(Length::Fill).spacing(5)
                             .into(),
                     );
                     layout_home.push(space().height(10).into());
@@ -323,30 +323,31 @@ impl Client {
                 // 虛擬鍵盤
                 {
                     let mut vsoft_keyboard = Vec::new();
-                    for key in 0..=9 {
+                    vsoft_keyboard.push((0..=9).fold(Row::new(), |layout, i|layout.push(self.home_create_vsoft_key(i.to_string()))).into());
+                    /* for key in 0..=9 {
                         vsoft_keyboard.push(self.home_create_vsoft_key(format!("{}", key)).into());
-                        vsoft_keyboard.push(space().width(10).into());
-                    }
-                    for key in ALPHABET {
+                    } */
+                    vsoft_keyboard.push(
+                        ALPHABET.iter().fold(Row::new(), |layout, i|layout.push(self.home_create_vsoft_key(i.to_string()))).into()
+                    );
+                    /* for key in ALPHABET {
                         vsoft_keyboard.push(
                             self.home_create_vsoft_key(format!("{}", key).to_lowercase())
                                 .into(),
                         );
-                        vsoft_keyboard.push(space().width(10).into());
-                    }
-                    for key in [":", "[", "]", ".", "/", "backspace"] {
+                    } */
+                    vsoft_keyboard.push(
+                        [":", "[", "]", ".", "/", "backspace"].iter().fold(Row::new(), |layout, i|layout.push(self.home_create_vsoft_key(i.to_string()))).into()
+                    );
+                    /* for key in [":", "[", "]", ".", "/", "backspace"] {
                         vsoft_keyboard.push(self.home_create_vsoft_key(key.to_string()).into());
-                        vsoft_keyboard.push(space().width(10).into());
-                    }
+                    } */
                     layout_home.push(
-                        scrollable(Row::from_vec(vsoft_keyboard))
-                            .direction(scrollable::Direction::Horizontal(
-                                scrollable::Scrollbar::new(),
-                            ))
+                        Column::from_vec(vsoft_keyboard).spacing(4).align_x(alignment::Horizontal::Center)
                             .into(),
                     );
+                    layout_home.push(space().height(20).into());
                 }
-                layout_home.push(space().height(20).into());
                 // 訊息顯示
                 {
                     let mut msg_area = Vec::new();
@@ -695,41 +696,13 @@ impl Client {
                                 card_bar_elements.push(
                                     button(card_element)
                                         .on_press(UIMessage::Play(PlayMsg::ThrowCard(card.clone())))
-                                        .style(|t: &iced::Theme, s: button::Status| {
-                                            let p = t.extended_palette();
-                                            let mut style = button::Style::default();
-                                            style.border.width = 1.2;
-                                            style.border.radius = iced::border::radius(10);
-                                            style.text_color = p.background.base.text;
-                                            match s {
-                                                button::Status::Active => {
-                                                    style.border.color = p.background.strong.color;
-                                                    style.background = None;
-                                                }
-                                                button::Status::Disabled => {
-                                                    style.background =
-                                                        Some(iced::Background::Color(
-                                                            p.background.weak.color,
-                                                        ));
-                                                }
-                                                button::Status::Hovered => {
-                                                    style.border.color = p.primary.weak.color;
-                                                    style.border.width = 1.5;
-                                                }
-                                                button::Status::Pressed => {
-                                                    style.border.color = p.primary.strong.color;
-                                                    style.border.width = 0.7;
-                                                    style.border.radius = iced::border::radius(6);
-                                                }
-                                            }
-                                            style
-                                        })
+                                        .style(ButtonStyles::PrimaryOutlined.style())
                                         .into(),
                                 );
                             } else {
                                 card_bar_elements.push(
                                     container(card_element)
-                                        .style(ContainerStyles::PrimaryOutlined.style())
+                                        .style(ContainerStyles::BackgroundOutlined.style())
                                         .into(),
                                 );
                             }
@@ -796,21 +769,18 @@ impl Client {
     ) -> button::Button<'a, UIMessage, iced::theme::Theme, iced::Renderer> {
         button(
             if key == "backspace" || key == "\u{e14a}" {
-                text("\u{e14a}".to_string()).font(MATERIAL_SYMBOLS_OUTLINED)
+                text("\u{e14a}").font(MATERIAL_SYMBOLS_OUTLINED)
             } else {
-                text(key.to_string())
+                text(key.clone())
             }
             .size(Pixels::from(28))
-            .height(Length::Fill)
-            .width(Length::Fill)
             .align_x(text::Alignment::Center)
             .align_y(alignment::Vertical::Center)
-            .style(text::primary),
         )
         .height(Length::Shrink)
         .width(Length::Shrink)
         .on_press(UIMessage::Home(HomeMessage::VSoftKeyBoardInput(
-            key.to_string(),
+            key,
         )))
         .style(ButtonStyles::PrimaryRounded.style())
     }

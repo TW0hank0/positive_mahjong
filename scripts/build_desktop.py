@@ -15,6 +15,7 @@
 
 import os
 import platform
+import shutil
 import sys
 import zipfile
 from typing import Literal
@@ -89,6 +90,12 @@ def main():
             timeout=60 * 75,  # 75分鐘
             stream=True,
         )
+        _ = util.run_cmd(
+            ["cargo", "build", "--package", "pmj-desktop"],
+            cwd=util.fix_path(),
+            timeout=60 * 60,  # a hour
+            stream=True,
+        )
     build_license.main()
     zip_desktop(targets)
 
@@ -139,6 +146,22 @@ def zip_desktop(targets: list[str]):
         for file in os.listdir(target_path):
             full_file_path = os.path.join(target_path, file)
             if os.path.isfile(full_file_path) is True:
+                if os.path.basename(full_file_path) in [
+                    "pmj-desktop-installer",
+                    "pmj-desktop-installer.exe",
+                ]:
+                    shutil.copy2(
+                        full_file_path,
+                        util.fix_path(
+                            "artifacts",
+                            f"pmj-desktop-installer-v{version}-{target}" + ".exe"
+                            if os.name == "nt"
+                            else "",
+                        ),
+                    )
+                    print(
+                        f"copied to {util.fix_path('artifacts', f'pmj-desktop-installer-v{version}-{target}' + '.exe' if os.name == 'nt' else '')}"
+                    )
                 if INCLUDE_FILES_MATCH_TYPE == "inclue_all_files":
                     include_files.append(full_file_path)
                 elif INCLUDE_FILES_MATCH_TYPE == "exe_split":
