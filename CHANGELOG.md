@@ -87,6 +87,11 @@ git tag -a "版本" -m "release pmj: 版本"
 
 - 更改 kekbe-case
 
+**2026-9-28**
+
+- 新增：［網頁］下載
+- 新增：［電腦］pmj-desktop-installer
+
 ## [v0.1.1] - 2026-8-17
 
 修復客戶端錯誤，並改進訊息顯示。
