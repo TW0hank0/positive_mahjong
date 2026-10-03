@@ -15,11 +15,16 @@
 
 use std::{fs, io, path::PathBuf, sync::mpsc, thread};
 
+use iced::{
+    self, Element, Length, Task,
+    widget::{Column, Row, button, rule, space, text},
+};
+use tracing::{debug, error, info, trace, warn};
 use zip;
-use iced::{self, Element, Length, Task, widget::{Column, Row, button, rule, space, text}};
-use tracing::{trace, debug, info, warn, error};
 
-use pmj_shared::shared::{self, ICON_PNG_BYTES, FONT_NOTO_SANS_REG_BYTES, PROJECT_NAME, PROJECT_VERSION};
+use pmj_shared::shared::{
+    self, FONT_NOTO_SANS_REG_BYTES, ICON_PNG_BYTES, PROJECT_NAME, PROJECT_VERSION,
+};
 
 const INST_STORED_BYTES: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/inst-stored.zip"));
 const FONT_NOTO_SANS_REG: iced::font::Font = iced::font::Font::with_name("Noto Sans TC");
@@ -85,18 +90,22 @@ impl Scenes {
             Self::Install => {3}
         }
     } */
-    pub fn next(&self) ->Self {
+    pub fn next(&self) -> Self {
         match self {
-            Self::Welcome => {Self::InstSmmary}
-            Self::InstSmmary=> {Self::Install(None)}
-            Self::Install(_) => {panic!("call Scenes::Install.next()")}
+            Self::Welcome => Self::InstSmmary,
+            Self::InstSmmary => Self::Install(None),
+            Self::Install(_) => {
+                panic!("call Scenes::Install.next()")
+            }
         }
     }
     pub fn prev(&self) -> Self {
         match self {
-            Scenes::Welcome => {panic!("call Senes::Welcome.prev()")},
-            Scenes::InstSmmary => {Scenes::Welcome},
-            Self::Install(_) => {Self::InstSmmary}
+            Scenes::Welcome => {
+                panic!("call Senes::Welcome.prev()")
+            }
+            Scenes::InstSmmary => Scenes::Welcome,
+            Self::Install(_) => Self::InstSmmary,
         }
     }
 }
@@ -115,7 +124,11 @@ struct InstSettings {
 }
 impl Default for InstSettings {
     fn default() -> Self {
-        Self { location: dirs::executable_dir().unwrap_or(dirs::config_local_dir().unwrap()).join(PROJECT_NAME) }
+        Self {
+            location: dirs::executable_dir()
+                .unwrap_or(dirs::config_local_dir().unwrap())
+                .join(PROJECT_NAME),
+        }
     }
 }
 #[derive(Debug)]
@@ -129,7 +142,13 @@ struct PmjInstaller {
 
 impl Default for PmjInstaller {
     fn default() -> Self {
-        Self { theme: iced::Theme::TokyoNight,scene:Scenes::Welcome, inst_settings:InstSettings::default(),installing:false, install_state:None }
+        Self {
+            theme: iced::Theme::TokyoNight,
+            scene: Scenes::Welcome,
+            inst_settings: InstSettings::default(),
+            installing: false,
+            install_state: None,
+        }
     }
 }
 
@@ -144,34 +163,28 @@ impl PmjInstaller {
                 return iced::exit();
             }
             Message::NextScene => {
-                self.scene=self.scene.next();
+                self.scene = self.scene.next();
             }
             Message::PrevScene => {
-                self.scene=self.scene.prev();
+                self.scene = self.scene.prev();
             }
-            Message::UpdateInstallState => {
-                match self.scene {
-                    Scenes::Install(ref maybe_rx) => {
-                        match maybe_rx {
-                            Some(rx)=>{
-                                match rx.try_recv() {
-                                    Ok(inst_state) => {
-                                        self.install_state=Some(inst_state);
-                                    }
-                                    Err(mpsc::TryRecvError::Empty) => {
-
-                                    }
-                                    Err(mpsc::TryRecvError::Disconnected) => {
-                                        panic!("update: Err(mpsc::TryRecvError::Disconnected)");
-                                    }
-                                }
-                            }
-                            None => {}
+            Message::UpdateInstallState => match self.scene {
+                Scenes::Install(ref maybe_rx) => match maybe_rx {
+                    Some(rx) => match rx.try_recv() {
+                        Ok(inst_state) => {
+                            self.install_state = Some(inst_state);
                         }
-                    }
-                    _ => {warn!("update: warn scene");}
+                        Err(mpsc::TryRecvError::Empty) => {}
+                        Err(mpsc::TryRecvError::Disconnected) => {
+                            panic!("update: Err(mpsc::TryRecvError::Disconnected)");
+                        }
+                    },
+                    None => {}
+                },
+                _ => {
+                    warn!("update: warn scene");
                 }
-            }
+            },
         }
         Task::none()
     }
@@ -180,35 +193,57 @@ impl PmjInstaller {
         let btn_exitable = !self.installing;
         let mut btn_continueable = true;
         let mut btn_backable = true;
-        let page_title:String;
+        let page_title: String;
         let mut content: Vec<Element<'_, Message, iced::Theme, iced::Renderer>> = Vec::new();
         match self.scene {
             Scenes::Welcome => {
-                btn_backable=false;
-                page_title=format!("{} v{} 安裝程式", PROJECT_NAME, PROJECT_VERSION);
-                content.push(text(format!("這是 {} v{} 的安裝程式，此安裝程式之目的為幫您完成安裝流程。", PROJECT_NAME, PROJECT_VERSION))
-                    .size(18).into());
+                btn_backable = false;
+                page_title = format!("{} v{} 安裝程式", PROJECT_NAME, PROJECT_VERSION);
+                content.push(
+                    text(format!(
+                        "這是 {} v{} 的安裝程式，此安裝程式之目的為幫您完成安裝流程。",
+                        PROJECT_NAME, PROJECT_VERSION
+                    ))
+                    .size(18)
+                    .into(),
+                );
             }
             Scenes::InstSmmary => {
-                page_title=String::from("安裝總覽");
-                content.push(text(format!("安裝位子：{}", self.inst_settings.location.display())).into());
+                page_title = String::from("安裝總覽");
+                content.push(
+                    text(format!(
+                        "安裝位子：{}",
+                        self.inst_settings.location.display()
+                    ))
+                    .into(),
+                );
             }
             Scenes::Install(_) => {
-                btn_continueable=false;
+                btn_continueable = false;
                 if self.installing {
                     page_title = String::from("安裝中");
                     match self.install_state {
-                        Some(ref inst_state)=> {
+                        Some(ref inst_state) => {
                             content.push(text(inst_state.clone()).into());
                         }
-                        None=>{}
+                        None => {}
                     }
                 } else {
-                    page_title=String::from("準備安裝");
-                    content.push(button(text("開始安裝")).on_press(Message::StartInstall).into());}
+                    page_title = String::from("準備安裝");
+                    content.push(
+                        button(text("開始安裝"))
+                            .on_press(Message::StartInstall)
+                            .into(),
+                    );
+                }
             }
         }
-        layout.push(Column::new().push(text(page_title).size(32)).push(rule::horizontal(1)).into());
+        layout.push(
+            Column::new()
+                .push(text(page_title).size(32))
+                .push(rule::horizontal(1))
+                .into(),
+        );
         layout.push(space().height(10).into());
         layout.push(Column::from_vec(content).spacing(3).into());
         // 按鈕
@@ -218,14 +253,34 @@ impl PmjInstaller {
             layout.push(space().height(3).into());
             let mut buttons = Vec::new();
             if btn_exitable {
-        buttons.push(button(text("退出").size(20)).on_press(Message::ExitInstaller).into());}
-            if btn_backable {
-        buttons.push(button(text("返回").size(20)).on_press(Message::PrevScene).into());
+                buttons.push(
+                    button(text("退出").size(20))
+                        .on_press(Message::ExitInstaller)
+                        .into(),
+                );
             }
-            if btn_continueable {buttons.push(button(text("繼續").size(20)).on_press(Message::NextScene).into());
-            }layout.push(Row::from_vec(buttons).spacing(20).into());
+            if btn_backable {
+                buttons.push(
+                    button(text("返回").size(20))
+                        .on_press(Message::PrevScene)
+                        .into(),
+                );
+            }
+            if btn_continueable {
+                buttons.push(
+                    button(text("繼續").size(20))
+                        .on_press(Message::NextScene)
+                        .into(),
+                );
+            }
+            layout.push(Row::from_vec(buttons).spacing(20).into());
         }
-        Column::from_vec(layout).padding(5).spacing(3).height(Length::Fill).width(Length::Fill).into()
+        Column::from_vec(layout)
+            .padding(5)
+            .spacing(3)
+            .height(Length::Fill)
+            .width(Length::Fill)
+            .into()
     }
     pub fn theme(&self) -> iced::Theme {
         self.theme.clone()
@@ -235,22 +290,24 @@ impl PmjInstaller {
     }
     fn start_install(&mut self) {
         let (tx, rx) = mpsc::channel();
-        self.scene=Scenes::Install(Some(rx));
+        self.scene = Scenes::Install(Some(rx));
         let inst_settings = self.inst_settings.clone();
-        thread::spawn(move||{
-            let temp_archive_path = dirs::download_dir().unwrap().join("pmj-desktop-installer-tempfile");
-        fs::write(temp_archive_path.clone(), INST_STORED_BYTES).ok();
-        let file = fs::File::open(temp_archive_path).unwrap();
-        let mut archive = zip::ZipArchive::new(file).unwrap();
-        for i in 0..archive.len() {
-            let mut file = archive.by_index(i).unwrap();
-            let outpath = match file.enclosed_name() {
+        thread::spawn(move || {
+            let temp_archive_path = dirs::download_dir()
+                .unwrap()
+                .join("pmj-desktop-installer-tempfile");
+            fs::write(temp_archive_path.clone(), INST_STORED_BYTES).ok();
+            let file = fs::File::open(temp_archive_path).unwrap();
+            let mut archive = zip::ZipArchive::new(file).unwrap();
+            for i in 0..archive.len() {
+                let mut file = archive.by_index(i).unwrap();
+                let outpath = match file.enclosed_name() {
                     Some(path) => path.to_owned(),
                     None => continue,
                 };
-            tx.send(outpath.display().to_string()).ok();
-            let outpath = inst_settings.location.join(outpath);
-            if file.name().unwrap().ends_with('/') {
+                tx.send(outpath.display().to_string()).ok();
+                let outpath = inst_settings.location.join(outpath);
+                if file.name().unwrap().ends_with('/') {
                     // 如果是目錄，直接建立
                     fs::create_dir_all(&outpath).ok();
                 } else {
@@ -262,6 +319,8 @@ impl PmjInstaller {
                     }
                     let mut outfile = fs::File::create(&outpath).unwrap();
                     io::copy(&mut file, &mut outfile).unwrap();
-                }}});
+                }
+            }
+        });
     }
 }

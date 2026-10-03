@@ -38,14 +38,17 @@ impl ContainerStyles {
                     ..Default::default()
                 }
             },
-            Self::BackgroundOutlined => |theme:&iced::Theme|{
+            Self::BackgroundOutlined => |theme: &iced::Theme| {
                 let p = theme.extended_palette();
-                container::Style { border: Border {
-                    color: p.background.strong.color,
-                    width:0.7,
-                    radius:border::radius(8),
-                },..Default::default() }
-            }
+                container::Style {
+                    border: Border {
+                        color: p.background.strong.color,
+                        width: 0.7,
+                        radius: border::radius(8),
+                    },
+                    ..Default::default()
+                }
+            },
         }
     }
 }
@@ -91,31 +94,35 @@ impl ButtonStyles {
                 let p = theme.extended_palette();
                 button::Style {
                     background: match status {
-                        button::Status::Disabled => {Some(iced::Background::Color(
-                            p.background.weak.color,
-                        ))}
-                        _=>{None}
+                        button::Status::Disabled => {
+                            Some(iced::Background::Color(p.background.weak.color))
+                        }
+                        _ => None,
                     },
-                    text_color:p.background.base.text,
+                    text_color: p.background.base.text,
                     border: Border {
                         width: match status {
-                            button::Status::Active | button::Status::Disabled => {1.2}
-                            button::Status::Hovered => {1.5}
-                            button::Status::Pressed => {0.7}
+                            button::Status::Active | button::Status::Disabled => 1.2,
+                            button::Status::Hovered => 1.5,
+                            button::Status::Pressed => 0.7,
                         },
                         color: match status {
-                            button::Status::Active | button::Status::Disabled =>{p.background.strong.color}
-                            button::Status::Hovered => {p.primary.weak.color}
-                            button::Status::Pressed => {p.primary.strong.color}
+                            button::Status::Active | button::Status::Disabled => {
+                                p.background.strong.color
+                            }
+                            button::Status::Hovered => p.primary.weak.color,
+                            button::Status::Pressed => p.primary.strong.color,
                         },
                         radius: border::radius(match status {
-                            button::Status::Active | button::Status::Disabled | button::Status::Hovered => {10}
-                            button::Status::Pressed => {6}
-                        })
+                            button::Status::Active
+                            | button::Status::Disabled
+                            | button::Status::Hovered => 10,
+                            button::Status::Pressed => 6,
+                        }),
                     },
                     ..Default::default()
                 }
-            }
+            },
         }
     }
 }
