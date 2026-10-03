@@ -31,6 +31,7 @@ fn main() {
     println!("rerun-if-changed=Cargo.lock");
     let file = fs::OpenOptions::new()
         .create(true)
+        .truncate(true)
         .write(true)
         .read(true)
         .open(path::PathBuf::from(env::var_os("OUT_DIR").unwrap()).join("inst-stored.zip"))

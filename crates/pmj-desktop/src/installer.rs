@@ -19,7 +19,7 @@ use iced::{
     self, Element, Length, Task,
     widget::{Column, Row, button, rule, space, text},
 };
-use tracing::{debug, error, info, trace, warn};
+use tracing::{debug, error, info, warn};
 use zip;
 
 use pmj_shared::shared::{
@@ -78,7 +78,7 @@ fn main() {
 #[derive(Debug)]
 enum Scenes {
     Welcome,
-    InstSmmary,
+    InstSummary,
     Install(Option<mpsc::Receiver<String>>),
 }
 
@@ -92,8 +92,8 @@ impl Scenes {
     } */
     pub fn next(&self) -> Self {
         match self {
-            Self::Welcome => Self::InstSmmary,
-            Self::InstSmmary => Self::Install(None),
+            Self::Welcome => Self::InstSummary,
+            Self::InstSummary => Self::Install(None),
             Self::Install(_) => {
                 panic!("call Scenes::Install.next()")
             }
@@ -104,8 +104,8 @@ impl Scenes {
             Scenes::Welcome => {
                 panic!("call Senes::Welcome.prev()")
             }
-            Scenes::InstSmmary => Scenes::Welcome,
-            Self::Install(_) => Self::InstSmmary,
+            Scenes::InstSummary => Scenes::Welcome,
+            Self::Install(_) => Self::InstSummary,
         }
     }
 }
@@ -208,7 +208,7 @@ impl PmjInstaller {
                     .into(),
                 );
             }
-            Scenes::InstSmmary => {
+            Scenes::InstSummary => {
                 page_title = String::from("安裝總覽");
                 content.push(
                     text(format!(
