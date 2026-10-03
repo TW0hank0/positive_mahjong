@@ -2,7 +2,7 @@
 
 ![icon](./assets/icon/icon.png)
 
-**繁體中文** | [English (outdated)](READMEs/README_en.md)
+**繁體中文** | [English（已過時）](READMEs/README_en.md)
 
 ![GitLab Stars](https://img.shields.io/gitlab/stars/TW0hank0%2Fpositive_mahjong?style=for-the-badge&color=green)
 ![Gitlab Pipeline Status](https://img.shields.io/gitlab/pipeline-status/TW0hank0%2Fpositive_mahjong?branch=master&style=for-the-badge&label=Gitlab%20Pipeline&color=green)
@@ -21,23 +21,21 @@
 
 [Github CI儲存庫](https://github.com/TW0hank0/positive_mahjong/)
 
-[專案網站](https://tw0hank0.gitlab.io/positive_mahjong/)
+[專案網站（Github Pages）](https://tw0hank0.github.io/positive_mahjong/)
 
-> [Github Pages](https://tw0hank0.github.io/positive_mahjong/)
+> [Gitlab Pages（已過時）](https://tw0hank0.gitlab.io/positive_mahjong/)
 
 [KeepAndroidOpen](https://keepandroidopen.org/)
 
 > 從 2026 年 9 月起，Google 將在未經使用者同意的情況下，悄悄推送一項更新，封鎖所有未向 Google 登記、未簽署其合約、未繳費，且未提交政府核發身分證明文件的 Android 應用程式。
-
-[KillSubCultureDiscrimination](https://killscd.gitlab.io/website/)
-
-> 興趣不分貴賤，愛好不是犯罪。
 
 ### 安裝
 
 尚未完成...
 
 見：[專案說明文件](https://tw0hank0.gitlab.io/positive_mahjong/docs/)
+
+可在 Github Release 下載預編譯檔案或是在 [專案網站（Github Pages）](https://tw0hank0.github.io/positive_mahjong/files/) 下載。
 
 ### 授權與聲明
 

@@ -15,15 +15,16 @@
 
 [package]
 authors = { workspace = true }
+build = "build.rs"
 edition = { workspace = true }
 license = { workspace = true }
 name = "pmj-desktop"
 repository = { workspace = true }
 rust-version.workspace = true
 version = { workspace = true }
-build = "build.rs"
 
 [dependencies]
+dirs = { workspace = true }
 iced = { workspace = true }
 image = { workspace = true }
 lyon_algorithms = { workspace = true }
@@ -31,7 +32,6 @@ pmj-shared = { workspace = true }
 serde_json = { workspace = true }
 tracing = { workspace = true }
 zip = { workspace = true }
-dirs = { workspace = true }
 
 [build-dependencies]
 zip = { workspace = true }

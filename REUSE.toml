@@ -14,6 +14,7 @@ path = [
     ".gitlab/**",
     ".zed/*",
     "CHANGELOG.md",
+    "CONTRIBUTING.md",
     "Cargo.lock",
     "Cargo.toml",
     "README.md",
