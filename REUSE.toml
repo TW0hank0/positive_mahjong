@@ -42,6 +42,7 @@ path = [
     "taplo.toml",
     "templates/*",
     "website/**",
+    "CONTRIBUTING.md",
 ]
 precedence = "override"
 
