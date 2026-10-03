@@ -13,14 +13,10 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-use std::{env, fs, io::{Read, Write}, path};
+use std::{env, fs, io::{Read, Write}, path, env::consts::EXE_SUFFIX};
 use zip;
 
 const INCLUDE_FILES: [&str;2] = ["pmj-client-desktop", "pmj-server-desktop"];
-#[cfg(target_os = "windows")]
-const EXE_SUFFIX: &str = ".exe";
-#[cfg(not(target_os = "windows"))]
-const EXE_SUFFIX: &str = "";
 
 fn main() {
     println!("rerun-if-changed=**/crates/**");

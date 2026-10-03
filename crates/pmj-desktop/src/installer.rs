@@ -13,7 +13,7 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-use std::{io, path::PathBuf, fs};
+use std::{fs, io, path::PathBuf, sync::mpsc, thread};
 
 use zip;
 use iced::{self, Element, Length, Task, widget::{Column, Row, button, rule, space, text}};
@@ -50,7 +50,7 @@ fn main() {
         ..Default::default()
     };
     let iced_result = iced::application(
-        PmjInstaller::new,
+        PmjInstaller::default,
         PmjInstaller::update,
         PmjInstaller::view,
     )
@@ -70,45 +70,46 @@ fn main() {
     }
 }
 
-#[derive(Debug,Clone)]
+#[derive(Debug)]
 enum Scenes {
     Welcome,
     InstSmmary,
-    Install,
+    Install(Option<mpsc::Receiver<String>>),
 }
 
 impl Scenes {
-    pub fn to_num(&self) -> u8 {
+    /* pub fn to_num(&self) -> u8 {
         match self {
             Scenes::Welcome => {1},
             Scenes::InstSmmary => {2},
             Self::Install => {3}
         }
-    }
-    pub fn next(&self) ->Option<Self> {
+    } */
+    pub fn next(&self) ->Self {
         match self {
-            Scenes::Welcome => {Some(Self::InstSmmary)}
-            Scenes::InstSmmary=> {Some(Self::Install)},
-            Self::Install =>{None}
+            Self::Welcome => {Self::InstSmmary}
+            Self::InstSmmary=> {Self::Install(None)}
+            Self::Install(_) => {panic!("call Scenes::Install.next()")}
         }
     }
-    pub fn prev(&self) -> Option<Self> {
+    pub fn prev(&self) -> Self {
         match self {
-            Scenes::Welcome => {None},
-            Scenes::InstSmmary => {Some(Scenes::Welcome)},
-            Self::Install => {Some(Self::InstSmmary)}
+            Scenes::Welcome => {panic!("call Senes::Welcome.prev()")},
+            Scenes::InstSmmary => {Scenes::Welcome},
+            Self::Install(_) => {Self::InstSmmary}
         }
     }
 }
 
 #[derive(Debug, Clone)]
-enum UIMessage {
+enum Message {
     ExitInstaller,
     NextScene,
     PrevScene,
     StartInstall,
+    UpdateInstallState,
 }
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct InstSettings {
     location: PathBuf,
 }
@@ -121,96 +122,146 @@ impl Default for InstSettings {
 struct PmjInstaller {
     theme: iced::Theme,
     scene: Scenes,
-    inst_settings: InstSettings
+    inst_settings: InstSettings,
+    installing: bool,
+    install_state: Option<String>,
 }
-impl PmjInstaller {
-    pub fn new() -> Self {
-        Self { theme: iced::Theme::TokyoNight,scene:Scenes::Welcome, inst_settings:InstSettings::default() }
+
+impl Default for PmjInstaller {
+    fn default() -> Self {
+        Self { theme: iced::Theme::TokyoNight,scene:Scenes::Welcome, inst_settings:InstSettings::default(),installing:false, install_state:None }
     }
-    pub fn update(&mut self, message: UIMessage) -> iced::Task<UIMessage> {
+}
+
+impl PmjInstaller {
+    pub fn update(&mut self, message: Message) -> iced::Task<Message> {
         info!("update: message={:?}", message);
         match message {
-            UIMessage::StartInstall => {
-                let temp_archive_path = dirs::download_dir().unwrap().join("pmj-desktop-installer-tempfile");
-                fs::write(temp_archive_path.clone(), INST_STORED_BYTES).ok();
-                let file = fs::File::open(temp_archive_path).unwrap();
-                let mut archive = zip::ZipArchive::new(file).unwrap();
-                for i in 0..archive.len() {
-                    let mut file = archive.by_index(i).unwrap();
-                    let outpath = match file.enclosed_name() {
-                            Some(path) => path.to_owned(),
-                            None => continue,
-                        };
-                    let outpath = std::path::Path::new(&self.inst_settings.location).join(outpath);
-                    if file.name().unwrap().ends_with('/') {
-                            // 如果是目錄，直接建立
-                            fs::create_dir_all(&outpath);
-                        } else {
-                            // 如果是檔案，確保父目錄存在並寫入內容
-                            if let Some(p) = outpath.parent() {
-                                if !p.exists() {
-                                    fs::create_dir_all(p).unwrap();
-                                }
-                            }
-                            let mut outfile = fs::File::create(&outpath).unwrap();
-                            io::copy(&mut file, &mut outfile).unwrap();
-                        }}
+            Message::StartInstall => {
+                self.start_install();
             }
-            UIMessage::ExitInstaller => {
+            Message::ExitInstaller => {
                 return iced::exit();
             }
-            UIMessage::NextScene => {
-                match self.scene.next() {
-                    Some(n) => {self.scene=n}
-                    None=>{}
-                }
+            Message::NextScene => {
+                self.scene=self.scene.next();
             }
-            UIMessage::PrevScene => {
-                match self.scene.prev() {
-                    Some(p) => {self.scene=p}
-                    None=>{}
+            Message::PrevScene => {
+                self.scene=self.scene.prev();
+            }
+            Message::UpdateInstallState => {
+                match self.scene {
+                    Scenes::Install(ref maybe_rx) => {
+                        match maybe_rx {
+                            Some(rx)=>{
+                                match rx.try_recv() {
+                                    Ok(inst_state) => {
+                                        self.install_state=Some(inst_state);
+                                    }
+                                    Err(mpsc::TryRecvError::Empty) => {
+
+                                    }
+                                    Err(mpsc::TryRecvError::Disconnected) => {
+                                        panic!("update: Err(mpsc::TryRecvError::Disconnected)");
+                                    }
+                                }
+                            }
+                            None => {}
+                        }
+                    }
+                    _ => {warn!("update: warn scene");}
                 }
             }
         }
         Task::none()
     }
-    pub fn view(&self) -> Element<'_, UIMessage, iced::Theme, iced::Renderer> {
-        let mut layout: Vec<Element<'_, UIMessage, iced::Theme, iced::Renderer>> = Vec::new();
+    pub fn view(&self) -> Element<'_, Message, iced::Theme, iced::Renderer> {
+        let mut layout: Vec<Element<'_, Message, iced::Theme, iced::Renderer>> = Vec::new();
+        let btn_exitable = !self.installing;
+        let mut btn_continueable = true;
+        let mut btn_backable = true;
+        let page_title:String;
+        let mut content: Vec<Element<'_, Message, iced::Theme, iced::Renderer>> = Vec::new();
         match self.scene {
             Scenes::Welcome => {
-                layout.push(text(format!("{} v{} 安裝程式", PROJECT_NAME, PROJECT_VERSION)).size(32).into());
-                layout.push(rule::horizontal(1).into());
-                layout.push(space().height(10).into());
-                layout.push(text(format!("這是 {} v{} 的安裝程式，此安裝程式之目的為幫您完成安裝流程。", PROJECT_NAME, PROJECT_VERSION))
+                btn_backable=false;
+                page_title=format!("{} v{} 安裝程式", PROJECT_NAME, PROJECT_VERSION);
+                content.push(text(format!("這是 {} v{} 的安裝程式，此安裝程式之目的為幫您完成安裝流程。", PROJECT_NAME, PROJECT_VERSION))
                     .size(18).into());
             }
             Scenes::InstSmmary => {
-                layout.push(text("安裝總覽").size(32).into());
-                layout.push(rule::horizontal(1).into());
-                layout.push(text(format!("安裝位子：{}", self.inst_settings.location.display())).into());
+                page_title=String::from("安裝總覽");
+                content.push(text(format!("安裝位子：{}", self.inst_settings.location.display())).into());
             }
-            Scenes::Install => {
-                layout.push(text("安裝").size(32).into());
+            Scenes::Install(_) => {
+                btn_continueable=false;
+                if self.installing {
+                    page_title = String::from("安裝中");
+                    match self.install_state {
+                        Some(ref inst_state)=> {
+                            content.push(text(inst_state.clone()).into());
+                        }
+                        None=>{}
+                    }
+                } else {
+                    page_title=String::from("準備安裝");
+                    content.push(button(text("開始安裝")).on_press(Message::StartInstall).into());}
             }
         }
+        layout.push(Column::new().push(text(page_title).size(32)).push(rule::horizontal(1)).into());
+        layout.push(space().height(10).into());
+        layout.push(Column::from_vec(content).spacing(3).into());
         // 按鈕
         {
             layout.push(space().height(Length::Fill).into());
             layout.push(rule::horizontal(1).into());
             layout.push(space().height(3).into());
             let mut buttons = Vec::new();
-        buttons.push(button(text("退出").size(20)).on_press(UIMessage::ExitInstaller).into());
-        buttons.push(space().width(20).into());
-        buttons.push(button(text("返回").size(20)).on_press(UIMessage::PrevScene).into());
-        buttons.push(space().width(20).into());
-        buttons.push(button(text("繼續").size(20)).on_press(UIMessage::NextScene).into());
-        layout.push(Row::from_vec(buttons).into());}
-        Column::from_vec(layout).padding(7).spacing(3).height(Length::Fill).width(Length::Fill).into()
+            if btn_exitable {
+        buttons.push(button(text("退出").size(20)).on_press(Message::ExitInstaller).into());}
+            if btn_backable {
+        buttons.push(button(text("返回").size(20)).on_press(Message::PrevScene).into());
+            }
+            if btn_continueable {buttons.push(button(text("繼續").size(20)).on_press(Message::NextScene).into());
+            }layout.push(Row::from_vec(buttons).spacing(20).into());
+        }
+        Column::from_vec(layout).padding(5).spacing(3).height(Length::Fill).width(Length::Fill).into()
     }
     pub fn theme(&self) -> iced::Theme {
         self.theme.clone()
     }
     pub fn title(&self) -> String {
         format!("pmj-desktop-installer - {}", PROJECT_NAME)
+    }
+    fn start_install(&mut self) {
+        let (tx, rx) = mpsc::channel();
+        self.scene=Scenes::Install(Some(rx));
+        let inst_settings = self.inst_settings.clone();
+        thread::spawn(move||{
+            let temp_archive_path = dirs::download_dir().unwrap().join("pmj-desktop-installer-tempfile");
+        fs::write(temp_archive_path.clone(), INST_STORED_BYTES).ok();
+        let file = fs::File::open(temp_archive_path).unwrap();
+        let mut archive = zip::ZipArchive::new(file).unwrap();
+        for i in 0..archive.len() {
+            let mut file = archive.by_index(i).unwrap();
+            let outpath = match file.enclosed_name() {
+                    Some(path) => path.to_owned(),
+                    None => continue,
+                };
+            tx.send(outpath.display().to_string()).ok();
+            let outpath = inst_settings.location.join(outpath);
+            if file.name().unwrap().ends_with('/') {
+                    // 如果是目錄，直接建立
+                    fs::create_dir_all(&outpath).ok();
+                } else {
+                    // 如果是檔案，確保父目錄存在並寫入內容
+                    if let Some(p) = outpath.parent() {
+                        if !p.exists() {
+                            fs::create_dir_all(p).unwrap();
+                        }
+                    }
+                    let mut outfile = fs::File::create(&outpath).unwrap();
+                    io::copy(&mut file, &mut outfile).unwrap();
+                }}});
     }
 }
