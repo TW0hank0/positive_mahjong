@@ -22,13 +22,12 @@ use std::{
 };
 
 use iced::{
-    self, Border, Length, alignment,
-    widget::{Column, Row, button, container, rule, scrollable, space, text, text_input},
+    self, Length, alignment,
+    widget::{Column, Row, button, container, rule, space, text, text_input},
 };
-use tracing::{error, info, warn};
+use tracing::{info, warn};
 
 use pmj_desktop::shared::ContainerStyles;
-use pmj_gamemodes;
 use pmj_shared::shared::{FONT_NOTO_SANS_REG_BYTES, ICON_PNG_BYTES, PROJECT_NAME};
 
 pub const FONT_NOTO_SANS_REG: iced::font::Font = iced::font::Font::with_name("Noto Sans TC");
@@ -140,12 +139,12 @@ impl ServerGUI {
                         info!("第六代網路地址：{}", ipv6_address.to_string());
                         info!("端口：{}", ip_port);
                         self.scene = ServerScene::V2BetterServer(V2BetterState {
-                            backend: backend,
+                            backend,
                             game_status: GameStatus::Room,
                             tinput_room_msg: String::new(),
                             local_ipv4_address: ipv4_address,
                             local_ipv6_address: ipv6_address,
-                            ip_port: ip_port,
+                            ip_port,
                             players: Vec::new(),
                         })
                     }

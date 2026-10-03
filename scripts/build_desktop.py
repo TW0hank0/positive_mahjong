@@ -88,7 +88,6 @@ def main():
             cmd,
             cwd=util.fix_path(),
             timeout=60 * 75,  # 75分鐘
-            stream=True,
         )
         _ = util.run_cmd(
             ["cargo", "build", "--package", "pmj-desktop"],
@@ -150,16 +149,22 @@ def zip_desktop(targets: list[str]):
                     "pmj-desktop-installer",
                     "pmj-desktop-installer.exe",
                 ]:
-                    shutil.copy2(
-                        full_file_path,
-                        util.fix_path(
-                            "artifacts",
-                        ),
+                    if os.path.exists(util.fix_path("artifacts")) is False:
+                        os.mkdir(util.fix_path("artifacts"))
+                    print(
+                        "copied to: "
+                        + str(
+                            shutil.copy2(
+                                full_file_path,
+                                util.fix_path(
+                                    "artifacts",
+                                ),
+                            )
+                        )
                     )
                     new_desktop_installer_name = (
-                        f"pmj-desktop-installer-v{version}-{target}" + ".exe"
-                        if os.name == "nt"
-                        else ""
+                        f"pmj-desktop-installer-v{version}-{target}"
+                        + (".exe" if os.name == "nt" else "")
                     )
                     os.rename(
                         util.fix_path("artifacts", file),

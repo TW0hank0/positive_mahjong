@@ -58,9 +58,9 @@ runs:
 
     - name: Rustup update
       shell: bash
-      env:
-        RUSTUP_AUTO_INSTALL: "0"
-      run: rustup update
+      run: |
+        rustup set auto-install enable
+        rustup update
 
     - name: check rust Install
       shell: bash

@@ -13,13 +13,10 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-use std;
 
 use iced::{
     self, Border, Color, Element, Length, Pixels, alignment, task,
-    widget::{
-        self, Column, Row, button, container, scrollable, space, stack, text, text_input,
-    },
+    widget::{self, Column, Row, button, container, scrollable, space, stack, text, text_input},
 };
 use tracing::{error, warn};
 
@@ -137,7 +134,7 @@ impl Client {
                             for (msgid, gmsg) in gms_v2.game_events.clone().iter() {
                                 play_state
                                     .game_msgs
-                                    .push((msgid.clone(), format!("{:?}", gmsg)));
+                                    .push((*msgid, format!("{:?}", gmsg)));
                             }
                         }
                     }
@@ -315,7 +312,8 @@ impl Client {
                     );
                     layout_home.push(
                         Row::from_vec(server_ip_input_bar)
-                            .width(Length::Fill).spacing(5)
+                            .width(Length::Fill)
+                            .spacing(5)
                             .into(),
                     );
                     layout_home.push(space().height(10).into());
@@ -323,12 +321,23 @@ impl Client {
                 // 虛擬鍵盤
                 {
                     let mut vsoft_keyboard = Vec::new();
-                    vsoft_keyboard.push((0..=9).fold(Row::new(), |layout, i|layout.push(self.home_create_vsoft_key(i.to_string()))).into());
+                    vsoft_keyboard.push(
+                        (0..=9)
+                            .fold(Row::new(), |layout, i| {
+                                layout.push(self.home_create_vsoft_key(i.to_string()))
+                            })
+                            .into(),
+                    );
                     /* for key in 0..=9 {
                         vsoft_keyboard.push(self.home_create_vsoft_key(format!("{}", key)).into());
                     } */
                     vsoft_keyboard.push(
-                        ALPHABET.iter().fold(Row::new(), |layout, i|layout.push(self.home_create_vsoft_key(i.to_string()))).into()
+                        ALPHABET
+                            .iter()
+                            .fold(Row::new(), |layout, i| {
+                                layout.push(self.home_create_vsoft_key(i.to_string()))
+                            })
+                            .into(),
                     );
                     /* for key in ALPHABET {
                         vsoft_keyboard.push(
@@ -337,13 +346,20 @@ impl Client {
                         );
                     } */
                     vsoft_keyboard.push(
-                        [":", "[", "]", ".", "/", "backspace"].iter().fold(Row::new(), |layout, i|layout.push(self.home_create_vsoft_key(i.to_string()))).into()
+                        [":", "[", "]", ".", "/", "backspace"]
+                            .iter()
+                            .fold(Row::new(), |layout, i| {
+                                layout.push(self.home_create_vsoft_key(i.to_string()))
+                            })
+                            .into(),
                     );
                     /* for key in [":", "[", "]", ".", "/", "backspace"] {
                         vsoft_keyboard.push(self.home_create_vsoft_key(key.to_string()).into());
                     } */
                     layout_home.push(
-                        Column::from_vec(vsoft_keyboard).spacing(4).align_x(alignment::Horizontal::Center)
+                        Column::from_vec(vsoft_keyboard)
+                            .spacing(4)
+                            .align_x(alignment::Horizontal::Center)
                             .into(),
                     );
                     layout_home.push(space().height(20).into());
@@ -464,8 +480,7 @@ impl Client {
                                 Column::from_vec(layout_home)
                                     .width(Length::Fill)
                                     .padding(10),
-                            ))
-                            .into(),
+                            )),
                             content.into(),
                         ])
                         .into(),
@@ -775,13 +790,11 @@ impl Client {
             }
             .size(Pixels::from(28))
             .align_x(text::Alignment::Center)
-            .align_y(alignment::Vertical::Center)
+            .align_y(alignment::Vertical::Center),
         )
         .height(Length::Shrink)
         .width(Length::Shrink)
-        .on_press(UIMessage::Home(HomeMessage::VSoftKeyBoardInput(
-            key,
-        )))
+        .on_press(UIMessage::Home(HomeMessage::VSoftKeyBoardInput(key)))
         .style(ButtonStyles::PrimaryRounded.style())
     }
 

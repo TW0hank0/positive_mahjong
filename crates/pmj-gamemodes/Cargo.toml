@@ -24,8 +24,6 @@ version = { workspace = true }
 
 [dependencies]
 crossbeam = { workspace = true }
-image = { workspace = true }
-local-ip-address = { workspace = true }
 pmj-shared = { workspace = true }
 rand = { workspace = true }
 rayon = { workspace = true }

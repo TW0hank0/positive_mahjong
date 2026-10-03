@@ -25,11 +25,8 @@ version = { workspace = true }
 [dependencies]
 # --- shared ---
 godot = { workspace = true }
-image = { workspace = true }
-lyon_algorithms = { workspace = true }
 pmj-shared = { workspace = true }
 serde_json = { workspace = true }
-tungstenite = { workspace = true }
 # --- wasm ---
 console_error_panic_hook = { workspace = true, optional = true }
 wasm-bindgen = { workspace = true, optional = true }
