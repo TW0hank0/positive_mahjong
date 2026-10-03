@@ -31,12 +31,10 @@ pmj-shared = { workspace = true }
 serde_json = { workspace = true }
 tracing = { workspace = true }
 zip = { workspace = true }
-zip-extensions = { workspace = true }
 dirs = { workspace = true }
 
 [build-dependencies]
 zip = { workspace = true }
-zip-extensions = { workspace = true }
 
 [features]
 default = []

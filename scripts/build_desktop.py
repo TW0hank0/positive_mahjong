@@ -154,13 +154,19 @@ def zip_desktop(targets: list[str]):
                         full_file_path,
                         util.fix_path(
                             "artifacts",
-                            f"pmj-desktop-installer-v{version}-{target}" + ".exe"
-                            if os.name == "nt"
-                            else "",
                         ),
                     )
+                    new_desktop_installer_name = (
+                        f"pmj-desktop-installer-v{version}-{target}" + ".exe"
+                        if os.name == "nt"
+                        else ""
+                    )
+                    os.rename(
+                        util.fix_path("artifacts", file),
+                        util.fix_path("artifacts", new_desktop_installer_name),
+                    )
                     print(
-                        f"copied to {util.fix_path('artifacts', f'pmj-desktop-installer-v{version}-{target}' + '.exe' if os.name == 'nt' else '')}"
+                        f"copied to {util.fix_path('artifacts', new_desktop_installer_name)}"
                     )
                 if INCLUDE_FILES_MATCH_TYPE == "inclue_all_files":
                     include_files.append(full_file_path)
