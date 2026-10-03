@@ -68,6 +68,20 @@ jobs:
             ~/.cargo/bin/taplo.exe
             ~/.cargo/bin/eza.exe
           key: ${{ runner.os }}-${{ runner.arch }}-cargo-tools-${{ hashFiles('ci-cache-version.json') }}
+      - name: build ThirdPartyLicense
+        run: |
+          cd scripts
+          uv run build_license.py
+          cd ..
+
+      - name: Save Cache ThirdPartyLicense
+        uses: actions/cache/save@v6.1.0
+        with:
+          path: |
+            auto_generated/ThirdPartyLicense-Rust.html
+            auto_generated/ThirdPartyLicense-Rust.json
+            auto_generated/ThirdPartyLicense-Rust.md
+          key: ${{ runner.os }}-${{ runner.arch }}-ThirdPartyLicense-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('templates/about_*.hbs') }}
   check:
     runs-on: ${{ matrix.os }}
     strategy:
