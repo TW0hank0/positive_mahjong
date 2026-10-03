@@ -90,10 +90,9 @@ def main():
             timeout=60 * 75,  # 75分鐘
         )
         _ = util.run_cmd(
-            ["cargo", "build", "--package", "pmj-desktop"],
+            ["cargo", "build", "--package", "pmj-desktop", "--target", target],
             cwd=util.fix_path(),
-            timeout=60 * 60,  # a hour
-            stream=True,
+            timeout=60 * 60,  # 一小時
         )
     build_license.main()
     zip_desktop(targets)
