@@ -13,7 +13,6 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-use std;
 
 use iced::{
     self, Border, Color, Element, Length, Pixels, alignment, task,
@@ -135,7 +134,7 @@ impl Client {
                             for (msgid, gmsg) in gms_v2.game_events.clone().iter() {
                                 play_state
                                     .game_msgs
-                                    .push((msgid.clone(), format!("{:?}", gmsg)));
+                                    .push((*msgid, format!("{:?}", gmsg)));
                             }
                         }
                     }
@@ -481,8 +480,7 @@ impl Client {
                                 Column::from_vec(layout_home)
                                     .width(Length::Fill)
                                     .padding(10),
-                            ))
-                            .into(),
+                            )),
                             content.into(),
                         ])
                         .into(),

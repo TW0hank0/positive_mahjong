@@ -20,7 +20,6 @@ use std::{
     io::{Read, Write},
     path,
 };
-use zip;
 
 const INCLUDE_FILES: [&str; 2] = ["pmj-client-desktop", "pmj-server-desktop"];
 

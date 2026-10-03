@@ -1363,7 +1363,7 @@ impl PositiveMahjong {
                         }
                     }
                     card_nums.sort();
-                    if !((card_nums.get(1).unwrap() == &(card_nums.get(0).unwrap() + 1))
+                    if !((card_nums.get(1).unwrap() == &(card_nums.first().unwrap() + 1))
                         && (card_nums.get(2).unwrap() == &(card_nums.get(1).unwrap() + 1)))
                     {
                         warn!("EAT：卡牌數字非連續！");

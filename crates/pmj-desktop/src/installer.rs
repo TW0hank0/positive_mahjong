@@ -20,7 +20,6 @@ use iced::{
     widget::{Column, Row, button, rule, space, text},
 };
 use tracing::{debug, error, info, warn};
-use zip;
 
 use pmj_shared::shared::{
     self, FONT_NOTO_SANS_REG_BYTES, ICON_PNG_BYTES, PROJECT_NAME, PROJECT_VERSION,
@@ -169,18 +168,15 @@ impl PmjInstaller {
                 self.scene = self.scene.prev();
             }
             Message::UpdateInstallState => match self.scene {
-                Scenes::Install(ref maybe_rx) => match maybe_rx {
-                    Some(rx) => match rx.try_recv() {
-                        Ok(inst_state) => {
-                            self.install_state = Some(inst_state);
-                        }
-                        Err(mpsc::TryRecvError::Empty) => {}
-                        Err(mpsc::TryRecvError::Disconnected) => {
-                            panic!("update: Err(mpsc::TryRecvError::Disconnected)");
-                        }
-                    },
-                    None => {}
-                },
+                Scenes::Install(ref maybe_rx) => if let Some(rx) = maybe_rx { match rx.try_recv() {
+                    Ok(inst_state) => {
+                        self.install_state = Some(inst_state);
+                    }
+                    Err(mpsc::TryRecvError::Empty) => {}
+                    Err(mpsc::TryRecvError::Disconnected) => {
+                        panic!("update: Err(mpsc::TryRecvError::Disconnected)");
+                    }
+                } },
                 _ => {
                     warn!("update: warn scene");
                 }
@@ -222,11 +218,8 @@ impl PmjInstaller {
                 btn_continueable = false;
                 if self.installing {
                     page_title = String::from("安裝中");
-                    match self.install_state {
-                        Some(ref inst_state) => {
-                            content.push(text(inst_state.clone()).into());
-                        }
-                        None => {}
+                    if let Some(ref inst_state) = self.install_state {
+                        content.push(text(inst_state.clone()).into());
                     }
                 } else {
                     page_title = String::from("準備安裝");
@@ -312,11 +305,10 @@ impl PmjInstaller {
                     fs::create_dir_all(&outpath).ok();
                 } else {
                     // 如果是檔案，確保父目錄存在並寫入內容
-                    if let Some(p) = outpath.parent() {
-                        if !p.exists() {
+                    if let Some(p) = outpath.parent()
+                        && !p.exists() {
                             fs::create_dir_all(p).unwrap();
                         }
-                    }
                     let mut outfile = fs::File::create(&outpath).unwrap();
                     io::copy(&mut file, &mut outfile).unwrap();
                 }

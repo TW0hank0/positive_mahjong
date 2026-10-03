@@ -102,8 +102,8 @@ impl ClientCore {
                     let (_event_num, event) = state.game_events.last().unwrap();
                     match event {
                         V2BetterEvents::YouGetCard(_) => able_action.push(PlayerCtrl::ThrowCard),
-                        V2BetterEvents::ChangeTurn(turn_player) => {
-                            if turn_player == &state.player_id {
+                        V2BetterEvents::ChangeTurn(turn_player)
+                            if turn_player == &state.player_id => {
                                 let (_event_num, event2) =
                                     state.game_events.get(state.game_events.len() - 2).unwrap();
                                 match event2 {
@@ -117,7 +117,6 @@ impl ClientCore {
                                     }
                                 }
                             }
-                        }
                         _ => {}
                     }
                 }
@@ -405,7 +404,7 @@ impl ClientCore {
                                                                         pmj_gamemodes::v2_better::shared::ServerGameMsg::ChangedTurn(player_turn) => {
                                                                             state_v2.game_events.push(
                                                                                 ((state_v2.game_events.len() as u64) +1,
-                                                                                    V2BetterEvents::ChangeTurn(player_turn.clone()))
+                                                                                    V2BetterEvents::ChangeTurn(player_turn))
                                                                             );
                                                                             state_v2.player_turn = Some(player_turn);
                                                                         }
