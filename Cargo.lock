@@ -3716,11 +3716,8 @@ version = "0.2.0-dev"
 dependencies = [
  "console_error_panic_hook",
  "godot",
- "image",
- "lyon_algorithms",
  "pmj-shared",
  "serde_json",
- "tungstenite",
  "wasm-bindgen",
 ]
 
@@ -3776,8 +3773,6 @@ name = "pmj-gamemodes"
 version = "0.2.0-dev"
 dependencies = [
  "crossbeam",
- "image",
- "local-ip-address",
  "pmj-shared",
  "rand 0.10.3",
  "rayon",
@@ -3811,7 +3806,6 @@ name = "pmj-shared"
 version = "0.2.0-dev"
 dependencies = [
  "dirs",
- "image",
  "positive_tool_rs",
  "serde",
  "serde_json",
