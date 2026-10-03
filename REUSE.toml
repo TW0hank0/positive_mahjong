@@ -14,6 +14,7 @@ path = [
     ".gitlab/**",
     ".zed/*",
     "CHANGELOG.md",
+    "CONTRIBUTING.md",
     "Cargo.lock",
     "Cargo.toml",
     "README.md",
@@ -42,7 +43,6 @@ path = [
     "taplo.toml",
     "templates/*",
     "website/**",
-    "CONTRIBUTING.md",
 ]
 precedence = "override"
 
