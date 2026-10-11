@@ -68,7 +68,7 @@ positive_tool_rs = { git = "https://gitlab.com/TW0hank0/positive_tool_rs.git", r
 rand = "=0.10.3"
 rayon = "=1.12.0"
 serde = { version = "=1.0.229", features = ["derive", "serde_derive"] }
-serde_json = "=1.0.151"
+serde_json = "=1.0.154"
 tracing = { version = "=0.1.44" }
 tracing-appender = { version = "=0.2.5" }
 tungstenite = { version = "=0.30.0", features = [
