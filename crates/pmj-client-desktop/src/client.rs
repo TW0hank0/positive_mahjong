@@ -15,8 +15,7 @@
 
 
 use iced::{
-    self, Border, Color, Element, Length, Pixels, alignment, task,
-    widget::{self, Column, Row, button, container, scrollable, space, stack, text, text_input},
+    self, Border, Color, Element, Length, Pixels, Task, alignment, task, widget::{self, Column, Row, button, container, scrollable, space, stack, text, text_input},
 };
 use tracing::{error, warn};
 
@@ -26,10 +25,10 @@ use pmj_desktop::{
 };
 
 use pmj_shared::shared::{
-    self, FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES, FONT_NOTO_SANS_REG_BYTES, PROJECT_NAME,
+    self, FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES, PROJECT_NAME,
 };
 
-// pub const FONT_NOTO_SANS_REG: iced::font::Font = iced::font::Font::with_name("Noto Sans TC");
+pub const MEMBER_NAME: &str = "pmj-client-desktop";
 pub const MATERIAL_SYMBOLS_OUTLINED: iced::font::Font =
     iced::font::Font::with_name("Material Symbols Outlined");
 
@@ -66,14 +65,14 @@ pub struct PlayState {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum UIMessage {
-    Home(HomeMessage),
+pub enum Message {
+    Home(HomeMsg),
     Play(PlayMsg),
     CCoreProcessTask,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum HomeMessage {
+pub enum HomeMsg {
     InputServerIpChanged(String),
     VSoftKeyBoardInput(String),
     ConnectServer,
@@ -91,10 +90,8 @@ pub const ALPHABET: [char; 26] = [
 ];
 
 impl Client {
-    pub fn new() -> Self {
-        let _ = iced::font::load(FONT_NOTO_SANS_REG_BYTES);
-        let _ = iced::font::load(FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES);
-        Self {
+    pub fn new() -> (Self, Task<Message>) {
+        (Self {
             server_url: String::from("ws://"),
             scene: ClientScenes::Home(HomeState {
                 try_connecting_server: false,
@@ -102,11 +99,11 @@ impl Client {
                 connect_msg: None,
             }),
             theme: iced::theme::Theme::TokyoNight,
-        }
+        },iced::font::load(FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES).discard())
     }
-    pub fn update(&mut self, message: UIMessage) -> task::Task<UIMessage> {
+    pub fn update(&mut self, message: Message) -> task::Task<Message> {
         match message {
-            UIMessage::CCoreProcessTask => match self.scene {
+            Message::CCoreProcessTask => match self.scene {
                 ClientScenes::Home(ref _home_state) => {
                     warn!("update: warn scene");
                 }
@@ -138,11 +135,11 @@ impl Client {
                             }
                         }
                     }
-                    return iced::Task::done(UIMessage::CCoreProcessTask);
+                    return iced::Task::done(Message::CCoreProcessTask);
                 }
             },
-            UIMessage::Home(home_message) => match home_message {
-                HomeMessage::InputServerIpChanged(server_ip) => match self.scene {
+            Message::Home(home_message) => match home_message {
+                HomeMsg::InputServerIpChanged(server_ip) => match self.scene {
                     ClientScenes::Home(ref mut home_state) => {
                         if home_state.try_connecting_server {
                             home_state
@@ -156,7 +153,7 @@ impl Client {
                         warn!("update: warn scene");
                     }
                 },
-                HomeMessage::VSoftKeyBoardInput(key) => match self.scene {
+                HomeMsg::VSoftKeyBoardInput(key) => match self.scene {
                     ClientScenes::Home(ref mut home_state) => {
                         if home_state.try_connecting_server {
                             let msg = String::from("已有正在嘗試連接的伺服器！");
@@ -174,7 +171,7 @@ impl Client {
                         warn!("update: warn scene");
                     }
                 },
-                HomeMessage::ConnectServer => match self.scene {
+                HomeMsg::ConnectServer => match self.scene {
                     ClientScenes::Home(ref mut home_state) => {
                         if self.server_url.is_empty() {
                             let msg = String::from("未輸入伺服器地址！");
@@ -217,7 +214,7 @@ impl Client {
                                             }
                                         }
                                     }
-                                    return task::Task::done(UIMessage::CCoreProcessTask);
+                                    return task::Task::done(Message::CCoreProcessTask);
                                 }
                                 Err(e) => {
                                     error!("update: {}", e);
@@ -231,7 +228,7 @@ impl Client {
                     }
                 },
             },
-            UIMessage::Play(play_base_message) => match play_base_message {
+            Message::Play(play_base_message) => match play_base_message {
                 PlayMsg::GetCard => match self.scene {
                     ClientScenes::Home(ref _home_state) => {
                         warn!("update: warn scene");
@@ -257,11 +254,11 @@ impl Client {
         iced::task::Task::none()
     }
 
-    pub fn view(&self) -> Element<'_, UIMessage, iced::Theme, iced::Renderer> {
-        let mut layout: Vec<iced::Element<'_, UIMessage>> = Vec::new();
+    pub fn view(&self) -> Element<'_, Message, iced::Theme, iced::Renderer> {
+        let mut layout: Vec<iced::Element<'_, Message>> = Vec::new();
         match self.scene {
             ClientScenes::Home(ref home_state) => {
-                let mut layout_home: Vec<iced::Element<'_, UIMessage>> = Vec::new();
+                let mut layout_home: Vec<iced::Element<'_, Message>> = Vec::new();
                 // 標題欄
                 {
                     let mut title_bar = Vec::new();
@@ -291,9 +288,9 @@ impl Client {
                     server_ip_input_bar.push(
                         text_input("輸入伺服器地址...", &self.server_url)
                             .on_input(|content| {
-                                UIMessage::Home(HomeMessage::InputServerIpChanged(content))
+                                Message::Home(HomeMsg::InputServerIpChanged(content))
                             })
-                            .on_submit(UIMessage::Home(HomeMessage::ConnectServer))
+                            .on_submit(Message::Home(HomeMsg::ConnectServer))
                             .size(Pixels::from(24))
                             .line_height(text::LineHeight::Relative(1.5))
                             .style(|t: &iced::Theme, s: text_input::Status| {
@@ -306,7 +303,7 @@ impl Client {
                     );
                     server_ip_input_bar.push(
                         button(text("連線").size(24))
-                            .on_press(UIMessage::Home(HomeMessage::ConnectServer))
+                            .on_press(Message::Home(HomeMsg::ConnectServer))
                             .style(ButtonStyles::PrimaryRounded.style())
                             .into(),
                     );
@@ -498,7 +495,7 @@ impl Client {
                 }
             }
             ClientScenes::Play(ref play_state) => {
-                let mut layout_play: Vec<iced::Element<'_, UIMessage>> = Vec::new();
+                let mut layout_play: Vec<iced::Element<'_, Message>> = Vec::new();
                 {
                     let mut info_bar = Vec::new();
                     info_bar.push(text(format!("伺服器地址：{}", self.server_url.clone())).into());
@@ -545,7 +542,7 @@ impl Client {
                 }
                 // ctr_bar
                 {
-                    let mut ctr_bar: Vec<iced::Element<'_, UIMessage>> = Vec::new();
+                    let mut ctr_bar: Vec<iced::Element<'_, Message>> = Vec::new();
                     let mut gmsg_bar = Vec::new();
                     if play_state.is_start {
                         for (gmsg_id, gmsg) in play_state.game_msgs.iter() {
@@ -682,7 +679,7 @@ impl Client {
                         {
                             pga_bar.push(
                                 button(text("GetCard"))
-                                    .on_press(UIMessage::Play(PlayMsg::GetCard))
+                                    .on_press(Message::Play(PlayMsg::GetCard))
                                     .into(),
                             );
                         }
@@ -690,7 +687,7 @@ impl Client {
                     }
                     // 卡牌
                     {
-                        let mut card_bar_elements: Vec<iced::Element<'_, UIMessage>> = Vec::new();
+                        let mut card_bar_elements: Vec<iced::Element<'_, Message>> = Vec::new();
                         for card in play_state.hand_cards.iter() {
                             let card_element = Column::new()
                                 .padding(5)
@@ -710,7 +707,7 @@ impl Client {
                             {
                                 card_bar_elements.push(
                                     button(card_element)
-                                        .on_press(UIMessage::Play(PlayMsg::ThrowCard(card.clone())))
+                                        .on_press(Message::Play(PlayMsg::ThrowCard(card.clone())))
                                         .style(ButtonStyles::PrimaryOutlined.style())
                                         .into(),
                                 );
@@ -781,7 +778,7 @@ impl Client {
     fn home_create_vsoft_key<'a>(
         &self,
         key: String,
-    ) -> button::Button<'a, UIMessage, iced::theme::Theme, iced::Renderer> {
+    ) -> button::Button<'a, Message, iced::theme::Theme, iced::Renderer> {
         button(
             if key == "backspace" || key == "\u{e14a}" {
                 text("\u{e14a}").font(MATERIAL_SYMBOLS_OUTLINED)
@@ -794,12 +791,12 @@ impl Client {
         )
         .height(Length::Shrink)
         .width(Length::Shrink)
-        .on_press(UIMessage::Home(HomeMessage::VSoftKeyBoardInput(key)))
+        .on_press(Message::Home(HomeMsg::VSoftKeyBoardInput(key)))
         .style(ButtonStyles::PrimaryRounded.style())
     }
 
     pub fn title(&self) -> String {
-        format!("{} - pmj_client_desktop", PROJECT_NAME)
+        format!("{} - {}", MEMBER_NAME, PROJECT_NAME)
     }
 
     pub fn theme(&self) -> iced::theme::Theme {

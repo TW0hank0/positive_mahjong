@@ -87,7 +87,7 @@ def main():
         _ = util.run_cmd(
             cmd,
             cwd=util.fix_path(),
-            timeout=60 * 75,  # 75分鐘
+            timeout=60 * 90,  # 90分鐘
         )
         _ = util.run_cmd(
             ["cargo", "build", "--package", "pmj-desktop", "--target", target],

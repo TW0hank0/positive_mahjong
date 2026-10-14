@@ -36,7 +36,7 @@ pub const FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES: &[u8] = include_bytes!(
 );
 
 pub const SERVER_PORT: u16 = 6060;
-pub const DEFAULT_GAMEMODE: GameModes = GameModes::Base;
+pub const DEFAULT_GAMEMODE: GameModes = GameModes::V2Better;
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct ClientConnectRequestType {
@@ -106,6 +106,7 @@ pub fn init_tracing_fmt(member_name: String) -> tracing_appender::non_blocking::
     let log_dir_path = dirs::data_local_dir()
         .unwrap_or(env::current_dir().unwrap())
         .join("positive_mahjong")
+        .join("logs")
         .join(member_name.clone());
     if !fs::exists(&log_dir_path).unwrap_or(false) {
         fs::create_dir_all(&log_dir_path).ok();
