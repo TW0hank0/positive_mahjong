@@ -70,7 +70,7 @@ def main():
     for target, pkg in build_info:
         targets.append(target)
         _ = util.run_cmd(["rustup", "target", "add", target], cwd=util.fix_path())
-        _ = util.run_cmd(["cargo", "check", target, "--workspace"], cwd=util.fix_path())
+        _ = util.run_cmd(["cargo", "check", "--target", target, "--workspace"], cwd=util.fix_path())
         print(f"{Fore.CYAN}Building release for target {target}...{Fore.RESET}", end="")
         cmd = ["cargo", "build", "--release", "--locked", "--target", target]
         if pkg is None:
