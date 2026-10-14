@@ -69,7 +69,8 @@ def main():
     targets = []
     for target, pkg in build_info:
         targets.append(target)
-        _ = util.run_cmd(["rustup", "target", "add", target])
+        _ = util.run_cmd(["rustup", "target", "add", target], cwd=util.fix_path())
+        _ = util.run_cmd(["cargo", "check", target, "--workspace"], cwd=util.fix_path())
         print(f"{Fore.CYAN}Building release for target {target}...{Fore.RESET}", end="")
         cmd = ["cargo", "build", "--release", "--locked", "--target", target]
         if pkg is None:
@@ -87,15 +88,21 @@ def main():
         _ = util.run_cmd(
             cmd,
             cwd=util.fix_path(),
-            timeout=60 * 75,  # 75分鐘
+            timeout=60 * 90,  # 90分鐘
         )
         _ = util.run_cmd(
             ["cargo", "build", "--package", "pmj-desktop", "--target", target],
             cwd=util.fix_path(),
-            timeout=60 * 60,  # 一小時
+            timeout=60 * 65,  # 65分鐘
         )
     build_license.main()
     zip_desktop(targets)
+    for target, pkg in build_info:
+        _ = util.run_cmd(
+            ["cargo", "build", "--package", "pmj-desktop", "--target", target],
+            cwd=util.fix_path(),
+            timeout=60 * 55,  # 55分鐘
+        )
 
 
 def zip_desktop(targets: list[str]):
@@ -172,7 +179,7 @@ def zip_desktop(targets: list[str]):
                     print(
                         f"copied to {util.fix_path('artifacts', new_desktop_installer_name)}"
                     )
-                if INCLUDE_FILES_MATCH_TYPE == "inclue_all_files":
+                elif INCLUDE_FILES_MATCH_TYPE == "inclue_all_files":
                     include_files.append(full_file_path)
                 elif INCLUDE_FILES_MATCH_TYPE == "exe_split":
                     match platform.system():

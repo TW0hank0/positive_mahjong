@@ -17,42 +17,18 @@ use tracing::{debug, error};
 
 mod client;
 
-use pmj_shared::shared::{self, FONT_NOTO_SANS_REG_BYTES, ICON_PNG_BYTES, PROJECT_NAME};
-
-pub const FONT_NOTO_SANS_REG: iced::font::Font = iced::font::Font::with_name("Noto Sans TC");
-
-pub fn icon_init() -> Option<iced::window::Icon> {
-    let img = image::load_from_memory_with_format(ICON_PNG_BYTES, image::ImageFormat::Png)
-        .unwrap()
-        .into_rgba8();
-    let (img_width, img_height) = img.dimensions();
-    iced::window::icon::from_rgba(img.into_raw(), img_width, img_height).ok()
-}
+use pmj_shared::shared::init_tracing_fmt;
+use pmj_desktop::shared::{iced_app_settins, iced_window_settings, FONT_NOTO_SANS_REG};
 
 fn main() {
-    let _guard = shared::init_tracing_fmt(String::from("pmj_client_desktop"));
-    let window_settings = iced::window::Settings {
-        maximized: true,
-        min_size: Some(iced::Size::new(720.0, 480.0)),
-        icon: icon_init(),
-        position: iced::window::Position::Centered,
-        ..Default::default()
-    };
-    let app_settings = iced::Settings {
-        id: Some(format!("{} - pmj_client_desktop", PROJECT_NAME)),
-        default_text_size: iced::Pixels::from(24),
-        default_font: FONT_NOTO_SANS_REG,
-        vsync: true,
-        fonts: vec![std::borrow::Cow::from(FONT_NOTO_SANS_REG_BYTES)],
-        ..Default::default()
-    };
+    let _guard = init_tracing_fmt(String::from("pmj-client-desktop"));
     let iced_result = iced::application(
         client::Client::new,
         client::Client::update,
         client::Client::view,
     )
-    .window(window_settings)
-    .settings(app_settings)
+    .window(iced_window_settings())
+    .settings(iced_app_settins(String::from(client::MEMBER_NAME)))
     .default_font(FONT_NOTO_SANS_REG)
     .title(client::Client::title)
     .theme(client::Client::theme)

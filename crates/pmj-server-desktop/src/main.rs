@@ -37,7 +37,7 @@ enum SubCmds {
 }
 
 fn main() {
-    let _guard = pmj_shared::shared::init_tracing_fmt(String::from("pmj_server_gui"));
+    let _guard = pmj_shared::shared::init_tracing_fmt(String::from("pmj-server-desktop"));
     let args = CliArgs::parse();
 
     info!("args.command = {:?}", args.command);

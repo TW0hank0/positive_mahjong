@@ -19,6 +19,7 @@ import shutil
 from typing import Literal
 
 import mistune
+import pydantic
 import requests
 from colorama import Back, Fore
 
@@ -32,16 +33,27 @@ ignored_paths: list[str] = [
     ".venv",
 ]
 
-SKIP_PREV_ARTIFACTS: bool = True
+SKIP_PREV_ARTIFACTS: bool = False
 GH_PAGES_BASE_URL: str = "https://tw0hank0.github.io/positive_mahjong/"
 ARTIFACTS_LIST_FILE: str = "releases-artifacts-list.json"
-SCHEME_ARTIFACTS_LIST = dict[
+TYPE_HINT_RELEASE_ARTIFACTS = dict[
+    Literal[
+        "aarch64-pc-windows-msvc",
+        "x86_64-pc-windows-msvc",
+        "x86_64-unknown-linux-gnu",
+        "x86_64-unknown-linux-musl",
+        "aarch64-unknown-linux-musl",
+        "aarch64-unknown-linux-gnu",
+    ],
+    str,
+]
+TYPE_HINT_ARTIFACTS_LIST = dict[
     str,
     dict[
         Literal[
             "is_released", "release_artifacts", "ci_test_artifacts", "release_name"
         ],
-        bool | dict[str, str] | dict[str, dict] | str,
+        bool | dict[str, str] | dict[str, dict] | str | TYPE_HINT_RELEASE_ARTIFACTS,
     ],
 ]
 RUST_TARGETS = [
@@ -52,6 +64,13 @@ RUST_TARGETS = [
     "aarch64-unknown-linux-musl",
     "aarch64-unknown-linux-gnu",
 ]
+
+
+class ArtifactList(pydantic.BaseModel):
+    is_released: bool
+    release_name: str
+    release_artifacts: TYPE_HINT_RELEASE_ARTIFACTS
+    ci_tests: dict[str, TYPE_HINT_RELEASE_ARTIFACTS]
 
 
 def main():

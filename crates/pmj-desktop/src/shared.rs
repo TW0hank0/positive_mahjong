@@ -18,6 +18,10 @@ use iced::{
     widget::{button, container},
 };
 
+use pmj_shared::shared::{FONT_NOTO_SANS_REG_BYTES, PROJECT_NAME, ICON_PNG_BYTES};
+
+pub const FONT_NOTO_SANS_REG: iced::font::Font = iced::font::Font::with_name("Noto Sans TC");
+
 #[derive(Debug)]
 pub enum ContainerStyles {
     PrimaryOutlined,
@@ -124,5 +128,29 @@ impl ButtonStyles {
                 }
             },
         }
+    }
+}
+
+pub fn iced_window_settings() -> iced::window::Settings {
+    let img = image::load_from_memory_with_format(ICON_PNG_BYTES, image::ImageFormat::Png)
+        .unwrap()
+        .into_rgba8();
+    let (img_width, img_height) = img.dimensions();
+    iced::window::Settings {
+        maximized: true,
+        min_size: Some(iced::Size::new(720.0, 480.0)),
+        icon: iced::window::icon::from_rgba(img.into_raw(), img_width, img_height).ok(),
+        position: iced::window::Position::Centered,
+        ..Default::default()
+    }
+}
+pub fn iced_app_settins(member_name: String) -> iced::Settings {
+    iced::Settings {
+        id: Some(format!("{} - {}", member_name, PROJECT_NAME)),
+        default_text_size: iced::Pixels::from(24),
+        default_font: FONT_NOTO_SANS_REG,
+        vsync: true,
+        fonts: vec![std::borrow::Cow::from(FONT_NOTO_SANS_REG_BYTES)],
+        ..Default::default()
     }
 }

@@ -48,8 +48,8 @@ fn main() {
     for file in INCLUDE_FILES {
         let fullpath = target_dir.join(format!("{}{}", file, EXE_SUFFIX));
         if fs::exists(fullpath.clone()).unwrap_or(false) {
-            zip.start_file_from_path(
-                fullpath.file_name().unwrap(),
+            zip.start_file(
+                fullpath.file_name().unwrap().display(),
                 zip::write::FileOptions::DEFAULT.compression_method(zip::CompressionMethod::Stored),
             )
             .unwrap();
