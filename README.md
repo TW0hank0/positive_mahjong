@@ -33,9 +33,9 @@
 
 尚未完成...
 
-見：[專案說明文件](https://tw0hank0.gitlab.io/positive_mahjong/docs/)
+見：[專案說明文件](https://tw0hank0.github.io/positive_mahjong/docs/)
 
-可在 Github Release 下載預編譯檔案或是在 [專案網站（Github Pages）](https://tw0hank0.github.io/positive_mahjong/files/) 下載。
+可在 Release 下載預編譯檔案或是在 [專案網站（Github Pages）](https://tw0hank0.github.io/positive_mahjong/files/) 下載。
 
 ### 授權與聲明
 
@@ -57,29 +57,29 @@
 #### 第三方模組庫授權
 
 見：
-[ThirdPartyLicense-Rust.md](https://tw0hank0.gitlab.io/positive_mahjong/files/ThirdPartyLicense-Rust.md)
-[ThirdPartyLicense-Rust.html](https://tw0hank0.gitlab.io/positive_mahjong/files/ThirdPartyLicense-Rust.html)
-[ThirdPartyLicense-Rust.json](https://tw0hank0.gitlab.io/positive_mahjong/files/ThirdPartyLicense-Rust.json)
+[ThirdPartyLicense-Rust.md](https://tw0hank0.github.io/positive_mahjong/files/ThirdPartyLicense-Rust.md)
+[ThirdPartyLicense-Rust.html](https://tw0hank0.github.io/positive_mahjong/files/ThirdPartyLicense-Rust.html)
+[ThirdPartyLicense-Rust.json](https://tw0hank0.github.io/positive_mahjong/files/ThirdPartyLicense-Rust.json)
 
 #### 第三方專案聲明
 
-見：[專案文檔](https://tw0hank0.gitlab.io/positive_mahjong/docs/license/res.html)
+見：[專案文檔](https://tw0hank0.github.io/positive_mahjong/docs/license/res.html)
 
 ##### Noto Sans TC
 
-本專案使用的 `Noto Sans TC` 依據 [SIL OPEN FONT LICENSE Version 1.1](https://tw0hank0.gitlab.io/positive_mahjong/files/Noto_Sans_TC_OFL.txt) 授權，作者為 \[Google 與 Adobe\]。
+本專案使用的 `Noto Sans TC` 依據 [SIL OPEN FONT LICENSE Version 1.1](https://tw0hank0.github.io/positive_mahjong/files/LICENSES_LicenseRef-Noto-Sans-TC.txt) 授權，作者為 \[Google 與 Adobe\]。
 
 路徑：`assets/Noto_Sans_TC/`
 
 ##### Material Symbols
 
-本專案使用的 `Material Symbols` 依據 [Apache License Version 2.0](https://tw0hank0.gitlab.io/positive_mahjong/files/material_symbols_LICENSE) 授權，作者為 \[Google\]。
+本專案使用的 `Material Symbols` 依據 [Apache License Version 2.0](https://tw0hank0.github.io/positive_mahjong/files/material_symbols_LICENSE) 授權，作者為 \[Google\]。
 
 路徑：`assets/material_symbols/`
 
 ##### loading_spinners
 
-本專案使用的 `loading_spinners` 依據 [MIT License](https://tw0hank0.gitlab.io/positive_mahjong/files/LICENSES_iced.txt) 授權，作者為 \[Héctor Ramón 與 Iced contributors\]。
+本專案使用的 `loading_spinners` 依據 [MIT License](https://tw0hank0.github.io/positive_mahjong/files/LICENSES_LicenseRef-Iced.txt) 授權，作者為 \[Héctor Ramón 與 Iced contributors\]。
 
 路徑：
 
