@@ -1,0 +1,180 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# 版權所有 (C) 2026 TW0hank0
+#
+# 本檔案屬於 positive_mahjong 專案的一部分。
+# 專案儲存庫：https://gitlab.com/TW0hank0/positive_mahjong
+#
+# 本程式為自由軟體：您可以根據自由軟體基金會發佈的 GNU Affero 通用公共授權條款
+# 第 3 版（僅此版本）重新發佈及/或修改本程式。
+#
+# 本程式的發佈是希望它能發揮功用，但不提供任何擔保；
+# 甚至沒有隱含的適銷性或特定目的適用性擔保。詳見 GNU Affero 通用公共授權條款。
+#
+# 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
+# 如果沒有，請參見 <https://www.gnu.org/licenses/>。
+
+toml-version = "v1.1.0"
+
+[files]
+include = [
+    "**/*.toml",
+    "**/Cargo.toml",
+    "Cargo.toml",
+    "about.toml",
+    "crates/pmj-client-core/Cargo.toml",
+    "crates/pmj-client-cross/Cargo.toml",
+    "crates/pmj-client-desktop/Cargo.toml",
+    "crates/pmj-desktop/Cargo.toml",
+    "crates/pmj-gamemodes/Cargo.toml",
+    "crates/pmj-server-desktop/Cargo.toml",
+    "deny.toml",
+    "rust-toolchain.toml",
+]
+exclude = [
+    "**/.venv/**",
+    ".cargo/config.toml",
+    "auto_generated/**",
+    "docs/book/**",
+    "scripts/pylock.toml",
+    "supply-chain/**",
+    "target/**",
+    "website_build/**",
+]
+respect-ignore-files = true
+
+[format]
+[format.rules]
+array-bracket-space-width = 0
+array-comma-space-width = 1
+comment-style = "normalize"
+date-time-delimiter = "T"
+group-blank-lines-limit = 1
+indent-style = "space"
+indent-sub-tables = false
+indent-table-key-value-pairs = false
+indent-width = 4
+inline-table-brace-space-width = 1
+inline-table-comma-space-width = 1
+key-quote-style = "double"
+key-value-equals-sign-alignment = false
+key-value-equals-sign-space-width = 1
+line-ending = "lf"
+string-quote-style = "double"
+table-blank-lines = 1
+trailing-comment-alignment = false
+trailing-comment-space-width = 2
+
+[lint]
+[lint.rules]
+dotted-keys-out-of-order = "warn"
+key-empty = "warn"
+tables-out-of-order = "warn"
+
+[lsp]
+code-action.enabled = true
+completion.enabled = true
+diagnostic.enabled = true
+document-link.enabled = true
+formatting.enabled = true
+goto-declaration.enabled = true
+goto-definition.enabled = true
+goto-type-definition.enabled = true
+hover.enabled = true
+workspace-diagnostic.enabled = true
+
+[schema]
+enabled = true
+strict = true
+catalog = {
+    paths = [
+        "tombi://www.schemastore.org/api/json/catalog.json",
+        "https://www.schemastore.org/api/json/catalog.json",
+    ],
+}
+format.rules = {
+    array-values-order.enabled = true,
+    table-keys-order.enabled = true,
+}
+lint.rules = {
+    deprecated = "warn",
+}
+
+[extensions]
+"tombi-toml/cargo" = {
+    lsp = {
+        code-action = {
+            add-to-workspace-and-inherit-dependency.enabled = true,
+            convert-dependency-to-table-format.enabled = true,
+            inherit-dependency-from-workspace.enabled = true,
+            inherit-from-workspace.enabled = true,
+            update-dependency-to-latest-version.enabled = true,
+        },
+        completion = {
+            dependency-feature.enabled = true,
+            dependency-version.enabled = true,
+            path.enabled = true,
+        },
+        document-link = {
+            crates-io.enabled = true,
+        },
+        goto-declaration = {
+            dependency.enabled = true,
+        },
+        goto-definition = {
+            dependency.enabled = true,
+            member.enabled = true,
+            path.enabled = true,
+        },
+        hover = {
+            default-features.enabled = true,
+            dependency-detail.enabled = true,
+            feature-dependencies.enabled = true,
+        },
+        inlay-hint = {
+            default-features.enabled = true,
+            dependency-version.enabled = true,
+            workspace-value.enabled = true,
+        },
+    }
+}
+"tombi-toml/pyproject" = {
+    lsp = {
+        code-action = {
+            add-to-workspace-and-use-workspace-dependency.enabled = true,
+            update-dependency-to-latest-version.enabled = true,
+            use-workspace-dependency.enabled = true,
+        },
+        completion = {
+            path.enabled = true,
+        },
+        document-link = {
+            pypi-org.enabled = true,
+        },
+        goto-declaration = {
+            dependency.enabled = true,
+            member.enabled = true,
+        },
+        goto-definition = {
+            dependency.enabled = true,
+            member.enabled = true,
+            path.enabled = true,
+        },
+        hover = {
+            dependency-detail.enabled = true,
+        },
+        inlay-hint = {
+            dependency-version.enabled = true,
+        },
+    }
+}
+"tombi-toml/tombi" = {
+    lsp = {
+        completion = {
+            path.enabled = true,
+        },
+        goto-definition = {
+            path.enabled = true,
+        },
+        hover.enabled = true,
+    }
+}

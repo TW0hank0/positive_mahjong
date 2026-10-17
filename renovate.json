@@ -1,6 +1,6 @@
 {
 	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
-	"extends": ["config:best-practices","security:minimumReleaseAgeCrate"],
+	"extends": ["config:best-practices", "security:minimumReleaseAgeCrate"],
 	"automerge": false,
 	"labels": ["dep-update"],
 	"customManagers": [
@@ -19,12 +19,12 @@
 		{
 			"automerge": false,
 			"matchPackageNames": ["*"]
-},
+		},
 		{
-					"description": "將所有未鎖定或萬用字元版本釘選到具體版本",
-								"rangeStrategy": "pin",
-											"matchPackageNames": ["*"]
-											}
+			"description": "將所有未鎖定或萬用字元版本釘選到具體版本",
+			"rangeStrategy": "pin",
+			"matchPackageNames": ["*"]
+		}
 	],
 	"timezone": "Asia/Taipei"
 }

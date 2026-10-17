@@ -69,8 +69,8 @@ RUST_TARGETS = [
 class ArtifactList(pydantic.BaseModel):
     is_released: bool
     release_name: str
-    release_artifacts: TYPE_HINT_RELEASE_ARTIFACTS
-    ci_tests: dict[str, TYPE_HINT_RELEASE_ARTIFACTS]
+    release_artifacts: TYPE_HINT_RELEASE_ARTIFACTS = {}
+    ci_tests: dict[str, TYPE_HINT_RELEASE_ARTIFACTS] = {}
 
 
 def main():
@@ -178,21 +178,31 @@ def build_download_page(build_root: str):
         f.write(download_page)
 
 
-def artifacts_list():
+def artifacts_list() -> None:
     # download prev
     if SKIP_PREV_ARTIFACTS is False:
+        print(f"requests.get: {GH_PAGES_BASE_URL}files/{ARTIFACTS_LIST_FILE}")
         prev_artifacts_list = requests.get(
             f"{GH_PAGES_BASE_URL}files/{ARTIFACTS_LIST_FILE}"
         )
         prev_artifacts_list.raise_for_status()
-        prev_list = prev_artifacts_list.json()
-        list(prev_list.keys()).sort()
+        i_prev_list: dict[str, ArtifactList | dict] = prev_artifacts_list.json()
+        prev_list = {}
+        for iprev_key, iprev_value in i_prev_list.items():
+            prev_list[iprev_key] = ArtifactList.model_validate_json(
+                json.dumps(iprev_value)
+            )
+        print("prepared prev_list")
+        old_prev_list = prev_artifacts_list.json()
+        list(old_prev_list.keys()).sort()
         print(f"prev_list={prev_list}")
-        for arelease_num in prev_list:
-            arelease = prev_list[arelease_num]
+        print(f"old_prev_list={old_prev_list}")
+        for arelease_num in old_prev_list:
+            arelease = old_prev_list[arelease_num]
             if arelease["is_released"] is True:
                 arelease_artifcats: dict = arelease["release_artifacts"]
                 for ara_filename in arelease_artifcats.values():
+                    print(f"requests.get({GH_PAGES_BASE_URL}files/{ara_filename})")
                     ara_file_resp = requests.get(
                         f"{GH_PAGES_BASE_URL}files/{ara_filename}"
                     )
@@ -215,7 +225,7 @@ def artifacts_list():
     if SKIP_PREV_ARTIFACTS is True:
         new_list = {"1": {"is_released": False, "release_name": version, "ci_test": {}}}
     else:
-        new_list = prev_list
+        new_list = old_prev_list
     # prepare file list
     files_list = {}
     for file in util.list_files(
@@ -233,6 +243,7 @@ def artifacts_list():
             "is_released": False,
             "release_name": version,
             "ci_test": {},
+            "release_artifacts": {},
         }
         lastest_num = str(int(lastest_num) + 1)
     commit_info = util.get_commit_info()

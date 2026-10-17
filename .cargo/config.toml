@@ -14,17 +14,17 @@
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 [unstable]
-# codegen-backend = true
+codegen-backend = true
 profile-rustflags = true
 
-# [profile.dev]
-# # GUI is NOT able with cranelift cg-backend currently!
-# #codegen-backend = "cranelift"
-# codegen-backend = "llvm"
-# [profile.dev.build-override]
-# codegen-backend = "llvm"
-# [profile.dev.package."*"]
-# codegen-backend = "llvm"
+[profile.dev]
+# GUI is NOT able with cranelift cg-backend currently!
+# codegen-backend = "cranelift"
+codegen-backend = "llvm"
+[profile.dev.build-override]
+codegen-backend = "llvm"
+[profile.dev.package."*"]
+codegen-backend = "llvm"
 
 [profile.release]
 # use release profile cause by: let rust-analyzer work
@@ -44,8 +44,8 @@ rustflags = [
 # ]
 
 [target.x86_64-pc-windows-msvc]
-# use open-source linker
-linker = "lld-link"
+# use open-source linker (embed in rust)
+linker = "rust-lld"
 
 [target.x86_64-unknown-linux-gnu]
 linker = "gcc"

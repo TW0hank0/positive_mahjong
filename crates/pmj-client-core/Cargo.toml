@@ -14,13 +14,15 @@
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 [package]
-authors = { workspace = true }
-edition = { workspace = true }
-license = { workspace = true }
 name = "pmj-client-core"
-repository = { workspace = true }
-rust-version.workspace = true
 version = { workspace = true }
+edition = { workspace = true }
+rust-version.workspace = true
+repository = { workspace = true }
+license = { workspace = true }
+
+[lib]
+path = "src/lib.rs"
 
 [dependencies]
 pmj-gamemodes = { workspace = true }
@@ -32,6 +34,3 @@ url = { workspace = true }
 
 [features]
 default = []
-
-[lib]
-path = "src/lib.rs"

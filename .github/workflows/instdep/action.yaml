@@ -20,6 +20,13 @@ runs:
     - name: Install uv
       uses: astral-sh/setup-uv@v10.3.0
 
+    - name: Remove Snap
+      if: runner.os == 'Linux'
+      run: |
+        sudo systemctl stop snapd.service
+        sudo apt-get purge -y snapd
+        # sudo rm -rf ~/snap /snap /var/snap /var/lib/snapd /etc/snapd
+
     - name: install Linux build needed dep
       shell: bash
       if: runner.os == 'Linux'

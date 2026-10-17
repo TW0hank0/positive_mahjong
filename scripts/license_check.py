@@ -36,43 +36,24 @@ def addlicense_check():
     ignore_dir = [
         "**/.git/**",
         "**/.venv/**",
-        "dist/**",
-        "pkg/**",
+        # "dist/**",
+        # "pkg/**",
         "target/**",
         "build/**",
         "**/__pycache__/**",
         "**/*.lock",
         "**/.python-version",
-        # "**/*.png",
-        # "**/*.kra",
-        # "**/*.ttf",
-        # "**/*.otf",
         "assets/**",
-        # "**/*.json",
         # auto generated license info
         "**/ThirdPartyLicense-Rust.*",
         "**/ThirdPartyLicense-Python.*",
         "auto_generated/**",
-        # "**/*.icon",
-        # "**/*.ico",
-        "**/docs/book/**",
-        # for ci
+        "docs/book/**",
+        # for ci rustup install
         "**/rustup-init.sh",
-        # for ci
+        # for ci rustup install
         "**/rustup-init.exe",
         "website_build/**",
-        # Author: [iced team](https://github.com/iced-rs/)
-        # This file is from project [iced](https://github.com/iced-rs/iced/).
-        "crates/pmj-client-desktop/src/easing.rs",
-        # Author: [iced team](https://github.com/iced-rs/)
-        # This file is from project [iced](https://github.com/iced-rs/iced/).
-        "crates/pmj-client-desktop/src/circular.rs",
-        # Author: [iced team](https://github.com/iced-rs/)
-        # This file is from project [iced](https://github.com/iced-rs/iced/).
-        "crates/pmj-client-desktop-base/src/easing.rs",
-        # Author: [iced team](https://github.com/iced-rs/)
-        # This file is from project [iced](https://github.com/iced-rs/iced/).
-        "crates/pmj-client-desktop-base/src/circular.rs",
         # Author: [iced team](https://github.com/iced-rs/)
         # This file is from project [iced](https://github.com/iced-rs/iced/).
         "crates/pmj-desktop/src/easing.rs",

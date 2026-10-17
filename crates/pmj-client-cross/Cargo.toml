@@ -14,29 +14,28 @@
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 [package]
-authors = { workspace = true }
-edition = { workspace = true }
-license = { workspace = true }
 name = "pmj-client-cross"
-repository = { workspace = true }
-rust-version.workspace = true
 version = { workspace = true }
-
-[dependencies]
-# --- shared ---
-godot = { workspace = true }
-pmj-shared = { workspace = true }
-serde_json = { workspace = true }
-# --- wasm ---
-console_error_panic_hook = { workspace = true, optional = true }
-wasm-bindgen = { workspace = true, optional = true }
-
-[features]
-android = []
-default = []
-wasm = ["dep:console_error_panic_hook", "dep:wasm-bindgen"]
+edition = { workspace = true }
+rust-version.workspace = true
+repository = { workspace = true }
+license = { workspace = true }
 
 [lib]
 crate-type = ["cdylib"]
 name = "pmj_client_cross_lib"
 path = "rust/src/lib.rs"
+
+[dependencies]
+# --- wasm ---
+console_error_panic_hook = { workspace = true, optional = true }
+# --- shared ---
+godot = { workspace = true }
+pmj-shared = { workspace = true }
+serde_json = { workspace = true }
+wasm-bindgen = { workspace = true, optional = true }
+
+[features]
+default = []
+android = []
+wasm = ["dep:console_error_panic_hook", "dep:wasm-bindgen"]
