@@ -44,9 +44,7 @@ def main():
     if os.path.exists(WORK_DIR) is False:
         os.mkdir(WORK_DIR)
     LOGGER.debug("start mr script")
-    private_token = os.environ.get(
-        "GITLAB_TOKEN", "glpat-0PdYyoG0FA7VG7nBoZ7T0mM6MQpvOjEKdTpwdmhucQ8.01.170irtvei"
-    )
+    private_token = os.environ.get("GITLAB_TOKEN")
     if private_token is None:
         LOGGER.error("GITLAB_TOKEN environment variable is not set")
         sys.exit(1)
