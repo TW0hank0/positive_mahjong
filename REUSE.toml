@@ -43,6 +43,7 @@ path = [
     "scripts/**",
     "supply-chain/*",
     "taplo.toml",
+    "tombi.toml",
     "templates/*",
     "website/**",
 ]
