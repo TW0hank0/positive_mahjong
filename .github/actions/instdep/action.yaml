@@ -46,7 +46,7 @@ runs:
       shell: bash
       run: |
         uv self version
-        uv python install cpython-3.14
+        uv python install cpython-3.15
 
     - name: install rustup on Windows
       if: runner.os == 'Windows'
@@ -76,6 +76,10 @@ runs:
         rustup --version
         rustc --version
         cargo --version
+
+    - run: rustup component add rustc-codegen-cranelift
+      shell: bash
+      if: runner.os == 'Linux'
 
     - name: install go
       uses: actions/setup-go@v7.0.0
@@ -141,12 +145,13 @@ runs:
         taplo --version
         mdbook --version
         eza --version
-    - name: install reuse-tool, ruff and ty using uv
+    - name: install reuse-tool, tombi, ruff and ty using uv
       shell: bash
       run: |
         uv tool install ruff
         uv tool install ty
         uv tool install reuse[charset-normalizer]
+        uv tool install tombi
     - name: list files with eza
       shell: bash
       run: eza --tree .

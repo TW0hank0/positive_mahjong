@@ -12,38 +12,34 @@
 #
 # 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
-
 name: Renovate GitLab Projects
-
 "on":
   # 設定定時觸發，每天 10 與 20 點 UTC
   schedule:
-    - cron: "0 10 * * *"
-    - cron: "0 20 * * *"
+    - cron: 0 */2 * * *
   # 支援在 GitHub 上手動點擊觸發
-  workflow_dispatch:
+  workflow_dispatch: 
   push:
     branches:
       - master
-
 jobs:
   renovate:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7.0.1
-
       - name: Run Renovate against GitLab
         uses: renovatebot/github-action@v46.3.8
         env:
           # 告訴 Renovate 平臺是 GitLab
-          RENOVATE_PLATFORM: "gitlab"
+          RENOVATE_PLATFORM: gitlab
           # 帶入 GitLab PAT
-          RENOVATE_TOKEN: ${{ secrets.GL_PAT }}
+          RENOVATE_TOKEN: ${{ secrets.RENOVATE_GITLAB_TOKEN }}
           # Github Pat
           RENOVATE_GITHUB_COM_TOKEN: ${{ secrets.GH_TOKEN }}
           # 指定目標 GitLab 專案
           # 若有多個專案可用空格隔開，如 'owner/repo1 owner/repo2'
-          RENOVATE_REPOSITORIES: "TW0hank0/positive_mahjong"
+          RENOVATE_REPOSITORIES: TW0hank0/positive_mahjong
+          LOG_LEVEL: debug
         with:
           renovate-version: full

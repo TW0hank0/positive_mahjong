@@ -71,7 +71,7 @@ def main():
         targets.append(target)
         _ = util.run_cmd(["rustup", "target", "add", target], cwd=util.fix_path())
         _ = util.run_cmd(
-            ["cargo", "check", "--target", target, "--workspace"],
+            ["cargo", "check", "--release", "--target", target, "--workspace"],
             cwd=util.fix_path(),
             stream=True,
         )

@@ -107,10 +107,8 @@ jobs:
           uv venv
           uv sync
           cd ..
-      - name: Run debug check
+      - name: Run cargo check
         run: cargo check --workspace
-      - name: Run release check
-        run: cargo check --release --workspace
       - name: Run clippy
         run: cargo clippy
       - name: Run License Check
