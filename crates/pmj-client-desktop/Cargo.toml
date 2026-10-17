@@ -14,13 +14,16 @@
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 [package]
-authors = { workspace = true }
-edition = { workspace = true }
-license = { workspace = true }
 name = "pmj-client-desktop"
-repository = { workspace = true }
-rust-version.workspace = true
 version = { workspace = true }
+edition = { workspace = true }
+rust-version.workspace = true
+repository = { workspace = true }
+license = { workspace = true }
+
+[[bin]]
+name = "pmj-client-desktop"
+path = "src/main.rs"
 
 [dependencies]
 iced = { workspace = true }
@@ -37,7 +40,3 @@ url = { workspace = true }
 
 [features]
 default = []
-
-[[bin]]
-name = "pmj-client-desktop"
-path = "src/main.rs"
