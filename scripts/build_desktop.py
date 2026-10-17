@@ -71,7 +71,9 @@ def main():
         targets.append(target)
         _ = util.run_cmd(["rustup", "target", "add", target], cwd=util.fix_path())
         _ = util.run_cmd(
-            ["cargo", "check", target, "--workspace"], cwd=util.fix_path(), stream=True
+            ["cargo", "check", "--target", target, "--workspace"],
+            cwd=util.fix_path(),
+            stream=True,
         )
         print(f"{Fore.CYAN}Building release for target {target}...{Fore.RESET}", end="")
         cmd = ["cargo", "build", "--release", "--locked", "--target", target]

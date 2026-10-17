@@ -1,8 +1,8 @@
 {
 	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
-	"extends": ["config:recommended"],
+	"extends": ["config:best-practices","security:minimumReleaseAgeCrate"],
 	"automerge": false,
-	"labels": ["it-is::dep-update"],
+	"labels": ["dep-update"],
 	"customManagers": [
 		{
 			"description": "Monitor cargo tools versions in ci-cache-version.json",
@@ -19,12 +19,12 @@
 		{
 			"automerge": false,
 			"matchPackageNames": ["*"]
-		},
+},
 		{
-			"description": "將所有未鎖定或萬用字元版本釘選到具體版本",
-			"rangeStrategy": "pin",
-			"matchPackageNames": ["*"]
-		}
+					"description": "將所有未鎖定或萬用字元版本釘選到具體版本",
+								"rangeStrategy": "pin",
+											"matchPackageNames": ["*"]
+											}
 	],
 	"timezone": "Asia/Taipei"
 }
