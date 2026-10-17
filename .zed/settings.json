@@ -1,22 +1,32 @@
 {
-	"languages": {
-		"JSON": {
-			"tab_size": 4
-		},
-		"JSONC": {
-			"tab_size": 4
-		}
-	},
+	"languages": { "JSON": { "tab_size": 4 }, "JSONC": { "tab_size": 4 } },
 	"line_ending": "enforce_lf",
 	"lsp": {
 		"rust-analyzer": {
 			"initialization_options": {
-				"cargo": {
-					"features": [],
-					"extraArgs": []
-				}
-			},
-			"excludeGlobs": ["**/*.md"]
+				"cargo": { "features": [], "extraArgs": [] },
+				"files": {
+					"excludeDirs": [],
+					"exclude": [
+						"**/*.md",
+						"**/*.html",
+						"**/*.yaml",
+						"**/*.css",
+						"**/*.hbs",
+						"**/*.json",
+						"**/*.py",
+						"**/*.yaml"
+					]
+				},
+				"excludeGlobs": ["**/*.md",
+				"**/*.html",
+				"**/*.yaml",
+				"**/*.css",
+				"**/*.hbs",
+				"**/*.json",
+				"**/*.py",
+				"**/*.yaml"]
+			}
 		}
 	},
 	"ensure_final_newline_on_save": true,

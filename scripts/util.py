@@ -33,30 +33,38 @@ rtb.install()
 
 def show_cmd(
     command: list[str],
-    prefix: str = "  ",
-    first_prefix: str = "| ",
-    suffix: str = " \\ ",
-):
+    # prefix: str = "  ",
+    # first_prefix: str = "| ",
+    # suffix: str = " \\ ",
+) -> str:
     (twidth, _theight) = shutil.get_terminal_size()
-    resplit_command = []
-    last_command: str = " ".join(command)
-    while True:
-        time_prefix = first_prefix if len(resplit_command) <= 0 else prefix
-        if (len(last_command) + len(time_prefix) + len(suffix)) < twidth:
-            resplit_command.append(last_command)
-            break
-        else:
-            resplit_command.append(
-                last_command[: twidth - len(time_prefix) - len(suffix)]
+    formatted = str(Back.LIGHTBLACK_EX)
+    if len(" ".join(command)) <= twidth:
+        formatted += " ".join(command)
+    else:
+        formatted += f"{Back.LIGHTBLACK_EX}{command[0]}  \\{Back.RESET}\n"
+        for cmd_part in command[1 : len(command) - 2]:
+            formatted += f"  {Back.LIGHTBLACK_EX}{cmd_part}  \\{Back.RESET}\n"
+        del cmd_part
+        formatted += f"  {Back.LIGHTBLACK_EX}{command[len(command) - 1]}{Back.RESET}"
+    formatted += str(Back.RESET)
+    return formatted
+
+
+def show_output(name: str, content: str) -> str:
+    formatted = ""
+    if (content == "\n") or (content.strip() == ""):
+        formatted += f"{Fore.MAGENTA}{name} does not have any content.{Fore.RESET}"
+    else:
+        formatted += f"{Fore.LIGHTBLACK_EX}---{Fore.RESET} {name}\n"
+        line_num = 1
+        for line in content.split("\n"):
+            formatted += (
+                f"{Fore.LIGHTBLACK_EX}{str(line_num).rjust(3)}|{Fore.RESET} {line}\n"
             )
-            last_command = last_command[twidth - len(time_prefix) - len(suffix) :]
-    return (
-        f"{Fore.LIGHTBLACK_EX}{first_prefix}{Fore.RESET}{Back.LIGHTBLACK_EX}"
-        + f"{suffix}{Back.RESET}\n{str(Fore.LIGHTBLACK_EX) + prefix + str(Fore.RESET)}{Back.LIGHTBLACK_EX}".join(
-            resplit_command
-        )
-        + str(Back.RESET)
-    )
+            line_num += 1
+        formatted += f"{Fore.LIGHTBLACK_EX}--- end-of {name}{Fore.RESET}"
+    return formatted
 
 
 def run_cmd(
@@ -92,19 +100,20 @@ def run_cmd(
         if process.poll() is not None:
             break
         elif int(time.time() - start_time) > timeout:
+            show_output(
+                "stdout",
+                "" if process.stdout is None else process.stdout.read().decode(),
+            )
+            show_output(
+                "stderr",
+                "" if process.stderr is None else process.stderr.read().decode(),
+            )
             raise subprocess.TimeoutExpired(cmd=command, timeout=timeout)
         else:
             time.sleep(0.00001)
     end_time = time.time()
     process_time = end_time - start_time
-    if process.stdout is None:
-        pstdout = ""
-    else:
-        pstdout = process.stdout.read().decode()
-    if process.stderr is None:
-        pstderr = ""
-    else:
-        pstderr = process.stderr.read().decode()
+    pstdout = "" if process.stdout is None else process.stdout.read().decode()
     if int(process_time) > 1:
         process_time_str = f"({process_time:.3f} secs)"
     else:
@@ -114,6 +123,7 @@ def run_cmd(
             f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.GREEN}Process finished sucessful.{Fore.RESET} {Fore.LIGHTBLACK_EX}{process_time_str}{Fore.RESET}"
         )
     else:
+        pstderr = "" if process.stderr is None else process.stderr.read().decode()
         print(
             f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.RED}Process exited with non-zero code{Fore.RESET} {Fore.LIGHTBLACK_EX}({process.returncode}){Fore.RESET}! {Fore.LIGHTBLACK_EX}{process_time_str}{Fore.RESET}"
         )
@@ -121,17 +131,7 @@ def run_cmd(
             ("stdout", pstdout),
             ("stderr", pstderr),
         ]:
-            if (data == "\n") or (data.strip() == ""):
-                print(f"{Fore.MAGENTA}{name} does not have any content.{Fore.RESET}")
-            else:
-                print(f"{Fore.LIGHTBLACK_EX}---{Fore.RESET} {name}")
-                line_num = 1
-                for line in data.split("\n"):
-                    print(
-                        f"{Fore.LIGHTBLACK_EX}{str(line_num).rjust(3)}|{Fore.RESET} {line}"
-                    )
-                    line_num += 1
-                print(f"{Fore.LIGHTBLACK_EX}--- end-of {name}{Fore.RESET}")
+            print(show_output(name, data))
         if exit_on_failed is True:
             sys.exit(process.returncode)
     return (process.returncode, pstdout.rstrip("\n"))
