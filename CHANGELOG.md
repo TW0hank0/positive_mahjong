@@ -23,7 +23,13 @@
 發佈版本時使用：
 
 ```
-git tag -a "版本" -m "release pmj: 版本"
+# Deprecated
+# git tag -a "版本" -m "release pmj: 版本"
+# New:
+git checkout master
+git checkout -b {版本}
+git commit -m "release pmj: {版本}"
+git push origin {版本}
 ```
 
 ---
