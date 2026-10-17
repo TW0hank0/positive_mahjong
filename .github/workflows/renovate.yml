@@ -13,8 +13,8 @@
 # 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 name: Renovate GitLab Projects
-"on":
-  # 設定定時觸發，每天 10 與 20 點 UTC
+on:
+  # 設定定時觸發，每 2 小時 UTC
   schedule:
     - cron: 0 */2 * * *
   # 支援在 GitHub 上手動點擊觸發

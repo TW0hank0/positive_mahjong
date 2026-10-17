@@ -28,7 +28,7 @@ from typing import Literal
 from colorama import Back, Fore
 from rich import traceback as rtb
 
-rtb.install()
+rtb.install(show_locals=True)
 
 
 def show_cmd(
@@ -226,7 +226,7 @@ def fix_path(*p: str) -> str:
 
 
 def get_version(
-    how_get: Literal["file_workspace", "file_package", "cargo"] = "file_workspace",
+    how_get: Literal["file_workspace", "file_package", "cargo"] = "cargo",
 ) -> str:
     if how_get == "file_package" or how_get == "file_workspace":
         with open(
@@ -244,9 +244,11 @@ def get_version(
         )
         metadata = json.loads(stdout)
         for pkg in metadata["packages"]:
-            if pkg["name"] == "pmj_client_desktop":
-                version = str(pkg["version"])
-                break
+            # if pkg["name"] == "pmj_client_desktop":
+            #     version = str(pkg["version"])
+            #     break
+            version = str(pkg["version"])
+            break
         else:
             raise RuntimeError("no version found.")
     return version
