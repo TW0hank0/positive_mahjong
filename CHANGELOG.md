@@ -98,6 +98,10 @@ git push origin {版本}
 - 新增：［網頁］下載
 - 新增：［電腦］pmj-desktop-installer
 
+**2026-10-17**
+
+- 新增：MR-Check (my.py)
+
 ## [v0.1.1] - 2026-8-17
 
 修復客戶端錯誤，並改進訊息顯示。

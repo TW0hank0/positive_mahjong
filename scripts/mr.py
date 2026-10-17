@@ -24,14 +24,12 @@ def upsert_note(mr_obj, current_user_id: int, new_body: str):
     """
     notes = mr_obj.notes.list(get_all=True)
     target_note = None
-
     for note in notes:
         author_id = note.author.get("id") if isinstance(note.author, dict) else None
-        if author_id == current_user_id:
+        if author_id is not None and author_id == current_user_id:
             target_note = note
             break
-
-    if target_note:
+    if target_note is not None:
         target_note.body = new_body
         target_note.save()
         LOGGER.info(f"Updated existing note (Note ID: {target_note.id})")

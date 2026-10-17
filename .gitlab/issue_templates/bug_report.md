@@ -14,4 +14,4 @@ type something here.
 
 ---
 
-/label ~"it-is::bug"
+/label ~"bug"
