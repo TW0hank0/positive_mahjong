@@ -6,4 +6,4 @@ type something here.
 
 ---
 
-/label ~"it-is::enhancement"
+/label ~"enhancement"

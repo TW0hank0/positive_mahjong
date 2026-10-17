@@ -23,7 +23,7 @@ on:
 #   branches:
 #     - master
 jobs:
-  renovate:
+  mr-check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
