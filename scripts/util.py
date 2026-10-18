@@ -43,10 +43,9 @@ def show_cmd(
         formatted += " ".join(command)
     else:
         formatted += f"{Back.LIGHTBLACK_EX}{command[0]}  \\{Back.RESET}\n"
-        for cmd_part in command[1 : len(command) - 2]:
+        for cmd_part in command[1:]:
             formatted += f"  {Back.LIGHTBLACK_EX}{cmd_part}  \\{Back.RESET}\n"
         del cmd_part
-        formatted += f"  {Back.LIGHTBLACK_EX}{command[len(command) - 1]}{Back.RESET}"
     formatted += str(Back.RESET)
     return formatted
 

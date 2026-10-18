@@ -41,8 +41,6 @@ def addlicense_check():
         "target/**",
         "build/**",
         "**/__pycache__/**",
-        "**/*.lock",
-        "**/.python-version",
         "assets/**",
         # auto generated license info
         "**/ThirdPartyLicense-Rust.*",
