@@ -23,12 +23,14 @@ def upsert_note(mr_obj, current_user_id: int, new_body: str):
     若存在則直接編輯更新 (Save)，不存在則建立新留言 (Create)。
     """
     notes = mr_obj.notes.list(get_all=True)
+    LOGGER.debug(f"notes: {notes}")
     target_note = None
     for note in notes:
-        author_id = note.author.get("id") if isinstance(note.author, dict) else None
-        if author_id is not None and author_id == current_user_id:
-            target_note = note
-            break
+        if note.system is False:
+            author_id = note.author.get("id") if isinstance(note.author, dict) else None
+            if author_id is not None and author_id == current_user_id:
+                target_note = note
+                break
     if target_note is not None:
         target_note.body = new_body
         target_note.save()

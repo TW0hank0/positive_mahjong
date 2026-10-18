@@ -73,6 +73,7 @@ def run_cmd(
     timeout: int = 60 * 30,
     stream: bool = False,
     exit_on_failed: bool = True,
+    show_command: bool = True,
 ) -> tuple[int, str]:
     """
     when stream is True no stdout return"""
@@ -84,7 +85,8 @@ def run_cmd(
         print()
     else:
         print(f"{Fore.LIGHTBLACK_EX} (at {cwd}){Fore.RESET}")
-    print(show_cmd(command))
+    if show_command is True:
+        print(show_cmd(command))
     start_time = time.time()
     sys.stdout.flush()
     if stream is True:
@@ -137,31 +139,35 @@ def run_cmd(
     return (process.returncode, pstdout.rstrip("\n"))
 
 
-def get_commit_info() -> CommitInfo:
+def get_commit_info(show_cmd: bool = True) -> CommitInfo:
     """return CommitInfo"""
-    (_returncode, sha_stdout) = run_cmd(["git", "rev-parse", "HEAD"], cwd=fix_path())
+    (_returncode, sha_stdout) = run_cmd(
+        ["git", "rev-parse", "HEAD"], cwd=fix_path(), show_command=show_cmd
+    )
     commit_sha = sha_stdout.replace("\n", "")
     (_returncode, ssha_stdout) = run_cmd(
-        ["git", "rev-parse", "--short", "HEAD"], cwd=fix_path()
+        ["git", "rev-parse", "--short", "HEAD"], cwd=fix_path(), show_command=show_cmd
     )
     commit_short_sha = ssha_stdout.replace("\n", "")
     (_returncode, commit_time) = run_cmd(
-        ["git", "log", "-1", "--format=%cd", "--date=iso"], cwd=fix_path()
+        ["git", "log", "-1", "--format=%cd", "--date=iso"],
+        cwd=fix_path(),
+        show_command=show_cmd,
     )
     (_returncode, commit_msg) = run_cmd(
-        ["git", "log", "-1", "--format=%B"], cwd=fix_path()
+        ["git", "log", "-1", "--format=%B"], cwd=fix_path(), show_command=show_cmd
     )
     (_, commit_committer_name) = run_cmd(
-        ["git", "log", "-1", "--format=%cn"], cwd=fix_path()
+        ["git", "log", "-1", "--format=%cn"], cwd=fix_path(), show_command=show_cmd
     )
     (_, commit_committer_email) = run_cmd(
-        ["git", "log", "-1", "--format=%ce"], cwd=fix_path()
+        ["git", "log", "-1", "--format=%ce"], cwd=fix_path(), show_command=show_cmd
     )
     (_, commit_author_name) = run_cmd(
-        ["git", "log", "-1", "--format=%an"], cwd=fix_path()
+        ["git", "log", "-1", "--format=%an"], cwd=fix_path(), show_command=show_cmd
     )
     (_, commit_author_email) = run_cmd(
-        ["git", "log", "-1", "--format=%ae"], cwd=fix_path()
+        ["git", "log", "-1", "--format=%ae"], cwd=fix_path(), show_command=show_cmd
     )
     return CommitInfo(
         commit_sha,
@@ -227,6 +233,7 @@ def fix_path(*p: str) -> str:
 
 def get_version(
     how_get: Literal["file_workspace", "file_package", "cargo"] = "cargo",
+    show_cmd: bool = True,
 ) -> str:
     if how_get == "file_package" or how_get == "file_workspace":
         with open(
@@ -240,7 +247,9 @@ def get_version(
             version = str(data["workspace"]["package"]["version"])
     elif how_get == "cargo":
         (_returncode, stdout) = run_cmd(
-            ["cargo", "metadata", "--format-version", "1", "--no-deps"], cwd=fix_path()
+            ["cargo", "metadata", "--format-version", "1", "--no-deps"],
+            cwd=fix_path(),
+            show_command=show_cmd,
         )
         metadata = json.loads(stdout)
         for pkg in metadata["packages"]:
@@ -327,16 +336,16 @@ if __name__ == "__main__":
 
     @app_get.command("version")
     def util_get_version():
-        print(get_version())
+        print(get_version(show_cmd=False))
 
     @app_get.command("commit_msg")
     def util_get_commit_msg() -> None:
-        commit_info = get_commit_info()
+        commit_info = get_commit_info(show_cmd=False)
         print(commit_info.msg)
 
     @app_get.command("commit_short_sha")
     def util_get_commit_short_sha() -> None:
-        commit_info = get_commit_info()
+        commit_info = get_commit_info(show_cmd=False)
         print(commit_info.short_sha)
 
     @app_get.command("datetime")
@@ -345,7 +354,7 @@ if __name__ == "__main__":
 
     @app_get.command("commit_sha")
     def util_get_commit_sha() -> None:
-        commit_info = get_commit_info()
+        commit_info = get_commit_info(show_cmd=False)
         print(commit_info.sha)
 
     app()
