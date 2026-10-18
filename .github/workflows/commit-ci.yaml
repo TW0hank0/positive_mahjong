@@ -44,7 +44,7 @@ jobs:
       - name: Install Dep
         uses: ./.github/actions/instdep
       - name: Save Cache Cargo installed tools on Linux
-        uses: actions/cache/save@v6.1.0
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         if: runner.os == 'Linux'
         with:
           path: |
@@ -57,7 +57,7 @@ jobs:
             ~/.cargo/bin/wild
           key: ${{ runner.os }}-${{ runner.arch }}-cargo-tools-${{ hashFiles('ci-cache-version.json') }}
       - name: Save Cache Cargo installed tools on Windows
-        uses: actions/cache/save@v6.1.0
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         if: runner.os == 'Windows'
         with:
           path: |
@@ -75,7 +75,7 @@ jobs:
           cd ..
 
       - name: Save Cache ThirdPartyLicense
-        uses: actions/cache/save@v6.1.0
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
             auto_generated/ThirdPartyLicense-Rust.html
