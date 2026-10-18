@@ -17,7 +17,6 @@ toml-version = "v1.1.0"
 
 [files]
 include = [
-    "**/*.toml",
     "**/Cargo.toml",
     "Cargo.toml",
     "about.toml",
