@@ -15,7 +15,7 @@
 name: commit-ci
 on:
   # 支援在 GitHub 上手動點擊觸發
-  workflow_dispatch: 
+  workflow_dispatch:
   push:
     branches:
       - master
@@ -162,22 +162,6 @@ jobs:
         run: |
           cd scripts
           uv run build_desktop.py
-          cd ..
-      - name: get version on Linux
-        id: get_version_linux
-        if: runner.os == 'Linux'
-        run: |
-          cd scripts
-          file=$(uv run util.py get version)
-          echo "version=$file" >> $GITHUB_OUTPUT
-          cd ..
-      - name: get version on Windows
-        id: get_version_windows
-        if: runner.os == 'Windows'
-        run: |
-          cd scripts
-          $file = (uv run util.py get version)
-          echo "version=$file" >> $env:GITHUB_OUTPUT
           cd ..
       - name: Upload desktop artifact
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

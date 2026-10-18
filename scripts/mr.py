@@ -123,8 +123,18 @@ def main():
                 current_user_id in approved_by_userid
                 or current_username in approved_by_username
             ):
-                LOGGER.info(f"Already checked (already approved by {current_user_id})")
-                continue
+                for approved_by_detail in approvals.approved_by:
+                    if (
+                        approved_by_detail["user"]["id"] == current_user_id
+                        and approvals.updated_at >= approved_by_detail.approved_at
+                    ):
+                        mr_detail.unapprove()
+                        break
+                else:
+                    LOGGER.info(
+                        f"Already checked (already approved by {current_user_id})"
+                    )
+                    continue
             LOGGER.info(
                 f"MR !{mr_iid} is approved by @{REQUIRED_APPROVER_USERNAME}. Fetching code..."
             )
@@ -133,23 +143,40 @@ def main():
             util.run_cmd(["git", "checkout", "FETCH_HEAD"], cwd=WORK_DIR)
             LOGGER.info(f"Successfully checked out MR !{mr_iid}.")
             LOGGER.info("Running mr check...")
-            (check_returncode, _check_stdout) = util.run_cmd(
-                ["cargo", "check", "--workspace"],
-                cwd=WORK_DIR,
-                exit_on_failed=False,
-                stream=True,
-            )
-            if check_returncode == 0:
-                msg = f"✅MR Check Passed (!{mr_iid})"
+            check_result = check()
+            if check_result is None:
+                msg = f"#### ✅MR Check Passed (!{mr_iid})"
                 LOGGER.info(f"Check SUCCESS: {msg}")
                 mr_detail.approve()
                 mr_detail.save()
                 upsert_note(mr_detail, current_user_id, msg)
             else:
-                msg = f"❌MR Check Failed (!{mr_iid})"
+                msg = f"#### ❌MR Check Failed (!{mr_iid})"
+                (command, returncode, stdout) = check_result
+                msg += f"\n\nCommand `{command}` return code `{returncode}`."
+                msg += f"\n\n<details><summary>stdout</summary>{stdout}</details>"
                 LOGGER.warning(f"Check FAILED: {msg}")
                 upsert_note(mr_detail, current_user_id, msg)
     LOGGER.info("mr script finish")
+
+
+def check() -> None | tuple[str, int, str]:
+    commands = [
+        (["cargo", "check", "--workspace"], "."),
+        (["uv", "run", "license_check.py"], "scripts"),
+        (["ty", "check", "."], "scripts"),
+        (["ruff", "check", "."], "scripts"),
+    ]
+    for command, relpath in commands:
+        (check_returncode, check_stdout) = util.run_cmd(
+            command,
+            cwd=os.path.join(WORK_DIR, relpath),
+            exit_on_failed=False,
+            stream=True,
+        )
+        if check_returncode != 0:
+            return (" ".join(command), check_returncode, check_stdout)
+    return None
 
 
 if __name__ == "__main__":

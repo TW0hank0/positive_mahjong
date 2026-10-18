@@ -15,7 +15,7 @@
 
 
 use iced::{
-    self, Border, Color, Element, Length, Pixels, Task, alignment, task, widget::{self, Column, Row, button, container, scrollable, space, stack, text, text_input},
+    self, Border, Color, Element, Length, Pixels, Task, alignment, task, widget::{self, Column, Row, button, container, scrollable, space, Stack, text, text_input},
 };
 use tracing::{error, warn};
 
@@ -110,6 +110,7 @@ impl Client {
         match message {
             Message::ToastUpdate => {
                 self.toast.process();
+                return Task::done(Message::ToastUpdate);
             }
             Message::CCoreProcessTask => match self.scene {
                 ClientScenes::Home(ref _home_state) => {
@@ -480,14 +481,14 @@ impl Client {
                         style
                     });
                     layout.push(
-                        stack([
+                        Stack::new().push(
                             widget::opaque(scrollable(
                                 Column::from_vec(layout_home)
                                     .width(Length::Fill)
                                     .padding(10),
-                            )),
-                            content.into(),
-                        ])
+                            ))).push(
+                            content,
+                        )
                         .into(),
                     );
                 } else {
@@ -776,11 +777,10 @@ impl Client {
                 );
             }
         }
-        stack([Column::from_vec(layout)
+        Stack::new().push(Column::from_vec(layout)
             .height(Length::Fill)
             .width(Length::Fill)
-            .padding(10)
-            .into(), self.toast.view().into()]).into()
+            .padding(10)).push(self.toast.view()).into()
     }
 
     fn home_create_vsoft_key<'a>(

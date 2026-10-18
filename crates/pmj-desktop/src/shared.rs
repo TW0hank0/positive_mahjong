@@ -14,9 +14,9 @@
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 use std::time;
-
+use tracing::info;
 use iced::{
-    self, Background, Border, border, widget::{Column, button, container, scrollable, space, text},
+    self, Background, Border, border, widget::{Column, button, container, scrollable,  text},
 };
 
 use pmj_shared::shared::{FONT_NOTO_SANS_REG_BYTES, PROJECT_NAME, ICON_PNG_BYTES};
@@ -169,7 +169,11 @@ impl ToastManager {
             toasts:Vec::new()
         }
     }
+    pub fn is_new_empty(&self)->bool{
+        self.new_toasts.is_empty()
+    }
     pub fn add(&mut self, toast: Toast){
+        info!("Add toast: {:?}", toast);
         self.new_toasts.push((toast, time::Instant::now()));
     }
     pub fn process(&mut self) {
@@ -188,6 +192,7 @@ impl ToastManager {
     }
     pub fn view<'a, Message:'a>(&self) -> scrollable::Scrollable<'a, Message> {
         let mut layout = Column::new();
+        if !self.new_toasts.is_empty(){
         for (toast, instant) in self.new_toasts.clone() {
             let mut tlayout = Column::new();
             match toast.title {
@@ -209,7 +214,7 @@ impl ToastManager {
                         ToastLevel::Warning => {p.warning.base.color}
                     })
                     ),..Default::default()}}))
-        }
+        }}
         scrollable(layout)
     }
 }
