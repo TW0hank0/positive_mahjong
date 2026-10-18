@@ -29,7 +29,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Run Renovate against GitLab
-        uses: renovatebot/github-action@v46.3.8
+        uses: renovatebot/github-action@f0f41e5f2e706165f6814b1d0f0d0e319de7d1d9 # v46.3.8
         env:
           # 告訴 Renovate 平臺是 GitLab
           RENOVATE_PLATFORM: gitlab
