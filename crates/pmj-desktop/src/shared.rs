@@ -13,9 +13,10 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
+use std::time;
+
 use iced::{
-    self, Border, border,
-    widget::{button, container},
+    self, Background, Border, border, widget::{Column, button, container, scrollable, space, text},
 };
 
 use pmj_shared::shared::{FONT_NOTO_SANS_REG_BYTES, PROJECT_NAME, ICON_PNG_BYTES};
@@ -153,4 +154,107 @@ pub fn iced_app_settins(member_name: String) -> iced::Settings {
         fonts: vec![std::borrow::Cow::from(FONT_NOTO_SANS_REG_BYTES)],
         ..Default::default()
     }
+}
+
+#[derive(Debug)]
+pub struct ToastManager {
+    new_toasts: Vec<(Toast, time::Instant)>,
+    toasts: Vec<Toast>,
+}
+
+impl ToastManager {
+    pub fn new() -> Self {
+        Self {
+            new_toasts:Vec::new(),
+            toasts:Vec::new()
+        }
+    }
+    pub fn add(&mut self, toast: Toast){
+        self.new_toasts.push((toast, time::Instant::now()));
+    }
+    pub fn process(&mut self) {
+        let mut indexes = Vec::new();
+        let mut index = 0;
+        for (_toast, instant) in self.new_toasts.iter() {
+            if instant.elapsed() > time::Duration::from_secs(10) {
+                indexes.push(index);
+            }
+            index += 1;
+        }
+        for i in indexes {
+            let (t, _) = self.new_toasts.remove(i);
+            self.toasts.push(t);
+        }
+    }
+    pub fn view<'a, Message:'a>(&self) -> scrollable::Scrollable<'a, Message> {
+        let mut layout = Column::new();
+        for (toast, instant) in self.new_toasts.clone() {
+            let mut tlayout = Column::new();
+            match toast.title {
+                Some(title) => {tlayout=tlayout.push(text(title).size(28))}
+                None => {}
+            }
+            tlayout=tlayout.push(text(toast.msg).size(22));
+            tlayout=tlayout.push(iced::widget::progress_bar(0.0..=10.0, instant.elapsed().as_secs_f32()));
+            let tlevel = toast.level;
+            layout=layout.push(container(tlayout).style(move|theme:&iced::Theme| {
+                let p=theme.extended_palette();
+                container::Style{
+                    background: Some(Background::Color(match tlevel {
+                        ToastLevel::Error => {p.danger.base.color}
+                        ToastLevel::Info => {
+                            p.primary.base.color
+                        }
+                        ToastLevel::Sucessful => {p.success.base.color}
+                        ToastLevel::Warning => {p.warning.base.color}
+                    })
+                    ),..Default::default()}}))
+        }
+        scrollable(layout)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct Toast {
+    level: ToastLevel,
+    msg: String,
+    title: Option<String>
+}
+impl Default for Toast {
+    fn default() -> Self {
+        Self { level: ToastLevel::Info, msg: String::new(), title: None }
+    }
+}
+impl Toast {
+    pub fn new(msg: String) -> Self {
+        Self { msg,..Default::default() }
+    }
+    pub fn set_sucessful(mut self) -> Self {
+        self.level=ToastLevel::Sucessful;
+        self
+    }
+    pub fn set_info(mut self)->Self{
+        self.level=ToastLevel::Info;
+        self
+    }
+    pub fn set_warning(mut self)->Self{
+        self.level=ToastLevel::Warning;
+        self
+    }
+    pub fn set_error(mut self) ->Self{
+        self.level=ToastLevel::Error;
+        self
+    }
+    pub fn set_title(mut self, t: String) ->Self{
+        self.title=Some(t);
+        self
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum ToastLevel {
+    Sucessful,
+    Info,
+    Warning,
+    Error,
 }

@@ -21,11 +21,11 @@ use tracing::{error, warn};
 
 use pmj_desktop::{
     circular, easing,
-    shared::{ButtonStyles, ContainerStyles},
+    shared::{ButtonStyles, ContainerStyles, Toast, ToastManager},
 };
 
 use pmj_shared::shared::{
-    self, FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES, PROJECT_NAME,
+    self, FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES, PROJECT_NAME,PROJECT_VERSION
 };
 
 pub const MEMBER_NAME: &str = "pmj-client-desktop";
@@ -37,6 +37,7 @@ pub struct Client {
     server_url: String,
     scene: ClientScenes,
     theme: iced::theme::Theme,
+    toast: ToastManager,
 }
 
 #[derive(Debug)]
@@ -69,6 +70,7 @@ pub enum Message {
     Home(HomeMsg),
     Play(PlayMsg),
     CCoreProcessTask,
+    ToastUpdate,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -91,6 +93,8 @@ pub const ALPHABET: [char; 26] = [
 
 impl Client {
     pub fn new() -> (Self, Task<Message>) {
+        let mut toast = ToastManager::new();
+        toast.add(Toast::new(format!("{} - {} v{}", MEMBER_NAME, PROJECT_NAME, PROJECT_VERSION)));
         (Self {
             server_url: String::from("ws://"),
             scene: ClientScenes::Home(HomeState {
@@ -99,10 +103,14 @@ impl Client {
                 connect_msg: None,
             }),
             theme: iced::theme::Theme::TokyoNight,
-        },iced::font::load(FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES).discard())
+            toast:toast,
+        },iced::font::load(FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES).discard().chain(task::Task::done(Message::ToastUpdate)))
     }
     pub fn update(&mut self, message: Message) -> task::Task<Message> {
         match message {
+            Message::ToastUpdate => {
+                self.toast.process();
+            }
             Message::CCoreProcessTask => match self.scene {
                 ClientScenes::Home(ref _home_state) => {
                     warn!("update: warn scene");
@@ -768,11 +776,11 @@ impl Client {
                 );
             }
         }
-        Column::from_vec(layout)
+        stack([Column::from_vec(layout)
             .height(Length::Fill)
             .width(Length::Fill)
             .padding(10)
-            .into()
+            .into(), self.toast.view().into()]).into()
     }
 
     fn home_create_vsoft_key<'a>(

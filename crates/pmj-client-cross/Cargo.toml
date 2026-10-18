@@ -27,9 +27,7 @@ name = "pmj_client_cross_lib"
 path = "rust/src/lib.rs"
 
 [dependencies]
-# --- wasm ---
 console_error_panic_hook = { workspace = true, optional = true }
-# --- shared ---
 godot = { workspace = true }
 pmj-shared = { workspace = true }
 serde_json = { workspace = true }
