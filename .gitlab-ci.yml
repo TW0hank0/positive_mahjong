@@ -18,7 +18,7 @@ stages:
 
 sync_to_mirrors:
   stage: sync
-  image: alpine:latest
+  image: alpine:latest@sha256:294b683cb724975bec92580e1e685676bd4b50bda910ddb8c51d4cabeaec77e6
   before_script:
     # 安裝必要工具
     - apk add --no-cache git openssh-client curl bash
