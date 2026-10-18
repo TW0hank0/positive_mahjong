@@ -40,7 +40,7 @@ jobs:
           - windows-11-arm
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install Dep
         uses: ./.github/actions/instdep
       - name: Save Cache Cargo installed tools on Linux
@@ -98,7 +98,7 @@ jobs:
           - windows-11-arm
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install Dep
         uses: ./.github/actions/instdep
       - name: Prepare venv
@@ -148,7 +148,7 @@ jobs:
           - windows-11-arm
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/instdep
       - name: Prepare venv
         run: |
@@ -196,7 +196,7 @@ jobs:
       contents: write
     steps:
       - name: checkout code
-        uses: actions/checkout@v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/instdep
       - name: prepare CI Venv
         run: |
@@ -230,7 +230,7 @@ jobs:
           - ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/instdep
       - name: download all artifacts
         uses: actions/download-artifact@v8.0.2
