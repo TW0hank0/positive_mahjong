@@ -126,7 +126,7 @@ def main():
                 for approved_by_detail in approvals.approved_by:
                     if (
                         approved_by_detail["user"]["id"] == current_user_id
-                        and approvals.updated_at >= approved_by_detail.approved_at
+                        and approvals.updated_at >= approved_by_detail["approved_at"]
                     ):
                         mr_detail.unapprove()
                         break
