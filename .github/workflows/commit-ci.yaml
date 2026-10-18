@@ -40,11 +40,11 @@ jobs:
           - windows-11-arm
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install Dep
         uses: ./.github/actions/instdep
       - name: Save Cache Cargo installed tools on Linux
-        uses: actions/cache/save@v6.1.0
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         if: runner.os == 'Linux'
         with:
           path: |
@@ -57,7 +57,7 @@ jobs:
             ~/.cargo/bin/wild
           key: ${{ runner.os }}-${{ runner.arch }}-cargo-tools-${{ hashFiles('ci-cache-version.json') }}
       - name: Save Cache Cargo installed tools on Windows
-        uses: actions/cache/save@v6.1.0
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         if: runner.os == 'Windows'
         with:
           path: |
@@ -75,7 +75,7 @@ jobs:
           cd ..
 
       - name: Save Cache ThirdPartyLicense
-        uses: actions/cache/save@v6.1.0
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
             auto_generated/ThirdPartyLicense-Rust.html
@@ -98,7 +98,7 @@ jobs:
           - windows-11-arm
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install Dep
         uses: ./.github/actions/instdep
       - name: Prepare venv
@@ -148,7 +148,7 @@ jobs:
           - windows-11-arm
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/instdep
       - name: Prepare venv
         run: |
@@ -180,7 +180,7 @@ jobs:
           echo "version=$file" >> $env:GITHUB_OUTPUT
           cd ..
       - name: Upload desktop artifact
-        uses: actions/upload-artifact@v7.0.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: client_desktop-${{ runner.os }}-${{ runner.arch }}
           path: artifacts
@@ -196,7 +196,7 @@ jobs:
       contents: write
     steps:
       - name: checkout code
-        uses: actions/checkout@v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/instdep
       - name: prepare CI Venv
         run: |
@@ -205,7 +205,7 @@ jobs:
           uv sync
           cd ..
       - name: download all artifacts
-        uses: actions/download-artifact@v8.0.2
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           path: artifacts
       - name: List Dir
@@ -230,10 +230,10 @@ jobs:
           - ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/instdep
       - name: download all artifacts
-        uses: actions/download-artifact@v8.0.2
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           path: artifacts
       - name: Build license
@@ -252,6 +252,6 @@ jobs:
           name: pages-with-artifacts
           path: ./website_build/
       - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v5.0.1
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
         with:
           artifact_name: pages-with-artifacts
