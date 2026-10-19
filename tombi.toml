@@ -95,7 +95,7 @@ format.rules = {
     table-keys-order.enabled = true,
 }
 lint.rules = {
-    deprecated = "warn",
+    deprecated = "error",
 }
 
 [extensions]
