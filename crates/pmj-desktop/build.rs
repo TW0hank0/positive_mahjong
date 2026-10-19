@@ -21,21 +21,17 @@ use std::{
     path,
 };
 
+const ENABLE_DESKTOP_ZIP: bool = true;
 const INCLUDE_FILES: [&str; 2] = ["pmj-client-desktop", "pmj-server-desktop"];
+pub const PROJECT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 fn main() {
     println!("rerun-if-changed=**/crates/**");
     println!("rerun-if-changed=**/target/**");
     println!("rerun-if-changed=Cargo.toml");
     println!("rerun-if-changed=Cargo.lock");
-    let file = fs::OpenOptions::new()
-        .create(true)
-        .truncate(true)
-        .write(true)
-        .read(true)
-        .open(path::PathBuf::from(env::var_os("OUT_DIR").unwrap()).join("inst-stored.zip"))
-        .unwrap();
-    let mut zip = zip::ZipWriter::new(file);
+    let out_file = path::PathBuf::from(env::var("OUT_DIR").unwrap())
+        .join("inst-stored.zip");
     let mut target_dir = path::PathBuf::from(env::var("OUT_DIR").unwrap());
     loop {
         if target_dir.file_name().unwrap() == "build" {
@@ -45,6 +41,28 @@ fn main() {
             target_dir = target_dir.parent().unwrap().to_path_buf();
         }
     }
+    if ENABLE_DESKTOP_ZIP {
+        let desktop_zip_name_template= "positive_mahjong-desktop-v{version}-{target}.zip";
+        let project_dir = target_dir.parent().unwrap()// project/target/release
+            .parent().unwrap() // project/target
+            .parent().unwrap() // project
+        ;
+        let target_triple = env::var("TARGET").unwrap();
+        let desktop_zip_name = desktop_zip_name_template.replace("{version}", PROJECT_VERSION).replace("{target}", &target_triple);
+        let desktop_zip_path = project_dir.join(desktop_zip_name);
+        if fs::exists(&desktop_zip_path).unwrap_or(false) {
+            fs::copy(desktop_zip_path.clone(), out_file.clone()).ok();
+            println!("Desktop Zip file copied from `{}` to `{}`", desktop_zip_path.display(), out_file.display());
+        }
+    } else {
+    let file = fs::OpenOptions::new()
+        .create(true)
+        .truncate(true)
+        .write(true)
+        .read(true)
+        .open(out_file.clone())
+        .unwrap();
+    let mut zip = zip::ZipWriter::new(file);
     for file in INCLUDE_FILES {
         let fullpath = target_dir.join(format!("{}{}", file, EXE_SUFFIX));
         if fs::exists(fullpath.clone()).unwrap_or(false) {
@@ -64,8 +82,7 @@ fn main() {
     zip.finish().unwrap();
     println!(
         "Zip file wrote: {}",
-        path::PathBuf::from(env::var_os("OUT_DIR").unwrap())
-            .join("inst-stored.zip")
+        out_file.clone()
             .display()
-    );
+    );}
 }

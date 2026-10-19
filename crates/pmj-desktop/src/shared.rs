@@ -16,7 +16,7 @@
 use std::time;
 use tracing::info;
 use iced::{
-    self, Background, Border, border, widget::{Column, button, container, scrollable,  text},
+    self, Background, Border, Length, alignment, border, widget::{Column, Row, button, container, scrollable,  text},
 };
 
 use pmj_shared::shared::{FONT_NOTO_SANS_REG_BYTES, PROJECT_NAME, ICON_PNG_BYTES};
@@ -191,7 +191,7 @@ impl ToastManager {
         }
     }
     pub fn view<'a, Message:'a>(&self) -> scrollable::Scrollable<'a, Message> {
-        let mut layout = Column::new();
+        let mut layout = Column::new().width(Length::Fill).height(Length::Fill).align_x(alignment::Horizontal::Right);
         if !self.new_toasts.is_empty(){
         for (toast, instant) in self.new_toasts.clone() {
             let mut tlayout = Column::new();
@@ -215,7 +215,7 @@ impl ToastManager {
                     })
                     ),..Default::default()}}))
         }}
-        scrollable(layout)
+        scrollable(Row::new().push(layout).width(Length::Fill).height(Length::Fill).align_y(alignment::Vertical::Bottom)).width(Length::Fill).height(Length::Fill)
     }
 }
 
