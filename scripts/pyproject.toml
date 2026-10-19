@@ -21,7 +21,7 @@ readme = "README.md"
 requires-python = "==3.15.0"
 dependencies = [
     "colorama==0.4.6",
-    "mistune==3.3.4",
+    "mistune==3.4.0",
     "pydantic==2.14.1",
     "python-gitlab==8.6.0",
     "requests==2.34.2",
