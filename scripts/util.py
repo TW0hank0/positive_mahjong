@@ -74,29 +74,26 @@ def run_cmd(
     exit_on_failed: bool = True,
     show_command: bool = True,
 ) -> tuple[int, str]:
-    """
-    when stream is True no stdout return"""
-    print(
-        f"{Fore.CYAN}Running command:{Fore.RESET}",
-        end="",
-    )
-    if cwd is None:
-        print()
-    else:
-        print(f"{Fore.LIGHTBLACK_EX} (at {cwd}){Fore.RESET}")
     if show_command is True:
-        print(show_cmd(command))
-    start_time = time.time()
-    sys.stdout.flush()
-    if stream is True:
-        process = subprocess.Popen(command, cwd=cwd)
-    else:
-        process = subprocess.Popen(
-            command,
-            stderr=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            cwd=cwd,
+        print(
+            f"{Fore.CYAN}Running command:{Fore.RESET}",
+            end="",
         )
+        if cwd is None:
+            print()
+        else:
+            print(f"{Fore.LIGHTBLACK_EX} (at {cwd}){Fore.RESET}")
+        print(show_cmd(command))
+    sys.stdout.flush()
+    pstdout = ""
+    pstderr = ""
+    start_time = time.time()
+    process = subprocess.Popen(
+        command,
+        stderr=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        cwd=cwd,
+    )
     while True:
         if process.poll() is not None:
             break
@@ -111,28 +108,38 @@ def run_cmd(
             )
             raise subprocess.TimeoutExpired(cmd=command, timeout=timeout)
         else:
+            if process.stdout is not None:
+                new = process.stdout.read().decode()
+                pstdout += new
+                if stream is True:
+                    print(new, end="")
+            if process.stderr is not None:
+                new = process.stderr.read().decode()
+                pstderr += new
+                if stream is True:
+                    print(new, end="")
             time.sleep(0.00001)
     end_time = time.time()
     process_time = end_time - start_time
-    pstdout = "" if process.stdout is None else process.stdout.read().decode()
     if int(process_time) > 1:
         process_time_str = f"({process_time:.3f} secs)"
     else:
         process_time_str = ""
     if process.returncode == 0:
-        print(
-            f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.GREEN}Process finished sucessful.{Fore.RESET} {Fore.LIGHTBLACK_EX}{process_time_str}{Fore.RESET}"
-        )
+        if show_command is True:
+            print(
+                f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.GREEN}Process finished sucessful.{Fore.RESET} {Fore.LIGHTBLACK_EX}{process_time_str}{Fore.RESET}"
+            )
     else:
-        pstderr = "" if process.stderr is None else process.stderr.read().decode()
-        print(
-            f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.RED}Process exited with non-zero code{Fore.RESET} {Fore.LIGHTBLACK_EX}({process.returncode}){Fore.RESET}! {Fore.LIGHTBLACK_EX}{process_time_str}{Fore.RESET}"
-        )
-        for name, data in [
-            ("stdout", pstdout),
-            ("stderr", pstderr),
-        ]:
-            print(show_output(name, data))
+        if show_command is True:
+            print(
+                f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.RED}Process exited with non-zero code{Fore.RESET} {Fore.LIGHTBLACK_EX}({process.returncode}){Fore.RESET}! {Fore.LIGHTBLACK_EX}{process_time_str}{Fore.RESET}"
+            )
+            for name, data in [
+                ("stdout", pstdout),
+                ("stderr", pstderr),
+            ]:
+                print(show_output(name, data))
         if exit_on_failed is True:
             sys.exit(process.returncode)
     return (process.returncode, pstdout.rstrip("\n"))
@@ -252,9 +259,6 @@ def get_version(
         )
         metadata = json.loads(stdout)
         for pkg in metadata["packages"]:
-            # if pkg["name"] == "pmj_client_desktop":
-            #     version = str(pkg["version"])
-            #     break
             version = str(pkg["version"])
             break
         else:

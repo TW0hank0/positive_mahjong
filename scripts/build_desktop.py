@@ -73,7 +73,6 @@ def main():
         _ = util.run_cmd(
             ["cargo", "check", "--release", "--target", target, "--workspace"],
             cwd=util.fix_path(),
-            stream=True,
         )
         print(f"{Fore.CYAN}Building release for target {target}...{Fore.RESET}", end="")
         cmd = ["cargo", "build", "--release", "--locked", "--target", target]
@@ -92,7 +91,7 @@ def main():
         _ = util.run_cmd(
             cmd,
             cwd=util.fix_path(),
-            timeout=60 * 110,  # 110分鐘
+            timeout=60 * 100,  # 100分鐘
             stream=True,
         )
         # _ = util.run_cmd(
@@ -103,13 +102,54 @@ def main():
         # )
     build_license.main()
     zip_desktop(targets)
-    for target, pkg in build_info:
+    if util.get_commit_info().is_release is False:
+        version = util.get_version() + "+" + util.get_commit_info().short_sha
+    else:
+        version = util.get_version()
+    for target, _pkg in build_info:
         _ = util.run_cmd(
             ["cargo", "build", "--bin", "pmj-desktop-installer", "--target", target],
             cwd=util.fix_path(),
-            timeout=60 * 55,  # 55分鐘
+            timeout=60 * 50,  # 50分鐘
             stream=True,
         )
+        target_path = util.fix_path(
+            "target",
+            target,
+            "release",
+        )
+        for file in os.listdir(target_path):
+            full_file_path = os.path.join(target_path, file)
+            if os.path.isfile(full_file_path) is True and os.path.basename(
+                full_file_path
+            ) in [
+                "pmj-desktop-installer",
+                "pmj-desktop-installer.exe",
+            ]:
+                if os.path.exists(util.fix_path("artifacts")) is False:
+                    os.mkdir(util.fix_path("artifacts"))
+                print(
+                    "Copied to: "
+                    + str(
+                        shutil.copy2(
+                            full_file_path,
+                            util.fix_path(
+                                "artifacts",
+                            ),
+                        )
+                    )
+                )
+                new_desktop_installer_name = (
+                    f"pmj-desktop-installer-v{version}-{target}"
+                    + (".exe" if os.name == "nt" else "")
+                )
+                os.rename(
+                    util.fix_path("artifacts", file),
+                    util.fix_path("artifacts", new_desktop_installer_name),
+                )
+                print(
+                    f"copied to {util.fix_path('artifacts', new_desktop_installer_name)}"
+                )
 
 
 def zip_desktop(targets: list[str]):
@@ -158,35 +198,7 @@ def zip_desktop(targets: list[str]):
         for file in os.listdir(target_path):
             full_file_path = os.path.join(target_path, file)
             if os.path.isfile(full_file_path) is True:
-                if os.path.basename(full_file_path) in [
-                    "pmj-desktop-installer",
-                    "pmj-desktop-installer.exe",
-                ]:
-                    if os.path.exists(util.fix_path("artifacts")) is False:
-                        os.mkdir(util.fix_path("artifacts"))
-                    print(
-                        "copied to: "
-                        + str(
-                            shutil.copy2(
-                                full_file_path,
-                                util.fix_path(
-                                    "artifacts",
-                                ),
-                            )
-                        )
-                    )
-                    new_desktop_installer_name = (
-                        f"pmj-desktop-installer-v{version}-{target}"
-                        + (".exe" if os.name == "nt" else "")
-                    )
-                    os.rename(
-                        util.fix_path("artifacts", file),
-                        util.fix_path("artifacts", new_desktop_installer_name),
-                    )
-                    print(
-                        f"copied to {util.fix_path('artifacts', new_desktop_installer_name)}"
-                    )
-                elif INCLUDE_FILES_MATCH_TYPE == "inclue_all_files":
+                if INCLUDE_FILES_MATCH_TYPE == "inclue_all_files":
                     include_files.append(full_file_path)
                 elif INCLUDE_FILES_MATCH_TYPE == "exe_split":
                     match platform.system():
