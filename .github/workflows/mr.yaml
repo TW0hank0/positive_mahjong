@@ -19,9 +19,9 @@ on:
     - cron: 10 * * * *  # 每小時10分
   # 支援在 GitHub 上手動點擊觸發
   workflow_dispatch: 
-# push:
-#   branches:
-#     - master
+concurrency:
+  group: Merge-Request-Check
+  cancel-in-progress: false
 jobs:
   mr-check:
     runs-on: ubuntu-latest
