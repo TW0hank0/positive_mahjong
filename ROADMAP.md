@@ -10,6 +10,7 @@
 
 ### v0.2.0 - [2026/8/16~]
 
+- pmj_client_core：客戶端核心
 - [V2Better 玩法](<./TODO.md#V2Better 玩法>)
   - 包含 房間(room) 遊戲結束返回
   - 丟牌 吃 碰 杠
@@ -18,7 +19,6 @@
 
 ### v0.3.0
 
-- pmj_client_core：客戶端核心
 - github-workflow：cache licenses 用 Cargo.lock 作為 key
 - [伺服器GUI顯示遊戲狀態](./TODO.md#伺服器GUI顯示遊戲狀態)
 
@@ -28,12 +28,12 @@
 
 ### v0.5.0
 
-- [電腦平臺：安裝程式](./TODO.md#pmj_desktop_installer)
-- [電腦平臺：解除安裝程式](./TODO.md#pmj_desktop_uninstaller)
+- [電腦平臺：安裝程式](./TODO.md#pmj-desktop-installer)
+- [電腦平臺：解除安裝程式](./TODO.md#pmj-desktop-uninstaller)
 
 ### v0.6.0
 
-- 伺服器GUI優化
+- （暫定）開發 pmj_server_tui
 
 ### v0.7.0
 
@@ -41,7 +41,3 @@
   - 資料傳輸加密
   - 資料完整性檢查 (blake3)
   - 資料超時檢查 (資料帶時間)
-
-### v0.8.0
-
-- （暫定）開發 pmj_server_tui
