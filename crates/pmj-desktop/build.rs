@@ -53,8 +53,9 @@ fn main() {
         if fs::exists(&desktop_zip_path).unwrap_or(false) {
             fs::copy(desktop_zip_path.clone(), out_file.clone()).ok();
             println!("Desktop Zip file copied from `{}` to `{}`", desktop_zip_path.display(), out_file.display());
+            return;
         }
-    } else {
+    }
     let file = fs::OpenOptions::new()
         .create(true)
         .truncate(true)
@@ -84,5 +85,5 @@ fn main() {
         "Zip file wrote: {}",
         out_file.clone()
             .display()
-    );}
+    );
 }

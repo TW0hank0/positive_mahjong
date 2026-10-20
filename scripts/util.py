@@ -33,9 +33,6 @@ rtb.install(show_locals=True)
 
 def show_cmd(
     command: list[str],
-    # prefix: str = "  ",
-    # first_prefix: str = "| ",
-    # suffix: str = " \\ ",
 ) -> str:
     (twidth, _theight) = shutil.get_terminal_size()
     formatted = str(Back.LIGHTBLACK_EX)
@@ -43,8 +40,17 @@ def show_cmd(
         formatted += " ".join(command)
     else:
         formatted += f"{Back.LIGHTBLACK_EX}{command[0]}  \\{Back.RESET}\n"
-        for cmd_part in command[1:]:
-            formatted += f"  {Back.LIGHTBLACK_EX}{cmd_part}  \\{Back.RESET}\n"
+        for count, cmd_part in enumerate(command):
+            indent = "" if count == 0 else "  "
+            suffix = "" if count == (len(command) - 1) else " \\"
+            formatted += (
+                indent
+                + str(Back.LIGHTBLACK_EX)
+                + cmd_part
+                + suffix
+                + str(Back.RESET)
+                + "\n"
+            )
         del cmd_part
     formatted += str(Back.RESET)
     return formatted

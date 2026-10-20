@@ -1,12 +1,5 @@
 # 待辦事項
 
-#### 客戶端更多 CLI ARG
-
-［pmj_client_desktop］
-
-- [ ] 開始
-- [ ] 完成
-
 #### V2Better 玩法
 
 第二代玩法
@@ -23,8 +16,8 @@
       - [ ] 暗槓
     - [ ] 伺服器
       - [x] 吃
-      - [ ] 碰
-      - [ ] 明槓
+      - [x] 碰
+      - [x] 明槓
       - [ ] 暗槓
 - [ ] 完成
 
@@ -60,12 +53,12 @@
   - [ ] 發送遊戲訊息
 - [ ] 完成
 
-#### pmj_server_tui
+#### pmj-server-tui
 
 - [ ] 開始
 - [ ] 完成
 
-#### pmj_client_cross
+#### pmj-client-cross
 
 - [ ] 開始
   - [ ] 可編譯
@@ -102,17 +95,17 @@
   - [ ] 房間訊息
 - [ ] 完成
 
-#### pmj_desktop_installer
+#### pmj-desktop-installer
 
 iced-GUI + TUI + CLI
 
 - [x] 開始
-  - [ ] GUI
+  - [x] GUI
   - [ ] TUI
   - [ ] CLI
 - [ ] 完成
 
-#### pmj_desktop_uninstaller
+#### pmj-desktop-uninstaller
 
 iced-GUI + TUI + CLI
 
