@@ -14,9 +14,9 @@
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 name: Merge Request Check
 on:
-  # 設定定時觸發，每2小時 UTC
   schedule:
-    - cron: 0 */2 * * *
+    - cron: 0 */2 * * *  # 設定定時觸發，每2小時 UTC
+    - cron: 10 * * * *  # 每小時10分
   # 支援在 GitHub 上手動點擊觸發
   workflow_dispatch: 
 # push:
@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
       - name: Install Dep
         uses: ./.github/actions/instdep
       - name: Run script
