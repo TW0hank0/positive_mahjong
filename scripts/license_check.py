@@ -20,6 +20,30 @@ from colorama import Back, Fore, Style
 
 import util
 
+IGNORED_DIRS = [
+    "**/.git/**",
+    "**/.venv/**",
+    "target/**",
+    "**/__pycache__/**",
+    "assets/**",
+    # auto generated license info
+    "**/ThirdPartyLicense-Rust.*",
+    "**/ThirdPartyLicense-Python.*",
+    "auto_generated/**",
+    "docs/book/**",
+    "**/rustup-init.sh",  # for ci rustup install
+    "**/rustup-init.exe",  # for ci rustup install
+    "website_build/**",  # website
+    # Author: [iced team](https://github.com/iced-rs/)
+    # This file is from project [iced](https://github.com/iced-rs/iced/).
+    "crates/pmj-desktop/src/easing.rs",
+    # Author: [iced team](https://github.com/iced-rs/)
+    # This file is from project [iced](https://github.com/iced-rs/iced/).
+    "crates/pmj-desktop/src/circular.rs",
+    "supply-chain/**",
+    "scripts/pylock.toml",
+]
+
 
 def main():
     print(f"{Fore.LIGHTBLACK_EX}addlicense check{Fore.RESET}")
@@ -33,36 +57,8 @@ def reuse_check():
 
 
 def addlicense_check():
-    ignore_dir = [
-        "**/.git/**",
-        "**/.venv/**",
-        # "dist/**",
-        # "pkg/**",
-        "target/**",
-        "build/**",
-        "**/__pycache__/**",
-        "assets/**",
-        # auto generated license info
-        "**/ThirdPartyLicense-Rust.*",
-        "**/ThirdPartyLicense-Python.*",
-        "auto_generated/**",
-        "docs/book/**",
-        # for ci rustup install
-        "**/rustup-init.sh",
-        # for ci rustup install
-        "**/rustup-init.exe",
-        "website_build/**",
-        # Author: [iced team](https://github.com/iced-rs/)
-        # This file is from project [iced](https://github.com/iced-rs/iced/).
-        "crates/pmj-desktop/src/easing.rs",
-        # Author: [iced team](https://github.com/iced-rs/)
-        # This file is from project [iced](https://github.com/iced-rs/iced/).
-        "crates/pmj-desktop/src/circular.rs",
-        "supply-chain/**",
-        "scripts/pylock.toml",
-    ]
     ignored: list[str] = []
-    for dir in ignore_dir:
+    for dir in IGNORED_DIRS:
         ignored.extend(["-ignore", dir])
     command = [
         "addlicense",
