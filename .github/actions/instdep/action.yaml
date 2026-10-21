@@ -82,7 +82,7 @@ runs:
       if: runner.os == 'Linux'
 
     - name: install go
-      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e  # v7.0.0
       with:
         go-version: stable
         cache: false
@@ -91,6 +91,14 @@ runs:
       run: |
         go install github.com/google/addlicense@latest
         echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+
+    - name: Exclude Workspace from Windows Defender
+      run: |
+        Add-MpPreference -ExclusionPath "${{ github.workspace }}"
+        Add-MpPreference -ExclusionPath "$env:USERPROFILE\.cargo"
+      shell: powershell
+      if: runner.os == 'Windows'
+
     - name: Cache Cargo installed tools on Linux
       uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6.1.0
       id: cache-cargo-tools-linux
