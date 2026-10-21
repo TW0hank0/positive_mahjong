@@ -1,4 +1,5 @@
 * text=auto eol=lf
 
-crates/old_slint_client/** linguist-vendored
-crates/old_pmj_client/** linguist-vendored
+Cargo.lock linguist-generated=false -gitlab-generated
+scripts/uv.lock linguist-generated=false -gitlab-generated
+scripts/pylock.toml linguist-generated=false -gitlab-generated

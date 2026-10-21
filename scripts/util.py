@@ -114,17 +114,26 @@ def run_cmd(
             )
             raise subprocess.TimeoutExpired(cmd=command, timeout=timeout)
         else:
-            if process.stdout is not None:
-                new = process.stdout.read().decode()
-                pstdout += new
-                if stream is True:
+            if stream is True:
+                if process.stdout is not None:
+                    new = process.stdout.read().decode()
+                    pstdout += new
                     print(new, end="")
-            if process.stderr is not None:
-                new = process.stderr.read().decode()
-                pstderr += new
-                if stream is True:
+                if process.stderr is not None:
+                    new = process.stderr.read().decode()
+                    pstderr += new
                     print(new, end="")
             time.sleep(0.00001)
+    if process.stdout is not None:
+        new = process.stdout.read().decode()
+        pstdout += new
+        if stream is True:
+            print(new, end="")
+    if process.stderr is not None:
+        new = process.stderr.read().decode()
+        pstderr += new
+        if stream is True:
+            print(new, end="")
     end_time = time.time()
     process_time = end_time - start_time
     if int(process_time) > 1:
