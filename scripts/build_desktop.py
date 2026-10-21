@@ -26,6 +26,7 @@ import build_license
 import util
 
 INCLUDE_FILES_MATCH_TYPE: Literal["exe_split", "inclue_all_files"] = "exe_split"
+RUN_CMD_STREAM: bool = os.name == "nt"
 
 
 def main():
@@ -73,6 +74,7 @@ def main():
         _ = util.run_cmd(
             ["cargo", "check", "--release", "--target", target, "--workspace"],
             cwd=util.fix_path(),
+            stream=RUN_CMD_STREAM,
         )
         print(f"{Fore.CYAN}Building release for target {target}...{Fore.RESET}", end="")
         cmd = ["cargo", "build", "--release", "--locked", "--target", target]
@@ -92,7 +94,7 @@ def main():
             cmd,
             cwd=util.fix_path(),
             timeout=60 * 100,  # 100分鐘
-            stream=True,
+            stream=RUN_CMD_STREAM,
         )
         # _ = util.run_cmd(
         #     ["cargo", "build", "--package", "pmj-desktop", "--target", target],
@@ -111,7 +113,7 @@ def main():
             ["cargo", "build", "--bin", "pmj-desktop-installer", "--target", target],
             cwd=util.fix_path(),
             timeout=60 * 50,  # 50分鐘
-            stream=True,
+            stream=RUN_CMD_STREAM,
         )
         target_path = util.fix_path(
             "target",
