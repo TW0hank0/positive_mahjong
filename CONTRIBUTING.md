@@ -1,36 +1,46 @@
 # 貢獻說明
 
-說明如何對 positive_mahjong 進行貢獻，未完成。
+說明如何對 positive_mahjong 進行貢獻。
 
-專案儲存庫在 [gitlab.com/TW0hank0/positive_mahjong](https://gitlab.com/TW0hank0/positive_mahjong)
+專案儲存庫在 [gitlab.com/TW0hank0/positive_mahjong](https://gitlab.com/TW0hank0/positive_mahjong)。
 
 ### 工具安裝
 
 #### Rust
 
-程式語言及編譯器
+專案使用 Rust 語言開發，需要編譯器及相關工具。
 
 建議使用 [Rustup](https://rustup.rs/) 安裝。
 
 #### uv
 
-用於執行 scripts。
+專案使用 Python 作為腳本語言，此工具用於下載依賴和執行 scripts。
 
-[uv 專案網站](https://docs.astral.sh/uv/)
+<https://docs.astral.sh/uv/>。
 
 #### cargo-deny
 
+`cargo install cargo-deny`
+
 #### cargo-about
+
+`cargo install --locked cargo-about --features="cli"`
 
 #### cargo-vet
 
-#### taplo (taplo-cli)
+`cargo install --locked cargo-vet`
 
 #### tombi
 
+`uv tool install tombi`
+
 #### reuse-tool
 
+`uv tool install reuse[charset-normalizer]`
+
 #### mdbook
+
+`cargo install --locked mdbook`
 
 ### AI/LLM
 
