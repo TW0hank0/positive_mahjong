@@ -23,6 +23,8 @@ permissions:
   contents: write
   pages: write
   id-token: write
+env:
+    RUST_LOG: debug
 jobs:
   make-cache:
     runs-on: ${{ matrix.os }}
