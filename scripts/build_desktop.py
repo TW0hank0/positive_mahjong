@@ -75,6 +75,7 @@ def main():
             ["cargo", "-vv", "check", "--release", "--target", target, "--workspace"],
             cwd=util.fix_path(),
             stream=RUN_CMD_STREAM,
+            timeout=60 * 20,
         )
         print(f"{Fore.CYAN}Building release for target {target}...{Fore.RESET}", end="")
         cmd = ["cargo", "-vv", "build", "--release", "--locked", "--target", target]
@@ -93,15 +94,9 @@ def main():
         _ = util.run_cmd(
             cmd,
             cwd=util.fix_path(),
-            timeout=60 * 100,  # 100分鐘
+            timeout=60 * 80,  # 80分鐘
             stream=RUN_CMD_STREAM,
         )
-        # _ = util.run_cmd(
-        #     ["cargo", "build", "--package", "pmj-desktop", "--target", target],
-        #     cwd=util.fix_path(),
-        #     timeout=60 * 65,  # 65分鐘
-        #     stream=True,
-        # )
     build_license.main()
     zip_desktop(targets)
     if util.get_commit_info().is_release is False:
@@ -110,9 +105,17 @@ def main():
         version = util.get_version()
     for target, _pkg in build_info:
         _ = util.run_cmd(
-            ["cargo", "-vv", "build", "--bin", "pmj-desktop-installer", "--target", target],
+            [
+                "cargo",
+                "-vv",
+                "build",
+                "--bin",
+                "pmj-desktop-installer",
+                "--target",
+                target,
+            ],
             cwd=util.fix_path(),
-            timeout=60 * 50,  # 50分鐘
+            timeout=60 * 40,  # 40分鐘
             stream=RUN_CMD_STREAM,
         )
         target_path = util.fix_path(

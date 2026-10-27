@@ -10,12 +10,10 @@
 
 ### v0.2.0 - [2026/8/16~]
 
-- pmj_client_core：客戶端核心
+- [pmj-client-core：客戶端核心](./TODO.md#pmj-client-core)
 - [V2Better 玩法](<./TODO.md#V2Better 玩法>)
-  - 包含 房間(room) 遊戲結束返回
-  - 丟牌 吃 碰 杠
-  - [客戶端遊戲中退出向玩家確認](./TODO.md#客戶端遊戲中退出向玩家確認)
-  - [客戶端遊戲中退出向伺服器傳送訊息](./TODO.md#客戶端遊戲中退出向伺服器傳送訊息)
+- [客戶端遊戲中退出向玩家確認](./TODO.md#客戶端遊戲中退出向玩家確認)
+- [客戶端遊戲中退出向伺服器傳送訊息](./TODO.md#客戶端遊戲中退出向伺服器傳送訊息)
 
 ### v0.3.0
 
@@ -24,16 +22,16 @@
 
 ### v0.4.0
 
-- pmj_client_cross：跨平臺客戶端
-
-### v0.5.0
-
 - [電腦平臺：安裝程式](./TODO.md#pmj-desktop-installer)
 - [電腦平臺：解除安裝程式](./TODO.md#pmj-desktop-uninstaller)
 
+### v0.5.0
+
+- [pmj-client-cross：跨平臺客戶端](./TODO.md#pmj-client-cross)
+
 ### v0.6.0
 
-- （暫定）開發 pmj_server_tui
+- （暫定）pmj-server-tui：總端中的客戶端
 
 ### v0.7.0
 

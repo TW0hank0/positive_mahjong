@@ -190,11 +190,11 @@ impl ToastManager {
             self.toasts.push(t);
         }
     }
-    pub fn view<'a, Message:'a>(&self) -> scrollable::Scrollable<'a, Message> {
+    pub fn view<'a, Message:'a>(&self) -> iced::Element<'a, Message> {
         let mut layout = Column::new().width(Length::Fill).height(Length::Fill).align_x(alignment::Horizontal::Right);
         if !self.new_toasts.is_empty(){
         for (toast, instant) in self.new_toasts.clone() {
-            let mut tlayout = Column::new();
+            let mut tlayout = Column::new().max_width(300).width(Length::FillPortion(5));
             match toast.title {
                 Some(title) => {tlayout=tlayout.push(text(title).size(28))}
                 None => {}
@@ -215,7 +215,7 @@ impl ToastManager {
                     })
                     ),..Default::default()}}))
         }}
-        scrollable(Row::new().push(layout).width(Length::Fill).height(Length::Fill).align_y(alignment::Vertical::Bottom)).width(Length::Fill).height(Length::Fill)
+        Row::new().push(scrollable(layout).height(Length::Fill)).width(Length::Fill).height(Length::Fill).align_y(alignment::Vertical::Bottom).into()
     }
 }
 

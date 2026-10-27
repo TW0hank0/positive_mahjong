@@ -17,7 +17,6 @@ toml-version = "v1.1.0"
 
 [files]
 include = [
-    "**/Cargo.toml",
     "Cargo.toml",
     "about.toml",
     "crates/pmj-client-core/Cargo.toml",
@@ -28,6 +27,8 @@ include = [
     "crates/pmj-server-desktop/Cargo.toml",
     "deny.toml",
     "rust-toolchain.toml",
+    "tombi.toml",
+    "REUSE.toml",
 ]
 exclude = [
     "**/.venv/**",
