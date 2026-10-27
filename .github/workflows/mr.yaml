@@ -15,7 +15,7 @@
 name: Merge Request Check
 on:
   schedule:
-    - cron: 0 */3 * * *  # 每3小時
+    - cron: 0 */4 * * *  # 每4小時
   # 支援在 GitHub 上手動點擊觸發
   workflow_dispatch: 
 concurrency:

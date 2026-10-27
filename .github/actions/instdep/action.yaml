@@ -34,13 +34,11 @@ runs:
       run: |
         sudo apt-get update
         sudo apt-get upgrade -y
-        sudo apt-get install -y libfontconfig1-dev pkg-config mold gcc musl-tools clang
+        sudo apt-get install -y libfontconfig1-dev pkg-config gcc musl-tools clang
 
-    # - name: install Windows needed dep
-    #   shell: bash
-    #   if: runner.os == 'Windows'
-    #   run: |
-    #     winget install --id LLVM.LLVM --accept-source-agreements --accept-package-agreements
+    - uses: rui314/setup-mold
+      with:
+        make-default: false
 
     - name: check uv install and install cpython
       shell: bash
@@ -110,7 +108,6 @@ runs:
           ~/.cargo/bin/mdbook
           ~/.cargo/bin/cargo-msrv
           ~/.cargo/bin/eza
-          ~/.cargo/bin/wild
         key: ${{ runner.os }}-${{ runner.arch }}-cargo-tools-${{ hashFiles('ci-cache-version.json') }}
     - name: Cache Cargo installed tools on Windows
       uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6.1.0
@@ -128,7 +125,7 @@ runs:
       shell: bash
       if: steps.cache-cargo-tools-linux.outputs.cache-hit != 'true' && runner.os == 'Linux'
       run: |
-        cargo +stable install --locked cargo-msrv cargo-deny mdbook eza wild-linker
+        cargo +stable install --locked cargo-msrv cargo-deny mdbook eza
         cargo +stable install --locked cargo-about --features="cli"
     - name: Install cargo tools if not cached on Windows
       shell: bash
@@ -136,12 +133,13 @@ runs:
       run: |
         cargo +stable install --locked cargo-msrv cargo-deny mdbook eza
         cargo +stable install --locked cargo-about --features="cli"
-    - name: Create soft link for wild
-      shell: bash
-      if: runner.os == 'Linux'
-      run: |
-        echo 'create link for wild'
-        sudo ln -s ~/.cargo/bin/wild /usr/bin/ld.wild
+    - uses: wild-linker/action
+    # - name: Create soft link for wild
+    #   shell: bash
+    #   if: runner.os == 'Linux'
+    #   run: |
+    #     echo 'create link for wild'
+    #     sudo ln -s ~/.cargo/bin/wild /usr/bin/ld.wild
     - name: check tools installion
       shell: bash
       run: |
