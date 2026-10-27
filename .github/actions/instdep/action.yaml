@@ -36,7 +36,7 @@ runs:
         sudo apt-get upgrade -y
         sudo apt-get install -y libfontconfig1-dev pkg-config gcc musl-tools clang
 
-    - uses: rui314/setup-mold@main
+    - uses: rui314/setup-mold@da13e0b42e392e3a45d1215033a2270b849d7d36 # main
       with:
         make-default: false
 
