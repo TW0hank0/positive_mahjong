@@ -161,7 +161,7 @@ jobs:
       - run: cargo check --release
         shell: bash
       - name: use build script
-        #env:
+        env:
           #CARGO_BUILD_JOBS: 1  # 限制為單線程，避免 OOM Killer
         run: |
           cd scripts
