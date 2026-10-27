@@ -111,8 +111,8 @@ def run_cmd(
             command,
             check=False,
             cwd=cwd,
-            stdout=subprocess.STD_OUTPUT_HANDLE if stream is True else subprocess.PIPE,
-            stderr=subprocess.STD_ERROR_HANDLE if stream is True else subprocess.PIPE,
+            stdout=sys.stdout if stream is True else subprocess.PIPE,
+            stderr=sys.stderr if stream is True else subprocess.PIPE,
             timeout=timeout,
         )
     elif impl_type == "Popen":
