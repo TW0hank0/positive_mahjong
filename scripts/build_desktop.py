@@ -75,7 +75,7 @@ def main():
             ["cargo", "-vv", "check", "--release", "--target", target, "--workspace"],
             cwd=util.fix_path(),
             stream=RUN_CMD_STREAM,
-            timeout=60 * 50,
+            timeout=60 * 20,
         )
         print(f"{Fore.CYAN}Building release for target {target}...{Fore.RESET}", end="")
         cmd = ["cargo", "-vv", "build", "--release", "--locked", "--target", target]
@@ -94,7 +94,7 @@ def main():
         _ = util.run_cmd(
             cmd,
             cwd=util.fix_path(),
-            timeout=60 * 110,  # 110分鐘
+            timeout=60 * 80,  # 80分鐘
             stream=RUN_CMD_STREAM,
         )
     build_license.main()
@@ -115,7 +115,7 @@ def main():
                 target,
             ],
             cwd=util.fix_path(),
-            timeout=60 * 50,  # 50分鐘
+            timeout=60 * 40,  # 40分鐘
             stream=RUN_CMD_STREAM,
         )
         target_path = util.fix_path(

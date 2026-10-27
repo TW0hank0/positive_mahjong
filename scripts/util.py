@@ -24,11 +24,21 @@ import sys
 import time
 import tomllib
 from typing import Literal
+lazy import selectors
 
 from colorama import Back, Fore
 from rich import traceback as rtb
 
 rtb.install(show_locals=True)
+
+if sys.platform == "win32":
+    import socket
+
+    try:
+        test_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        test_sock.close()
+    except OSError:
+        pass
 
 
 def show_cmd(
@@ -75,11 +85,13 @@ def show_output(name: str, content: str) -> str:
 def run_cmd(
     command: list[str],
     cwd: str | None = None,
-    timeout: int = 60 * 30,
+    timeout: int = 60 * 10,
     stream: bool = False,
     exit_on_failed: bool = True,
     show_command: bool = True,
+    impl_type: Literal["Popen", "run"] = "run",
 ) -> tuple[int, str]:
+    """no stdout or stderr data when stream is True"""
     if show_command is True:
         print(
             f"{Fore.CYAN}Running command:{Fore.RESET}",
@@ -94,46 +106,72 @@ def run_cmd(
     pstdout = ""
     pstderr = ""
     start_time = time.time()
-    process = subprocess.Popen(
-        command,
-        stderr=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        cwd=cwd,
-    )
-    while True:
-        if process.poll() is not None:
-            break
-        elif int(time.time() - start_time) > timeout:
-            show_output(
-                "stdout",
-                "" if process.stdout is None else process.stdout.read().decode(),
-            )
-            show_output(
-                "stderr",
-                "" if process.stderr is None else process.stderr.read().decode(),
-            )
-            raise subprocess.TimeoutExpired(cmd=command, timeout=timeout)
-        else:
-            if stream is True:
-                if process.stdout is not None:
-                    new = process.stdout.read().decode()
-                    pstdout += new
+    if impl_type == "run":
+        process = subprocess.run(
+            command,
+            check=False,
+            cwd=cwd,
+            stdout=subprocess.STDOUT if stream is True else subprocess.PIPE,
+            stderr=subprocess.STD_ERROR_HANDLE if stream is True else subprocess.PIPE,
+            timeout=timeout,
+        )
+    elif impl_type == "Popen":
+        process = subprocess.Popen(
+            command,
+            stderr=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            cwd=cwd,
+        )
+        if (process.stdout is not None) or (process.stderr is not None):
+            sel = selectors.DefaultSelector()
+            if process.stdout is not None:
+                sel_key_stdout = sel.register(process.stdout, selectors.EVENT_READ)
+            if process.stderr is not None:
+                sel_key_stderr = sel.register(process.stderr, selectors.EVENT_READ)
+        while True:
+            if process.poll() is not None:
+                break
+            elif int(time.time() - start_time) > timeout:
+                show_output(
+                    "stdout",
+                    "" if process.stdout is None else process.stdout.read().decode(),
+                )
+                show_output(
+                    "stderr",
+                    "" if process.stderr is None else process.stderr.read().decode(),
+                )
+                raise subprocess.TimeoutExpired(cmd=command, timeout=timeout)
+            else:
+                if (process.stdout is not None) or (process.stderr is not None):
+                    events = sel.select(timeout=1.0)
+                    events_sel_key = [event[0] for event in events]
+                    if process.stdout is not None and sel_key_stdout in events_sel_key:
+                        new = process.stdout.read().decode()
+                        pstdout += new
+                        if stream is True:
+                            print(new, end="")
+                    if process.stderr is not None and sel_key_stderr in events_sel_key:
+                        new = process.stderr.read().decode()
+                        pstderr += new
+                        if stream is True:
+                            print(new, end="")
+                time.sleep(0.01)
+        if (process.stdout is not None) or (process.stderr is not None):
+            events = sel.select()
+            events_sel_key = [event[0] for event in events]
+            if process.stdout is not None and sel_key_stdout in events_sel_key:
+                sel.unregister(process.stdout)
+                new = process.stdout.read().decode()
+                pstdout += new
+                if stream is True:
                     print(new, end="")
-                if process.stderr is not None:
-                    new = process.stderr.read().decode()
-                    pstderr += new
+            if process.stderr is not None and sel_key_stderr in events_sel_key:
+                sel.unregister(process.stderr)
+                new = process.stderr.read().decode()
+                pstderr += new
+                if stream is True:
                     print(new, end="")
-            time.sleep(0.00001)
-    if process.stdout is not None:
-        new = process.stdout.read().decode()
-        pstdout += new
-        if stream is True:
-            print(new, end="")
-    if process.stderr is not None:
-        new = process.stderr.read().decode()
-        pstderr += new
-        if stream is True:
-            print(new, end="")
+            del sel
     end_time = time.time()
     process_time = end_time - start_time
     if int(process_time) > 1:
