@@ -111,7 +111,7 @@ def run_cmd(
             command,
             check=False,
             cwd=cwd,
-            stdout=subprocess.STDOUT if stream is True else subprocess.PIPE,
+            stdout=subprocess.STD_OUTPUT_HANDLE if stream is True else subprocess.PIPE,
             stderr=subprocess.STD_ERROR_HANDLE if stream is True else subprocess.PIPE,
             timeout=timeout,
         )
