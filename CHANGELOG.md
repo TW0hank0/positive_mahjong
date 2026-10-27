@@ -1,4 +1,4 @@
-# positive_mahjong 的版本更改紀錄
+# 更改紀錄
 
 這裡會紀錄版本間的更改。
 
@@ -23,7 +23,7 @@
 發佈版本時使用：
 
 ```
-# Deprecated
+# Deprecated:
 # git tag -a "版本" -m "release pmj: 版本"
 # New:
 git checkout master

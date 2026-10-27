@@ -2,7 +2,7 @@
 
 說明如何對 positive_mahjong 進行貢獻。
 
-專案儲存庫在 [gitlab.com/TW0hank0/positive_mahjong](https://gitlab.com/TW0hank0/positive_mahjong)。
+專案主儲存庫在 [gitlab.com/TW0hank0/positive_mahjong](https://gitlab.com/TW0hank0/positive_mahjong)。
 
 ### 工具安裝
 
@@ -32,6 +32,8 @@
 
 #### tombi
 
+Toml formatter and linter.
+
 `uv tool install tombi`
 
 #### reuse-tool
@@ -40,8 +42,18 @@
 
 #### mdbook
 
+用於說明文件。
+
 `cargo install --locked mdbook`
 
 ### AI/LLM
 
-禁止 AI/LLM 生成的程式碼，僅允許使用 AI/LLM 作為原型參考，**所有使用 AI/LLM 的內容須披露**。
+#### 禁止
+
+純 AI/LLM 生成的程式碼。
+
+#### 允許
+
+使用 AI/LLM 搜尋資料。
+
+**所有使用 AI/LLM 的內容皆須經人類檢查與披露。**
