@@ -23,6 +23,8 @@ permissions:
   contents: write
   pages: write
   id-token: write
+env:
+    RUST_LOG: debug
 jobs:
   make-cache:
     runs-on: ${{ matrix.os }}
@@ -156,9 +158,11 @@ jobs:
           uv venv
           uv sync
           cd ..
+      - run: cargo check --release
+        shell: bash
       - name: use build script
-        env:
-          CARGO_BUILD_JOBS: 1  # 限制為單線程，避免 OOM Killer
+        #env:
+          #CARGO_BUILD_JOBS: 1  # 限制為單線程，避免 OOM Killer
         run: |
           cd scripts
           uv run build_desktop.py
