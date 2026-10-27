@@ -133,7 +133,7 @@ runs:
       run: |
         cargo +stable install --locked cargo-msrv cargo-deny mdbook eza
         cargo +stable install --locked cargo-about --features="cli"
-    - uses: wild-linker/action
+    - uses: wild-linker/action@lastest
     # - name: Create soft link for wild
     #   shell: bash
     #   if: runner.os == 'Linux'
