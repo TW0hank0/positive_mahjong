@@ -68,7 +68,7 @@ def addlicense_check():
     ]
     command.extend(ignored.copy())
     command.append(".")
-    (returncode, _stdout) = util.run_cmd(
+    (returncode, _stdout, _stderr) = util.run_cmd(
         command, cwd=util.fix_path(), exit_on_failed=False
     )
     if returncode != 0:

@@ -26,7 +26,7 @@ import build_license
 import util
 
 INCLUDE_FILES_MATCH_TYPE: Literal["exe_split", "inclue_all_files"] = "exe_split"
-RUN_CMD_STREAM: bool = os.name == "nt"
+RUN_CMD_STREAM: bool = False  # os.name == "nt"
 
 
 def main():
@@ -94,7 +94,7 @@ def main():
         _ = util.run_cmd(
             cmd,
             cwd=util.fix_path(),
-            timeout=60 * 80,  # 80分鐘
+            timeout=60 * 60,  # 60 分鐘
             stream=RUN_CMD_STREAM,
         )
     build_license.main()
@@ -115,7 +115,7 @@ def main():
                 target,
             ],
             cwd=util.fix_path(),
-            timeout=60 * 40,  # 40分鐘
+            timeout=60 * 30,  # 30分鐘
             stream=RUN_CMD_STREAM,
         )
         target_path = util.fix_path(
