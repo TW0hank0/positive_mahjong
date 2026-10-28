@@ -168,7 +168,7 @@ def check() -> None | tuple[str, int, str]:
         (["ruff", "check", "."], "scripts"),
     ]
     for command, relpath in commands:
-        (check_returncode, check_stdout) = util.run_cmd(
+        (check_returncode, check_stdout, _stderr) = util.run_cmd(
             command,
             cwd=os.path.join(WORK_DIR, relpath),
             exit_on_failed=False,

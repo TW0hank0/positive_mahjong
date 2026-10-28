@@ -25,20 +25,12 @@ import time
 import tomllib
 from typing import Literal
 lazy import selectors
+lazy import socket
 
 from colorama import Back, Fore
 from rich import traceback as rtb
 
 rtb.install(show_locals=True)
-
-if sys.platform == "win32":
-    import socket
-
-    try:
-        test_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        test_sock.close()
-    except OSError:
-        pass
 
 
 def show_cmd(
@@ -85,12 +77,12 @@ def show_output(name: str, content: str) -> str:
 def run_cmd(
     command: list[str],
     cwd: str | None = None,
-    timeout: int = 60 * 10,
+    timeout: int = 60 * 5,
     stream: bool = False,
     exit_on_failed: bool = True,
     show_command: bool = True,
     impl_type: Literal["Popen", "run"] = "run",
-) -> tuple[int, str]:
+) -> tuple[int, str, str]:
     """no stdout or stderr data when stream is True"""
     if show_command is True:
         print(
@@ -115,7 +107,15 @@ def run_cmd(
             stderr=sys.stderr if stream is True else subprocess.PIPE,
             timeout=timeout,
         )
+        pstdout = process.stdout.decode()
+        pstderr = process.stderr.decode()
     elif impl_type == "Popen":
+        if sys.platform == "win32":
+            try:
+                test_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                test_sock.close()
+            except OSError:
+                pass
         process = subprocess.Popen(
             command,
             stderr=subprocess.PIPE,
@@ -195,37 +195,37 @@ def run_cmd(
                 print(show_output(name, data))
         if exit_on_failed is True:
             sys.exit(process.returncode)
-    return (process.returncode, pstdout.rstrip("\n"))
+    return (process.returncode, pstdout.rstrip("\n"), pstderr)
 
 
 def get_commit_info(show_cmd: bool = True) -> CommitInfo:
     """return CommitInfo"""
-    (_returncode, sha_stdout) = run_cmd(
+    (_returncode, sha_stdout, _stderr) = run_cmd(
         ["git", "rev-parse", "HEAD"], cwd=fix_path(), show_command=show_cmd
     )
     commit_sha = sha_stdout.replace("\n", "")
-    (_returncode, ssha_stdout) = run_cmd(
+    (_returncode, ssha_stdout, _stderr) = run_cmd(
         ["git", "rev-parse", "--short", "HEAD"], cwd=fix_path(), show_command=show_cmd
     )
     commit_short_sha = ssha_stdout.replace("\n", "")
-    (_returncode, commit_time) = run_cmd(
+    (_returncode, commit_time, _stderr) = run_cmd(
         ["git", "log", "-1", "--format=%cd", "--date=iso"],
         cwd=fix_path(),
         show_command=show_cmd,
     )
-    (_returncode, commit_msg) = run_cmd(
+    (_returncode, commit_msg, _stderr) = run_cmd(
         ["git", "log", "-1", "--format=%B"], cwd=fix_path(), show_command=show_cmd
     )
-    (_, commit_committer_name) = run_cmd(
+    (_, commit_committer_name, _stderr) = run_cmd(
         ["git", "log", "-1", "--format=%cn"], cwd=fix_path(), show_command=show_cmd
     )
-    (_, commit_committer_email) = run_cmd(
+    (_, commit_committer_email, _stderr) = run_cmd(
         ["git", "log", "-1", "--format=%ce"], cwd=fix_path(), show_command=show_cmd
     )
-    (_, commit_author_name) = run_cmd(
+    (_, commit_author_name, _stderr) = run_cmd(
         ["git", "log", "-1", "--format=%an"], cwd=fix_path(), show_command=show_cmd
     )
-    (_, commit_author_email) = run_cmd(
+    (_, commit_author_email, _stderr) = run_cmd(
         ["git", "log", "-1", "--format=%ae"], cwd=fix_path(), show_command=show_cmd
     )
     return CommitInfo(
@@ -305,7 +305,7 @@ def get_version(
         elif how_get == "file_workspace":
             version = str(data["workspace"]["package"]["version"])
     elif how_get == "cargo":
-        (_returncode, stdout) = run_cmd(
+        (_returncode, stdout, _stderr) = run_cmd(
             ["cargo", "metadata", "--format-version", "1", "--no-deps"],
             cwd=fix_path(),
             show_command=show_cmd,
