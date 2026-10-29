@@ -56,7 +56,16 @@ TYPE_HINT_ARTIFACTS_LIST = dict[
         bool | dict[str, str] | dict[str, dict] | str | TYPE_HINT_RELEASE_ARTIFACTS,
     ],
 ]
-RUST_TARGETS = [
+RUST_TARGETS: list[
+    Literal[
+        "aarch64-pc-windows-msvc",
+        "x86_64-pc-windows-msvc",
+        "x86_64-unknown-linux-gnu",
+        "x86_64-unknown-linux-musl",
+        "aarch64-unknown-linux-musl",
+        "aarch64-unknown-linux-gnu",
+    ]
+] = [
     "aarch64-pc-windows-msvc",
     "x86_64-pc-windows-msvc",
     "x86_64-unknown-linux-gnu",
@@ -154,21 +163,29 @@ def build_download_page(build_root: str):
     dy_vars = {}
     dy_vars["VERSION"] = util.get_version()
     with open(util.fix_path("artifacts", ARTIFACTS_LIST_FILE), "r") as f:
-        artifacts_list: dict[str, dict] = json.load(f)
+        i_artifacts_list: dict[str, ArtifactList | dict] = json.load(f)
+    artifacts_list = {}
+    for iprev_key, iprev_value in i_artifacts_list.items():
+        artifacts_list[iprev_key] = ArtifactList.model_validate_json(
+            json.dumps(iprev_value)
+        )
     print(f"artifacts_list={artifacts_list}")
-    lasest_stable_version_num = str(max(list(artifacts_list.keys())))
+    latest_stable_version_num = next(iter(artifacts_list.keys()))
+    for version_num in artifacts_list:
+        if int(version_num) > int(latest_stable_version_num):
+            latest_stable_version_num = version_num
     while True:
-        if artifacts_list[lasest_stable_version_num]["is_released"] is True:
+        if artifacts_list[latest_stable_version_num].is_released is True:
             break
         else:
-            lasest_stable_version_num = str(int(lasest_stable_version_num) - 1)
-            if int(lasest_stable_version_num) < 0:
+            latest_stable_version_num = str(int(latest_stable_version_num) - 1)
+            if int(latest_stable_version_num) <= 0:
                 return  # happend when no release artifacts gen yet
     dl_link_template = '<a href="/files/{}" class="dl-button">{}</a>'
     dl_links = []
-    for target, filename in artifacts_list[lasest_stable_version_num][
-        "release_artifacts"
-    ].items():
+    for target, filename in artifacts_list[
+        latest_stable_version_num
+    ].release_artifacts.items():
         dl_links.append(dl_link_template.format(filename, target))
     for dy_var in list(dy_vars.keys()):
         download_page = download_page.replace(
@@ -193,14 +210,10 @@ def artifacts_list() -> None:
                 json.dumps(iprev_value)
             )
         print("prepared prev_list")
-        old_prev_list = prev_artifacts_list.json()
-        list(old_prev_list.keys()).sort()
         print(f"prev_list={prev_list}")
-        print(f"old_prev_list={old_prev_list}")
-        for arelease_num in old_prev_list:
-            arelease = old_prev_list[arelease_num]
-            if arelease["is_released"] is True:
-                arelease_artifcats: dict = arelease["release_artifacts"]
+        for arelease in prev_list.values():
+            if arelease.is_released is True:
+                arelease_artifcats: dict = arelease.release_artifacts
                 for ara_filename in arelease_artifcats.values():
                     print(f"requests.get({GH_PAGES_BASE_URL}files/{ara_filename})")
                     ara_file_resp = requests.get(
@@ -209,7 +222,7 @@ def artifacts_list() -> None:
                     ara_file_resp.raise_for_status()
                     with open(util.fix_path("artifacts", "history", ara_filename)) as f:
                         shutil.copyfileobj(ara_file_resp.raw, f)
-            arelease_ci_artifacts: dict = arelease["ci_test"]
+            arelease_ci_artifacts = arelease.ci_tests
             for aca_id in arelease_ci_artifacts.values():
                 for aca_filename in aca_id.values():
                     ara_file_resp = requests.get(
@@ -223,11 +236,24 @@ def artifacts_list() -> None:
     # gen new list
     version = util.get_version()
     if SKIP_PREV_ARTIFACTS is True:
-        new_list = {"1": {"is_released": False, "release_name": version, "ci_test": {}}}
+        new_list = {
+            "1": ArtifactList(
+                is_released=False,
+                release_name="0.1.0",
+                ci_tests={},
+                release_artifacts={},
+            ),
+            "2": ArtifactList(
+                is_released=False,
+                release_name=version,
+                ci_tests={},
+                release_artifacts={},
+            ),
+        }
     else:
-        new_list = old_prev_list
+        new_list = prev_list
     # prepare file list
-    files_list = {}
+    files_list: TYPE_HINT_RELEASE_ARTIFACTS = {}
     for file in util.list_files(
         util.fix_path("artifacts"), ignores=[util.fix_path("artifacts", "history")]
     ):
@@ -236,28 +262,31 @@ def artifacts_list() -> None:
                 files_list[target] = file
                 break
         else:
-            print(f"unknown target: {file}")
+            print(f"unknown target, file: {file}")
     lastest_num = max(list(new_list.keys()))
-    if new_list[lastest_num]["is_released"] is True:
-        new_list[str(int(lastest_num) + 1)] = {
-            "is_released": False,
-            "release_name": version,
-            "ci_test": {},
-            "release_artifacts": {},
-        }
+    if new_list[lastest_num].is_released is True:
+        new_list[str(int(lastest_num) + 1)] = ArtifactList(
+            is_released=False,
+            release_name=version,
+            ci_tests={},
+            release_artifacts={},
+        )
         lastest_num = str(int(lastest_num) + 1)
     commit_info = util.get_commit_info()
     if commit_info.is_release is False:
-        ci_test_id = f"{commit_info.time.replace(' ', '_')}-_-_-{commit_info.sha}"
-        new_list[lastest_num]["ci_test"][ci_test_id] = files_list  # ty: ignore[invalid-assignment]
+        ci_test_id = f"{commit_info.time.replace(' ', '_')}::{commit_info.sha}"
+        new_list[lastest_num].ci_tests[ci_test_id] = files_list
     else:
-        new_list[lastest_num]["is_released"] = True
-        new_list[lastest_num]["release_artifacts"] = files_list
+        new_list[lastest_num].is_released = True
+        new_list[lastest_num].release_artifacts = files_list
     print(f"new_list={new_list}")
+    new_list_json = {}
+    for key, value in new_list.items():
+        new_list_json[key] = json.loads(value.model_dump_json(indent=4))
     with open(
         util.fix_path("artifacts", ARTIFACTS_LIST_FILE), "w", encoding="utf-8"
     ) as f:
-        json.dump(new_list, f, indent=4)
+        json.dump(new_list_json, f, indent=4)
 
 
 def copytree_ignore(src: str, names: list[str], /) -> list[str]:

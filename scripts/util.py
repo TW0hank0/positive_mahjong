@@ -41,7 +41,6 @@ def show_cmd(
     if len(" ".join(command)) <= twidth:
         formatted += " ".join(command)
     else:
-        formatted += f"{Back.LIGHTBLACK_EX}{command[0]}  \\{Back.RESET}\n"
         for count, cmd_part in enumerate(command):
             indent = "" if count == 0 else "  "
             suffix = "" if count == (len(command) - 1) else " \\"
@@ -82,8 +81,9 @@ def run_cmd(
     exit_on_failed: bool = True,
     show_command: bool = True,
     impl_type: Literal["Popen", "run"] = "run",
+    env: dict[str, str] | None = None,
 ) -> tuple[int, str, str]:
-    """no stdout or stderr data when stream is True"""
+    """no output show when timeout on impl_type 'run'"""
     if show_command is True:
         print(
             f"{Fore.CYAN}Running command:{Fore.RESET}",
@@ -106,9 +106,12 @@ def run_cmd(
             stdout=sys.stdout if stream is True else subprocess.PIPE,
             stderr=sys.stderr if stream is True else subprocess.PIPE,
             timeout=timeout,
+            env=env,
         )
-        pstdout = process.stdout.decode()
-        pstderr = process.stderr.decode()
+        if process.stdout is not None:
+            pstdout = process.stdout.decode()
+        if process.stderr is not None:
+            pstderr = process.stderr.decode()
     elif impl_type == "Popen":
         if sys.platform == "win32":
             try:
@@ -184,15 +187,15 @@ def run_cmd(
                 f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.GREEN}Process finished sucessful.{Fore.RESET} {Fore.LIGHTBLACK_EX}{process_time_str}{Fore.RESET}"
             )
     else:
-        if show_command is True:
-            print(
-                f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.RED}Process exited with non-zero code{Fore.RESET} {Fore.LIGHTBLACK_EX}({process.returncode}){Fore.RESET}! {Fore.LIGHTBLACK_EX}{process_time_str}{Fore.RESET}"
-            )
-            for name, data in [
-                ("stdout", pstdout),
-                ("stderr", pstderr),
-            ]:
-                print(show_output(name, data))
+        print(
+            f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.RED}Process exited with non-zero code{Fore.RESET} {Fore.LIGHTBLACK_EX}({process.returncode}){Fore.RESET}! {Fore.LIGHTBLACK_EX}{process_time_str}{Fore.RESET}"
+        )
+        for name, data in [
+            ("stdout", pstdout),
+            ("stderr", pstderr),
+        ]:
+            print(show_output(name, data))
+        sys.stdout.flush()
         if exit_on_failed is True:
             sys.exit(process.returncode)
     return (process.returncode, pstdout.rstrip("\n"), pstderr)

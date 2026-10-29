@@ -1,0 +1,3 @@
+[tools]
+cargo-deny = "0.19.8"
+"cargo:cargo-about"="0.8.4"

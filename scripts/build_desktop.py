@@ -68,6 +68,8 @@ def main():
             print(f"{Fore.RED}Unsupport system!{Fore.RESET}")
     print(f"target: {build_info}")
     targets = []
+    build_env = os.environ.copy()
+    build_env["CARGO_BUILD_JOBS"] = "1"
     for target, pkg in build_info:
         targets.append(target)
         _ = util.run_cmd(["rustup", "target", "add", target], cwd=util.fix_path())
@@ -75,7 +77,8 @@ def main():
             ["cargo", "-vv", "check", "--release", "--target", target, "--workspace"],
             cwd=util.fix_path(),
             stream=RUN_CMD_STREAM,
-            timeout=60 * 20,
+            timeout=60 * 15,
+            env=build_env,
         )
         print(f"{Fore.CYAN}Building release for target {target}...{Fore.RESET}", end="")
         cmd = ["cargo", "-vv", "build", "--release", "--locked", "--target", target]
@@ -94,8 +97,9 @@ def main():
         _ = util.run_cmd(
             cmd,
             cwd=util.fix_path(),
-            timeout=60 * 60,  # 60 分鐘
+            timeout=60 * 45,  # 45 分鐘
             stream=RUN_CMD_STREAM,
+            env=build_env,
         )
     build_license.main()
     zip_desktop(targets)
@@ -115,8 +119,9 @@ def main():
                 target,
             ],
             cwd=util.fix_path(),
-            timeout=60 * 30,  # 30分鐘
+            timeout=60 * 15,  # 15 分鐘
             stream=RUN_CMD_STREAM,
+            env=build_env,
         )
         target_path = util.fix_path(
             "target",
