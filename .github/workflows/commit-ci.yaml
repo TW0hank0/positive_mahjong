@@ -24,7 +24,7 @@ permissions:
   pages: write
   id-token: write
 env:
-    RUST_LOG: debug
+  RUST_LOG: debug
 jobs:
   make-cache:
     runs-on: ${{ matrix.os }}
@@ -86,6 +86,8 @@ jobs:
           key: ${{ runner.os }}-${{ runner.arch }}-ThirdPartyLicense-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('templates/about_*.hbs') }}
   check:
     runs-on: ${{ matrix.os }}
+    needs:
+      - make-cache
     strategy:
       fail-fast: false
       matrix:
@@ -136,6 +138,8 @@ jobs:
           cargo deny check
   build_client_desktop:
     runs-on: ${{ matrix.os }}
+    needs:
+      - make-cache
     strategy:
       fail-fast: false
       matrix:
@@ -235,7 +239,7 @@ jobs:
           uv run build_website.py
           cd ..
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9  # v5.0.0
         with:
           name: pages-with-artifacts
           path: ./website_build/
