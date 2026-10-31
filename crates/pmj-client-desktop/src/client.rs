@@ -24,6 +24,7 @@ use pmj_desktop::{
     shared::{ButtonStyles, ContainerStyles, Toast, ToastManager},
 };
 
+use pmj_client_core::ccore;
 use pmj_shared::shared::{
     self, FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES, PROJECT_NAME, PROJECT_VERSION,
 };
@@ -49,7 +50,6 @@ pub enum ClientScenes {
 #[derive(Debug, PartialEq, Eq)]
 pub struct HomeState {
     try_connecting_server: bool,
-    msgs: Vec<String>,
     connect_msg: Option<String>,
 }
 
@@ -103,7 +103,6 @@ impl Client {
                 server_url: String::from("ws://"),
                 scene: ClientScenes::Home(HomeState {
                     try_connecting_server: false,
-                    msgs: Vec::new(),
                     connect_msg: None,
                 }),
                 theme: iced::theme::Theme::TokyoNight,
@@ -122,7 +121,9 @@ impl Client {
             }
             Message::CCoreProcessTask => match self.scene {
                 ClientScenes::Home(ref _home_state) => {
-                    warn!("update: warn scene");
+                    let msg = String::from("warn scene");
+                    warn!(msg);
+                    self.toast.add(Toast::new(msg).set_warning());
                 }
                 ClientScenes::Play(ref mut play_state) => {
                     play_state.ccore.process_task();
@@ -130,7 +131,9 @@ impl Client {
                     play_state.gm_state = play_state.ccore.game_state();
                     match play_state.gm_state {
                         pmj_client_core::ccore::GMState::HomePage => {
-                            warn!("update: warn GMState");
+                            let msg = String::from("warn GMState");
+                            warn!(msg);
+                            self.toast.add(Toast::new(msg).set_warning());
                         }
                         pmj_client_core::ccore::GMState::V2Better(ref gms_v2) => {
                             play_state.current_turn = gms_v2.player_turn;
@@ -157,23 +160,25 @@ impl Client {
                 HomeMsg::InputServerIpChanged(server_ip) => match self.scene {
                     ClientScenes::Home(ref mut home_state) => {
                         if home_state.try_connecting_server {
-                            home_state
-                                .msgs
-                                .push(String::from("已有正在嘗試連接的伺服器！"));
+                            let msg = String::from("已有正在嘗試連接的伺服器！");
+                            warn!(msg);
+                            self.toast.add(Toast::new(msg).set_warning())
                         } else {
                             self.server_url = server_ip;
                         }
                     }
                     ClientScenes::Play(ref _play_state) => {
-                        warn!("update: warn scene");
+                        let msg = String::from("warn scene");
+                        warn!(msg);
+                        self.toast.add(Toast::new(msg).set_warning());
                     }
                 },
                 HomeMsg::VSoftKeyBoardInput(key) => match self.scene {
                     ClientScenes::Home(ref mut home_state) => {
                         if home_state.try_connecting_server {
                             let msg = String::from("已有正在嘗試連接的伺服器！");
-                            home_state.msgs.push(msg.clone());
-                            warn!("update: {}", msg);
+                            warn!(msg);
+                            self.toast.add(Toast::new(msg).set_warning());
                         } else {
                             if key == "backspace" || key == "\u{e14a}" {
                                 self.server_url.pop();
@@ -183,22 +188,24 @@ impl Client {
                         }
                     }
                     ClientScenes::Play(ref _play_state) => {
-                        warn!("update: warn scene");
+                        let msg=String::from("warn scene");
+                        warn!(msg);
+                        self.toast.add(Toast::new(msg).set_warning());
                     }
                 },
                 HomeMsg::ConnectServer => match self.scene {
                     ClientScenes::Home(ref mut home_state) => {
                         if self.server_url.is_empty() {
                             let msg = String::from("未輸入伺服器地址！");
-                            home_state.msgs.push(msg.clone());
-                            warn!("update: {}", msg);
+                            warn!(msg);
+                            self.toast.add(Toast::new(msg).set_warning());
                         } else if home_state.try_connecting_server {
                             let msg = String::from("已有正在嘗試連接的伺服器！");
-                            home_state.msgs.push(msg.clone());
-                            warn!("update: {}", msg);
+                            warn!(msg);
+                            self.toast.add(Toast::new(msg).set_warning());
                         } else {
                             home_state.try_connecting_server = true;
-                            match pmj_client_core::ccore::ClientCore::connect(
+                            match ccore::ClientCore::connect(
                                 self.server_url.clone(),
                             ) {
                                 Ok(mut ccore) => {
@@ -206,8 +213,11 @@ impl Client {
                                     let mut gm_state = ccore.game_state();
                                     loop {
                                         match gm_state.clone() {
-                                            pmj_client_core::ccore::GMState::HomePage => {
-                                                warn!("update: warn GMState");
+                                            ccore::GMState::HomePage => {
+                                                {let msg=String::from("update: warn GMState");
+                                                    warn!(msg);
+                                                    self.toast.add(Toast::new(msg).set_warning());
+                                                }
                                                 std::thread::sleep(
                                                     std::time::Duration::from_millis(500),
                                                 );
@@ -232,8 +242,9 @@ impl Client {
                                     return task::Task::done(Message::CCoreProcessTask);
                                 }
                                 Err(e) => {
-                                    error!("update: {}", e);
-                                    home_state.msgs.push(format!("update: {}", e));
+                                    let msg = format!("update: {}", e);
+                                    error!(msg);
+                                    self.toast.add(Toast::new(msg).set_error());
                                 }
                             }
                         }
@@ -340,9 +351,6 @@ impl Client {
                             })
                             .into(),
                     );
-                    /* for key in 0..=9 {
-                        vsoft_keyboard.push(self.home_create_vsoft_key(format!("{}", key)).into());
-                    } */
                     vsoft_keyboard.push(
                         ALPHABET
                             .iter()
@@ -351,12 +359,6 @@ impl Client {
                             })
                             .into(),
                     );
-                    /* for key in ALPHABET {
-                        vsoft_keyboard.push(
-                            self.home_create_vsoft_key(format!("{}", key).to_lowercase())
-                                .into(),
-                        );
-                    } */
                     vsoft_keyboard.push(
                         [":", "[", "]", ".", "/", "backspace"]
                             .iter()
@@ -365,9 +367,6 @@ impl Client {
                             })
                             .into(),
                     );
-                    /* for key in [":", "[", "]", ".", "/", "backspace"] {
-                        vsoft_keyboard.push(self.home_create_vsoft_key(key.to_string()).into());
-                    } */
                     layout_home.push(
                         Column::from_vec(vsoft_keyboard)
                             .spacing(4)
@@ -376,50 +375,6 @@ impl Client {
                     );
                     layout_home.push(space().height(20).into());
                 }
-                // 訊息顯示
-                {
-                    let mut msg_area = Vec::new();
-                    let mut msg_number: u64 = 1;
-                    for msg in home_state.msgs.iter() {
-                        let ex_palette = self.theme.extended_palette();
-                        let mut msg_row = Vec::new();
-                        msg_row.push(
-                            text(msg_number.to_string())
-                                .size(20)
-                                .style(move |_theme| text::Style {
-                                    color: Some(ex_palette.secondary.strong.text),
-                                })
-                                .into(),
-                        );
-                        msg_row.push(
-                            text(msg)
-                                .size(20)
-                                .style(move |_theme| text::Style {
-                                    color: Some(ex_palette.secondary.base.text),
-                                })
-                                .into(),
-                        );
-                        msg_area.push(Row::from_vec(msg_row).spacing(3).into());
-                        msg_number += 1;
-                    }
-                    layout_home.push(
-                        container(Column::from_vec(msg_area))
-                            .style(|theme: &iced::theme::Theme| {
-                                let ex_palette = theme.extended_palette();
-                                let mut style = container::Style::default();
-                                style.background =
-                                    Some(iced::Background::Color(ex_palette.secondary.base.color));
-                                style.border = Border {
-                                    color: ex_palette.secondary.strong.color,
-                                    width: 2.5,
-                                    radius: iced::border::Radius::new(Pixels::from(8)),
-                                };
-                                style
-                            })
-                            .into(),
-                    );
-                }
-                layout_home.push(space().height(5).into());
                 //
                 if home_state.try_connecting_server {
                     let mut content_column = Vec::new();
@@ -491,7 +446,7 @@ impl Client {
                             .push(widget::opaque(scrollable(
                                 Column::from_vec(layout_home)
                                     .width(Length::Fill)
-                                    .padding(10),
+                                    .padding(10).spacing(10),
                             )))
                             .push(content)
                             .into(),
@@ -502,7 +457,7 @@ impl Client {
                             Column::from_vec(layout_home)
                                 .width(Length::Fill)
                                 .height(Length::Fill)
-                                .padding(10),
+                                .padding(10).spacing(10),
                         )
                         .into(),
                     );
