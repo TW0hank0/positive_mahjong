@@ -42,7 +42,93 @@ checksum = "sha256:7db40a864ea299304e3a6c1d9f647fa8f554bb0353e181f63955b21c0dc57
 url = "https://github.com/EmbarkStudios/cargo-deny/releases/download/0.19.8/cargo-deny-0.19.8-x86_64-pc-windows-msvc.tar.gz"
 url_api = "https://api.github.com/repos/EmbarkStudios/cargo-deny/releases/assets/431893877"
 
+[[tools.cargo-msrv]]
+version = "0.19.3"
+backend = "aqua:foresterre/cargo-msrv"
+specifiers = ["0.19.3"]
+
+[tools.cargo-msrv."platforms.linux-x64"]
+checksum = "sha256:6f9a0011ca8ad959d304185b9090390fd1ad87e2d764007fbb0abe043afa9ff5"
+url = "https://github.com/foresterre/cargo-msrv/releases/download/v0.19.3/cargo-msrv-x86_64-unknown-linux-gnu-v0.19.3.tgz"
+url_api = "https://api.github.com/repos/foresterre/cargo-msrv/releases/assets/380850047"
+
+[tools.cargo-msrv."platforms.linux-x64-musl"]
+checksum = "sha256:441ddbf85c589062029ac33fcfcfc33ddd4e87f04984d91b16ea4ae02e4d779d"
+url = "https://github.com/foresterre/cargo-msrv/releases/download/v0.19.3/cargo-msrv-x86_64-unknown-linux-musl-v0.19.3.tgz"
+url_api = "https://api.github.com/repos/foresterre/cargo-msrv/releases/assets/380849992"
+
+[tools.cargo-msrv."platforms.macos-arm64"]
+checksum = "sha256:bf42f653b5a7c426972f728b38a3756529a105b6598c2fdc89bc25ac056726f1"
+url = "https://github.com/foresterre/cargo-msrv/releases/download/v0.19.3/cargo-msrv-aarch64-apple-darwin-v0.19.3.tgz"
+url_api = "https://api.github.com/repos/foresterre/cargo-msrv/releases/assets/380850630"
+
+[tools.cargo-msrv."platforms.macos-x64"]
+checksum = "sha256:2427399177872d74b822b46a2f52817bfab5fb1ff6d8e5e6faaafc82a66f2351"
+url = "https://github.com/foresterre/cargo-msrv/releases/download/v0.19.3/cargo-msrv-x86_64-apple-darwin-v0.19.3.tgz"
+url_api = "https://api.github.com/repos/foresterre/cargo-msrv/releases/assets/380858063"
+
+[tools.cargo-msrv."platforms.windows-x64"]
+checksum = "sha256:e437443331865218763d44089680f4d36547353e8c3c8b394c24859203e6cd05"
+url = "https://github.com/foresterre/cargo-msrv/releases/download/v0.19.3/cargo-msrv-x86_64-pc-windows-msvc-v0.19.3.zip"
+url_api = "https://api.github.com/repos/foresterre/cargo-msrv/releases/assets/380851496"
+
 [[tools."cargo:cargo-about"]]
 version = "0.8.4"
 backend = "cargo:cargo-about"
 specifiers = ["0.8.4"]
+
+[[tools.eza]]
+version = "0.23.5"
+backend = "vfox:eza"
+specifiers = ["0.23.5"]
+
+[tools.eza."platforms.linux-arm64"]
+url = "https://github.com/eza-community/eza/releases/download/v0.23.5/eza_aarch64-unknown-linux-gnu.tar.gz"
+
+[tools.eza."platforms.linux-arm64-musl"]
+url = "https://github.com/eza-community/eza/releases/download/v0.23.5/eza_aarch64-unknown-linux-gnu.tar.gz"
+
+[tools.eza."platforms.linux-x64"]
+url = "https://github.com/eza-community/eza/releases/download/v0.23.5/eza_x86_64-unknown-linux-gnu.tar.gz"
+
+[tools.eza."platforms.linux-x64-musl"]
+url = "https://github.com/eza-community/eza/releases/download/v0.23.5/eza_x86_64-unknown-linux-gnu.tar.gz"
+
+[tools.eza."platforms.macos-arm64"]
+url = "https://github.com/cargo-bins/cargo-quickinstall/releases/download/eza-0.23.5/eza-0.23.5-aarch64-apple-darwin.tar.gz"
+
+[tools.eza."platforms.macos-x64"]
+url = "https://github.com/cargo-bins/cargo-quickinstall/releases/download/eza-0.23.5/eza-0.23.5-x86_64-apple-darwin.tar.gz"
+
+[tools.eza."platforms.windows-x64"]
+url = "https://github.com/eza-community/eza/releases/download/v0.23.5/eza.exe_x86_64-pc-windows-gnu.tar.gz"
+
+[[tools.mdbook]]
+version = "0.5.4"
+backend = "aqua:rust-lang/mdBook"
+specifiers = ["0.5.4"]
+
+[tools.mdbook."platforms.linux-x64"]
+checksum = "sha256:3f28de05dafca9d0f2eab99c662116b0e37b89b1d96a08f8f430b9eeae958cd7"
+url = "https://github.com/rust-lang/mdBook/releases/download/v0.5.4/mdbook-v0.5.4-x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/rust-lang/mdBook/releases/assets/468209394"
+
+[tools.mdbook."platforms.linux-x64-musl"]
+checksum = "sha256:5222beabd3e37dc5be0d18ff99b79058469354db5c220153a1b92db5ba12be89"
+url = "https://github.com/rust-lang/mdBook/releases/download/v0.5.4/mdbook-v0.5.4-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/rust-lang/mdBook/releases/assets/468209670"
+
+[tools.mdbook."platforms.macos-arm64"]
+checksum = "sha256:a47d7bf0d5d670cff9ee6cce95537cbeb62dc10704d9e7131ffbd13e2b59a5de"
+url = "https://github.com/rust-lang/mdBook/releases/download/v0.5.4/mdbook-v0.5.4-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/rust-lang/mdBook/releases/assets/468210169"
+
+[tools.mdbook."platforms.macos-x64"]
+checksum = "sha256:a47d7bf0d5d670cff9ee6cce95537cbeb62dc10704d9e7131ffbd13e2b59a5de"
+url = "https://github.com/rust-lang/mdBook/releases/download/v0.5.4/mdbook-v0.5.4-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/rust-lang/mdBook/releases/assets/468210169"
+
+[tools.mdbook."platforms.windows-x64"]
+checksum = "sha256:8a6b2421aa522de06d746871d2b8fff9c8d71773467e310a4516d2566e7f2de4"
+url = "https://github.com/rust-lang/mdBook/releases/download/v0.5.4/mdbook-v0.5.4-x86_64-pc-windows-msvc.zip"
+url_api = "https://api.github.com/repos/rust-lang/mdBook/releases/assets/468210971"
