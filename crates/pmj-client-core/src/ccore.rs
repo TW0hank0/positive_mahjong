@@ -103,20 +103,21 @@ impl ClientCore {
                     match event {
                         V2BetterEvents::YouGetCard(_) => able_action.push(PlayerCtrl::ThrowCard),
                         V2BetterEvents::ChangeTurn(turn_player)
-                            if turn_player == &state.player_id => {
-                                let (_event_num, event2) =
-                                    state.game_events.get(state.game_events.len() - 2).unwrap();
-                                match event2 {
-                                    V2BetterEvents::PlayerAction(e2p, _e2pga) => {
-                                        if e2p != &state.player_id {
-                                            able_action.push(PlayerCtrl::GetCard);
-                                        }
-                                    }
-                                    _ => {
+                            if turn_player == &state.player_id =>
+                        {
+                            let (_event_num, event2) =
+                                state.game_events.get(state.game_events.len() - 2).unwrap();
+                            match event2 {
+                                V2BetterEvents::PlayerAction(e2p, _e2pga) => {
+                                    if e2p != &state.player_id {
                                         able_action.push(PlayerCtrl::GetCard);
                                     }
                                 }
+                                _ => {
+                                    able_action.push(PlayerCtrl::GetCard);
+                                }
                             }
+                        }
                         _ => {}
                     }
                 }

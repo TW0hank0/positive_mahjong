@@ -16,31 +16,29 @@
 use std::{fmt::Display, fs, io, path::PathBuf, sync::mpsc, thread};
 
 use iced::{
-    self, Element, Length, Task, widget::{Column, Row, Stack, button, rule, scrollable, space, text},
+    self, Element, Length, Task,
+    widget::{Column, Row, Stack, button, rule, scrollable, space, text},
 };
 use tracing::{debug, error, info, trace, warn};
 
-use pmj_shared::shared::{
-    self, PROJECT_NAME, PROJECT_VERSION,
+use pmj_desktop::shared::{
+    FONT_NOTO_SANS_REG, Toast, ToastManager, iced_app_settings, iced_window_settings,
 };
-use pmj_desktop::shared::{iced_app_settings, iced_window_settings, FONT_NOTO_SANS_REG, Toast, ToastManager};
+use pmj_shared::shared::{self, PROJECT_NAME, PROJECT_VERSION};
 
 const MEMBER_NAME: &str = "pmj-desktop-installer";
 const INST_STORED_BYTES: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/inst-stored.zip"));
 
 fn main() {
     let _guard = shared::init_tracing_fmt(String::from(MEMBER_NAME));
-    let iced_result = iced::application(
-        PmjInstaller::new,
-        PmjInstaller::update,
-        PmjInstaller::view,
-    )
-    .window(iced_window_settings())
-    .settings(iced_app_settings(String::from("pmj-desktop-installer")))
-    .default_font(FONT_NOTO_SANS_REG)
-    .title(PmjInstaller::title)
-    .theme(PmjInstaller::theme)
-    .run();
+    let iced_result =
+        iced::application(PmjInstaller::new, PmjInstaller::update, PmjInstaller::view)
+            .window(iced_window_settings())
+            .settings(iced_app_settings(String::from("pmj-desktop-installer")))
+            .default_font(FONT_NOTO_SANS_REG)
+            .title(PmjInstaller::title)
+            .theme(PmjInstaller::theme)
+            .run();
     match iced_result {
         Ok(_) => {
             debug!("iced::Result::Ok");
@@ -122,20 +120,25 @@ struct PmjInstaller {
     inst_settings: InstSettings,
     installing: bool,
     install_states: Vec<InstState>,
-    toast:ToastManager
+    toast: ToastManager,
 }
 
 #[derive(Debug)]
 enum InstState {
     UnzippingFile(PathBuf),
-    InstallFinish
+    InstallFinish,
 }
 impl Display for InstState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(match self {
-            Self::UnzippingFile(path) => {format!("解壓縮檔案：{}", path.display())}
-            Self::InstallFinish => {String::from("已安裝")}
-        }.as_str())
+        f.write_str(
+            match self {
+                Self::UnzippingFile(path) => {
+                    format!("解壓縮檔案：{}", path.display())
+                }
+                Self::InstallFinish => String::from("已安裝"),
+            }
+            .as_str(),
+        )
     }
 }
 
@@ -147,7 +150,7 @@ impl Default for PmjInstaller {
             inst_settings: InstSettings::default(),
             installing: false,
             install_states: Vec::new(),
-            toast:ToastManager::new_and_add(MEMBER_NAME.to_string())
+            toast: ToastManager::new_and_add(MEMBER_NAME.to_string()),
         }
     }
 }
@@ -164,9 +167,12 @@ impl PmjInstaller {
                 return Task::done(Message::ToastUpdate);
             }
             Message::StartInstall => {
-                self.installing=true;
+                self.installing = true;
                 self.start_install();
-                self.toast.add(Toast::new(format!("開始安裝 {} v{}", PROJECT_NAME, PROJECT_VERSION)));
+                self.toast.add(Toast::new(format!(
+                    "開始安裝 {} v{}",
+                    PROJECT_NAME, PROJECT_VERSION
+                )));
                 return Task::done(Message::UpdateInstallState);
             }
             Message::ExitInstaller => {
@@ -186,9 +192,10 @@ impl PmjInstaller {
                                 if matches!(inst_state, InstState::InstallFinish) {
                                     info!("update: matches!(inst_state, InstState::InstallFinish)");
                                     self.scene = Scenes::Installed;
-                                    self.installing=false;
+                                    self.installing = false;
                                 } else {
-                                    self.install_states.push(inst_state);}
+                                    self.install_states.push(inst_state);
+                                }
                             }
                             Err(mpsc::TryRecvError::Empty) => {}
                             Err(mpsc::TryRecvError::Disconnected) => {
@@ -239,15 +246,23 @@ impl PmjInstaller {
                 btn_continueable = false;
                 if self.installing {
                     page_title = String::from("安裝中");
-                    content.push(scrollable(
-                        self.install_states.iter()
-                            .fold(Column::new().spacing(1).padding(2), |layout, item| {
-                            layout.push(text(item.to_string()))
-                        })
-                    ).direction(scrollable::Direction::Vertical(scrollable::Scrollbar::new().margin(3)
-                    .spacing(5)
-                    .width(3)
-                    .scroller_width(6))).into());
+                    content.push(
+                        scrollable(
+                            self.install_states
+                                .iter()
+                                .fold(Column::new().spacing(1).padding(2), |layout, item| {
+                                    layout.push(text(item.to_string()))
+                                }),
+                        )
+                        .direction(scrollable::Direction::Vertical(
+                            scrollable::Scrollbar::new()
+                                .margin(3)
+                                .spacing(5)
+                                .width(3)
+                                .scroller_width(6),
+                        ))
+                        .into(),
+                    );
                 } else {
                     page_title = String::from("準備安裝");
                     content.push(
@@ -258,8 +273,8 @@ impl PmjInstaller {
                 }
             }
             Scenes::Installed => {
-                btn_backable=false;
-                btn_continueable=false;
+                btn_backable = false;
+                btn_continueable = false;
                 page_title = String::from("安裝完成")
             }
         }
@@ -277,28 +292,44 @@ impl PmjInstaller {
             layout.push(rule::horizontal(1).into());
             layout.push(space().height(3).into());
             let mut buttons = Vec::new();
-                buttons.push(
-                    button(text("退出").size(22))
-                        .on_press_maybe(if btn_exitable{Some( Message::ExitInstaller)} else {None})
-                        .into(),
-                );
-                buttons.push(
-                    button(text("返回").size(22))
-                        .on_press_maybe(if btn_backable {Some(Message::PrevScene)} else {None})
-                        .into(),
-                );
-                buttons.push(
-                    button(text("繼續").size(22))
-                        .on_press_maybe(if btn_continueable {Some(Message::NextScene)} else {None})
-                        .into(),
-                );
+            buttons.push(
+                button(text("退出").size(22))
+                    .on_press_maybe(if btn_exitable {
+                        Some(Message::ExitInstaller)
+                    } else {
+                        None
+                    })
+                    .into(),
+            );
+            buttons.push(
+                button(text("返回").size(22))
+                    .on_press_maybe(if btn_backable {
+                        Some(Message::PrevScene)
+                    } else {
+                        None
+                    })
+                    .into(),
+            );
+            buttons.push(
+                button(text("繼續").size(22))
+                    .on_press_maybe(if btn_continueable {
+                        Some(Message::NextScene)
+                    } else {
+                        None
+                    })
+                    .into(),
+            );
             layout.push(Row::from_vec(buttons).spacing(20).into());
         }
-        Stack::new().push(Column::from_vec(layout)
-            .padding(5)
-            .spacing(3)
-            .height(Length::Fill)
-            .width(Length::Fill)).push(self.toast.view())
+        Stack::new()
+            .push(
+                Column::from_vec(layout)
+                    .padding(5)
+                    .spacing(3)
+                    .height(Length::Fill)
+                    .width(Length::Fill),
+            )
+            .push(self.toast.view())
             .into()
     }
     pub fn theme(&self) -> iced::Theme {

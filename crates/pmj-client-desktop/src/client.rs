@@ -13,9 +13,9 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-
 use iced::{
-    self, Border, Color, Element, Length, Pixels, Task, alignment, task, widget::{self, Column, Row, button, container, scrollable, space, Stack, text, text_input},
+    self, Border, Color, Element, Length, Pixels, Task, alignment, task,
+    widget::{self, Column, Row, Stack, button, container, scrollable, space, text, text_input},
 };
 use tracing::{error, warn};
 
@@ -25,7 +25,7 @@ use pmj_desktop::{
 };
 
 use pmj_shared::shared::{
-    self, FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES, PROJECT_NAME,PROJECT_VERSION
+    self, FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES, PROJECT_NAME, PROJECT_VERSION,
 };
 
 pub const MEMBER_NAME: &str = "pmj-client-desktop";
@@ -94,17 +94,25 @@ pub const ALPHABET: [char; 26] = [
 impl Client {
     pub fn new() -> (Self, Task<Message>) {
         let mut toast = ToastManager::new();
-        toast.add(Toast::new(format!("{} - {} v{}", MEMBER_NAME, PROJECT_NAME, PROJECT_VERSION)));
-        (Self {
-            server_url: String::from("ws://"),
-            scene: ClientScenes::Home(HomeState {
-                try_connecting_server: false,
-                msgs: Vec::new(),
-                connect_msg: None,
-            }),
-            theme: iced::theme::Theme::TokyoNight,
-            toast:toast,
-        },iced::font::load(FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES).discard().chain(task::Task::done(Message::ToastUpdate)))
+        toast.add(Toast::new(format!(
+            "{} - {} v{}",
+            MEMBER_NAME, PROJECT_NAME, PROJECT_VERSION
+        )));
+        (
+            Self {
+                server_url: String::from("ws://"),
+                scene: ClientScenes::Home(HomeState {
+                    try_connecting_server: false,
+                    msgs: Vec::new(),
+                    connect_msg: None,
+                }),
+                theme: iced::theme::Theme::TokyoNight,
+                toast: toast,
+            },
+            iced::font::load(FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES)
+                .discard()
+                .chain(task::Task::done(Message::ToastUpdate)),
+        )
     }
     pub fn update(&mut self, message: Message) -> task::Task<Message> {
         match message {
@@ -138,9 +146,7 @@ impl Client {
                             play_state.hand_cards = gms_v2.cards.clone();
                             play_state.game_msgs.clear();
                             for (msgid, gmsg) in gms_v2.game_events.clone().iter() {
-                                play_state
-                                    .game_msgs
-                                    .push((*msgid, format!("{:?}", gmsg)));
+                                play_state.game_msgs.push((*msgid, format!("{:?}", gmsg)));
                             }
                         }
                     }
@@ -481,15 +487,14 @@ impl Client {
                         style
                     });
                     layout.push(
-                        Stack::new().push(
-                            widget::opaque(scrollable(
+                        Stack::new()
+                            .push(widget::opaque(scrollable(
                                 Column::from_vec(layout_home)
                                     .width(Length::Fill)
                                     .padding(10),
-                            ))).push(
-                            content,
-                        )
-                        .into(),
+                            )))
+                            .push(content)
+                            .into(),
                     );
                 } else {
                     layout.push(
@@ -780,12 +785,13 @@ impl Client {
         Stack::new()
             .push(
                 Column::from_vec(layout)
-            .height(Length::Fill)
-            .width(Length::Fill)
-            .padding(10)
+                    .height(Length::Fill)
+                    .width(Length::Fill)
+                    .padding(10),
             )
             .push(self.toast.view())
-            .width(Length::Fill).height(Length::Fill)
+            .width(Length::Fill)
+            .height(Length::Fill)
             .into()
     }
 
