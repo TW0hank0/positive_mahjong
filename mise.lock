@@ -3,79 +3,79 @@
 lockfile_version = 3
 
 [[tools.cargo-deny]]
-version = "0.19.8"
+version = "0.20.2"
 backend = "aqua:EmbarkStudios/cargo-deny"
-specifiers = ["0.19.8"]
+specifiers = ["0.20.2"]
 
 [tools.cargo-deny."platforms.linux-arm64"]
-checksum = "sha256:67ef48056523d27f58a527c5e49172bc24758f7b8147998d47219d45b181c354"
-url = "https://github.com/EmbarkStudios/cargo-deny/releases/download/0.19.8/cargo-deny-0.19.8-aarch64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/EmbarkStudios/cargo-deny/releases/assets/431892981"
+checksum = "sha256:995c82be0defc7a025cae49a2aa2644ce8245c9a3318fc4103907c6a285e8c7d"
+url = "https://github.com/EmbarkStudios/cargo-deny/releases/download/0.20.2/cargo-deny-0.20.2-aarch64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/EmbarkStudios/cargo-deny/releases/assets/471598345"
 
 [tools.cargo-deny."platforms.linux-arm64-musl"]
-checksum = "sha256:67ef48056523d27f58a527c5e49172bc24758f7b8147998d47219d45b181c354"
-url = "https://github.com/EmbarkStudios/cargo-deny/releases/download/0.19.8/cargo-deny-0.19.8-aarch64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/EmbarkStudios/cargo-deny/releases/assets/431892981"
+checksum = "sha256:995c82be0defc7a025cae49a2aa2644ce8245c9a3318fc4103907c6a285e8c7d"
+url = "https://github.com/EmbarkStudios/cargo-deny/releases/download/0.20.2/cargo-deny-0.20.2-aarch64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/EmbarkStudios/cargo-deny/releases/assets/471598345"
 
 [tools.cargo-deny."platforms.linux-x64"]
-checksum = "sha256:70e769ae3872e34d45132b17040859175e11401dc12dddb0303e0b8c7d088f3f"
-url = "https://github.com/EmbarkStudios/cargo-deny/releases/download/0.19.8/cargo-deny-0.19.8-x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/EmbarkStudios/cargo-deny/releases/assets/431892850"
+checksum = "sha256:9f12ed4c49936e09b48bf862b595cde2fe64fcbd9d74dfacac6131ca824c8d5f"
+url = "https://github.com/EmbarkStudios/cargo-deny/releases/download/0.20.2/cargo-deny-0.20.2-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/EmbarkStudios/cargo-deny/releases/assets/471598214"
 
 [tools.cargo-deny."platforms.linux-x64-musl"]
-checksum = "sha256:70e769ae3872e34d45132b17040859175e11401dc12dddb0303e0b8c7d088f3f"
-url = "https://github.com/EmbarkStudios/cargo-deny/releases/download/0.19.8/cargo-deny-0.19.8-x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/EmbarkStudios/cargo-deny/releases/assets/431892850"
+checksum = "sha256:9f12ed4c49936e09b48bf862b595cde2fe64fcbd9d74dfacac6131ca824c8d5f"
+url = "https://github.com/EmbarkStudios/cargo-deny/releases/download/0.20.2/cargo-deny-0.20.2-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/EmbarkStudios/cargo-deny/releases/assets/471598214"
 
 [tools.cargo-deny."platforms.macos-arm64"]
-checksum = "sha256:24bbdbe694f9b0cc00b721d94cbd5a8f967eb9a4d2ee99351aa246a69b33ae4f"
-url = "https://github.com/EmbarkStudios/cargo-deny/releases/download/0.19.8/cargo-deny-0.19.8-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/EmbarkStudios/cargo-deny/releases/assets/431892654"
+checksum = "sha256:fe67d82a10d8597a3549364cb733a3f9cc1bfff9031b7ae46384a9f2a72090c3"
+url = "https://github.com/EmbarkStudios/cargo-deny/releases/download/0.20.2/cargo-deny-0.20.2-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/EmbarkStudios/cargo-deny/releases/assets/471597689"
 
 [tools.cargo-deny."platforms.macos-x64"]
-checksum = "sha256:dcd997dd8b7039015cd6f72d4feff64a21f5a6ec905e463751df80e70d82886c"
-url = "https://github.com/EmbarkStudios/cargo-deny/releases/download/0.19.8/cargo-deny-0.19.8-x86_64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/EmbarkStudios/cargo-deny/releases/assets/431893129"
+checksum = "sha256:248da7f581724e470071990c088ffc55c811981715f4cbdb258621fb79f8b7a6"
+url = "https://github.com/EmbarkStudios/cargo-deny/releases/download/0.20.2/cargo-deny-0.20.2-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/EmbarkStudios/cargo-deny/releases/assets/471598357"
 
 [tools.cargo-deny."platforms.windows-x64"]
-checksum = "sha256:7db40a864ea299304e3a6c1d9f647fa8f554bb0353e181f63955b21c0dc57cd0"
-url = "https://github.com/EmbarkStudios/cargo-deny/releases/download/0.19.8/cargo-deny-0.19.8-x86_64-pc-windows-msvc.tar.gz"
-url_api = "https://api.github.com/repos/EmbarkStudios/cargo-deny/releases/assets/431893877"
+checksum = "sha256:975a22143262fd27476d19ee00c7af67978426e40e1dee94eed6bbade1cf87dc"
+url = "https://github.com/EmbarkStudios/cargo-deny/releases/download/0.20.2/cargo-deny-0.20.2-x86_64-pc-windows-msvc.tar.gz"
+url_api = "https://api.github.com/repos/EmbarkStudios/cargo-deny/releases/assets/471599057"
 
 [[tools.cargo-msrv]]
-version = "0.19.3"
+version = "0.19.6"
 backend = "aqua:foresterre/cargo-msrv"
-specifiers = ["0.19.3"]
+specifiers = ["0.19.6"]
 
 [tools.cargo-msrv."platforms.linux-x64"]
-checksum = "sha256:6f9a0011ca8ad959d304185b9090390fd1ad87e2d764007fbb0abe043afa9ff5"
-url = "https://github.com/foresterre/cargo-msrv/releases/download/v0.19.3/cargo-msrv-x86_64-unknown-linux-gnu-v0.19.3.tgz"
-url_api = "https://api.github.com/repos/foresterre/cargo-msrv/releases/assets/380850047"
+checksum = "sha256:5fa075586e40d1fb0c57bc1c69e31e6608e2765fa4a16c1920d4e4c1ca76efef"
+url = "https://github.com/foresterre/cargo-msrv/releases/download/v0.19.6/cargo-msrv-x86_64-unknown-linux-gnu-v0.19.6.tgz"
+url_api = "https://api.github.com/repos/foresterre/cargo-msrv/releases/assets/664092192"
 
 [tools.cargo-msrv."platforms.linux-x64-musl"]
-checksum = "sha256:441ddbf85c589062029ac33fcfcfc33ddd4e87f04984d91b16ea4ae02e4d779d"
-url = "https://github.com/foresterre/cargo-msrv/releases/download/v0.19.3/cargo-msrv-x86_64-unknown-linux-musl-v0.19.3.tgz"
-url_api = "https://api.github.com/repos/foresterre/cargo-msrv/releases/assets/380849992"
+checksum = "sha256:55f60d7bd89c6b765aab1d738d6ce63132b7daa5dfc240be0c680f48a4b82058"
+url = "https://github.com/foresterre/cargo-msrv/releases/download/v0.19.6/cargo-msrv-x86_64-unknown-linux-musl-v0.19.6.tgz"
+url_api = "https://api.github.com/repos/foresterre/cargo-msrv/releases/assets/664093469"
 
 [tools.cargo-msrv."platforms.macos-arm64"]
-checksum = "sha256:bf42f653b5a7c426972f728b38a3756529a105b6598c2fdc89bc25ac056726f1"
-url = "https://github.com/foresterre/cargo-msrv/releases/download/v0.19.3/cargo-msrv-aarch64-apple-darwin-v0.19.3.tgz"
-url_api = "https://api.github.com/repos/foresterre/cargo-msrv/releases/assets/380850630"
+checksum = "sha256:9c2af7930eab0bb325321a0d32c34a09fc3bcb7116f36f92e0d5e110984f6244"
+url = "https://github.com/foresterre/cargo-msrv/releases/download/v0.19.6/cargo-msrv-aarch64-apple-darwin-v0.19.6.tgz"
+url_api = "https://api.github.com/repos/foresterre/cargo-msrv/releases/assets/664091723"
 
 [tools.cargo-msrv."platforms.macos-x64"]
-checksum = "sha256:2427399177872d74b822b46a2f52817bfab5fb1ff6d8e5e6faaafc82a66f2351"
-url = "https://github.com/foresterre/cargo-msrv/releases/download/v0.19.3/cargo-msrv-x86_64-apple-darwin-v0.19.3.tgz"
-url_api = "https://api.github.com/repos/foresterre/cargo-msrv/releases/assets/380858063"
+checksum = "sha256:f1525fb20fe47e5e1c380ea2158cf67f4588fd74f1a081734c9444f95f0cd0b0"
+url = "https://github.com/foresterre/cargo-msrv/releases/download/v0.19.6/cargo-msrv-x86_64-apple-darwin-v0.19.6.tgz"
+url_api = "https://api.github.com/repos/foresterre/cargo-msrv/releases/assets/664130506"
 
 [tools.cargo-msrv."platforms.windows-x64"]
-checksum = "sha256:e437443331865218763d44089680f4d36547353e8c3c8b394c24859203e6cd05"
-url = "https://github.com/foresterre/cargo-msrv/releases/download/v0.19.3/cargo-msrv-x86_64-pc-windows-msvc-v0.19.3.zip"
-url_api = "https://api.github.com/repos/foresterre/cargo-msrv/releases/assets/380851496"
+checksum = "sha256:6378f5ed2a7dfeac778ec16243246f9c27da0dddd30a411208b2b1fabafeca48"
+url = "https://github.com/foresterre/cargo-msrv/releases/download/v0.19.6/cargo-msrv-x86_64-pc-windows-msvc-v0.19.6.zip"
+url_api = "https://api.github.com/repos/foresterre/cargo-msrv/releases/assets/664099616"
 
 [[tools."cargo:cargo-about"]]
-version = "0.8.4"
+version = "0.9.3"
 backend = "cargo:cargo-about"
-specifiers = ["0.8.4"]
+specifiers = ["0.9.3"]
 
 [[tools.eza]]
 version = "0.23.5"
