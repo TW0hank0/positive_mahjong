@@ -15,7 +15,7 @@
 
 [tools]
 cargo-deny = "0.19.8"
-"cargo:cargo-about"="0.8.4"
-mdbook= "0.5.4"
-cargo-msrv= "0.19.3"
-"eza"= "0.23.5"
+"cargo:cargo-about" = "0.8.4"
+mdbook = "0.5.4"
+cargo-msrv = "0.19.3"
+eza = "0.23.5"
