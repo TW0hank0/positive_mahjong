@@ -123,18 +123,22 @@ def main():
                 current_user_id in approved_by_userid
                 or current_username in approved_by_username
             ):
+                current_user_approved = True
                 for approved_by_detail in approvals.approved_by:
                     if (
                         approved_by_detail["user"]["id"] == current_user_id
                         and approvals.updated_at >= approved_by_detail["approved_at"]
                     ):
-                        mr_detail.unapprove()
+                        mr_detail.commits(get_all=True)
+                        mr_detail.pprint()
                         break
                 else:
                     LOGGER.info(
                         f"Already checked (already approved by {current_user_id})"
                     )
                     continue
+            else:
+                current_user_approved = False
             LOGGER.info(
                 f"MR !{mr_iid} is approved by @{REQUIRED_APPROVER_USERNAME}. Fetching code..."
             )
@@ -147,7 +151,8 @@ def main():
             if check_result is None:
                 msg = f"#### ✅MR Check Passed (!{mr_iid})"
                 LOGGER.info(f"Check SUCCESS: {msg}")
-                mr_detail.approve()
+                if current_user_approved is False:
+                    mr_detail.approve()
                 mr_detail.save()
                 upsert_note(mr_detail, current_user_id, msg)
             else:
@@ -157,6 +162,9 @@ def main():
                 msg += f"\n\n<details><summary>stdout</summary>{stdout}</details>"
                 msg += f"\n\n<details><summary>stderr</summary>{stderr}</details>"
                 LOGGER.warning(f"Check FAILED: {msg}")
+                if current_user_approved is True:
+                    mr_detail.unapprove()
+                mr_detail.save()
                 upsert_note(mr_detail, current_user_id, msg)
     LOGGER.info("mr script finish")
 
