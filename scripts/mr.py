@@ -152,15 +152,16 @@ def main():
                 upsert_note(mr_detail, current_user_id, msg)
             else:
                 msg = f"#### ❌MR Check Failed (!{mr_iid})"
-                (command, returncode, stdout) = check_result
+                (command, returncode, stdout, stderr) = check_result
                 msg += f"\n\nCommand `{command}` return code `{returncode}`."
                 msg += f"\n\n<details><summary>stdout</summary>{stdout}</details>"
+                msg += f"\n\n<details><summary>stderr</summary>{stderr}</details>"
                 LOGGER.warning(f"Check FAILED: {msg}")
                 upsert_note(mr_detail, current_user_id, msg)
     LOGGER.info("mr script finish")
 
 
-def check() -> None | tuple[str, int, str]:
+def check() -> None | tuple[str, int, str, str]:
     commands = [
         (["cargo", "check", "--workspace"], "."),
         (["uv", "run", "license_check.py"], "scripts"),
@@ -168,14 +169,13 @@ def check() -> None | tuple[str, int, str]:
         (["ruff", "check", "."], "scripts"),
     ]
     for command, relpath in commands:
-        (check_returncode, check_stdout, _stderr) = util.run_cmd(
+        (check_returncode, check_stdout, check_stderr) = util.run_cmd(
             command,
-            cwd=os.path.join(WORK_DIR, relpath),
+            cwd=os.path.abspath(os.path.join(WORK_DIR, relpath)),
             exit_on_failed=False,
-            stream=True,
         )
         if check_returncode != 0:
-            return (" ".join(command), check_returncode, check_stdout)
+            return (" ".join(command), check_returncode, check_stdout, check_stderr)
     return None
 
 
