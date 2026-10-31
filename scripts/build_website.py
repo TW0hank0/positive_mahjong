@@ -33,7 +33,7 @@ ignored_paths: list[str] = [
     ".venv",
 ]
 
-SKIP_PREV_ARTIFACTS: bool = True
+SKIP_PREV_ARTIFACTS: bool = False
 GH_PAGES_BASE_URL: str = "https://tw0hank0.github.io/positive_mahjong/"
 ARTIFACTS_LIST_FILE: str = "releases-artifacts-list.json"
 TYPE_HINT_RELEASE_ARTIFACTS = dict[
@@ -237,12 +237,6 @@ def artifacts_list() -> None:
     version = util.get_version()
     if SKIP_PREV_ARTIFACTS is True:
         new_list = {
-            # "1": ArtifactList(
-            #     is_released=True,
-            #     release_name="0.1.0",
-            #     ci_tests={},
-            #     release_artifacts={},
-            # ),
             "1": ArtifactList(
                 is_released=False,
                 release_name=version,
