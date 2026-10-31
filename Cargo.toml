@@ -67,7 +67,7 @@ image = {
     ]
 }
 local-ip-address = "=0.6.13"
-lyon_algorithms = "=1.0.21"
+lyon_algorithms = "=1.0.22"
 pmj-client-core = { path = "crates/pmj-client-core" }
 pmj-desktop = { path = "crates/pmj-desktop" }
 pmj-gamemodes = { path = "crates/pmj-gamemodes" }
