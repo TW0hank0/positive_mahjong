@@ -7,4 +7,4 @@
 - [安裝](install.md)
 - [授權與聲明](license/index.md)
   - [模組庫授權與聲明](license/ThirdPartyLicense-Rust.md)
-  - [第一方與第三方專案授權聲明](license/res.md)
+  - [其他第三方專案授權聲明](license/res.md)
