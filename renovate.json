@@ -3,18 +3,6 @@
 	"extends": ["config:best-practices", "security:minimumReleaseAgeCrate"],
 	"automerge": false,
 	"labels": ["dep-update"],
-	"customManagers": [
-		{
-			"description": "Monitor cargo tools versions in ci-cache-version.json",
-			"customType": "regex",
-			"managerFilePatterns": ["/^ci-cache-version\\.json$/"],
-			"matchStrings": [
-				"\"(?<depName>[a-z0-9-]+)\":\\s*\"(?<currentValue>[\\d\\.]+)\""
-			],
-			"datasourceTemplate": "crate",
-			"versioningTemplate": "semver"
-		}
-	],
 	"packageRules": [
 		{
 			"automerge": false,
