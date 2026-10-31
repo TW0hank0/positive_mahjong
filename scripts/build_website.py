@@ -33,7 +33,7 @@ ignored_paths: list[str] = [
     ".venv",
 ]
 
-SKIP_PREV_ARTIFACTS: bool = False
+SKIP_PREV_ARTIFACTS: bool = True
 GH_PAGES_BASE_URL: str = "https://tw0hank0.github.io/positive_mahjong/"
 ARTIFACTS_LIST_FILE: str = "releases-artifacts-list.json"
 TYPE_HINT_RELEASE_ARTIFACTS = dict[
