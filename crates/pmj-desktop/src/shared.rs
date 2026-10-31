@@ -16,10 +16,10 @@
 use std::time;
 use tracing::info;
 use iced::{
-    self, Background, Border, Length, alignment, border, widget::{Column, Row, button, container, scrollable,  text},
+    self, Background, Border, Length, alignment, border, widget::{Column, Row, button, container, scrollable,  text, space, progress_bar},
 };
 
-use pmj_shared::shared::{FONT_NOTO_SANS_REG_BYTES, PROJECT_NAME, ICON_PNG_BYTES};
+use pmj_shared::shared::{FONT_NOTO_SANS_REG_BYTES, PROJECT_NAME, PROJECT_VERSION, ICON_PNG_BYTES};
 
 pub const FONT_NOTO_SANS_REG: iced::font::Font = iced::font::Font::with_name("Noto Sans TC");
 
@@ -145,7 +145,7 @@ pub fn iced_window_settings() -> iced::window::Settings {
         ..Default::default()
     }
 }
-pub fn iced_app_settins(member_name: String) -> iced::Settings {
+pub fn iced_app_settings(member_name: String) -> iced::Settings {
     iced::Settings {
         id: Some(format!("{} - {}", member_name, PROJECT_NAME)),
         default_text_size: iced::Pixels::from(24),
@@ -165,9 +165,14 @@ pub struct ToastManager {
 impl ToastManager {
     pub fn new() -> Self {
         Self {
-            new_toasts:Vec::new(),
+            new_toasts: Vec::new(),
             toasts:Vec::new()
         }
+    }
+    pub fn new_and_add(member_name: String) -> Self {
+        let mut instance = Self::new();
+        instance.add(Toast::new(format!("{} - {} v{}", member_name, PROJECT_NAME, PROJECT_VERSION)));
+        instance
     }
     pub fn is_new_empty(&self)->bool{
         self.new_toasts.is_empty()
@@ -191,31 +196,61 @@ impl ToastManager {
         }
     }
     pub fn view<'a, Message:'a>(&self) -> iced::Element<'a, Message> {
-        let mut layout = Column::new().width(Length::Fill).height(Length::Fill).align_x(alignment::Horizontal::Right);
         if !self.new_toasts.is_empty(){
-        for (toast, instant) in self.new_toasts.clone() {
-            let mut tlayout = Column::new().max_width(300).width(Length::FillPortion(5));
-            match toast.title {
-                Some(title) => {tlayout=tlayout.push(text(title).size(28))}
-                None => {}
-            }
-            tlayout=tlayout.push(text(toast.msg).size(22));
-            tlayout=tlayout.push(iced::widget::progress_bar(0.0..=10.0, instant.elapsed().as_secs_f32()));
-            let tlevel = toast.level;
-            layout=layout.push(container(tlayout).style(move|theme:&iced::Theme| {
-                let p=theme.extended_palette();
-                container::Style{
-                    background: Some(Background::Color(match tlevel {
-                        ToastLevel::Error => {p.danger.base.color}
-                        ToastLevel::Info => {
-                            p.primary.base.color
-                        }
-                        ToastLevel::Sucessful => {p.success.base.color}
-                        ToastLevel::Warning => {p.warning.base.color}
-                    })
-                    ),..Default::default()}}))
-        }}
-        Row::new().push(scrollable(layout).height(Length::Fill)).width(Length::Fill).height(Length::Fill).align_y(alignment::Vertical::Bottom).into()
+            let mut reverse_toasts=self.new_toasts.clone();
+            reverse_toasts.reverse();
+            let layout=reverse_toasts.into_iter().fold(Column::new().padding(5).spacing(10), |layout, (toast, instant)| {
+                let mut tlayout = Column::new().padding(2).width(Length::Fixed(450.0));
+                match toast.title {
+                    Some(title) => {tlayout=tlayout.push(text(title).size(28))}
+                    None => {}
+                }
+                tlayout=tlayout.push(text(toast.msg).size(22));
+                tlayout=tlayout.push(progress_bar(0.0..=10.0, instant.elapsed().as_secs_f32()).girth(Length::Fixed(7.0)).style(|theme:&iced::Theme|{
+                    let p = theme.extended_palette();
+                    progress_bar::Style { background: Background::Color(p.background.base.color), bar: Background::Color(p.primary.base.color), border: iced::Border {color:p.primary.strong.color, width:1.0, radius:iced::border::radius(4)} }
+                }));
+                let tlevel = toast.level;
+                layout.push(container(tlayout).style(move|theme:&iced::Theme| {
+                    let p=theme.extended_palette();
+                    container::Style{
+                        background: Some(Background::Color(match tlevel {
+                            ToastLevel::Error => {p.danger.base.color}
+                            ToastLevel::Info => {
+                                p.secondary.base.color
+                            }
+                            ToastLevel::Sucessful => {p.success.base.color}
+                            ToastLevel::Warning => {p.warning.base.color}
+                        })
+                        ),
+                        text_color:Some(match tlevel {
+                            ToastLevel::Error => {p.danger.base.text}
+                            ToastLevel::Info => {
+                                p.secondary.base.text
+                            }
+                            ToastLevel::Sucessful => {p.success.base.text}
+                            ToastLevel::Warning => {p.warning.base.text}
+                        }),
+                        border:iced::Border {color:iced::Color::TRANSPARENT, width: 0.0, radius:iced::border::radius(2)},
+                        ..Default::default()}}))
+            });
+            container(
+                            scrollable(layout)
+                                .direction(
+                                    scrollable::Direction::Vertical(
+                                        scrollable::Scrollbar::new()
+                                            .width(5)
+                                            .anchor(scrollable::Anchor::End).scroller_width(10).spacing(3)
+                                    )
+                                )
+            )
+            .height(Length::Fill)
+            .align_y(alignment::Vertical::Bottom)
+            .width(Length::Fill)
+            .align_x(alignment::Horizontal::Right).into()
+        } else {
+            space().into()
+        }
     }
 }
 

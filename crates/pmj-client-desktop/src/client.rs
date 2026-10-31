@@ -777,10 +777,16 @@ impl Client {
                 );
             }
         }
-        Stack::new().push(Column::from_vec(layout)
+        Stack::new()
+            .push(
+                Column::from_vec(layout)
             .height(Length::Fill)
             .width(Length::Fill)
-            .padding(10)).push(self.toast.view()).into()
+            .padding(10)
+            )
+            .push(self.toast.view())
+            .width(Length::Fill).height(Length::Fill)
+            .into()
     }
 
     fn home_create_vsoft_key<'a>(

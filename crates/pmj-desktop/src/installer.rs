@@ -16,14 +16,14 @@
 use std::{fmt::Display, fs, io, path::PathBuf, sync::mpsc, thread};
 
 use iced::{
-    self, Element, Length, Task, widget::{Column, Row, button, rule, scrollable, space, text},
+    self, Element, Length, Task, widget::{Column, Row, Stack, button, rule, scrollable, space, text},
 };
 use tracing::{debug, error, info, trace, warn};
 
 use pmj_shared::shared::{
     self, PROJECT_NAME, PROJECT_VERSION,
 };
-use pmj_desktop::shared::{iced_app_settins, iced_window_settings, FONT_NOTO_SANS_REG};
+use pmj_desktop::shared::{iced_app_settings, iced_window_settings, FONT_NOTO_SANS_REG, Toast, ToastManager};
 
 const MEMBER_NAME: &str = "pmj-desktop-installer";
 const INST_STORED_BYTES: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/inst-stored.zip"));
@@ -31,12 +31,12 @@ const INST_STORED_BYTES: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/inst-
 fn main() {
     let _guard = shared::init_tracing_fmt(String::from(MEMBER_NAME));
     let iced_result = iced::application(
-        PmjInstaller::default,
+        PmjInstaller::new,
         PmjInstaller::update,
         PmjInstaller::view,
     )
     .window(iced_window_settings())
-    .settings(iced_app_settins(String::from("pmj-desktop-installer")))
+    .settings(iced_app_settings(String::from("pmj-desktop-installer")))
     .default_font(FONT_NOTO_SANS_REG)
     .title(PmjInstaller::title)
     .theme(PmjInstaller::theme)
@@ -100,6 +100,7 @@ enum Message {
     PrevScene,
     StartInstall,
     UpdateInstallState,
+    ToastUpdate,
 }
 #[derive(Debug, Clone)]
 struct InstSettings {
@@ -121,6 +122,7 @@ struct PmjInstaller {
     inst_settings: InstSettings,
     installing: bool,
     install_states: Vec<InstState>,
+    toast:ToastManager
 }
 
 #[derive(Debug)]
@@ -145,17 +147,26 @@ impl Default for PmjInstaller {
             inst_settings: InstSettings::default(),
             installing: false,
             install_states: Vec::new(),
+            toast:ToastManager::new_and_add(MEMBER_NAME.to_string())
         }
     }
 }
 
 impl PmjInstaller {
+    pub fn new() -> (Self, iced::Task<Message>) {
+        (Self::default(), iced::Task::done(Message::ToastUpdate))
+    }
     pub fn update(&mut self, message: Message) -> iced::Task<Message> {
         trace!("update: message={:?}", message);
         match message {
+            Message::ToastUpdate => {
+                self.toast.process();
+                return Task::done(Message::ToastUpdate);
+            }
             Message::StartInstall => {
                 self.installing=true;
                 self.start_install();
+                self.toast.add(Toast::new(format!("開始安裝 {} v{}", PROJECT_NAME, PROJECT_VERSION)));
                 return Task::done(Message::UpdateInstallState);
             }
             Message::ExitInstaller => {
@@ -283,11 +294,11 @@ impl PmjInstaller {
                 );
             layout.push(Row::from_vec(buttons).spacing(20).into());
         }
-        Column::from_vec(layout)
+        Stack::new().push(Column::from_vec(layout)
             .padding(5)
             .spacing(3)
             .height(Length::Fill)
-            .width(Length::Fill)
+            .width(Length::Fill)).push(self.toast.view())
             .into()
     }
     pub fn theme(&self) -> iced::Theme {
