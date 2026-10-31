@@ -90,6 +90,8 @@ runs:
         go install github.com/google/addlicense@latest
         echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
+    - run: cargo install cargo-about --locked --features=cli
+      shell: bash
     - uses: jdx/mise-action@v5
     - run: mise install
       shell: bash

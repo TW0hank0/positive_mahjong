@@ -237,12 +237,6 @@ def artifacts_list() -> None:
     version = util.get_version()
     if SKIP_PREV_ARTIFACTS is True:
         new_list = {
-            # "1": ArtifactList(
-            #     is_released=True,
-            #     release_name="0.1.0",
-            #     ci_tests={},
-            #     release_artifacts={},
-            # ),
             "1": ArtifactList(
                 is_released=False,
                 release_name=version,

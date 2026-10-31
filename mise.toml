@@ -13,9 +13,10 @@
 # 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
+# use cargo to install tool, to avoid no platform url in lockfile
 [tools]
-cargo-deny = "0.19.8"
-"cargo:cargo-about" = "0.8.4"
-mdbook = "0.5.4"
-cargo-msrv = "0.19.3"
-eza = "0.23.5"
+"cargo:cargo-deny" = "0.20.2"
+# "cargo:cargo-about" = "0.9.3"
+"cargo:mdbook" = "0.5.4"
+"cargo:cargo-msrv" = "0.19.6"
+"cargo:eza" = "0.23.5"
