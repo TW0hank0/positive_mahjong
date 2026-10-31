@@ -17,8 +17,8 @@ use tracing::{debug, error};
 
 mod client;
 
+use pmj_desktop::shared::{FONT_NOTO_SANS_REG, iced_app_settings, iced_window_settings};
 use pmj_shared::shared::init_tracing_fmt;
-use pmj_desktop::shared::{iced_app_settins, iced_window_settings, FONT_NOTO_SANS_REG};
 
 fn main() {
     let _guard = init_tracing_fmt(String::from("pmj-client-desktop"));
@@ -28,7 +28,7 @@ fn main() {
         client::Client::view,
     )
     .window(iced_window_settings())
-    .settings(iced_app_settins(String::from(client::MEMBER_NAME)))
+    .settings(iced_app_settings(String::from(client::MEMBER_NAME)))
     .default_font(FONT_NOTO_SANS_REG)
     .title(client::Client::title)
     .theme(client::Client::theme)

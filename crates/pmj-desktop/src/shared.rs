@@ -13,13 +13,14 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
+use iced::{
+    self, Background, Border, Length, alignment, border,
+    widget::{Column, button, container, progress_bar, scrollable, space, text},
+};
 use std::time;
 use tracing::info;
-use iced::{
-    self, Background, Border, Length, alignment, border, widget::{Column, Row, button, container, scrollable,  text},
-};
 
-use pmj_shared::shared::{FONT_NOTO_SANS_REG_BYTES, PROJECT_NAME, ICON_PNG_BYTES};
+use pmj_shared::shared::{FONT_NOTO_SANS_REG_BYTES, ICON_PNG_BYTES, PROJECT_NAME, PROJECT_VERSION};
 
 pub const FONT_NOTO_SANS_REG: iced::font::Font = iced::font::Font::with_name("Noto Sans TC");
 
@@ -145,7 +146,7 @@ pub fn iced_window_settings() -> iced::window::Settings {
         ..Default::default()
     }
 }
-pub fn iced_app_settins(member_name: String) -> iced::Settings {
+pub fn iced_app_settings(member_name: String) -> iced::Settings {
     iced::Settings {
         id: Some(format!("{} - {}", member_name, PROJECT_NAME)),
         default_text_size: iced::Pixels::from(24),
@@ -165,14 +166,22 @@ pub struct ToastManager {
 impl ToastManager {
     pub fn new() -> Self {
         Self {
-            new_toasts:Vec::new(),
-            toasts:Vec::new()
+            new_toasts: Vec::new(),
+            toasts: Vec::new(),
         }
     }
-    pub fn is_new_empty(&self)->bool{
+    pub fn new_and_add(member_name: String) -> Self {
+        let mut instance = Self::new();
+        instance.add(Toast::new(format!(
+            "{} - {} v{}",
+            member_name, PROJECT_NAME, PROJECT_VERSION
+        )));
+        instance
+    }
+    pub fn is_new_empty(&self) -> bool {
         self.new_toasts.is_empty()
     }
-    pub fn add(&mut self, toast: Toast){
+    pub fn add(&mut self, toast: Toast) {
         info!("Add toast: {:?}", toast);
         self.new_toasts.push((toast, time::Instant::now()));
     }
@@ -190,32 +199,81 @@ impl ToastManager {
             self.toasts.push(t);
         }
     }
-    pub fn view<'a, Message:'a>(&self) -> iced::Element<'a, Message> {
-        let mut layout = Column::new().width(Length::Fill).height(Length::Fill).align_x(alignment::Horizontal::Right);
-        if !self.new_toasts.is_empty(){
-        for (toast, instant) in self.new_toasts.clone() {
-            let mut tlayout = Column::new().max_width(300).width(Length::FillPortion(5));
-            match toast.title {
-                Some(title) => {tlayout=tlayout.push(text(title).size(28))}
-                None => {}
-            }
-            tlayout=tlayout.push(text(toast.msg).size(22));
-            tlayout=tlayout.push(iced::widget::progress_bar(0.0..=10.0, instant.elapsed().as_secs_f32()));
-            let tlevel = toast.level;
-            layout=layout.push(container(tlayout).style(move|theme:&iced::Theme| {
-                let p=theme.extended_palette();
-                container::Style{
-                    background: Some(Background::Color(match tlevel {
-                        ToastLevel::Error => {p.danger.base.color}
-                        ToastLevel::Info => {
-                            p.primary.base.color
+    pub fn view<'a, Message: 'a>(&self) -> iced::Element<'a, Message> {
+        if !self.new_toasts.is_empty() {
+            let mut reverse_toasts = self.new_toasts.clone();
+            reverse_toasts.reverse();
+            let layout = reverse_toasts.into_iter().fold(
+                Column::new().padding(5).spacing(10),
+                |layout, (toast, instant)| {
+                    let mut tlayout = Column::new().padding(2).width(Length::Fixed(450.0));
+                    if let Some(title) = toast.title { tlayout = tlayout.push(text(title).size(28)) }
+                    tlayout = tlayout.push(text(toast.msg).size(22));
+                    tlayout = tlayout.push(
+                        progress_bar(0.0..=10.0, instant.elapsed().as_secs_f32())
+                            .girth(Length::Fixed(7.0))
+                            .style(|theme: &iced::Theme| {
+                                let p = theme.extended_palette();
+                                progress_bar::Style {
+                                    background: Background::Color(p.background.base.color),
+                                    bar: Background::Color(p.primary.base.color),
+                                    border: iced::Border {
+                                        color: p.primary.strong.color,
+                                        width: 1.0,
+                                        radius: iced::border::radius(4),
+                                    },
+                                }
+                            }),
+                    );
+                    let tlevel = toast.level;
+                    layout.push(container(tlayout).style(move |theme: &iced::Theme| {
+                        let p = theme.extended_palette();
+                        container::Style {
+                            background: Some(Background::Color(match tlevel {
+                                ToastLevel::Error => p.danger.base.color,
+                                ToastLevel::Info => p.secondary.base.color,
+                                ToastLevel::Sucessful => p.success.base.color,
+                                ToastLevel::Warning => p.warning.base.color,
+                            })),
+                            text_color: Some(match tlevel {
+                                ToastLevel::Error => p.danger.base.text,
+                                ToastLevel::Info => p.secondary.base.text,
+                                ToastLevel::Sucessful => p.success.base.text,
+                                ToastLevel::Warning => p.warning.base.text,
+                            }),
+                            border: iced::Border {
+                                color: iced::Color::TRANSPARENT,
+                                width: 0.0,
+                                radius: iced::border::radius(2),
+                            },
+                            ..Default::default()
                         }
-                        ToastLevel::Sucessful => {p.success.base.color}
-                        ToastLevel::Warning => {p.warning.base.color}
-                    })
-                    ),..Default::default()}}))
-        }}
-        Row::new().push(scrollable(layout).height(Length::Fill)).width(Length::Fill).height(Length::Fill).align_y(alignment::Vertical::Bottom).into()
+                    }))
+                },
+            );
+            container(
+                scrollable(layout).direction(scrollable::Direction::Vertical(
+                    scrollable::Scrollbar::new()
+                        .width(5)
+                        .anchor(scrollable::Anchor::End)
+                        .scroller_width(10)
+                        .spacing(3),
+                )),
+            )
+            .height(Length::Fill)
+            .align_y(alignment::Vertical::Bottom)
+            .width(Length::Fill)
+            .align_x(alignment::Horizontal::Right)
+            .into()
+        } else {
+            space().into()
+        }
+    }
+}
+
+impl Default for ToastManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -223,35 +281,42 @@ impl ToastManager {
 pub struct Toast {
     level: ToastLevel,
     msg: String,
-    title: Option<String>
+    title: Option<String>,
 }
 impl Default for Toast {
     fn default() -> Self {
-        Self { level: ToastLevel::Info, msg: String::new(), title: None }
+        Self {
+            level: ToastLevel::Info,
+            msg: String::new(),
+            title: None,
+        }
     }
 }
 impl Toast {
     pub fn new(msg: String) -> Self {
-        Self { msg,..Default::default() }
+        Self {
+            msg,
+            ..Default::default()
+        }
     }
     pub fn set_sucessful(mut self) -> Self {
-        self.level=ToastLevel::Sucessful;
+        self.level = ToastLevel::Sucessful;
         self
     }
-    pub fn set_info(mut self)->Self{
-        self.level=ToastLevel::Info;
+    pub fn set_info(mut self) -> Self {
+        self.level = ToastLevel::Info;
         self
     }
-    pub fn set_warning(mut self)->Self{
-        self.level=ToastLevel::Warning;
+    pub fn set_warning(mut self) -> Self {
+        self.level = ToastLevel::Warning;
         self
     }
-    pub fn set_error(mut self) ->Self{
-        self.level=ToastLevel::Error;
+    pub fn set_error(mut self) -> Self {
+        self.level = ToastLevel::Error;
         self
     }
-    pub fn set_title(mut self, t: String) ->Self{
-        self.title=Some(t);
+    pub fn set_title(mut self, t: String) -> Self {
+        self.title = Some(t);
         self
     }
 }

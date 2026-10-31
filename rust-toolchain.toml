@@ -17,6 +17,9 @@
 channel = "nightly-2026-10-28"
 components = [
     "clippy",
+    "rust-src",  # for rust-analyzer
+    "cargo",
+    "rustfmt",
     # "rustc-codegen-cranelift"
 ]
 targets = ["aarch64-linux-android", "wasm32-unknown-unknown", "x86_64-linux-android"]

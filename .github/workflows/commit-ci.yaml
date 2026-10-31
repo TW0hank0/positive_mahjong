@@ -24,7 +24,7 @@ permissions:
   pages: write
   id-token: write
 env:
-    RUST_LOG: debug
+  RUST_LOG: debug
 jobs:
   make-cache:
     runs-on: ${{ matrix.os }}
@@ -45,37 +45,12 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
       - name: Install Dep
         uses: ./.github/actions/instdep
-      - name: Save Cache Cargo installed tools on Linux
-        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6.1.0
-        if: runner.os == 'Linux'
-        with:
-          path: |
-            ~/.cargo/bin/cargo-deny
-            ~/.cargo/bin/cargo-about
-            ~/.cargo/bin/mdbook
-            ~/.cargo/bin/cargo-msrv
-            ~/.cargo/bin/taplo
-            ~/.cargo/bin/eza
-            ~/.cargo/bin/wild
-          key: ${{ runner.os }}-${{ runner.arch }}-cargo-tools-${{ hashFiles('ci-cache-version.json') }}
-      - name: Save Cache Cargo installed tools on Windows
-        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6.1.0
-        if: runner.os == 'Windows'
-        with:
-          path: |
-            ~/.cargo/bin/cargo-deny.exe
-            ~/.cargo/bin/cargo-about.exe
-            ~/.cargo/bin/mdbook.exe
-            ~/.cargo/bin/cargo-msrv.exe
-            ~/.cargo/bin/taplo.exe
-            ~/.cargo/bin/eza.exe
-          key: ${{ runner.os }}-${{ runner.arch }}-cargo-tools-${{ hashFiles('ci-cache-version.json') }}
+
       - name: build ThirdPartyLicense
         run: |
           cd scripts
           uv run build_license.py
           cd ..
-
       - name: Save Cache ThirdPartyLicense
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6.1.0
         with:
@@ -86,6 +61,8 @@ jobs:
           key: ${{ runner.os }}-${{ runner.arch }}-ThirdPartyLicense-${{ hashFiles('Cargo.lock') }}-${{ hashFiles('templates/about_*.hbs') }}
   check:
     runs-on: ${{ matrix.os }}
+    needs:
+      - make-cache
     strategy:
       fail-fast: false
       matrix:
@@ -136,6 +113,8 @@ jobs:
           cargo deny check
   build_client_desktop:
     runs-on: ${{ matrix.os }}
+    needs:
+      - make-cache
     strategy:
       fail-fast: false
       matrix:
@@ -235,7 +214,7 @@ jobs:
           uv run build_website.py
           cd ..
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9  # v5.0.0
         with:
           name: pages-with-artifacts
           path: ./website_build/

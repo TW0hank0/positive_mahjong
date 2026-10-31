@@ -55,7 +55,6 @@ rustflags = ["-C", "link-arg=-fuse-ld=mold"]
 # rustflags = ["-C", "link-arg=-fuse-ld=wild"]
 
 # GUI is NOT able in musl env currently!
-# So this target can not run sucessful :(
 [target.x86_64-unknown-linux-musl]
 linker = "musl-gcc"
 rustflags = ["-C", "link-arg=-fuse-ld=mold"]

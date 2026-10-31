@@ -140,8 +140,13 @@ iced-GUI + TUI + CLI
 
 #### mise 管理工具版本
 
-- [ ] 開始
+- [x] 開始
 - [ ] 完成
+
+#### mr.py
+
+- [ ] 不重複檢查
+- [ ] 在 RequestsReview 時檢查
 
 ---
 

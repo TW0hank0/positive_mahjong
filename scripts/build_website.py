@@ -33,7 +33,7 @@ ignored_paths: list[str] = [
     ".venv",
 ]
 
-SKIP_PREV_ARTIFACTS: bool = False
+SKIP_PREV_ARTIFACTS: bool = True
 GH_PAGES_BASE_URL: str = "https://tw0hank0.github.io/positive_mahjong/"
 ARTIFACTS_LIST_FILE: str = "releases-artifacts-list.json"
 TYPE_HINT_RELEASE_ARTIFACTS = dict[
@@ -237,13 +237,13 @@ def artifacts_list() -> None:
     version = util.get_version()
     if SKIP_PREV_ARTIFACTS is True:
         new_list = {
+            # "1": ArtifactList(
+            #     is_released=True,
+            #     release_name="0.1.0",
+            #     ci_tests={},
+            #     release_artifacts={},
+            # ),
             "1": ArtifactList(
-                is_released=False,
-                release_name="0.1.0",
-                ci_tests={},
-                release_artifacts={},
-            ),
-            "2": ArtifactList(
                 is_released=False,
                 release_name=version,
                 ci_tests={},
@@ -255,11 +255,15 @@ def artifacts_list() -> None:
     # prepare file list
     files_list: TYPE_HINT_RELEASE_ARTIFACTS = {}
     for file in util.list_files(
-        util.fix_path("artifacts"), ignores=[util.fix_path("artifacts", "history")]
+        util.fix_path("artifacts"),
+        ignores=[
+            util.fix_path("artifacts", "history"),
+            util.fix_path("artifacts", ARTIFACTS_LIST_FILE),
+        ],
     ):
         for target in RUST_TARGETS:
             if target in file:
-                files_list[target] = file
+                files_list[target] = os.path.relpath(file, util.fix_path("artifacts"))
                 break
         else:
             print(f"unknown target, file: {file}")

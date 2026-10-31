@@ -30,8 +30,7 @@ fn main() {
     println!("rerun-if-changed=**/target/**");
     println!("rerun-if-changed=Cargo.toml");
     println!("rerun-if-changed=Cargo.lock");
-    let out_file = path::PathBuf::from(env::var("OUT_DIR").unwrap())
-        .join("inst-stored.zip");
+    let out_file = path::PathBuf::from(env::var("OUT_DIR").unwrap()).join("inst-stored.zip");
     let mut target_dir = path::PathBuf::from(env::var("OUT_DIR").unwrap());
     loop {
         if target_dir.file_name().unwrap() == "build" {
@@ -42,17 +41,23 @@ fn main() {
         }
     }
     if ENABLE_DESKTOP_ZIP {
-        let desktop_zip_name_template= "positive_mahjong-desktop-v{version}-{target}.zip";
+        let desktop_zip_name_template = "positive_mahjong-desktop-v{version}-{target}.zip";
         let project_dir = target_dir.parent().unwrap()// project/target/release
             .parent().unwrap() // project/target
             .parent().unwrap() // project
         ;
         let target_triple = env::var("TARGET").unwrap();
-        let desktop_zip_name = desktop_zip_name_template.replace("{version}", PROJECT_VERSION).replace("{target}", &target_triple);
+        let desktop_zip_name = desktop_zip_name_template
+            .replace("{version}", PROJECT_VERSION)
+            .replace("{target}", &target_triple);
         let desktop_zip_path = project_dir.join(desktop_zip_name);
         if fs::exists(&desktop_zip_path).unwrap_or(false) {
             fs::copy(desktop_zip_path.clone(), out_file.clone()).ok();
-            println!("Desktop Zip file copied from `{}` to `{}`", desktop_zip_path.display(), out_file.display());
+            println!(
+                "Desktop Zip file copied from `{}` to `{}`",
+                desktop_zip_path.display(),
+                out_file.display()
+            );
             return;
         }
     }
@@ -81,9 +86,5 @@ fn main() {
         }
     }
     zip.finish().unwrap();
-    println!(
-        "Zip file wrote: {}",
-        out_file.clone()
-            .display()
-    );
+    println!("Zip file wrote: {}", out_file.clone().display());
 }
