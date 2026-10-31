@@ -107,7 +107,7 @@ impl Client {
                     connect_msg: None,
                 }),
                 theme: iced::theme::Theme::TokyoNight,
-                toast: toast,
+                toast,
             },
             iced::font::load(FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES)
                 .discard()
