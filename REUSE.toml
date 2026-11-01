@@ -46,6 +46,8 @@ path = [
     "tombi.toml",
     "templates/*",
     "website/**",
+    "mise.toml",
+    "mise.lock",
 ]
 precedence = "override"
 
