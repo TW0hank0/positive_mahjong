@@ -18,7 +18,7 @@ use tracing::{debug, error, info};
 
 mod gui;
 
-const MEMBER_NAME:&str="pmj-server-desktop";
+const MEMBER_NAME: &str = "pmj-server-desktop";
 
 #[derive(clap::Parser)]
 #[command(

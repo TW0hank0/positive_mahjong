@@ -28,7 +28,7 @@ use iced::{
 use tracing::{info, warn};
 
 use pmj_desktop::shared::ContainerStyles;
-use pmj_shared::shared::{PROJECT_NAME};
+use pmj_shared::shared::PROJECT_NAME;
 
 use crate::MEMBER_NAME;
 
@@ -39,7 +39,9 @@ pub fn main() -> iced::Result {
         .title(ServerGUI::title)
         .theme(ServerGUI::theme)
         .subscription(ServerGUI::subscription)
-        .settings(pmj_desktop::shared::iced_app_settings(String::from(MEMBER_NAME)))
+        .settings(pmj_desktop::shared::iced_app_settings(String::from(
+            MEMBER_NAME,
+        )))
         .window(pmj_desktop::shared::iced_window_settings())
         .run()
 }

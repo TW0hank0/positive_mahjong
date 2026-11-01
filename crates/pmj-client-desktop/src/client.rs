@@ -163,52 +163,46 @@ impl Client {
                     return iced::Task::done(Message::CCoreProcessTask);
                 }
                 _ => {
-                    let msg =String::from("warn scene");
+                    let msg = String::from("warn scene");
                     warn!(msg);
                     self.toast.add(Toast::new(msg));
                 }
             },
-            Message::Connecting(connecting_msg) => {
-                match self.scene {
-                    ClientScenes::Connecting(ref mut connecting_state) => {
-                        match connecting_msg {
-                    ConnectingMsg::ReadResp=>{
+            Message::Connecting(connecting_msg) => match self.scene {
+                ClientScenes::Connecting(ref mut connecting_state) => match connecting_msg {
+                    ConnectingMsg::ReadResp => {
                         let mut ccore: ccore::ClientCore = connecting_state.ccore.take().unwrap();
-                    ccore.process_task();
-                            let gm_state =ccore.game_state();
-                            match gm_state.clone() {
-                                    ccore::GMState::HomePage => {
-                                        return Task::done(Message::Connecting(ConnectingMsg::ReadResp));
-                                    }
-                                    pmj_client_core::ccore::GMState::V2Better(gms_v2) => {
-                                        self.scene = ClientScenes::Play(PlayState {
-                                            is_start: false,
-                                            hand_cards: Vec::new(),
-                                            game_msgs: Vec::with_capacity(20),
-                                            game_controller: Vec::new(),
-                                            current_turn: None,
-                                            ccore,
-                                            gm_state,
-                                            player_id: gms_v2.player_id,
-                                        });
-                                        return task::Task::done(Message::CCoreProcessTask);
-                                    }
-                                }}
+                        ccore.process_task();
+                        let gm_state = ccore.game_state();
+                        match gm_state.clone() {
+                            ccore::GMState::HomePage => {
+                                return Task::done(Message::Connecting(ConnectingMsg::ReadResp));
+                            }
+                            pmj_client_core::ccore::GMState::V2Better(gms_v2) => {
+                                self.scene = ClientScenes::Play(PlayState {
+                                    is_start: false,
+                                    hand_cards: Vec::new(),
+                                    game_msgs: Vec::with_capacity(20),
+                                    game_controller: Vec::new(),
+                                    current_turn: None,
+                                    ccore,
+                                    gm_state,
+                                    player_id: gms_v2.player_id,
+                                });
+                                return task::Task::done(Message::CCoreProcessTask);
+                            }
+                        }
                     }
-                    }
-                    _ => {
-                        let msg = String::from("wrong scene");
-                        warn!(msg);
-                        self.toast.add(Toast::new(msg).set_warning());
-                    }
+                },
+                _ => {
+                    let msg = String::from("wrong scene");
+                    warn!(msg);
+                    self.toast.add(Toast::new(msg).set_warning());
                 }
-                }
-            Message::Home(home_message) => {
-                match self.scene
-                {
-                    ClientScenes::Home(ref mut home_state) =>
-                match home_message {
-                HomeMsg::InputServerIpChanged(server_ip) => {
+            },
+            Message::Home(home_message) => match self.scene {
+                ClientScenes::Home(ref mut home_state) => match home_message {
+                    HomeMsg::InputServerIpChanged(server_ip) => {
                         if home_state.try_connecting_server {
                             let msg = String::from("已有正在嘗試連接的伺服器！");
                             warn!(msg);
@@ -216,9 +210,9 @@ impl Client {
                         } else {
                             self.server_url = server_ip;
                         }
-                }
+                    }
 
-                HomeMsg::VSoftKeyBoardInput(key) =>  {
+                    HomeMsg::VSoftKeyBoardInput(key) => {
                         if home_state.try_connecting_server {
                             let msg = String::from("已有正在嘗試連接的伺服器！");
                             warn!(msg);
@@ -231,7 +225,7 @@ impl Client {
                             }
                         }
                     }
-                HomeMsg::ConnectServer => {
+                    HomeMsg::ConnectServer => {
                         if self.server_url.is_empty() {
                             let msg = String::from("未輸入伺服器地址！");
                             warn!(msg);
@@ -247,12 +241,14 @@ impl Client {
                                 self.toast.add(Toast::new(msg));
                             }
                             home_state.try_connecting_server = true;
-                            match ccore::ClientCore::connect(
-                                self.server_url.clone(),
-                            ) {
+                            match ccore::ClientCore::connect(self.server_url.clone()) {
                                 Ok(ccore) => {
-                                    self.scene=ClientScenes::Connecting(ConnectingState { ccore:Some(ccore) });
-                                    return task::Task::done(Message::Connecting(ConnectingMsg::ReadResp));
+                                    self.scene = ClientScenes::Connecting(ConnectingState {
+                                        ccore: Some(ccore),
+                                    });
+                                    return task::Task::done(Message::Connecting(
+                                        ConnectingMsg::ReadResp,
+                                    ));
                                 }
                                 Err(e) => {
                                     let msg = format!("update: {}", e);
@@ -261,29 +257,27 @@ impl Client {
                                 }
                             }
                         }
-                }
-            }
-            _=>{
-                let msg =String::from("wrong scene");
-                warn!(msg);
-                self.toast.add(Toast::new(msg).set_warning());
-            }
+                    }
+                },
+                _ => {
+                    let msg = String::from("wrong scene");
+                    warn!(msg);
+                    self.toast.add(Toast::new(msg).set_warning());
                 }
             },
             Message::Play(play_base_message) => match self.scene {
-                ClientScenes::Play(ref mut play_state) => {match play_base_message {
-                PlayMsg::GetCard => {
+                ClientScenes::Play(ref mut play_state) => match play_base_message {
+                    PlayMsg::GetCard => {
                         play_state.ccore.player_game_action(
                             pmj_gamemodes::v2_better::shared::PlayerGameActions::GetCard,
                         );
-                },
-                PlayMsg::ThrowCard(card) => {
+                    }
+                    PlayMsg::ThrowCard(card) => {
                         play_state.ccore.player_game_action(
                             pmj_gamemodes::v2_better::shared::PlayerGameActions::ThrowCard(card),
                         );
                     }
-                }
-                }
+                },
                 _ => {
                     let msg = String::from("wrong scene");
                     warn!(msg);
@@ -460,7 +454,8 @@ impl Client {
                             .push(widget::opaque(scrollable(
                                 Column::from_vec(layout_home)
                                     .width(Length::Fill)
-                                    .padding(10).spacing(10),
+                                    .padding(10)
+                                    .spacing(10),
                             )))
                             .push(content)
                             .into(),
@@ -471,7 +466,8 @@ impl Client {
                             Column::from_vec(layout_home)
                                 .width(Length::Fill)
                                 .height(Length::Fill)
-                                .padding(10).spacing(10),
+                                .padding(10)
+                                .spacing(10),
                         )
                         .into(),
                     );
