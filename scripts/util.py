@@ -32,6 +32,9 @@ from rich import traceback as rtb
 
 rtb.install(show_locals=True)
 
+OWNER_NAME = "TW0hank0"
+PROJECT_NAME = "positive_mahjong"
+
 
 def show_cmd(
     command: list[str],
@@ -322,7 +325,7 @@ def get_version(
     return version
 
 
-def get_datetime():
+def get_datetime() -> str:
     return datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d_%H-%M-%S")
 
 
