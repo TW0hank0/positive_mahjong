@@ -121,58 +121,25 @@ pub enum PlayerGameActions {
 
 impl PlayerGameActions {
     pub fn is_get_card(&self) -> bool {
-        match self {
-            Self::GetCard => true,
-            _ => false,
-        }
+        matches!(self, Self::GetCard)
     }
     pub fn is_throw_card(&self) -> bool {
-        match self {
-            Self::ThrowCard(_) => true,
-            _ => false,
-        }
+        matches!(self, Self::ThrowCard(_))
     }
     pub fn is_eat(&self) -> bool {
-        match self {
-            Self::Eat {
-                with: _,
-                eat_card: _,
-            } => true,
-            _ => false,
-        }
+        matches!(self, Self::Eat { with:_, eat_card:_ })
     }
     pub fn is_triplet(&self) -> bool {
-        match self {
-            Self::Triplet {
-                with: _,
-                triplet_card: _,
-            } => true,
-            _ => false,
-        }
+        matches!(self, Self::Triplet { with:_, triplet_card:_ })
     }
     pub fn is_exposed_kong(&self) -> bool {
-        match self {
-            Self::ExposedKong {
-                with: _,
-                kong_card: _,
-            } => true,
-            _ => false,
-        }
+        matches!(self, Self::ExposedKong { with:_, kong_card:_ })
     }
     pub fn is_concealed_kong(&self) -> bool {
-        match self {
-            Self::ConcealedKong {
-                with: _,
-                kong_card: _,
-            } => true,
-            _ => false,
-        }
+        matches!(self, Self::ConcealedKong { with:_, kong_card:_ })
     }
     pub fn is_replace_flower(&self) -> bool {
-        match self {
-            Self::ReplaceFlower(_) => true,
-            _ => false,
-        }
+        matches!(self, Self::ReplaceFlower(_))
     }
 }
 
@@ -219,34 +186,22 @@ pub enum PMJCardType {
 
 impl PMJCardType {
     pub fn is_ten_thousand(&self) -> bool {
-        match self {
-            Self::TenThousand(_) => true,
-            _ => false,
-        }
+        matches! (self,
+            Self::TenThousand(_)
+            )
+
     }
     pub fn is_line(&self) -> bool {
-        match self {
-            Self::Line(_) => true,
-            _ => false,
-        }
+        matches!(self, Self::Line(_))
     }
     pub fn is_dots(&self) -> bool {
-        match self {
-            Self::Dots(_) => true,
-            _ => false,
-        }
+        matches!(self, Self::Dots(_))
     }
     pub fn is_flower(&self) -> bool {
-        match self {
-            Self::Flower(_) => true,
-            _ => false,
-        }
+        matches!(self, Self::Flower(_))
     }
     pub fn is_words(&self) -> bool {
-        match self {
-            Self::Words(_) => true,
-            _ => false,
-        }
+        matches!(self, Self::Words(_))
     }
 }
 
