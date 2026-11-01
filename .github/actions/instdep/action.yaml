@@ -95,7 +95,7 @@ runs:
       run: cargo install cargo-about --locked --features=cli
       shell: bash
     - name: use mise action
-      uses: jdx/mise-action@v5
+      uses: jdx/mise-action@6612f0ef07ed2a736cd1e00a94a065522dd41195 # v5.2.5
 
     - name: Prepare venv
       shell: bash
