@@ -28,43 +28,19 @@ use iced::{
 use tracing::{info, warn};
 
 use pmj_desktop::shared::ContainerStyles;
-use pmj_shared::shared::{FONT_NOTO_SANS_REG_BYTES, ICON_PNG_BYTES, PROJECT_NAME};
+use pmj_shared::shared::{PROJECT_NAME};
 
-pub const FONT_NOTO_SANS_REG: iced::font::Font = iced::font::Font::with_name("Noto Sans TC");
+use crate::MEMBER_NAME;
 
-pub fn gui_init() -> Option<iced::window::Icon> {
-    let _ = iced::font::load(FONT_NOTO_SANS_REG_BYTES);
-    //
-    let img = image::load_from_memory_with_format(ICON_PNG_BYTES, image::ImageFormat::Png)
-        .unwrap()
-        .into_rgba8();
-    let (img_width, img_height) = img.dimensions();
-
-    iced::window::icon::from_rgba(img.into_raw(), img_width, img_height).ok()
-}
+// const FONT_NOTO_SANS_REG: iced::font::Font = iced::font::Font::with_name("Noto Sans TC");
 
 pub fn main() -> iced::Result {
-    let window_settings = iced::window::Settings {
-        maximized: true,
-        min_size: Some(iced::Size::new(720.0, 480.0)),
-        icon: gui_init(),
-        position: iced::window::Position::Centered,
-        ..Default::default()
-    };
-    let app_settings = iced::Settings {
-        id: Some(format!("{} - pmj_server::gui", PROJECT_NAME)),
-        default_text_size: iced::Pixels::from(22),
-        default_font: FONT_NOTO_SANS_REG,
-        vsync: true,
-        fonts: vec![std::borrow::Cow::from(FONT_NOTO_SANS_REG_BYTES)],
-        ..Default::default()
-    };
     iced::application(ServerGUI::new, ServerGUI::update, ServerGUI::view)
         .title(ServerGUI::title)
         .theme(ServerGUI::theme)
         .subscription(ServerGUI::subscription)
-        .settings(app_settings)
-        .window(window_settings)
+        .settings(pmj_desktop::shared::iced_app_settings(String::from(MEMBER_NAME)))
+        .window(pmj_desktop::shared::iced_window_settings())
         .run()
 }
 

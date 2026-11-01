@@ -17,7 +17,7 @@ use iced::{
     self, Border, Color, Element, Length, Pixels, Task, alignment, task,
     widget::{self, Column, Row, Stack, button, container, scrollable, space, text, text_input},
 };
-use tracing::{error, warn};
+use tracing::{error, info, warn};
 
 use pmj_desktop::{
     circular, easing,
@@ -44,10 +44,16 @@ pub struct Client {
 #[derive(Debug)]
 pub enum ClientScenes {
     Home(HomeState),
+    Connecting(ConnectingState),
     Play(PlayState),
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug)]
+pub struct ConnectingState {
+    ccore: Option<ccore::ClientCore>,
+}
+
+#[derive(Debug)]
 pub struct HomeState {
     try_connecting_server: bool,
     connect_msg: Option<String>,
@@ -65,19 +71,25 @@ pub struct PlayState {
     gm_state: pmj_client_core::ccore::GMState,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub enum Message {
     Home(HomeMsg),
+    Connecting(ConnectingMsg),
     Play(PlayMsg),
     CCoreProcessTask,
     ToastUpdate,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub enum HomeMsg {
     InputServerIpChanged(String),
     VSoftKeyBoardInput(String),
     ConnectServer,
+}
+
+#[derive(Debug, Clone)]
+pub enum ConnectingMsg {
+    ReadResp,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -120,11 +132,6 @@ impl Client {
                 return Task::done(Message::ToastUpdate);
             }
             Message::CCoreProcessTask => match self.scene {
-                ClientScenes::Home(ref _home_state) => {
-                    let msg = String::from("warn scene");
-                    warn!(msg);
-                    self.toast.add(Toast::new(msg).set_warning());
-                }
                 ClientScenes::Play(ref mut play_state) => {
                     play_state.ccore.process_task();
                     play_state.game_controller = play_state.ccore.current_ctrl();
@@ -155,10 +162,53 @@ impl Client {
                     }
                     return iced::Task::done(Message::CCoreProcessTask);
                 }
+                _ => {
+                    let msg =String::from("warn scene");
+                    warn!(msg);
+                    self.toast.add(Toast::new(msg));
+                }
             },
-            Message::Home(home_message) => match home_message {
-                HomeMsg::InputServerIpChanged(server_ip) => match self.scene {
-                    ClientScenes::Home(ref mut home_state) => {
+            Message::Connecting(connecting_msg) => {
+                match self.scene {
+                    ClientScenes::Connecting(ref mut connecting_state) => {
+                        match connecting_msg {
+                    ConnectingMsg::ReadResp=>{
+                        let mut ccore: ccore::ClientCore = connecting_state.ccore.take().unwrap();
+                    ccore.process_task();
+                            let gm_state =ccore.game_state();
+                            match gm_state.clone() {
+                                    ccore::GMState::HomePage => {
+                                        return Task::done(Message::Connecting(ConnectingMsg::ReadResp));
+                                    }
+                                    pmj_client_core::ccore::GMState::V2Better(gms_v2) => {
+                                        self.scene = ClientScenes::Play(PlayState {
+                                            is_start: false,
+                                            hand_cards: Vec::new(),
+                                            game_msgs: Vec::with_capacity(20),
+                                            game_controller: Vec::new(),
+                                            current_turn: None,
+                                            ccore,
+                                            gm_state,
+                                            player_id: gms_v2.player_id,
+                                        });
+                                        return task::Task::done(Message::CCoreProcessTask);
+                                    }
+                                }}
+                    }
+                    }
+                    _ => {
+                        let msg = String::from("wrong scene");
+                        warn!(msg);
+                        self.toast.add(Toast::new(msg).set_warning());
+                    }
+                }
+                }
+            Message::Home(home_message) => {
+                match self.scene
+                {
+                    ClientScenes::Home(ref mut home_state) =>
+                match home_message {
+                HomeMsg::InputServerIpChanged(server_ip) => {
                         if home_state.try_connecting_server {
                             let msg = String::from("已有正在嘗試連接的伺服器！");
                             warn!(msg);
@@ -166,15 +216,9 @@ impl Client {
                         } else {
                             self.server_url = server_ip;
                         }
-                    }
-                    ClientScenes::Play(ref _play_state) => {
-                        let msg = String::from("warn scene");
-                        warn!(msg);
-                        self.toast.add(Toast::new(msg).set_warning());
-                    }
-                },
-                HomeMsg::VSoftKeyBoardInput(key) => match self.scene {
-                    ClientScenes::Home(ref mut home_state) => {
+                }
+
+                HomeMsg::VSoftKeyBoardInput(key) =>  {
                         if home_state.try_connecting_server {
                             let msg = String::from("已有正在嘗試連接的伺服器！");
                             warn!(msg);
@@ -187,14 +231,7 @@ impl Client {
                             }
                         }
                     }
-                    ClientScenes::Play(ref _play_state) => {
-                        let msg=String::from("warn scene");
-                        warn!(msg);
-                        self.toast.add(Toast::new(msg).set_warning());
-                    }
-                },
-                HomeMsg::ConnectServer => match self.scene {
-                    ClientScenes::Home(ref mut home_state) => {
+                HomeMsg::ConnectServer => {
                         if self.server_url.is_empty() {
                             let msg = String::from("未輸入伺服器地址！");
                             warn!(msg);
@@ -204,42 +241,18 @@ impl Client {
                             warn!(msg);
                             self.toast.add(Toast::new(msg).set_warning());
                         } else {
+                            {
+                                let msg = format!("正在連接伺服器：{}", self.server_url.clone());
+                                info!(msg);
+                                self.toast.add(Toast::new(msg));
+                            }
                             home_state.try_connecting_server = true;
                             match ccore::ClientCore::connect(
                                 self.server_url.clone(),
                             ) {
-                                Ok(mut ccore) => {
-                                    ccore.process_task();
-                                    let mut gm_state = ccore.game_state();
-                                    loop {
-                                        match gm_state.clone() {
-                                            ccore::GMState::HomePage => {
-                                                {let msg=String::from("update: warn GMState");
-                                                    warn!(msg);
-                                                    self.toast.add(Toast::new(msg).set_warning());
-                                                }
-                                                std::thread::sleep(
-                                                    std::time::Duration::from_millis(500),
-                                                );
-                                                ccore.process_task();
-                                                gm_state = ccore.game_state();
-                                            }
-                                            pmj_client_core::ccore::GMState::V2Better(gms_v2) => {
-                                                self.scene = ClientScenes::Play(PlayState {
-                                                    is_start: false,
-                                                    hand_cards: Vec::new(),
-                                                    game_msgs: Vec::with_capacity(20),
-                                                    game_controller: Vec::new(),
-                                                    current_turn: None,
-                                                    ccore,
-                                                    gm_state,
-                                                    player_id: gms_v2.player_id,
-                                                });
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    return task::Task::done(Message::CCoreProcessTask);
+                                Ok(ccore) => {
+                                    self.scene=ClientScenes::Connecting(ConnectingState { ccore:Some(ccore) });
+                                    return task::Task::done(Message::Connecting(ConnectingMsg::ReadResp));
                                 }
                                 Err(e) => {
                                     let msg = format!("update: {}", e);
@@ -248,33 +261,34 @@ impl Client {
                                 }
                             }
                         }
-                    }
-                    ClientScenes::Play(ref _play_state) => {
-                        warn!("update: warn scene");
-                    }
-                },
+                }
+            }
+            _=>{
+                let msg =String::from("wrong scene");
+                warn!(msg);
+                self.toast.add(Toast::new(msg).set_warning());
+            }
+                }
             },
-            Message::Play(play_base_message) => match play_base_message {
-                PlayMsg::GetCard => match self.scene {
-                    ClientScenes::Home(ref _home_state) => {
-                        warn!("update: warn scene");
-                    }
-                    ClientScenes::Play(ref mut play_state) => {
+            Message::Play(play_base_message) => match self.scene {
+                ClientScenes::Play(ref mut play_state) => {match play_base_message {
+                PlayMsg::GetCard => {
                         play_state.ccore.player_game_action(
                             pmj_gamemodes::v2_better::shared::PlayerGameActions::GetCard,
                         );
-                    }
                 },
-                PlayMsg::ThrowCard(card) => match self.scene {
-                    ClientScenes::Home(ref _home_state) => {
-                        warn!("update: warn scene");
-                    }
-                    ClientScenes::Play(ref mut play_state) => {
+                PlayMsg::ThrowCard(card) => {
                         play_state.ccore.player_game_action(
                             pmj_gamemodes::v2_better::shared::PlayerGameActions::ThrowCard(card),
                         );
                     }
-                },
+                }
+                }
+                _ => {
+                    let msg = String::from("wrong scene");
+                    warn!(msg);
+                    self.toast.add(Toast::new(msg).set_warning());
+                }
             },
         }
         iced::task::Task::none()
@@ -462,6 +476,60 @@ impl Client {
                         .into(),
                     );
                 }
+            }
+            ClientScenes::Connecting(ref _connecting_state) => {
+                let mut content_column = Vec::new();
+                content_column.push(
+                    circular::Circular::new()
+                        .easing(&easing::STANDARD)
+                        .size(54.0)
+                        .into(),
+                );
+                content_column.push(
+                    text("連線中...")
+                        .size(28)
+                        .style(move |theme: &iced::theme::Theme| {
+                            let ex_palette = theme.extended_palette();
+                            text::Style {
+                                color: Some(ex_palette.secondary.base.text),
+                            }
+                        })
+                        .align_x(alignment::Horizontal::Center)
+                        .into(),
+                );
+                let content = container(
+                    container(Column::from_vec(content_column).padding(10).spacing(3)).style(
+                        move |theme: &iced::theme::Theme| {
+                            let ex_palette = theme.extended_palette();
+                            let mut style = container::Style::default();
+                            style = style.background(iced::Background::Color(
+                                ex_palette.secondary.weak.color,
+                            ));
+                            style.border(
+                                Border::default()
+                                    .color(ex_palette.secondary.strong.color)
+                                    .rounded(12)
+                                    .width(3),
+                            );
+                            style
+                        },
+                    ),
+                )
+                .center(Length::Fill)
+                .align_x(alignment::Alignment::Center)
+                .align_y(alignment::Alignment::Center)
+                .style(move |_theme| {
+                    let mut style = container::Style::default();
+                    style = style.background(iced::Background::Color(Color {
+                        r: 0.0,
+                        g: 0.0,
+                        b: 0.0,
+                        a: 0.4,
+                    }));
+                    style = style.border(Border::default().width(0));
+                    style
+                });
+                layout.push(content.into());
             }
             ClientScenes::Play(ref play_state) => {
                 let mut layout_play: Vec<iced::Element<'_, Message>> = Vec::new();
