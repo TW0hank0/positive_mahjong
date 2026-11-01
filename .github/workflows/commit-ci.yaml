@@ -43,14 +43,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
-      - name: Install Dep
-        uses: ./.github/actions/instdep
+      - uses: ./.github/actions/instdep
 
-      - name: build ThirdPartyLicense
-        run: |
-          cd scripts
-          uv run build_license.py
-          cd ..
+      # - name: build ThirdPartyLicense
+      #   run: |
+      #     cd scripts
+      #     uv run build_license.py
+      #     cd ..
       - name: Save Cache ThirdPartyLicense
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6.1.0
         with:
@@ -78,14 +77,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
-      - name: Install Dep
-        uses: ./.github/actions/instdep
-      - name: Prepare venv
-        run: |
-          cd scripts
-          uv venv
-          uv sync
-          cd ..
+      - uses: ./.github/actions/instdep
       - name: Run cargo check
         run: cargo check --workspace
       - name: Run clippy
@@ -165,12 +157,6 @@ jobs:
       - name: checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
       - uses: ./.github/actions/instdep
-      - name: prepare CI Venv
-        run: |
-          cd scripts
-          uv venv
-          uv sync
-          cd ..
       - name: download all artifacts
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333  # v8.0.2
         with:
@@ -203,11 +189,6 @@ jobs:
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333  # v8.0.2
         with:
           path: artifacts
-      - name: Build license
-        run: |
-          cd scripts
-          uv run build_license.py
-          cd ..
       - name: Build doc and website
         run: |
           cd scripts

@@ -27,8 +27,7 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
-      - name: Install Dep
-        uses: ./.github/actions/instdep
+      - uses: ./.github/actions/instdep
       - name: Run script
         shell: bash
         env:

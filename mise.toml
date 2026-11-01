@@ -16,7 +16,6 @@
 # use cargo to install tool, to avoid no platform url in lockfile
 [tools]
 "cargo:cargo-deny" = "0.20.2"
-# "cargo:cargo-about" = "0.9.3"
 "cargo:mdbook" = "0.5.4"
 "cargo:cargo-msrv" = "0.19.6"
 "cargo:eza" = "0.23.5"

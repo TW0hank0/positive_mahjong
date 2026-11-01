@@ -90,12 +90,20 @@ runs:
         go install github.com/google/addlicense@latest
         echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
-    - run: cargo install cargo-about --locked --features=cli
+    # cargo-about can not install by mise cause faetures flag
+    - name: install cargo-about
+      run: cargo install cargo-about --locked --features=cli
       shell: bash
-    - uses: jdx/mise-action@v5
-    - run: mise install
-      shell: bash
+    - name: use mise action
+      uses: jdx/mise-action@v5
 
+    - name: Prepare venv
+      shell: bash
+      run: |
+        cd scripts
+        uv venv
+        uv sync
+        cd ..
     - name: restore third-party license cache
       uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6.1.0
       id: third-party-license
