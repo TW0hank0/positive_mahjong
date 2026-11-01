@@ -18,6 +18,8 @@ use tracing::{debug, error, info};
 
 mod gui;
 
+const MEMBER_NAME: &str = "pmj-server-desktop";
+
 #[derive(clap::Parser)]
 #[command(
     name = "pmj_server",
@@ -37,7 +39,7 @@ enum SubCmds {
 }
 
 fn main() {
-    let _guard = pmj_shared::shared::init_tracing_fmt(String::from("pmj-server-desktop"));
+    let _guard = pmj_shared::shared::init_tracing_fmt(String::from(MEMBER_NAME));
     let args = CliArgs::parse();
 
     info!("args.command = {:?}", args.command);

@@ -22,21 +22,17 @@ from rich.logging import RichHandler
 
 import util
 
-PROJECT = "TW0hank0/positive_mahjong"
-REQUIRED_APPROVER_USERNAME = "TW0hank0"
+PROJECT = f"{util.OWNER_NAME}/{util.PROJECT_NAME}"
+REQUIRED_APPROVER_USERNAME = util.OWNER_NAME
 REQUIRED_APPROVER_ID = 35460034
 WORK_DIR = os.path.expanduser(os.path.join("~", "pmj_mr_script_workdir"))
 
-LOGGER = logging.getLogger("pmj-scripts.mr")
+LOGGER = logging.getLogger(name="pmj-scripts.mr")
 LOGGER.setLevel(logging.DEBUG)
 LOGGER.addHandler(RichHandler(logging.DEBUG))
 
 
 def upsert_note(mr_obj, current_user_id: int, new_body: str):
-    """
-    透過 User ID 比對是否已有當前 Token 帳號發出的留言。
-    若存在則直接編輯更新 (Save)，不存在則建立新留言 (Create)。
-    """
     notes = mr_obj.notes.list(get_all=True)
     LOGGER.debug(f"notes: {notes}")
     target_note = None
@@ -47,7 +43,7 @@ def upsert_note(mr_obj, current_user_id: int, new_body: str):
                 target_note = note
                 break
     if target_note is not None:
-        target_note.body = new_body
+        target_note.body = new_body + "\nupdated at `" + util.get_datetime() + "`"
         target_note.save()
         LOGGER.info(f"Updated existing note (Note ID: {target_note.id})")
     else:
@@ -175,6 +171,7 @@ def check() -> None | tuple[str, int, str, str]:
         (["uv", "run", "license_check.py"], "scripts"),
         (["ty", "check", "."], "scripts"),
         (["ruff", "check", "."], "scripts"),
+        (["tombi", "lint"], "."),
     ]
     for command, relpath in commands:
         (check_returncode, check_stdout, check_stderr) = util.run_cmd(

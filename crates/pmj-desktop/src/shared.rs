@@ -187,12 +187,10 @@ impl ToastManager {
     }
     pub fn process(&mut self) {
         let mut indexes = Vec::new();
-        let mut index = 0;
-        for (_toast, instant) in self.new_toasts.iter() {
+        for (index, (_toast, instant)) in self.new_toasts.iter().enumerate() {
             if instant.elapsed() > time::Duration::from_secs(10) {
                 indexes.push(index);
             }
-            index += 1;
         }
         for i in indexes {
             let (t, _) = self.new_toasts.remove(i);
@@ -207,7 +205,9 @@ impl ToastManager {
                 Column::new().padding(5).spacing(10),
                 |layout, (toast, instant)| {
                     let mut tlayout = Column::new().padding(2).width(Length::Fixed(450.0));
-                    if let Some(title) = toast.title { tlayout = tlayout.push(text(title).size(28)) }
+                    if let Some(title) = toast.title {
+                        tlayout = tlayout.push(text(title).size(28))
+                    }
                     tlayout = tlayout.push(text(toast.msg).size(22));
                     tlayout = tlayout.push(
                         progress_bar(0.0..=10.0, instant.elapsed().as_secs_f32())
