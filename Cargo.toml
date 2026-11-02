@@ -87,7 +87,7 @@ tungstenite = {
     ]
 }
 url = "=2.5.8"
-wasm-bindgen = { version = "=0.2.129" }
+wasm-bindgen = { version = "=0.2.130" }
 zip = "=9.1.3"
 
 [profile.dev]
