@@ -13,6 +13,7 @@
 # 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
+import hashlib
 import json
 import os
 import shutil
@@ -238,10 +239,10 @@ def build_download_page(build_root: str):
 def artifacts_list() -> None:
     # download prev
     if SKIP_PREV_ARTIFACTS is False:
-        print(f"requests.get: {GH_PAGES_BASE_URL}files/{ARTIFACTS_LIST_FILE}")
-        prev_artifacts_list = requests.get(
-            f"{GH_PAGES_BASE_URL}files/{ARTIFACTS_LIST_FILE}"
-        )
+        req_url = f"{GH_PAGES_BASE_URL}files/tree/artifacts/{ARTIFACTS_LIST_FILE}"
+        print(f"{req_url=}")
+        prev_artifacts_list = requests.get(req_url)
+        del req_url
         prev_artifacts_list.raise_for_status()
         i_prev_list: dict[str, ArtifactList | dict] = prev_artifacts_list.json()
         prev_list = {}
@@ -250,27 +251,56 @@ def artifacts_list() -> None:
                 json.dumps(iprev_value)
             )
         print("prepared prev_list")
-        print(f"prev_list={prev_list}")
-        for arelease in prev_list.values():
+        print(f"{prev_list=}")
+        for release_id, arelease in prev_list.items():
             if arelease.is_released is True:
-                arelease_artifcats: dict = arelease.release_artifacts
+                arelease_artifcats = arelease.release_artifacts
                 for ara_filename in arelease_artifcats.values():
-                    print(f"requests.get({GH_PAGES_BASE_URL}files/{ara_filename})")
-                    ara_file_resp = requests.get(
-                        f"{GH_PAGES_BASE_URL}files/{ara_filename}"
-                    )
+                    file_req_url = f"{GH_PAGES_BASE_URL}files/hash/{ara_filename}/file"
+                    print(f"{file_req_url=}")
+                    ara_file_resp = requests.get(file_req_url)
                     ara_file_resp.raise_for_status()
-                    with open(util.fix_path("artifacts", "history", ara_filename)) as f:
+                    fname_req_url = (
+                        f"{GH_PAGES_BASE_URL}files/hash/{ara_filename}/filename.txt"
+                    )
+                    print(f"{fname_req_url=}")
+                    ara_fname_resp = requests.get(fname_req_url)
+                    ara_fname_resp.raise_for_status()
+                    with open(
+                        util.fix_path(
+                            "artifacts",
+                            "history",
+                            release_id,
+                            ara_filename,  # file hash
+                            ara_fname_resp.content.decode(),  # file name
+                        )
+                    ) as f:
                         shutil.copyfileobj(ara_file_resp.raw, f)
             arelease_ci_artifacts = arelease.ci_tests
             for aca_id in arelease_ci_artifacts.values():
                 for aca_filename in aca_id.values():
-                    ara_file_resp = requests.get(
-                        f"{GH_PAGES_BASE_URL}files/{aca_filename}"
-                    )
+                    req_url = f"{GH_PAGES_BASE_URL}files/hash/{aca_filename}/file"
+                    print(f"{req_url=}")
+                    ara_file_resp = requests.get(req_url)
+                    del req_url
                     ara_file_resp.raise_for_status()
+                    # file name
+                    req_url = (
+                        f"{GH_PAGES_BASE_URL}files/hash/{aca_filename}/filename.txt"
+                    )
+                    print(f"{req_url=}")
+                    ara_fname_resp = requests.get(req_url)
+                    del req_url
+                    ara_fname_resp.raise_for_status()
                     with open(
-                        util.fix_path("artifacts", "history", "ci_test", ara_filename)
+                        util.fix_path(
+                            "artifacts",
+                            "history",
+                            release_id,
+                            "ci_test",
+                            ara_filename,  # file hash
+                            ara_fname_resp.content.decode(),  # file name
+                        )
                     ) as f:
                         shutil.copyfileobj(ara_file_resp.raw, f)
     # gen new list
@@ -297,7 +327,8 @@ def artifacts_list() -> None:
     ):
         for target in RUST_TARGETS:
             if target in file:
-                files_list[target] = os.path.relpath(file, util.fix_path("artifacts"))
+                with open(file, "rb") as f:
+                    files_list[target] = hashlib.sha256(f.read()).hexdigest()
                 break
         else:
             print(f"unknown target, file: {file}")
@@ -317,7 +348,7 @@ def artifacts_list() -> None:
     else:
         new_list[lastest_num].is_released = True
         new_list[lastest_num].release_artifacts = files_list
-    print(f"new_list={new_list}")
+    print(f"{new_list=}")
     new_list_json = {}
     for key, value in new_list.items():
         new_list_json[key] = json.loads(value.model_dump_json(indent=4))
@@ -346,6 +377,11 @@ class FilesPageIncludeFile:
         self.abs_path = os.path.abspath(path)
         self.path_rel_project = os.path.relpath(os.path.abspath(path), util.fix_path())
         self.rename = rename
+
+    def hash_name_sha256(self) -> str:
+        with open(self.abs_path, "rb") as f:
+            filehash = hashlib.sha256(data=f.read())
+        return filehash.hexdigest()
 
     def raw_name(self) -> str:
         """like: path/to/file.txt -> path-_-to-file.txt"""
@@ -412,6 +448,7 @@ def build_files_page(dir_path: str):
     files_summary = ""
     os.mkdir(os.path.join(dir_path, "raw"))
     os.mkdir(os.path.join(dir_path, "tree"))
+    os.mkdir(os.path.join(dir_path, "hash"))
     for include_file in include_files:
         for cfrom, cto in [
             (
@@ -422,10 +459,26 @@ def build_files_page(dir_path: str):
                 include_file.abs_path,
                 os.path.join(dir_path, "tree", include_file.path_rel_project),
             ),
+            (
+                include_file.abs_path,
+                os.path.join(
+                    dir_path, "hash", "sha256", include_file.hash_name_sha256(), "file"
+                ),
+            ),
         ]:
-            print(f"Copy: {cfrom=}, {cto=}")
+            print(f"Copy: {cfrom=} {cto=}")
             os.makedirs(os.path.dirname(cto), exist_ok=True)
             _ = shutil.copy2(cfrom, cto)
+        with open(
+            os.path.join(
+                dir_path,
+                "hash",
+                "sha256",
+                include_file.hash_name_sha256(),
+                "filename.txt",
+            )
+        ) as f:
+            _ = f.write(os.path.basename(include_file.abs_path))
         files_summary = (
             files_summary
             + f"""
