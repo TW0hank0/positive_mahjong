@@ -186,7 +186,7 @@ def main():
     shutil.copytree(website_root_path, build_root, ignore=copytree_ignore)
     if os.path.exists(util.fix_path("artifacts")) is False:
         os.mkdir(util.fix_path("artifacts"))
-    artifacts_list()
+    build_artifacts_list()
     os.mkdir(os.path.join(build_root, "files"))
     build_files_page(os.path.join(build_root, "files"))
     if SKIP_PREV_ARTIFACTS is False:
@@ -236,7 +236,7 @@ def build_download_page(build_root: str):
         f.write(download_page)
 
 
-def artifacts_list() -> None:
+def build_artifacts_list() -> None:
     # download prev
     if SKIP_PREV_ARTIFACTS is False:
         req_url = f"{GH_PAGES_BASE_URL}files/tree/artifacts/{ARTIFACTS_LIST_FILE}"
@@ -250,19 +250,18 @@ def artifacts_list() -> None:
             prev_list[iprev_key] = ArtifactList.model_validate_json(
                 json.dumps(iprev_value)
             )
-        print("prepared prev_list")
         print(f"{prev_list=}")
         for release_id, arelease in prev_list.items():
             if arelease.is_released is True:
                 arelease_artifcats = arelease.release_artifacts
                 for ara_filename in arelease_artifcats.values():
-                    file_req_url = f"{GH_PAGES_BASE_URL}files/hash/{ara_filename}/file"
+                    file_req_url = (
+                        f"{GH_PAGES_BASE_URL}files/hash/sha256/{ara_filename}/file"
+                    )
                     print(f"{file_req_url=}")
                     ara_file_resp = requests.get(file_req_url)
                     ara_file_resp.raise_for_status()
-                    fname_req_url = (
-                        f"{GH_PAGES_BASE_URL}files/hash/{ara_filename}/filename.txt"
-                    )
+                    fname_req_url = f"{GH_PAGES_BASE_URL}files/hash/sha256/{ara_filename}/filename.txt"
                     print(f"{fname_req_url=}")
                     ara_fname_resp = requests.get(fname_req_url)
                     ara_fname_resp.raise_for_status()
@@ -271,23 +270,23 @@ def artifacts_list() -> None:
                             "artifacts",
                             "history",
                             release_id,
+                            "sha256",
                             ara_filename,  # file hash
                             ara_fname_resp.content.decode(),  # file name
                         )
                     ) as f:
                         shutil.copyfileobj(ara_file_resp.raw, f)
-            arelease_ci_artifacts = arelease.ci_tests
-            for aca_id in arelease_ci_artifacts.values():
+            for aca_id in arelease.ci_tests.values():
                 for aca_filename in aca_id.values():
-                    req_url = f"{GH_PAGES_BASE_URL}files/hash/{aca_filename}/file"
+                    req_url = (
+                        f"{GH_PAGES_BASE_URL}files/hash/sha256/{aca_filename}/file"
+                    )
                     print(f"{req_url=}")
                     ara_file_resp = requests.get(req_url)
                     del req_url
                     ara_file_resp.raise_for_status()
                     # file name
-                    req_url = (
-                        f"{GH_PAGES_BASE_URL}files/hash/{aca_filename}/filename.txt"
-                    )
+                    req_url = f"{GH_PAGES_BASE_URL}files/hash/sha256/{aca_filename}/filename.txt"
                     print(f"{req_url=}")
                     ara_fname_resp = requests.get(req_url)
                     del req_url
@@ -298,6 +297,7 @@ def artifacts_list() -> None:
                             "history",
                             release_id,
                             "ci_test",
+                            "sha256",
                             ara_filename,  # file hash
                             ara_fname_resp.content.decode(),  # file name
                         )
