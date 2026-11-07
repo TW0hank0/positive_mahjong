@@ -52,7 +52,7 @@
 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 ```
 
-協議全文請見 [LICENSE](./LICENSE) 檔案。
+協議全文請見 [LICENSE.txt](./LICENSE.txt) 檔案。
 
 #### 第三方模組庫授權
 
