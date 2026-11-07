@@ -35,7 +35,7 @@
 
 見：[專案說明文件](https://tw0hank0.github.io/positive_mahjong/docs/)
 
-可在 Release 下載預編譯檔案或是在 [專案網站（Github Pages）](https://tw0hank0.github.io/positive_mahjong/files/) 下載。
+可在 Github Release 或是 [專案網站（Github Pages）](https://tw0hank0.github.io/positive_mahjong/files/) 下載預編譯檔案。
 
 ### 授權與聲明
 
@@ -52,7 +52,7 @@
 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 ```
 
-完整全文請見 [LICENSE](./LICENSE) 檔案。
+協議全文請見 [LICENSE](./LICENSE) 檔案。
 
 #### 第三方模組庫授權
 
@@ -63,7 +63,7 @@
 
 #### 第三方專案聲明
 
-見：[專案文檔](https://tw0hank0.github.io/positive_mahjong/docs/license/res.html)
+見：[專案文檔/其他第三方授權](https://tw0hank0.github.io/positive_mahjong/docs/license/other.html)
 
 ##### Noto Sans TC
 
@@ -73,7 +73,7 @@
 
 ##### Material Symbols
 
-本專案使用的 `Material Symbols` 依據 [Apache License Version 2.0](https://tw0hank0.github.io/positive_mahjong/files/material_symbols_LICENSE) 授權，作者為 \[Google\]。
+本專案使用的 `Material Symbols` 依據 [Apache License Version 2.0](https://tw0hank0.github.io/positive_mahjong/files/Apache-2.0.txt) 授權，作者為 \[Google\]。
 
 路徑：`assets/material_symbols/`
 
