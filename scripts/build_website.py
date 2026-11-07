@@ -67,7 +67,7 @@ RUST_TARGETS: list[TYPE_HINT_RUST_TARGETS] = [
     "aarch64-unknown-linux-musl",
     "aarch64-unknown-linux-gnu",
 ]
-FILES_SUMMARY_TEMPLATE = """\
+FILES_PAGE_TEMPLATE = """\
 <!doctype html>
 <html lang="zh-TW">
     <head>
@@ -95,6 +95,71 @@ FILES_SUMMARY_TEMPLATE = """\
     </body>
 </html>
 """
+DOWNLOAD_PAGE_TEMPLATE = """<!doctype html>
+<!--
+ SPDX-License-Identifier: AGPL-3.0-only
+ 著作權所有 (C) 2026 TW0hank0
+
+ 本檔案屬於 positive_mahjong 專案的一部分。
+ 專案儲存庫：https://gitlab.com/TW0hank0/positive_mahjong
+
+ 本程式為自由軟體：您可以根據自由軟體基金會發佈的 GNU Affero 通用公共授權條款
+ 第 3 版（僅此版本）重新發佈及/或修改本程式。
+
+ 本程式的發佈是希望它能發揮功用，但不提供任何擔保；
+ 甚至沒有隱含的適銷性或特定目的適用性擔保。詳見 GNU Affero 通用公共授權條款。
+
+ 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
+ 如果沒有，請參見 <https://www.gnu.org/licenses/>。
+-->
+
+<html lang="zh-TW">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+        />
+        <meta
+            name="description"
+            content="positive_mahjong project website"
+        />
+        <title>positive_mahjong —— 下載</title>
+        <link rel="stylesheet" href="style.css" />
+        <link rel="icon" href="icon.svg" />
+        <link rel="shortcut icon" href="icon.png" />
+    </head>
+    <body>
+        <header>
+            <nav>{{$VAR_NAV$}}</nav>
+        </header>
+        <section class="content">
+            <h2>穩定版 v{{$DY_VAR_VERSION$}}</h2>
+            {{$DY_VAR_DOWNLOAD_LINKS$}}
+        </section>
+    </body>
+</html>
+"""
+
+
+class VarStore:
+    __slots__ = ("prefix", "suffix", "vars")
+
+    def __init__(self, prefix: str = "{{$", suffix: str = "$}}"):
+        self.vars: dict[str, str] = {}
+        self.prefix = prefix
+        self.suffix = suffix
+
+    def set_var(self, key: str, value: str):
+        self.vars[key] = value
+
+    def replace(self, content: str) -> str:
+        replaced_content = content
+        for key, value in self.vars.items():
+            mixed_var_key = self.prefix + key + self.suffix
+            if mixed_var_key in replaced_content:
+                replaced_content = replaced_content.replace(mixed_var_key, value)
+        return replaced_content
 
 
 class ArtifactList(pydantic.BaseModel):
@@ -135,51 +200,6 @@ def main():
 
 
 def build_download_page(build_root: str):
-    download_page = """<!doctype html>
-    <!--
-     SPDX-License-Identifier: AGPL-3.0-only
-     著作權所有 (C) 2026 TW0hank0
-
-     本檔案屬於 positive_mahjong 專案的一部分。
-     專案儲存庫：https://gitlab.com/TW0hank0/positive_mahjong
-
-     本程式為自由軟體：您可以根據自由軟體基金會發佈的 GNU Affero 通用公共授權條款
-     第 3 版（僅此版本）重新發佈及/或修改本程式。
-
-     本程式的發佈是希望它能發揮功用，但不提供任何擔保；
-     甚至沒有隱含的適銷性或特定目的適用性擔保。詳見 GNU Affero 通用公共授權條款。
-
-     您應該已經收到一份 GNU Affero 通用公共授權條款副本。
-     如果沒有，請參見 <https://www.gnu.org/licenses/>。
-    -->
-
-    <html lang="zh-TW">
-        <head>
-            <meta charset="UTF-8" />
-            <meta
-                name="viewport"
-                content="width=device-width, initial-scale=1.0"
-            />
-            <meta
-                name="description"
-                content="positive_mahjong project website"
-            />
-            <title>positive_mahjong —— 下載</title>
-            <link rel="stylesheet" href="style.css" />
-            <link rel="icon" href="icon.svg" />
-            <link rel="shortcut icon" href="icon.png" />
-        </head>
-        <body>
-            <header>
-                <nav>{{$VAR_NAV$}}</nav>
-            </header>
-            <section class="content">
-                <h2>穩定版 v{{$DY_VAR_VERSION$}}</h2>
-                {{$DY_VAR_DOWNLOAD_LINKS$}}
-            </section>
-        </body>
-    </html>
-"""
     dy_vars = {}
     dy_vars["VERSION"] = util.get_version()
     with open(util.fix_path("artifacts", ARTIFACTS_LIST_FILE), "r") as f:
@@ -189,7 +209,7 @@ def build_download_page(build_root: str):
         artifacts_list[iprev_key] = ArtifactList.model_validate_json(
             json.dumps(iprev_value)
         )
-    print(f"artifacts_list={artifacts_list}")
+    print(f"{artifacts_list=}")
     latest_stable_version_num = next(iter(artifacts_list.keys()))
     for version_num in artifacts_list:
         if int(version_num) > int(latest_stable_version_num):
@@ -208,7 +228,7 @@ def build_download_page(build_root: str):
     ].release_artifacts.items():
         dl_links.append(dl_link_template.format(filename, target))
     for dy_var in list(dy_vars.keys()):
-        download_page = download_page.replace(
+        download_page = DOWNLOAD_PAGE_TEMPLATE.replace(
             "{{$DY_VAR_" + dy_var + "$}}", dy_vars[dy_var]
         )
     with open(os.path.join(build_root, "download.html"), "r") as f:
@@ -413,7 +433,7 @@ def build_files_page(dir_path: str):
           <a href="./tree/{include_file.path_rel_project}" target="_blank" download>{os.path.basename(include_file.abs_path) if include_file.rename is None else include_file.rename}</a>
         </div>"""
         )
-    replaced_template = FILES_SUMMARY_TEMPLATE.replace(
+    replaced_template = FILES_PAGE_TEMPLATE.replace(
         "{{$DY_VAR_FILES_SUMMARY$}}", files_summary
     )
     with open(os.path.join(dir_path, "index.html"), "w", encoding="utf-8") as f:
@@ -434,9 +454,7 @@ def process_dir(
         else:
             if os.path.isfile(full_dir_path) is True:
                 if dir.endswith(".html") is True:
-                    print(
-                        f"Found html file: {Back.LIGHTBLACK_EX}{full_dir_path}{Back.RESET}"
-                    )
+                    print(f"Found html file: {full_dir_path}")
                     with open(full_dir_path, "r", encoding="utf-8") as f:
                         orig_content = f.read()
                     new_content = replace_var(
@@ -456,33 +474,27 @@ def process_dir(
                     website_root_path=website_root_path,
                 )
             else:
-                print(f"???: isfile=False, isdir=False, dir={dir}")
+                print(f"???: isfile=False, isdir=False, {dir=}")
 
 
 def replace_var(
     replace_html_path: str, nav_template: str, website_root_path: str
 ) -> str:
-    orig_work_dir = os.getcwd()
-    template_vars: dict[str, str] = {}
-    os.chdir(website_root_path)
-    rel_path = os.path.relpath(
-        website_root_path, start=os.path.dirname(replace_html_path)
+    template_vars = VarStore()
+    template_vars.set_var(
+        "VAR_ROOT_DIR",
+        os.path.relpath(website_root_path, os.path.dirname(replace_html_path)),
     )
-    template_vars["VAR_ROOT_DIR"] = rel_path
-    new_template = nav_template
-    for key in list(template_vars.keys()):
-        key_fixed_name = "{{$" + key + "$}}"
-        if key_fixed_name in new_template:
-            new_template = new_template.replace(key_fixed_name, template_vars[key])
-            print(f"{Fore.LIGHTBLACK_EX}Replaced `{key}` in template.{Fore.RESET}")
-    html_vars: dict[str, str] = {}
-    html_vars["VAR_NAV"] = new_template
+    replaced_template = template_vars.replace(nav_template)
+    html_vars = VarStore()
+    html_vars.set_var("VAR_NAV", replaced_template)
     with open(
         util.fix_path("LICENSE.txt"),
         "r",
         encoding="utf-8",
     ) as f:
-        html_vars["VAR_LICENSE"] = f.read()
+        license_text = f.read()
+    html_vars.set_var("VAR_LICENSE", license_text)
     html_fixed_contents = [
         (
             "<https://fsf.org/>",
@@ -499,10 +511,10 @@ def replace_var(
             '<a href="https://www.gnu.org/licenses/" target="_blank">&lt;https://www.gnu.org/licenses/&gt;</a>',
         ),
     ]
-    fixed_license = html_vars["VAR_LICENSE"]
+    fixed_license = license_text
     for orig, replacement in html_fixed_contents:
         fixed_license = fixed_license.replace(orig, replacement)
-    html_vars["VAR_FIXED_LICENSE"] = fixed_license
+    html_vars.set_var("VAR_FIXED_LICENSE", fixed_license)
     with open(
         util.fix_path(
             "auto_generated",
@@ -511,38 +523,35 @@ def replace_var(
         "r",
         encoding="utf-8",
     ) as f:
-        t = f.read()
-    html_vars["VAR_THIRD_PARTY_LICENSE_RUST_MD"] = t
-    html_vars["VAR_THIRD_PARTY_LICENSE_RUST_MD_TO_HTML"] = str(mistune.html(t))
-    commit_info = util.get_commit_info()
-    html_vars["VAR_COMMIT_SHA"] = commit_info.sha
-    html_vars["VAR_COMMIT_SHORT_SHA"] = commit_info.short_sha
-    html_vars["VAR_COMMIT_TIME"] = commit_info.time
-    html_vars["VAR_COMMIT_MSG"] = commit_info.msg
-    html_vars["VAR_COMMIT_MSG_PREFER_HTML"] = str(
-        mistune.html(commit_info.msg.replace("<", "\\<").replace(">", "\\>"))
+        third_party_license = f.read()
+    html_vars.set_var("VAR_THIRD_PARTY_LICENSE_RUST_MD", third_party_license)
+    html_vars.set_var(
+        "VAR_THIRD_PARTY_LICENSE_RUST_MD_TO_HTML",
+        str(mistune.html(third_party_license)),
     )
-    html_vars["VAR_COMMIT_COMMITTER_NAME"] = commit_info.committer_name
-    html_vars["VAR_COMMIT_COMMITTER_EMAIL"] = commit_info.committer_email
-    html_vars["VAR_COMMIT_AUTHOR_NAME"] = commit_info.author_name
-    html_vars["VAR_COMMIT_AUTHOR_EMAIL"] = commit_info.author_email
+    del third_party_license
+    commit_info = util.get_commit_info()
+    html_vars.set_var("VAR_COMMIT_SHA", commit_info.sha)
+    html_vars.set_var("VAR_COMMIT_SHORT_SHA", commit_info.short_sha)
+    html_vars.set_var("VAR_COMMIT_TIME", commit_info.time)
+    html_vars.set_var("VAR_COMMIT_MSG", commit_info.msg)
+    html_vars.set_var(
+        "VAR_COMMIT_MSG_PREFER_HTML",
+        str(mistune.html(commit_info.msg.replace("<", "\\<").replace(">", "\\>"))),
+    )
+    html_vars.set_var("VAR_COMMIT_COMMITTER_NAME", commit_info.committer_name)
+    html_vars.set_var("VAR_COMMIT_COMMITTER_EMAIL", commit_info.committer_email)
+    html_vars.set_var("VAR_COMMIT_AUTHOR_NAME", commit_info.author_name)
+    html_vars.set_var("VAR_COMMIT_AUTHOR_EMAIL", commit_info.author_email)
+    del commit_info
     # read and replace
     with open(replace_html_path, "r", encoding="utf-8") as f:
-        new_html_content = f.read()
-    for key in list(html_vars.keys()):
-        key_fixed_name = "{{$" + key + "$}}"
-        if key_fixed_name in new_html_content:
-            new_html_content = new_html_content.replace(key_fixed_name, html_vars[key])
-            print(
-                f"{Fore.LIGHTBLACK_EX}Replaced `{key}` in file: {replace_html_path}.{Fore.RESET}"
-            )
-    os.chdir(orig_work_dir)
+        html_file_content = f.read()
+    new_html_content = html_vars.replace(html_file_content)
     return new_html_content
 
 
 def copy_website_dep(build_root: str):
-    orig_cwd = os.getcwd()
-    os.chdir(util.fix_path("docs"))
     _ = util.run_cmd(["mdbook", "build"], cwd=util.fix_path("docs"))
     if os.path.exists(os.path.join(build_root, "docs")) is True:
         shutil.rmtree(os.path.join(build_root, "docs"))
@@ -558,7 +567,6 @@ def copy_website_dep(build_root: str):
         util.fix_path("assets", "icon", "icon.svg"),
         os.path.join(build_root, "icon.svg"),
     )
-    os.chdir(orig_cwd)
 
 
 if __name__ == "__main__":

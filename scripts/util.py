@@ -189,6 +189,7 @@ def run_cmd(
             print(
                 f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.GREEN}Process finished sucessful.{Fore.RESET} {Fore.LIGHTBLACK_EX}{process_time_str}{Fore.RESET}"
             )
+            sys.stdout.flush()
     else:
         print(
             f"{Fore.LIGHTBLACK_EX}=>{Fore.RESET} {Fore.RED}Process exited with non-zero code{Fore.RESET} {Fore.LIGHTBLACK_EX}({process.returncode}){Fore.RESET}! {Fore.LIGHTBLACK_EX}{process_time_str}{Fore.RESET}"
@@ -200,7 +201,9 @@ def run_cmd(
             print(show_output(name, data))
         sys.stdout.flush()
         if exit_on_failed is True:
-            sys.exit(process.returncode)
+            raise subprocess.CalledProcessError(
+                process.returncode, command, output=pstdout, stderr=pstderr
+            )
     return (process.returncode, pstdout.rstrip("\n"), pstderr)
 
 
