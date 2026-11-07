@@ -13,6 +13,7 @@
 # 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 # 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
+import hashlib
 import json
 import os
 import shutil
@@ -25,26 +26,29 @@ from colorama import Back, Fore
 
 import util
 
-ignored_paths: list[str] = [
+IGNORED_PATHS: list[str] = [
     ".git",
     "__pycache__",
     "__pypy_cache__",
     ".ruff_cache",
     ".venv",
+    util.fix_path("website_build", "docs"),
+    util.fix_path("website_build", "files", "raw"),
+    util.fix_path("website_build", "files", "tree"),
 ]
-
 SKIP_PREV_ARTIFACTS: bool = True
 GH_PAGES_BASE_URL: str = "https://tw0hank0.github.io/positive_mahjong/"
 ARTIFACTS_LIST_FILE: str = "releases-artifacts-list.json"
+TYPE_HINT_RUST_TARGETS = Literal[
+    "aarch64-pc-windows-msvc",
+    "x86_64-pc-windows-msvc",
+    "x86_64-unknown-linux-gnu",
+    "x86_64-unknown-linux-musl",
+    "aarch64-unknown-linux-musl",
+    "aarch64-unknown-linux-gnu",
+]
 TYPE_HINT_RELEASE_ARTIFACTS = dict[
-    Literal[
-        "aarch64-pc-windows-msvc",
-        "x86_64-pc-windows-msvc",
-        "x86_64-unknown-linux-gnu",
-        "x86_64-unknown-linux-musl",
-        "aarch64-unknown-linux-musl",
-        "aarch64-unknown-linux-gnu",
-    ],
+    TYPE_HINT_RUST_TARGETS,
     str,
 ]
 TYPE_HINT_ARTIFACTS_LIST = dict[
@@ -56,16 +60,7 @@ TYPE_HINT_ARTIFACTS_LIST = dict[
         bool | dict[str, str] | dict[str, dict] | str | TYPE_HINT_RELEASE_ARTIFACTS,
     ],
 ]
-RUST_TARGETS: list[
-    Literal[
-        "aarch64-pc-windows-msvc",
-        "x86_64-pc-windows-msvc",
-        "x86_64-unknown-linux-gnu",
-        "x86_64-unknown-linux-musl",
-        "aarch64-unknown-linux-musl",
-        "aarch64-unknown-linux-gnu",
-    ]
-] = [
+RUST_TARGETS: list[TYPE_HINT_RUST_TARGETS] = [
     "aarch64-pc-windows-msvc",
     "x86_64-pc-windows-msvc",
     "x86_64-unknown-linux-gnu",
@@ -73,6 +68,99 @@ RUST_TARGETS: list[
     "aarch64-unknown-linux-musl",
     "aarch64-unknown-linux-gnu",
 ]
+FILES_PAGE_TEMPLATE = """\
+<!doctype html>
+<html lang="zh-TW">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+        />
+        <meta
+            name="description"
+            content="positive_mahjong project website"
+        />
+        <title>positive_mahjong —— 檔案</title>
+        <link rel="stylesheet" href="../style.css" />
+        <link rel="icon" href="../icon.svg" />
+        <link rel="shortcut icon" href="../icon.png" />
+    </head>
+    <body>
+        <header>
+            <nav>{{$VAR_NAV$}}</nav>
+        </header>
+        <section class="content">
+            {{$DY_VAR_FILES_SUMMARY$}}
+        </section>
+    </body>
+</html>
+"""
+DOWNLOAD_PAGE_TEMPLATE = """<!doctype html>
+<!--
+ SPDX-License-Identifier: AGPL-3.0-only
+ 著作權所有 (C) 2026 TW0hank0
+
+ 本檔案屬於 positive_mahjong 專案的一部分。
+ 專案儲存庫：https://gitlab.com/TW0hank0/positive_mahjong
+
+ 本程式為自由軟體：您可以根據自由軟體基金會發佈的 GNU Affero 通用公共授權條款
+ 第 3 版（僅此版本）重新發佈及/或修改本程式。
+
+ 本程式的發佈是希望它能發揮功用，但不提供任何擔保；
+ 甚至沒有隱含的適銷性或特定目的適用性擔保。詳見 GNU Affero 通用公共授權條款。
+
+ 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
+ 如果沒有，請參見 <https://www.gnu.org/licenses/>。
+-->
+
+<html lang="zh-TW">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+        />
+        <meta
+            name="description"
+            content="positive_mahjong project website"
+        />
+        <title>positive_mahjong —— 下載</title>
+        <link rel="stylesheet" href="style.css" />
+        <link rel="icon" href="icon.svg" />
+        <link rel="shortcut icon" href="icon.png" />
+    </head>
+    <body>
+        <header>
+            <nav>{{$VAR_NAV$}}</nav>
+        </header>
+        <section class="content">
+            <h2>穩定版 v{{$DY_VAR_VERSION$}}</h2>
+            {{$DY_VAR_DOWNLOAD_LINKS$}}
+        </section>
+    </body>
+</html>
+"""
+
+
+class VarStore:
+    __slots__ = ("prefix", "suffix", "vars")
+
+    def __init__(self, prefix: str = "{{$", suffix: str = "$}}"):
+        self.vars: dict[str, str] = {}
+        self.prefix = prefix
+        self.suffix = suffix
+
+    def set_var(self, key: str, value: str):
+        self.vars[key] = value
+
+    def replace(self, content: str) -> str:
+        replaced_content = content
+        for key, value in self.vars.items():
+            mixed_var_key = self.prefix + key + self.suffix
+            if mixed_var_key in replaced_content:
+                replaced_content = replaced_content.replace(mixed_var_key, value)
+        return replaced_content
 
 
 class ArtifactList(pydantic.BaseModel):
@@ -87,8 +175,6 @@ def main():
     nav_template_path = os.path.join(website_root_path, "nav.html.template")
     with open(nav_template_path, "r", encoding="utf-8") as f:
         nav_template_content = f.read()
-    # with open(util.fix_path("website", ".gitignore"), "r", encoding="utf-8") as f:
-    #     ignored_paths.extend(f.read().split("\n"))
     build_root = util.fix_path("website_build")
     if os.path.exists(build_root) is True:
         if os.path.isdir(build_root) is True:
@@ -98,16 +184,16 @@ def main():
         else:
             print("build_root already exists and is not file or dir!")
     shutil.copytree(website_root_path, build_root, ignore=copytree_ignore)
-    os.mkdir(os.path.join(build_root, "files"))
     if os.path.exists(util.fix_path("artifacts")) is False:
         os.mkdir(util.fix_path("artifacts"))
-    artifacts_list()
+    build_artifacts_list()
+    os.mkdir(os.path.join(build_root, "files"))
+    build_files_page(os.path.join(build_root, "files"))
     if SKIP_PREV_ARTIFACTS is False:
         build_download_page(build_root)
-    build_files_dl(os.path.join(build_root, "files"))
     process_dir(
         dir_path=build_root,
-        ignored=ignored_paths,
+        ignored=IGNORED_PATHS,
         nav_template=nav_template_content,
         website_root_path=build_root,
     )
@@ -115,51 +201,6 @@ def main():
 
 
 def build_download_page(build_root: str):
-    download_page = """<!doctype html>
-    <!--
-     SPDX-License-Identifier: AGPL-3.0-only
-     著作權所有 (C) 2026 TW0hank0
-
-     本檔案屬於 positive_mahjong 專案的一部分。
-     專案儲存庫：https://gitlab.com/TW0hank0/positive_mahjong
-
-     本程式為自由軟體：您可以根據自由軟體基金會發佈的 GNU Affero 通用公共授權條款
-     第 3 版（僅此版本）重新發佈及/或修改本程式。
-
-     本程式的發佈是希望它能發揮功用，但不提供任何擔保；
-     甚至沒有隱含的適銷性或特定目的適用性擔保。詳見 GNU Affero 通用公共授權條款。
-
-     您應該已經收到一份 GNU Affero 通用公共授權條款副本。
-     如果沒有，請參見 <https://www.gnu.org/licenses/>。
-    -->
-
-    <html lang="zh-TW">
-        <head>
-            <meta charset="UTF-8" />
-            <meta
-                name="viewport"
-                content="width=device-width, initial-scale=1.0"
-            />
-            <meta
-                name="description"
-                content="positive_mahjong project website"
-            />
-            <title>positive_mahjong —— 下載</title>
-            <link rel="stylesheet" href="style.css" />
-            <link rel="icon" href="icon.svg" />
-            <link rel="shortcut icon" href="icon.png" />
-        </head>
-        <body>
-            <header>
-                <nav>{{$VAR_NAV$}}</nav>
-            </header>
-            <section class="content">
-                <h2>穩定版 v{{$DY_VAR_VERSION$}}</h2>
-                {{$DY_VAR_DOWNLOAD_LINKS$}}
-            </section>
-        </body>
-    </html>
-"""
     dy_vars = {}
     dy_vars["VERSION"] = util.get_version()
     with open(util.fix_path("artifacts", ARTIFACTS_LIST_FILE), "r") as f:
@@ -169,7 +210,7 @@ def build_download_page(build_root: str):
         artifacts_list[iprev_key] = ArtifactList.model_validate_json(
             json.dumps(iprev_value)
         )
-    print(f"artifacts_list={artifacts_list}")
+    print(f"{artifacts_list=}")
     latest_stable_version_num = next(iter(artifacts_list.keys()))
     for version_num in artifacts_list:
         if int(version_num) > int(latest_stable_version_num):
@@ -188,20 +229,20 @@ def build_download_page(build_root: str):
     ].release_artifacts.items():
         dl_links.append(dl_link_template.format(filename, target))
     for dy_var in list(dy_vars.keys()):
-        download_page = download_page.replace(
+        download_page = DOWNLOAD_PAGE_TEMPLATE.replace(
             "{{$DY_VAR_" + dy_var + "$}}", dy_vars[dy_var]
         )
     with open(os.path.join(build_root, "download.html"), "r") as f:
         f.write(download_page)
 
 
-def artifacts_list() -> None:
+def build_artifacts_list() -> None:
     # download prev
     if SKIP_PREV_ARTIFACTS is False:
-        print(f"requests.get: {GH_PAGES_BASE_URL}files/{ARTIFACTS_LIST_FILE}")
-        prev_artifacts_list = requests.get(
-            f"{GH_PAGES_BASE_URL}files/{ARTIFACTS_LIST_FILE}"
-        )
+        req_url = f"{GH_PAGES_BASE_URL}files/tree/artifacts/{ARTIFACTS_LIST_FILE}"
+        print(f"{req_url=}")
+        prev_artifacts_list = requests.get(req_url)
+        del req_url
         prev_artifacts_list.raise_for_status()
         i_prev_list: dict[str, ArtifactList | dict] = prev_artifacts_list.json()
         prev_list = {}
@@ -209,28 +250,57 @@ def artifacts_list() -> None:
             prev_list[iprev_key] = ArtifactList.model_validate_json(
                 json.dumps(iprev_value)
             )
-        print("prepared prev_list")
-        print(f"prev_list={prev_list}")
-        for arelease in prev_list.values():
+        print(f"{prev_list=}")
+        for release_id, arelease in prev_list.items():
             if arelease.is_released is True:
-                arelease_artifcats: dict = arelease.release_artifacts
+                arelease_artifcats = arelease.release_artifacts
                 for ara_filename in arelease_artifcats.values():
-                    print(f"requests.get({GH_PAGES_BASE_URL}files/{ara_filename})")
-                    ara_file_resp = requests.get(
-                        f"{GH_PAGES_BASE_URL}files/{ara_filename}"
+                    file_req_url = (
+                        f"{GH_PAGES_BASE_URL}files/hash/sha256/{ara_filename}/file"
                     )
+                    print(f"{file_req_url=}")
+                    ara_file_resp = requests.get(file_req_url)
                     ara_file_resp.raise_for_status()
-                    with open(util.fix_path("artifacts", "history", ara_filename)) as f:
-                        shutil.copyfileobj(ara_file_resp.raw, f)
-            arelease_ci_artifacts = arelease.ci_tests
-            for aca_id in arelease_ci_artifacts.values():
-                for aca_filename in aca_id.values():
-                    ara_file_resp = requests.get(
-                        f"{GH_PAGES_BASE_URL}files/{aca_filename}"
-                    )
-                    ara_file_resp.raise_for_status()
+                    fname_req_url = f"{GH_PAGES_BASE_URL}files/hash/sha256/{ara_filename}/filename.txt"
+                    print(f"{fname_req_url=}")
+                    ara_fname_resp = requests.get(fname_req_url)
+                    ara_fname_resp.raise_for_status()
                     with open(
-                        util.fix_path("artifacts", "history", "ci_test", ara_filename)
+                        util.fix_path(
+                            "artifacts",
+                            "history",
+                            release_id,
+                            "sha256",
+                            ara_filename,  # file hash
+                            ara_fname_resp.content.decode(),  # file name
+                        )
+                    ) as f:
+                        shutil.copyfileobj(ara_file_resp.raw, f)
+            for aca_id in arelease.ci_tests.values():
+                for aca_filename in aca_id.values():
+                    req_url = (
+                        f"{GH_PAGES_BASE_URL}files/hash/sha256/{aca_filename}/file"
+                    )
+                    print(f"{req_url=}")
+                    ara_file_resp = requests.get(req_url)
+                    del req_url
+                    ara_file_resp.raise_for_status()
+                    # file name
+                    req_url = f"{GH_PAGES_BASE_URL}files/hash/sha256/{aca_filename}/filename.txt"
+                    print(f"{req_url=}")
+                    ara_fname_resp = requests.get(req_url)
+                    del req_url
+                    ara_fname_resp.raise_for_status()
+                    with open(
+                        util.fix_path(
+                            "artifacts",
+                            "history",
+                            release_id,
+                            "ci_test",
+                            "sha256",
+                            ara_filename,  # file hash
+                            ara_fname_resp.content.decode(),  # file name
+                        )
                     ) as f:
                         shutil.copyfileobj(ara_file_resp.raw, f)
     # gen new list
@@ -257,7 +327,8 @@ def artifacts_list() -> None:
     ):
         for target in RUST_TARGETS:
             if target in file:
-                files_list[target] = os.path.relpath(file, util.fix_path("artifacts"))
+                with open(file, "rb") as f:
+                    files_list[target] = hashlib.sha256(f.read()).hexdigest()
                 break
         else:
             print(f"unknown target, file: {file}")
@@ -277,7 +348,7 @@ def artifacts_list() -> None:
     else:
         new_list[lastest_num].is_released = True
         new_list[lastest_num].release_artifacts = files_list
-    print(f"new_list={new_list}")
+    print(f"{new_list=}")
     new_list_json = {}
     for key, value in new_list.items():
         new_list_json[key] = json.loads(value.model_dump_json(indent=4))
@@ -290,128 +361,136 @@ def artifacts_list() -> None:
 def copytree_ignore(src: str, names: list[str], /) -> list[str]:
     ignored_names = []
     for name in names:
-        if name in ignored_paths:
+        full_name = os.path.join(src, name)
+        if (
+            name in IGNORED_PATHS
+            or full_name in IGNORED_PATHS
+            or os.path.relpath(full_name, util.fix_path()) in IGNORED_PATHS
+        ):
             ignored_names.append(name)
-        else:
-            full_name = os.path.join(src, name)
-            rel_name = os.path.relpath(full_name, start=util.fix_path()).replace(
-                "\\",
-                "/",  # 處理 windows 路徑問題
-            )
-            if rel_name in ignored_paths:
-                ignored_names.append(name)
+    del full_name
     return ignored_names
 
 
-def build_files_dl(dir_path: str):
-    dlable_files: list[str | tuple[str, str]] = [
-        util.fix_path("LICENSE"),
-        util.fix_path("README.md"),
-        util.fix_path("TODO.md"),
-        util.fix_path(
-            "CHANGELOG.md",
-        ),
-        util.fix_path(
-            "ROADMAP.md",
-        ),
-        util.fix_path(
-            "auto_generated",
-            "ThirdPartyLicense-Rust.html",
-        ),
-        util.fix_path(
-            "auto_generated",
-            "ThirdPartyLicense-Rust.json",
-        ),
-        util.fix_path(
-            "auto_generated",
-            "ThirdPartyLicense-Rust.md",
-        ),
-        (
-            util.fix_path(
-                "assets",
-                "Noto_Sans_TC",
-                "OFL.txt",
-            ),
-            "Noto_Sans_TC_OFL.txt",
-        ),
-        (
-            util.fix_path(
-                "assets",
-                "material_symbols",
-                "LICENSE",
-            ),
-            "material_symbols_LICENSE",
-        ),
-    ]
-    if os.path.exists(util.fix_path("artifacts")) is True:
-        dlable_files.extend(
-            util.list_files(
-                util.fix_path("artifacts"),
-                ignores=[util.IGNORE_GH_PAGES, util.IGNORE_GH_PAGES_WITH_ARTIFACTS],
+class FilesPageIncludeFile:
+    def __init__(self, path: str, rename: str | None = None):
+        self.abs_path = os.path.abspath(path)
+        self.path_rel_project = os.path.relpath(os.path.abspath(path), util.fix_path())
+        self.rename = rename
+
+    def hash_name_sha256(self) -> str:
+        with open(self.abs_path, "rb") as f:
+            filehash = hashlib.sha256(data=f.read())
+        return filehash.hexdigest()
+
+    def raw_name(self) -> str:
+        """like: path/to/file.txt -> path-_-to-file.txt"""
+        return (
+            "-_-".join(os.path.dirname(self.path_rel_project).split(os.path.sep))
+            + (
+                "-"
+                if self.path_rel_project != os.path.basename(self.path_rel_project)
+                else ""
+            )
+            + os.path.basename(
+                self.path_rel_project if self.rename is None else self.rename
             )
         )
-    for license_file in util.list_files(util.fix_path("LICENSES")):
-        dlable_files.append(
-            (license_file, f"LICENSES_{os.path.basename(license_file)}")
+
+
+def build_files_page(dir_path: str):
+    include_files: list[FilesPageIncludeFile] = [
+        FilesPageIncludeFile(util.fix_path("LICENSE.txt")),
+        FilesPageIncludeFile(util.fix_path("README.md")),
+        FilesPageIncludeFile(util.fix_path("TODO.md")),
+        FilesPageIncludeFile(
+            util.fix_path(
+                "CHANGELOG.md",
+            )
+        ),
+        FilesPageIncludeFile(
+            util.fix_path(
+                "ROADMAP.md",
+            )
+        ),
+        FilesPageIncludeFile(
+            util.fix_path(
+                "auto_generated",
+                "ThirdPartyLicense-Rust.html",
+            )
+        ),
+        FilesPageIncludeFile(
+            util.fix_path(
+                "auto_generated",
+                "ThirdPartyLicense-Rust.json",
+            )
+        ),
+        FilesPageIncludeFile(
+            util.fix_path(
+                "auto_generated",
+                "ThirdPartyLicense-Rust.md",
+            )
+        ),
+    ]
+    include_files.extend(
+        [FilesPageIncludeFile(f) for f in util.list_files(util.fix_path("LICENSES"))]
+    )
+    if os.path.exists(util.fix_path("artifacts")) is True:
+        include_files.extend(
+            [
+                FilesPageIncludeFile(f)
+                for f in util.list_files(
+                    util.fix_path("artifacts"),
+                    ignores=[util.IGNORE_GH_PAGES, util.IGNORE_GH_PAGES_WITH_ARTIFACTS],
+                )
+            ]
         )
-    files_summary_template = """\
-<!doctype html>
-    <html lang="zh-TW">
-        <head>
-            <meta charset="UTF-8" />
-            <meta
-                name="viewport"
-                content="width=device-width, initial-scale=1.0"
-            />
-            <meta
-                name="description"
-                content="positive_mahjong project website"
-            />
-            <title>positive_mahjong —— 檔案</title>
-            <link rel="stylesheet" href="../style.css" />
-            <link rel="icon" href="../icon.svg" />
-            <link rel="shortcut icon" href="../icon.png" />
-        </head>
-        <body>
-            <header>
-                <nav>{{$VAR_NAV$}}</nav>
-            </header>
-            <section class="content">
-            {{$DY_VAR_FILES_SUMMARY$}}
-            </section>
-        </body>
-    </html>\n"""
-    summary_prepare = ""
-    # list[tuple[path, name]]
-    strict_dlable_files: list[tuple[str, str]] = []
-    for dlfile in dlable_files:
-        if type(dlfile) is str:
-            file_path = dlfile
-            new_name = os.path.basename(dlfile)
-        elif type(dlfile) is tuple:
-            file_path = dlfile[0]
-            new_name = dlfile[1]
-        else:
-            raise RuntimeError("type(dlfile) is not (str, tuple)")
-        strict_dlable_files.append((file_path, new_name))
-    strict_dlable_files.sort()
-    for path, name in strict_dlable_files:
-        print(
-            f"{Fore.LIGHTBLACK_EX}{path}{Fore.RESET} -> {Fore.LIGHTBLACK_EX}{os.path.join(dir_path, name)}{Fore.RESET}"
-        )
-        _ = shutil.copy2(path, os.path.join(dir_path, name))
-        summary_prepare = (
-            summary_prepare
+    files_summary = ""
+    os.mkdir(os.path.join(dir_path, "raw"))
+    os.mkdir(os.path.join(dir_path, "tree"))
+    os.mkdir(os.path.join(dir_path, "hash"))
+    for include_file in include_files:
+        for cfrom, cto in [
+            (
+                include_file.abs_path,
+                os.path.join(dir_path, "raw", include_file.raw_name()),
+            ),
+            (
+                include_file.abs_path,
+                os.path.join(dir_path, "tree", include_file.path_rel_project),
+            ),
+            (
+                include_file.abs_path,
+                os.path.join(
+                    dir_path, "hash", "sha256", include_file.hash_name_sha256(), "file"
+                ),
+            ),
+        ]:
+            print(f"Copy: {cfrom=} {cto=}")
+            os.makedirs(os.path.dirname(cto), exist_ok=True)
+            _ = shutil.copy2(cfrom, cto)
+        with open(
+            os.path.join(
+                dir_path,
+                "hash",
+                "sha256",
+                include_file.hash_name_sha256(),
+                "filename.txt",
+            )
+        ) as f:
+            _ = f.write(os.path.basename(include_file.abs_path))
+        files_summary = (
+            files_summary
             + f"""
         <div class="dlable-file">
-          <a href="./{name}" target="_blank" download>{name}</a>
+          <a href="./tree/{include_file.path_rel_project}" target="_blank" download>{os.path.basename(include_file.abs_path) if include_file.rename is None else include_file.rename}</a>
         </div>"""
         )
-    files_summary = files_summary_template.replace(
-        "{{$DY_VAR_FILES_SUMMARY$}}", summary_prepare
+    replaced_template = FILES_PAGE_TEMPLATE.replace(
+        "{{$DY_VAR_FILES_SUMMARY$}}", files_summary
     )
     with open(os.path.join(dir_path, "index.html"), "w", encoding="utf-8") as f:
-        _ = f.write(files_summary)
+        _ = f.write(replaced_template)
 
 
 def process_dir(
@@ -419,14 +498,16 @@ def process_dir(
 ):
     for dir in os.listdir(dir_path):
         full_dir_path = os.path.join(dir_path, dir)
-        if dir in ignored:
+        if (
+            dir in ignored
+            or full_dir_path in ignored
+            or os.path.relpath(full_dir_path, util.fix_path()) in ignored
+        ):
             continue
         else:
             if os.path.isfile(full_dir_path) is True:
                 if dir.endswith(".html") is True:
-                    print(
-                        f"Found html file: {Back.LIGHTBLACK_EX}{full_dir_path}{Back.RESET}"
-                    )
+                    print(f"Found html file: {full_dir_path}")
                     with open(full_dir_path, "r", encoding="utf-8") as f:
                         orig_content = f.read()
                     new_content = replace_var(
@@ -446,33 +527,27 @@ def process_dir(
                     website_root_path=website_root_path,
                 )
             else:
-                print(f"???: isfile=False, isdir=False, dir={dir}")
+                print(f"???: isfile=False, isdir=False, {dir=}")
 
 
 def replace_var(
     replace_html_path: str, nav_template: str, website_root_path: str
 ) -> str:
-    orig_work_dir = os.getcwd()
-    template_vars: dict[str, str] = {}
-    os.chdir(website_root_path)
-    rel_path = os.path.relpath(
-        website_root_path, start=os.path.dirname(replace_html_path)
+    template_vars = VarStore()
+    template_vars.set_var(
+        "VAR_ROOT_DIR",
+        os.path.relpath(website_root_path, os.path.dirname(replace_html_path)),
     )
-    template_vars["VAR_ROOT_DIR"] = rel_path
-    new_template = nav_template
-    for key in list(template_vars.keys()):
-        key_fixed_name = "{{$" + key + "$}}"
-        if key_fixed_name in new_template:
-            new_template = new_template.replace(key_fixed_name, template_vars[key])
-            print(f"{Fore.LIGHTBLACK_EX}Replaced `{key}` in template.{Fore.RESET}")
-    html_vars: dict[str, str] = {}
-    html_vars["VAR_NAV"] = new_template
+    replaced_template = template_vars.replace(nav_template)
+    html_vars = VarStore()
+    html_vars.set_var("VAR_NAV", replaced_template)
     with open(
-        util.fix_path("LICENSE"),
+        util.fix_path("LICENSE.txt"),
         "r",
         encoding="utf-8",
     ) as f:
-        html_vars["VAR_LICENSE"] = f.read()
+        license_text = f.read()
+    html_vars.set_var("VAR_LICENSE", license_text)
     html_fixed_contents = [
         (
             "<https://fsf.org/>",
@@ -489,10 +564,10 @@ def replace_var(
             '<a href="https://www.gnu.org/licenses/" target="_blank">&lt;https://www.gnu.org/licenses/&gt;</a>',
         ),
     ]
-    fixed_license = html_vars["VAR_LICENSE"]
+    fixed_license = license_text
     for orig, replacement in html_fixed_contents:
         fixed_license = fixed_license.replace(orig, replacement)
-    html_vars["VAR_FIXED_LICENSE"] = fixed_license
+    html_vars.set_var("VAR_FIXED_LICENSE", fixed_license)
     with open(
         util.fix_path(
             "auto_generated",
@@ -501,38 +576,35 @@ def replace_var(
         "r",
         encoding="utf-8",
     ) as f:
-        t = f.read()
-    html_vars["VAR_THIRD_PARTY_LICENSE_RUST_MD"] = t
-    html_vars["VAR_THIRD_PARTY_LICENSE_RUST_MD_TO_HTML"] = str(mistune.html(t))
-    commit_info = util.get_commit_info()
-    html_vars["VAR_COMMIT_SHA"] = commit_info.sha
-    html_vars["VAR_COMMIT_SHORT_SHA"] = commit_info.short_sha
-    html_vars["VAR_COMMIT_TIME"] = commit_info.time
-    html_vars["VAR_COMMIT_MSG"] = commit_info.msg
-    html_vars["VAR_COMMIT_MSG_PREFER_HTML"] = str(
-        mistune.html(commit_info.msg.replace("<", "\\<").replace(">", "\\>"))
+        third_party_license = f.read()
+    html_vars.set_var("VAR_THIRD_PARTY_LICENSE_RUST_MD", third_party_license)
+    html_vars.set_var(
+        "VAR_THIRD_PARTY_LICENSE_RUST_MD_TO_HTML",
+        str(mistune.html(third_party_license)),
     )
-    html_vars["VAR_COMMIT_COMMITTER_NAME"] = commit_info.committer_name
-    html_vars["VAR_COMMIT_COMMITTER_EMAIL"] = commit_info.committer_email
-    html_vars["VAR_COMMIT_AUTHOR_NAME"] = commit_info.author_name
-    html_vars["VAR_COMMIT_AUTHOR_EMAIL"] = commit_info.author_email
+    del third_party_license
+    commit_info = util.get_commit_info()
+    html_vars.set_var("VAR_COMMIT_SHA", commit_info.sha)
+    html_vars.set_var("VAR_COMMIT_SHORT_SHA", commit_info.short_sha)
+    html_vars.set_var("VAR_COMMIT_TIME", commit_info.time)
+    html_vars.set_var("VAR_COMMIT_MSG", commit_info.msg)
+    html_vars.set_var(
+        "VAR_COMMIT_MSG_PREFER_HTML",
+        str(mistune.html(commit_info.msg.replace("<", "\\<").replace(">", "\\>"))),
+    )
+    html_vars.set_var("VAR_COMMIT_COMMITTER_NAME", commit_info.committer_name)
+    html_vars.set_var("VAR_COMMIT_COMMITTER_EMAIL", commit_info.committer_email)
+    html_vars.set_var("VAR_COMMIT_AUTHOR_NAME", commit_info.author_name)
+    html_vars.set_var("VAR_COMMIT_AUTHOR_EMAIL", commit_info.author_email)
+    del commit_info
     # read and replace
     with open(replace_html_path, "r", encoding="utf-8") as f:
-        new_html_content = f.read()
-    for key in list(html_vars.keys()):
-        key_fixed_name = "{{$" + key + "$}}"
-        if key_fixed_name in new_html_content:
-            new_html_content = new_html_content.replace(key_fixed_name, html_vars[key])
-            print(
-                f"{Fore.LIGHTBLACK_EX}Replaced `{key}` in file: {replace_html_path}.{Fore.RESET}"
-            )
-    os.chdir(orig_work_dir)
+        html_file_content = f.read()
+    new_html_content = html_vars.replace(html_file_content)
     return new_html_content
 
 
 def copy_website_dep(build_root: str):
-    orig_cwd = os.getcwd()
-    os.chdir(util.fix_path("docs"))
     _ = util.run_cmd(["mdbook", "build"], cwd=util.fix_path("docs"))
     if os.path.exists(os.path.join(build_root, "docs")) is True:
         shutil.rmtree(os.path.join(build_root, "docs"))
@@ -548,7 +620,6 @@ def copy_website_dep(build_root: str):
         util.fix_path("assets", "icon", "icon.svg"),
         os.path.join(build_root, "icon.svg"),
     )
-    os.chdir(orig_cwd)
 
 
 if __name__ == "__main__":
