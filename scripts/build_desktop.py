@@ -169,7 +169,7 @@ def zip_desktop(targets: list[str]):
         version = util.get_version()
     include_files: list[str | tuple[str, str]] = [
         util.fix_path("README.md"),
-        util.fix_path("LICENSE"),
+        util.fix_path("LICENSE.txt"),
         util.fix_path(
             "auto_generated",
             "ThirdPartyLicense-Rust.html",
