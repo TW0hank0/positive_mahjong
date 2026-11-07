@@ -25,26 +25,29 @@ from colorama import Back, Fore
 
 import util
 
-ignored_paths: list[str] = [
+IGNORED_PATHS: list[str] = [
     ".git",
     "__pycache__",
     "__pypy_cache__",
     ".ruff_cache",
     ".venv",
+    util.fix_path("website_build", "docs"),
+    util.fix_path("website_build", "files", "raw"),
+    util.fix_path("website_build", "files", "tree"),
 ]
-
 SKIP_PREV_ARTIFACTS: bool = True
 GH_PAGES_BASE_URL: str = "https://tw0hank0.github.io/positive_mahjong/"
 ARTIFACTS_LIST_FILE: str = "releases-artifacts-list.json"
+TYPE_HINT_RUST_TARGETS = Literal[
+    "aarch64-pc-windows-msvc",
+    "x86_64-pc-windows-msvc",
+    "x86_64-unknown-linux-gnu",
+    "x86_64-unknown-linux-musl",
+    "aarch64-unknown-linux-musl",
+    "aarch64-unknown-linux-gnu",
+]
 TYPE_HINT_RELEASE_ARTIFACTS = dict[
-    Literal[
-        "aarch64-pc-windows-msvc",
-        "x86_64-pc-windows-msvc",
-        "x86_64-unknown-linux-gnu",
-        "x86_64-unknown-linux-musl",
-        "aarch64-unknown-linux-musl",
-        "aarch64-unknown-linux-gnu",
-    ],
+    TYPE_HINT_RUST_TARGETS,
     str,
 ]
 TYPE_HINT_ARTIFACTS_LIST = dict[
@@ -56,16 +59,7 @@ TYPE_HINT_ARTIFACTS_LIST = dict[
         bool | dict[str, str] | dict[str, dict] | str | TYPE_HINT_RELEASE_ARTIFACTS,
     ],
 ]
-RUST_TARGETS: list[
-    Literal[
-        "aarch64-pc-windows-msvc",
-        "x86_64-pc-windows-msvc",
-        "x86_64-unknown-linux-gnu",
-        "x86_64-unknown-linux-musl",
-        "aarch64-unknown-linux-musl",
-        "aarch64-unknown-linux-gnu",
-    ]
-] = [
+RUST_TARGETS: list[TYPE_HINT_RUST_TARGETS] = [
     "aarch64-pc-windows-msvc",
     "x86_64-pc-windows-msvc",
     "x86_64-unknown-linux-gnu",
@@ -73,6 +67,34 @@ RUST_TARGETS: list[
     "aarch64-unknown-linux-musl",
     "aarch64-unknown-linux-gnu",
 ]
+FILES_SUMMARY_TEMPLATE = """\
+<!doctype html>
+<html lang="zh-TW">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+        />
+        <meta
+            name="description"
+            content="positive_mahjong project website"
+        />
+        <title>positive_mahjong —— 檔案</title>
+        <link rel="stylesheet" href="../style.css" />
+        <link rel="icon" href="../icon.svg" />
+        <link rel="shortcut icon" href="../icon.png" />
+    </head>
+    <body>
+        <header>
+            <nav>{{$VAR_NAV$}}</nav>
+        </header>
+        <section class="content">
+            {{$DY_VAR_FILES_SUMMARY$}}
+        </section>
+    </body>
+</html>
+"""
 
 
 class ArtifactList(pydantic.BaseModel):
@@ -87,8 +109,6 @@ def main():
     nav_template_path = os.path.join(website_root_path, "nav.html.template")
     with open(nav_template_path, "r", encoding="utf-8") as f:
         nav_template_content = f.read()
-    # with open(util.fix_path("website", ".gitignore"), "r", encoding="utf-8") as f:
-    #     ignored_paths.extend(f.read().split("\n"))
     build_root = util.fix_path("website_build")
     if os.path.exists(build_root) is True:
         if os.path.isdir(build_root) is True:
@@ -98,16 +118,16 @@ def main():
         else:
             print("build_root already exists and is not file or dir!")
     shutil.copytree(website_root_path, build_root, ignore=copytree_ignore)
-    os.mkdir(os.path.join(build_root, "files"))
     if os.path.exists(util.fix_path("artifacts")) is False:
         os.mkdir(util.fix_path("artifacts"))
     artifacts_list()
+    os.mkdir(os.path.join(build_root, "files"))
+    build_files_page(os.path.join(build_root, "files"))
     if SKIP_PREV_ARTIFACTS is False:
         build_download_page(build_root)
-    build_files_dl(os.path.join(build_root, "files"))
     process_dir(
         dir_path=build_root,
-        ignored=ignored_paths,
+        ignored=IGNORED_PATHS,
         nav_template=nav_template_content,
         website_root_path=build_root,
     )
@@ -290,128 +310,114 @@ def artifacts_list() -> None:
 def copytree_ignore(src: str, names: list[str], /) -> list[str]:
     ignored_names = []
     for name in names:
-        if name in ignored_paths:
+        full_name = os.path.join(src, name)
+        if (
+            name in IGNORED_PATHS
+            or full_name in IGNORED_PATHS
+            or os.path.relpath(full_name, util.fix_path()) in IGNORED_PATHS
+        ):
             ignored_names.append(name)
-        else:
-            full_name = os.path.join(src, name)
-            rel_name = os.path.relpath(full_name, start=util.fix_path()).replace(
-                "\\",
-                "/",  # 處理 windows 路徑問題
-            )
-            if rel_name in ignored_paths:
-                ignored_names.append(name)
+    del full_name
     return ignored_names
 
 
-def build_files_dl(dir_path: str):
-    dlable_files: list[str | tuple[str, str]] = [
-        util.fix_path("LICENSE"),
-        util.fix_path("README.md"),
-        util.fix_path("TODO.md"),
-        util.fix_path(
-            "CHANGELOG.md",
-        ),
-        util.fix_path(
-            "ROADMAP.md",
-        ),
-        util.fix_path(
-            "auto_generated",
-            "ThirdPartyLicense-Rust.html",
-        ),
-        util.fix_path(
-            "auto_generated",
-            "ThirdPartyLicense-Rust.json",
-        ),
-        util.fix_path(
-            "auto_generated",
-            "ThirdPartyLicense-Rust.md",
-        ),
-        (
-            util.fix_path(
-                "assets",
-                "Noto_Sans_TC",
-                "OFL.txt",
-            ),
-            "Noto_Sans_TC_OFL.txt",
-        ),
-        (
-            util.fix_path(
-                "assets",
-                "material_symbols",
-                "LICENSE",
-            ),
-            "material_symbols_LICENSE",
-        ),
-    ]
-    if os.path.exists(util.fix_path("artifacts")) is True:
-        dlable_files.extend(
-            util.list_files(
-                util.fix_path("artifacts"),
-                ignores=[util.IGNORE_GH_PAGES, util.IGNORE_GH_PAGES_WITH_ARTIFACTS],
+class FilesPageIncludeFile:
+    def __init__(self, path: str, rename: str | None = None):
+        self.abs_path = os.path.abspath(path)
+        self.path_rel_project = os.path.relpath(os.path.abspath(path), util.fix_path())
+        self.rename = rename
+
+    def raw_name(self) -> str:
+        """like: path/to/file.txt -> path-_-to-file.txt"""
+        return (
+            "-_-".join(os.path.dirname(self.path_rel_project).split(os.path.sep))
+            + (
+                "-"
+                if self.path_rel_project != os.path.basename(self.path_rel_project)
+                else ""
+            )
+            + os.path.basename(
+                self.path_rel_project if self.rename is None else self.rename
             )
         )
-    for license_file in util.list_files(util.fix_path("LICENSES")):
-        dlable_files.append(
-            (license_file, f"LICENSES_{os.path.basename(license_file)}")
+
+
+def build_files_page(dir_path: str):
+    include_files: list[FilesPageIncludeFile] = [
+        FilesPageIncludeFile(util.fix_path("LICENSE.txt")),
+        FilesPageIncludeFile(util.fix_path("README.md")),
+        FilesPageIncludeFile(util.fix_path("TODO.md")),
+        FilesPageIncludeFile(
+            util.fix_path(
+                "CHANGELOG.md",
+            )
+        ),
+        FilesPageIncludeFile(
+            util.fix_path(
+                "ROADMAP.md",
+            )
+        ),
+        FilesPageIncludeFile(
+            util.fix_path(
+                "auto_generated",
+                "ThirdPartyLicense-Rust.html",
+            )
+        ),
+        FilesPageIncludeFile(
+            util.fix_path(
+                "auto_generated",
+                "ThirdPartyLicense-Rust.json",
+            )
+        ),
+        FilesPageIncludeFile(
+            util.fix_path(
+                "auto_generated",
+                "ThirdPartyLicense-Rust.md",
+            )
+        ),
+    ]
+    include_files.extend(
+        [FilesPageIncludeFile(f) for f in util.list_files(util.fix_path("LICENSES"))]
+    )
+    if os.path.exists(util.fix_path("artifacts")) is True:
+        include_files.extend(
+            [
+                FilesPageIncludeFile(f)
+                for f in util.list_files(
+                    util.fix_path("artifacts"),
+                    ignores=[util.IGNORE_GH_PAGES, util.IGNORE_GH_PAGES_WITH_ARTIFACTS],
+                )
+            ]
         )
-    files_summary_template = """\
-<!doctype html>
-    <html lang="zh-TW">
-        <head>
-            <meta charset="UTF-8" />
-            <meta
-                name="viewport"
-                content="width=device-width, initial-scale=1.0"
-            />
-            <meta
-                name="description"
-                content="positive_mahjong project website"
-            />
-            <title>positive_mahjong —— 檔案</title>
-            <link rel="stylesheet" href="../style.css" />
-            <link rel="icon" href="../icon.svg" />
-            <link rel="shortcut icon" href="../icon.png" />
-        </head>
-        <body>
-            <header>
-                <nav>{{$VAR_NAV$}}</nav>
-            </header>
-            <section class="content">
-            {{$DY_VAR_FILES_SUMMARY$}}
-            </section>
-        </body>
-    </html>\n"""
-    summary_prepare = ""
-    # list[tuple[path, name]]
-    strict_dlable_files: list[tuple[str, str]] = []
-    for dlfile in dlable_files:
-        if type(dlfile) is str:
-            file_path = dlfile
-            new_name = os.path.basename(dlfile)
-        elif type(dlfile) is tuple:
-            file_path = dlfile[0]
-            new_name = dlfile[1]
-        else:
-            raise RuntimeError("type(dlfile) is not (str, tuple)")
-        strict_dlable_files.append((file_path, new_name))
-    strict_dlable_files.sort()
-    for path, name in strict_dlable_files:
-        print(
-            f"{Fore.LIGHTBLACK_EX}{path}{Fore.RESET} -> {Fore.LIGHTBLACK_EX}{os.path.join(dir_path, name)}{Fore.RESET}"
-        )
-        _ = shutil.copy2(path, os.path.join(dir_path, name))
-        summary_prepare = (
-            summary_prepare
+    files_summary = ""
+    os.mkdir(os.path.join(dir_path, "raw"))
+    os.mkdir(os.path.join(dir_path, "tree"))
+    for include_file in include_files:
+        for cfrom, cto in [
+            (
+                include_file.abs_path,
+                os.path.join(dir_path, "raw", include_file.raw_name()),
+            ),
+            (
+                include_file.abs_path,
+                os.path.join(dir_path, "tree", include_file.path_rel_project),
+            ),
+        ]:
+            print(f"Copy: {cfrom=}, {cto=}")
+            os.makedirs(os.path.dirname(cto), exist_ok=True)
+            _ = shutil.copy2(cfrom, cto)
+        files_summary = (
+            files_summary
             + f"""
         <div class="dlable-file">
-          <a href="./{name}" target="_blank" download>{name}</a>
+          <a href="./tree/{include_file.path_rel_project}" target="_blank" download>{os.path.basename(include_file.abs_path) if include_file.rename is None else include_file.rename}</a>
         </div>"""
         )
-    files_summary = files_summary_template.replace(
-        "{{$DY_VAR_FILES_SUMMARY$}}", summary_prepare
+    replaced_template = FILES_SUMMARY_TEMPLATE.replace(
+        "{{$DY_VAR_FILES_SUMMARY$}}", files_summary
     )
     with open(os.path.join(dir_path, "index.html"), "w", encoding="utf-8") as f:
-        _ = f.write(files_summary)
+        _ = f.write(replaced_template)
 
 
 def process_dir(
@@ -419,7 +425,11 @@ def process_dir(
 ):
     for dir in os.listdir(dir_path):
         full_dir_path = os.path.join(dir_path, dir)
-        if dir in ignored:
+        if (
+            dir in ignored
+            or full_dir_path in ignored
+            or os.path.relpath(full_dir_path, util.fix_path()) in ignored
+        ):
             continue
         else:
             if os.path.isfile(full_dir_path) is True:
@@ -468,7 +478,7 @@ def replace_var(
     html_vars: dict[str, str] = {}
     html_vars["VAR_NAV"] = new_template
     with open(
-        util.fix_path("LICENSE"),
+        util.fix_path("LICENSE.txt"),
         "r",
         encoding="utf-8",
     ) as f:
