@@ -24,6 +24,7 @@ import sys
 import time
 import tomllib
 from typing import Literal
+from warnings import deprecated
 lazy import selectors
 lazy import socket
 
@@ -207,6 +208,7 @@ def run_cmd(
     return (process.returncode, pstdout.rstrip("\n"), pstderr)
 
 
+@deprecated("replace with CommitInfo.get_from_git()")
 def get_commit_info(show_cmd: bool = True) -> CommitInfo:
     """return CommitInfo"""
     (_returncode, sha_stdout, _stderr) = run_cmd(
@@ -282,7 +284,7 @@ class CommitInfo:
         committer_email: str,
         author_name: str,
         author_email: str,
-        is_release: bool,
+        is_release: bool | None = None,
     ) -> None:
         self.sha = commit_sha
         self.short_sha = commit_short_sha
@@ -292,7 +294,32 @@ class CommitInfo:
         self.committer_email = committer_email
         self.author_name = author_name
         self.author_email = author_email
-        self.is_release = is_release
+        self.is_release = (
+            is_release
+            if is_release is not None
+            else ("release pmj" in commit_msg.lower())
+        )
+
+    @staticmethod
+    def get_from_git(show_cmd: bool = True) -> CommitInfo:
+        command_infos = {
+            "commit_sha": (["git", "rev-parse", "HEAD"], None),
+            "commit_short_sha": (["git", "rev-parse", "--short", "HEAD"], None),
+            "commit_time": (["git", "log", "-1", "--format=%cd", "--date=iso"], None),
+            "commit_msg": (["git", "log", "-1", "--format=%B"], None),
+            "committer_name": (["git", "log", "-1", "--format=%cn"], None),
+            "committer_email": (["git", "log", "-1", "--format=%ce"], None),
+            "author_name": (["git", "log", "-1", "--format=%an"], None),
+            "author_email": (["git", "log", "-1", "--format=%ae"], None),
+        }
+        results = {}
+        for key, (cmd, cwd) in command_infos.items():
+            (_returncode, stdout, _stderr) = run_cmd(
+                cmd, cwd=fix_path() if cwd is None else cwd, show_command=show_cmd
+            )
+            # remove trailling new line (\n)
+            results[key] = stdout[: len(stdout) - 2]
+        return CommitInfo(**results, is_release=None)
 
 
 def fix_path(*p: str) -> str:
@@ -405,12 +432,12 @@ if __name__ == "__main__":
 
     @app_get.command("commit_msg")
     def util_get_commit_msg() -> None:
-        commit_info = get_commit_info(show_cmd=False)
+        commit_info = CommitInfo.get_from_git(show_cmd=False)
         print(commit_info.msg)
 
     @app_get.command("commit_short_sha")
     def util_get_commit_short_sha() -> None:
-        commit_info = get_commit_info(show_cmd=False)
+        commit_info = CommitInfo.get_from_git(show_cmd=False)
         print(commit_info.short_sha)
 
     @app_get.command("datetime")
@@ -419,7 +446,7 @@ if __name__ == "__main__":
 
     @app_get.command("commit_sha")
     def util_get_commit_sha() -> None:
-        commit_info = get_commit_info(show_cmd=False)
+        commit_info = CommitInfo.get_from_git(show_cmd=False)
         print(commit_info.sha)
 
     app()

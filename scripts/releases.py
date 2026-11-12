@@ -30,7 +30,7 @@ app = typer.Typer()
 
 @app.command()
 def main():
-    commit_info = util.get_commit_info()
+    commit_info = util.CommitInfo.get_from_git()
     files = util.list_files(
         util.fix_path("artifacts"),
         ignores=[util.IGNORE_GH_PAGES, util.IGNORE_GH_PAGES_WITH_ARTIFACTS],
