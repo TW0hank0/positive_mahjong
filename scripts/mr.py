@@ -18,6 +18,7 @@ import os
 import sys
 
 import gitlab
+from rich.ansi import re_ansi
 from rich.logging import RichHandler
 
 import util
@@ -34,7 +35,7 @@ LOGGER.addHandler(RichHandler(logging.DEBUG))
 
 def upsert_note(mr_obj, current_user_id: int, new_body: str):
     notes = mr_obj.notes.list(get_all=True)
-    LOGGER.debug(f"notes: {notes}")
+    LOGGER.debug(f"{notes=}")
     target_note = None
     for note in notes:
         if note.system is False:
@@ -42,8 +43,9 @@ def upsert_note(mr_obj, current_user_id: int, new_body: str):
             if author_id is not None and author_id == current_user_id:
                 target_note = note
                 break
+    new_body += "\n---\nCheck using mr-check script."
     if target_note is not None:
-        target_note.body = new_body + "\nupdated at `" + util.get_datetime() + "`"
+        target_note.body = new_body + "\nupdated at `" + util.get_datetime() + "`."
         target_note.save()
         LOGGER.info(f"Updated existing note (Note ID: {target_note.id})")
     else:
@@ -57,7 +59,7 @@ def main():
     LOGGER.debug("start mr script")
     private_token = os.environ.get("GITLAB_TOKEN")
     if private_token is None:
-        LOGGER.error("GITLAB_TOKEN environment variable is not set")
+        LOGGER.error("`GITLAB_TOKEN` environment variable is not set")
         sys.exit(1)
 
     util.run_cmd(
@@ -67,8 +69,7 @@ def main():
     gl = gitlab.Gitlab(private_token=private_token)
     gl.auth()
     if gl.user is None:
-        LOGGER.error("gl.user is None")
-        sys.exit(1)
+        raise RuntimeError("gl.user is None")
     LOGGER.debug(gl.user.attributes)
     current_user_id = gl.user.attributes["id"]
     current_username = gl.user.attributes["username"]
@@ -77,15 +78,14 @@ def main():
     try:
         project = gl.projects.get(PROJECT)
     except gitlab.exceptions.GitlabGetError as e:
-        LOGGER.error(f"Failed to get project '{PROJECT}': {e}")
-        sys.exit(1)
+        raise RuntimeError(f"Failed to get project '{PROJECT}': {e}")
     LOGGER.debug(f"Got project {project.attributes}")
     open_mrs: list | None = project.mergerequests.list(state="opened", all=True)
     if open_mrs is None:
         LOGGER.info(f"No open MRs found in project '{PROJECT}'.")
         sys.exit(0)
     LOGGER.info(f"Found {len(open_mrs)} open MRs. Starting checks...")
-    LOGGER.debug(f"Open MRs: {open_mrs}")
+    LOGGER.debug(f"{open_mrs=}")
     for mr in open_mrs:
         mr_iid = mr.iid
         mr_title = mr.title
@@ -94,24 +94,24 @@ def main():
         approvals = mr_detail.approvals.get()
         LOGGER.debug(approvals)
         if approvals.approved is False:
-            LOGGER.info("MR not approved yet, skip")
+            LOGGER.info("MR not approved yet, skip.")
             continue
         approved_by_userid = []
         approved_by_username = []
         for approved_by_detail in approvals.approved_by:
             aby_id = approved_by_detail["user"]["id"]
             aby_username = approved_by_detail["user"]["username"]
-            LOGGER.debug(f"Approved by {aby_username} (id: {aby_id})")
+            LOGGER.debug(f"Approved by {aby_username} (id: {aby_id}).")
             approved_by_userid.append(aby_id)
             approved_by_username.append(aby_username)
 
-        LOGGER.info(f"Approved by: {approved_by_username}")
+        LOGGER.info(f"Approved by: {approved_by_username}.")
         if (
             REQUIRED_APPROVER_ID not in approved_by_userid
             or REQUIRED_APPROVER_USERNAME not in approved_by_username
         ):
             LOGGER.info(
-                f"MR !{mr_iid} is not approved by @{REQUIRED_APPROVER_USERNAME}, Skipping."
+                f"MR !{mr_iid} is not approved by @{REQUIRED_APPROVER_USERNAME}, Skipped."
             )
             continue
         else:
@@ -130,7 +130,7 @@ def main():
                         break
                 else:
                     LOGGER.info(
-                        f"Already checked (already approved by {current_user_id})"
+                        f"Already checked (already approved by {current_user_id})."
                     )
                     continue
             else:
@@ -146,7 +146,7 @@ def main():
             check_result = check()
             if check_result is None:
                 msg = f"#### ✅MR Check Passed (!{mr_iid})"
-                LOGGER.info(f"Check SUCCESS: {msg}")
+                LOGGER.info(f"Check SUCCESS: {msg=}")
                 if current_user_approved is False:
                     mr_detail.approve()
                 mr_detail.save()
@@ -155,8 +155,10 @@ def main():
                 msg = f"#### ❌MR Check Failed (!{mr_iid})"
                 (command, returncode, stdout, stderr) = check_result
                 msg += f"\n\nCommand `{command}` return code `{returncode}`."
-                msg += f"\n\n<details><summary>stdout</summary>{stdout}</details>"
-                msg += f"\n\n<details><summary>stderr</summary>{stderr}</details>"
+                msg += f"\n\n<details><summary>stdout without ansi code</summary>{re_ansi.sub(stdout, '')}</details>"
+                msg += f"\n\n<details><summary>stderr without ansi code</summary>{re_ansi.sub(stderr, '')}</details>"
+                msg += f"\n\n<details><summary>stdout with ansi code</summary>{stdout}</details>"
+                msg += f"\n\n<details><summary>stderr with ansi code</summary>{stderr}</details>"
                 LOGGER.warning(f"Check FAILED: {msg}")
                 if current_user_approved is True:
                     mr_detail.unapprove()
@@ -169,6 +171,7 @@ def check() -> None | tuple[str, int, str, str]:
     commands = [
         (["cargo", "check", "--workspace"], "."),
         (["uv", "run", "license_check.py"], "scripts"),
+        (["uv", "run", "build_license.py"], "scripts"),
         (["ty", "check", "."], "scripts"),
         (["ruff", "check", "."], "scripts"),
         (["tombi", "lint"], "."),

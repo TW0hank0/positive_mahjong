@@ -19,6 +19,7 @@ import os
 import shutil
 from typing import Literal
 
+import blake3
 import mistune
 import pydantic
 import requests
@@ -383,6 +384,11 @@ class FilesPageIncludeFile:
             filehash = hashlib.sha256(data=f.read())
         return filehash.hexdigest()
 
+    def hash_name_blake3(self) -> str:
+        with open(self.abs_path, "rb") as f:
+            filehash = blake3.blake3(f.read())
+        return filehash.hexdigest()
+
     def raw_name(self) -> str:
         """like: path/to/file.txt -> path-_-to-file.txt"""
         return (
@@ -465,11 +471,17 @@ def build_files_page(dir_path: str):
                     dir_path, "hash", "sha256", include_file.hash_name_sha256(), "file"
                 ),
             ),
+            (
+                include_file.abs_path,
+                os.path.join(
+                    dir_path, "hash", "blake3", include_file.hash_name_blake3(), "file"
+                ),
+            ),
         ]:
             print(f"Copy: {cfrom=} {cto=}")
             os.makedirs(os.path.dirname(cto), exist_ok=True)
             _ = shutil.copy2(cfrom, cto)
-        with open(
+        for filename_path in [
             os.path.join(
                 dir_path,
                 "hash",
@@ -477,9 +489,19 @@ def build_files_page(dir_path: str):
                 include_file.hash_name_sha256(),
                 "filename.txt",
             ),
-            "w",
-        ) as f:
-            _ = f.write(os.path.basename(include_file.abs_path))
+            os.path.join(
+                dir_path,
+                "hash",
+                "blake3",
+                include_file.hash_name_blake3(),
+                "filename.txt",
+            ),
+        ]:
+            with open(
+                filename_path,
+                "w",
+            ) as f:
+                _ = f.write(os.path.basename(include_file.abs_path))
         files_summary = (
             files_summary
             + f"""
