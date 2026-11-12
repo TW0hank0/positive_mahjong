@@ -19,3 +19,4 @@
 "cargo:mdbook" = "0.5.4"
 "cargo:cargo-msrv" = "0.19.6"
 "cargo:eza" = "0.23.5"
+"npm:@biomejs/biome" = "2.6.7"

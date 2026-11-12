@@ -36,7 +36,8 @@ runs:
         sudo apt-get upgrade -y
         sudo apt-get install -y libfontconfig1-dev pkg-config gcc musl-tools clang
 
-    - uses: rui314/setup-mold@da13e0b42e392e3a45d1215033a2270b849d7d36  # main
+    - name: Install mold
+      uses: rui314/setup-mold@da13e0b42e392e3a45d1215033a2270b849d7d36  # main
       with:
         make-default: false
 
@@ -75,11 +76,12 @@ runs:
         rustc --version
         cargo --version
 
-    - run: rustup component add rustc-codegen-cranelift
+    - name: Install rustc-cg-clif on Linux
+      run: rustup component add rustc-codegen-cranelift
       shell: bash
       if: runner.os == 'Linux'
 
-    - name: install go
+    - name: Install go
       uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e  # v7.0.0
       with:
         go-version: stable
@@ -95,7 +97,7 @@ runs:
       run: cargo install cargo-about --locked --features=cli
       shell: bash
     - name: use mise action
-      uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
+      uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b  # v5.2.7
 
     - name: Prepare venv
       shell: bash
