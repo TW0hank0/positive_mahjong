@@ -27,5 +27,5 @@ dependencies = [
     "python-gitlab==8.6.0",
     "requests==2.34.2",
     "rich==15.0.0",
-    "typer==0.28.0",
+    "typer==0.29.1",
 ]
