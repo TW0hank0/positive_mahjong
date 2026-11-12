@@ -476,7 +476,8 @@ def build_files_page(dir_path: str):
                 "sha256",
                 include_file.hash_name_sha256(),
                 "filename.txt",
-            )
+            ),
+            "w",
         ) as f:
             _ = f.write(os.path.basename(include_file.abs_path))
         files_summary = (
