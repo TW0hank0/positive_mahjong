@@ -24,6 +24,7 @@ import sys
 import time
 import tomllib
 from typing import Literal
+from warnings import deprecated
 lazy import selectors
 lazy import socket
 
@@ -207,6 +208,7 @@ def run_cmd(
     return (process.returncode, pstdout.rstrip("\n"), pstderr)
 
 
+@deprecated("replace with CommitInfo.get_from_git()")
 def get_commit_info(show_cmd: bool = True) -> CommitInfo:
     """return CommitInfo"""
     (_returncode, sha_stdout, _stderr) = run_cmd(
@@ -430,12 +432,12 @@ if __name__ == "__main__":
 
     @app_get.command("commit_msg")
     def util_get_commit_msg() -> None:
-        commit_info = get_commit_info(show_cmd=False)
+        commit_info = CommitInfo.get_from_git(show_cmd=False)
         print(commit_info.msg)
 
     @app_get.command("commit_short_sha")
     def util_get_commit_short_sha() -> None:
-        commit_info = get_commit_info(show_cmd=False)
+        commit_info = CommitInfo.get_from_git(show_cmd=False)
         print(commit_info.short_sha)
 
     @app_get.command("datetime")
@@ -444,7 +446,7 @@ if __name__ == "__main__":
 
     @app_get.command("commit_sha")
     def util_get_commit_sha() -> None:
-        commit_info = get_commit_info(show_cmd=False)
+        commit_info = CommitInfo.get_from_git(show_cmd=False)
         print(commit_info.sha)
 
     app()

@@ -103,8 +103,9 @@ def main():
         )
     build_license.main()
     zip_desktop(targets)
-    if util.get_commit_info().is_release is False:
-        version = util.get_version() + "+" + util.get_commit_info().short_sha
+    commit_info = util.CommitInfo.get_from_git()
+    if commit_info.is_release is False:
+        version = util.get_version() + "+" + commit_info.short_sha
     else:
         version = util.get_version()
     for target, _pkg in build_info:
@@ -163,8 +164,9 @@ def main():
 
 
 def zip_desktop(targets: list[str]):
-    if util.get_commit_info().is_release is False:
-        version = util.get_version() + "+" + util.get_commit_info().short_sha
+    commit_info = util.CommitInfo.get_from_git()
+    if commit_info.is_release is False:
+        version = util.get_version() + "+" + commit_info.short_sha
     else:
         version = util.get_version()
     include_files: list[str | tuple[str, str]] = [

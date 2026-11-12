@@ -341,7 +341,7 @@ def build_artifacts_list() -> None:
             release_artifacts={},
         )
         lastest_num = str(int(lastest_num) + 1)
-    commit_info = util.get_commit_info()
+    commit_info = util.CommitInfo.get_from_git()
     if commit_info.is_release is False:
         ci_test_id = f"{commit_info.time.replace(' ', '_')}::{commit_info.sha}"
         new_list[lastest_num].ci_tests[ci_test_id] = files_list
@@ -584,7 +584,7 @@ def replace_var(
         str(mistune.html(third_party_license)),
     )
     del third_party_license
-    commit_info = util.get_commit_info()
+    commit_info = util.CommitInfo.get_from_git()
     html_vars.set_var("VAR_COMMIT_SHA", commit_info.sha)
     html_vars.set_var("VAR_COMMIT_SHORT_SHA", commit_info.short_sha)
     html_vars.set_var("VAR_COMMIT_TIME", commit_info.time)
