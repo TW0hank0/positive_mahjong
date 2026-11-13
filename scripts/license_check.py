@@ -42,21 +42,22 @@ IGNORED_DIRS = [
     "crates/pmj-desktop/src/circular.rs",
     "supply-chain/**",
     "scripts/pylock.toml",
+    ".mise/locks/**",
 ]
 
 
 def main():
-    print(f"{Fore.LIGHTBLACK_EX}addlicense check{Fore.RESET}")
-    addlicense_check()
-    print(f"{Fore.LIGHTBLACK_EX}reuse check{Fore.RESET}")
-    reuse_check()
+    infos = [(addlicense_check, "addlicense"), (reuse_check, "reuse")]
+    for func, name in infos:
+        print(str(Fore.LIGHTBLACK_EX) + "Running " + name + " check" + str(Fore.RESET))
+        func()
 
 
-def reuse_check():
+def reuse_check() -> None:
     _ = util.run_cmd(["reuse", "lint"], cwd=util.fix_path())
 
 
-def addlicense_check():
+def addlicense_check() -> None:
     ignored: list[str] = []
     for dir in IGNORED_DIRS:
         ignored.extend(["-ignore", dir])
