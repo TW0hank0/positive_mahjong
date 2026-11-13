@@ -5,8 +5,11 @@
 **繁體中文** | [English（已過時）](READMEs/README_en.md)
 
 ![GitLab Stars](https://img.shields.io/gitlab/stars/TW0hank0%2Fpositive_mahjong?style=for-the-badge&color=green)
+
 ![Gitlab Pipeline Status](https://img.shields.io/gitlab/pipeline-status/TW0hank0%2Fpositive_mahjong?branch=master&style=for-the-badge&label=Gitlab%20Pipeline&color=green)
+
 ![GitLab License](https://img.shields.io/gitlab/license/TW0hank0%2Fpositive_mahjong?style=for-the-badge&color=green)
+
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/TW0hank0/positive_mahjong/commit-ci.yaml?branch=master&style=for-the-badge&label=Github%20Action&color=green)
 
 ### 特色
@@ -23,8 +26,6 @@
 
 [專案網站（Github Pages）](https://tw0hank0.github.io/positive_mahjong/)
 
-> [Gitlab Pages（已過時）](https://tw0hank0.gitlab.io/positive_mahjong/)
-
 [KeepAndroidOpen](https://keepandroidopen.org/)
 
 > 從 2026 年 9 月起，Google 將在未經使用者同意的情況下，悄悄推送一項更新，封鎖所有未向 Google 登記、未簽署其合約、未繳費，且未提交政府核發身分證明文件的 Android 應用程式。
@@ -35,7 +36,7 @@
 
 見：[專案說明文件](https://tw0hank0.github.io/positive_mahjong/docs/)
 
-可在 Github Release 或是 [專案網站（Github Pages）](https://tw0hank0.github.io/positive_mahjong/files/) 下載預編譯檔案。
+可在 Github Release 或是 [專案網站](https://tw0hank0.github.io/positive_mahjong/download.html) 下載預編譯檔案。
 
 ### 授權與聲明
 
@@ -57,9 +58,9 @@
 #### 第三方模組庫授權
 
 見：
-[ThirdPartyLicense-Rust.md](https://tw0hank0.github.io/positive_mahjong/files/ThirdPartyLicense-Rust.md)
-[ThirdPartyLicense-Rust.html](https://tw0hank0.github.io/positive_mahjong/files/ThirdPartyLicense-Rust.html)
-[ThirdPartyLicense-Rust.json](https://tw0hank0.github.io/positive_mahjong/files/ThirdPartyLicense-Rust.json)
+[ThirdPartyLicense-Rust.md](https://tw0hank0.github.io/positive_mahjong/files/tree/auto_generated/ThirdPartyLicense-Rust.md)
+[ThirdPartyLicense-Rust.html](https://tw0hank0.github.io/positive_mahjong/files/tree/auto_generated/ThirdPartyLicense-Rust.html)
+[ThirdPartyLicense-Rust.json](https://tw0hank0.github.io/positive_mahjong/files/tree/auto_generated/ThirdPartyLicense-Rust.json)
 
 #### 第三方專案聲明
 
@@ -67,19 +68,19 @@
 
 ##### Noto Sans TC
 
-本專案使用的 `Noto Sans TC` 依據 [SIL OPEN FONT LICENSE Version 1.1](https://tw0hank0.github.io/positive_mahjong/files/LICENSES_LicenseRef-Noto-Sans-TC.txt) 授權，作者為 \[Google 與 Adobe\]。
+本專案使用的 `Noto Sans TC` 依據 [SIL OPEN FONT LICENSE Version 1.1](https://tw0hank0.github.io/positive_mahjong/files/tree/LICENSES/LicenseRef-Noto-Sans-TC.txt) 授權，作者為 \[Google 與 Adobe\]。
 
 路徑：`assets/Noto_Sans_TC/`
 
 ##### Material Symbols
 
-本專案使用的 `Material Symbols` 依據 [Apache License Version 2.0](https://tw0hank0.github.io/positive_mahjong/files/Apache-2.0.txt) 授權，作者為 \[Google\]。
+本專案使用的 `Material Symbols` 依據 [Apache License Version 2.0](https://tw0hank0.github.io/positive_mahjong/files/tree/LICENSES/Apache-2.0.txt) 授權，作者為 \[Google\]。
 
 路徑：`assets/material_symbols/`
 
 ##### loading_spinners
 
-本專案使用的 `loading_spinners` 依據 [MIT License](https://tw0hank0.github.io/positive_mahjong/files/LICENSES_LicenseRef-Iced.txt) 授權，作者為 \[Héctor Ramón 與 Iced contributors\]。
+本專案使用的 `loading_spinners` 依據 [MIT License](https://tw0hank0.github.io/positive_mahjong/files/tree/LICENSES/LicenseRef-Iced.txt) 授權，作者為 \[Héctor Ramón 與 Iced contributors\]。
 
 路徑：
 
