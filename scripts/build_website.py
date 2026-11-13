@@ -402,16 +402,13 @@ class FilesPageIncludeFile:
 
     def raw_name(self) -> str:
         """like: path/to/file.txt -> path-_-to-file.txt"""
-        return (
-            "-_-".join(os.path.dirname(self.path_rel_project).split(os.path.sep))
-            + (
-                "-"
-                if self.path_rel_project != os.path.basename(self.path_rel_project)
-                else ""
-            )
-            + os.path.basename(
-                self.path_rel_project if self.rename is None else self.rename
-            )
+        return "-_-".join(
+            os.path.join(
+                os.path.dirname(self.path_rel_project),
+                self.rename
+                if self.rename is not None
+                else os.path.basename(self.abs_path),
+            ).split(os.path.sep)
         )
 
 

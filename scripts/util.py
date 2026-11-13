@@ -34,6 +34,17 @@ rtb.install(show_locals=True)
 
 OWNER_NAME = "TW0hank0"
 PROJECT_NAME = "positive_mahjong"
+cache_commit_info: None | CommitInfo = None
+cache_version: dict[Literal["file_workspace", "file_package", "cargo"], str | None] = {
+    "file_workspace": None,
+    "file_package": None,
+    "cargo": None,
+}
+
+
+def init():
+    if os.path.exists(fix_path("artifacts")) is False:
+        os.mkdir(fix_path("artifacts"))
 
 
 def show_cmd(
@@ -256,24 +267,36 @@ class CommitInfo:
         )
 
     @staticmethod
-    def get_from_git(show_cmd: bool = True) -> CommitInfo:
-        command_infos = {
-            "commit_sha": (["git", "rev-parse", "HEAD"], None),
-            "commit_short_sha": (["git", "rev-parse", "--short", "HEAD"], None),
-            "commit_time": (["git", "log", "-1", "--format=%cd", "--date=iso"], None),
-            "commit_msg": (["git", "log", "-1", "--format=%B"], None),
-            "committer_name": (["git", "log", "-1", "--format=%cn"], None),
-            "committer_email": (["git", "log", "-1", "--format=%ce"], None),
-            "author_name": (["git", "log", "-1", "--format=%an"], None),
-            "author_email": (["git", "log", "-1", "--format=%ae"], None),
-        }
-        results = {}
-        for key, (cmd, cwd) in command_infos.items():
-            (_returncode, stdout, _stderr) = run_cmd(
-                cmd, cwd=fix_path() if cwd is None else cwd, show_command=show_cmd
-            )
-            results[key] = stdout
-        return CommitInfo(**results, is_release=None)
+    def get_from_git(show_cmd: bool = True, cache: bool = True) -> CommitInfo:
+        global cache_commit_info
+        if (cache is True) and (cache_commit_info is not None):
+            if show_cmd is True:
+                print("Return commit_info using cache.")
+            return cache_commit_info
+        else:
+            command_infos = {
+                "commit_sha": (["git", "rev-parse", "HEAD"], None),
+                "commit_short_sha": (["git", "rev-parse", "--short", "HEAD"], None),
+                "commit_time": (
+                    ["git", "log", "-1", "--format=%cd", "--date=iso"],
+                    None,
+                ),
+                "commit_msg": (["git", "log", "-1", "--format=%B"], None),
+                "committer_name": (["git", "log", "-1", "--format=%cn"], None),
+                "committer_email": (["git", "log", "-1", "--format=%ce"], None),
+                "author_name": (["git", "log", "-1", "--format=%an"], None),
+                "author_email": (["git", "log", "-1", "--format=%ae"], None),
+            }
+            results = {}
+            for key, (cmd, cwd) in command_infos.items():
+                (_returncode, stdout, _stderr) = run_cmd(
+                    cmd, cwd=fix_path() if cwd is None else cwd, show_command=show_cmd
+                )
+                results[key] = stdout
+            commit_info = CommitInfo(**results, is_release=None)
+            if cache is True:
+                cache_commit_info = commit_info
+            return commit_info
 
 
 def fix_path(*p: str) -> str:
@@ -283,7 +306,12 @@ def fix_path(*p: str) -> str:
 def get_version(
     how_get: Literal["file_workspace", "file_package", "cargo"] = "cargo",
     show_cmd: bool = True,
+    cache: bool = True,
 ) -> str:
+    if (cache is True) and (cache_version.get(how_get) is not None):
+        if show_cmd is True:
+            print("Return version using cache.")
+        return cache_version[how_get]  # ty: ignore[invalid-explicit-return]
     if how_get == "file_package" or how_get == "file_workspace":
         with open(
             fix_path("Cargo.toml"),
@@ -296,16 +324,14 @@ def get_version(
             version = str(data["workspace"]["package"]["version"])
     elif how_get == "cargo":
         (_returncode, stdout, _stderr) = run_cmd(
-            ["cargo", "metadata", "--format-version", "1", "--no-deps"],
+            ["cargo", "-vv", "metadata", "--format-version", "1", "--no-deps"],
             cwd=fix_path(),
             show_command=show_cmd,
         )
         metadata = json.loads(stdout)
-        for pkg in metadata["packages"]:
-            version = str(pkg["version"])
-            break
-        else:
-            raise RuntimeError("no version found.")
+        version = str(metadata["packages"][0]["version"])
+    if cache is True and cache_version.get(how_get, "not None value") is None:
+        cache_version[how_get] = version
     return version
 
 
