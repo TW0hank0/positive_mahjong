@@ -23,7 +23,7 @@ import blake3
 import mistune
 import pydantic
 import requests
-from colorama import Back, Fore
+from colorama import Fore
 
 import util
 
@@ -49,17 +49,17 @@ TYPE_HINT_RUST_TARGETS = Literal[
     "aarch64-unknown-linux-gnu",
 ]
 TYPE_HINT_RELEASE_ARTIFACTS = dict[
-    TYPE_HINT_RUST_TARGETS,
-    str,
+    TYPE_HINT_RUST_TARGETS, dict[Literal["sha256", "blake3"], str]
 ]
 TYPE_HINT_ARTIFACTS_LIST = dict[
-    str,
+    str | Literal["list_version"],
     dict[
         Literal[
             "is_released", "release_artifacts", "ci_test_artifacts", "release_name"
         ],
         bool | dict[str, str] | dict[str, dict] | str | TYPE_HINT_RELEASE_ARTIFACTS,
-    ],
+    ]
+    | str,
 ]
 RUST_TARGETS: list[TYPE_HINT_RUST_TARGETS] = [
     "aarch64-pc-windows-msvc",
@@ -145,19 +145,19 @@ DOWNLOAD_PAGE_TEMPLATE = """<!doctype html>
 
 
 class VarStore:
-    __slots__ = ("prefix", "suffix", "vars")
+    __slots__ = ("_vars", "prefix", "suffix")
 
     def __init__(self, prefix: str = "{{$", suffix: str = "$}}"):
-        self.vars: dict[str, str] = {}
+        self._vars: dict[str, str] = {}
         self.prefix = prefix
         self.suffix = suffix
 
     def set_var(self, key: str, value: str):
-        self.vars[key] = value
+        self._vars[key] = value
 
     def replace(self, content: str) -> str:
         replaced_content = content
-        for key, value in self.vars.items():
+        for key, value in self._vars.items():
             mixed_var_key = self.prefix + key + self.suffix
             if mixed_var_key in replaced_content:
                 replaced_content = replaced_content.replace(mixed_var_key, value)
@@ -172,6 +172,7 @@ class ArtifactList(pydantic.BaseModel):
 
 
 def main():
+    commit_info = util.CommitInfo.get_from_git()
     website_root_path = util.fix_path("website")
     nav_template_path = os.path.join(website_root_path, "nav.html.template")
     with open(nav_template_path, "r", encoding="utf-8") as f:
@@ -187,7 +188,7 @@ def main():
     shutil.copytree(website_root_path, build_root, ignore=copytree_ignore)
     if os.path.exists(util.fix_path("artifacts")) is False:
         os.mkdir(util.fix_path("artifacts"))
-    build_artifacts_list()
+    build_artifacts_list(commit_info=commit_info)
     os.mkdir(os.path.join(build_root, "files"))
     build_files_page(os.path.join(build_root, "files"))
     if SKIP_PREV_ARTIFACTS is False:
@@ -197,6 +198,7 @@ def main():
         ignored=IGNORED_PATHS,
         nav_template=nav_template_content,
         website_root_path=build_root,
+        commit_info=commit_info,
     )
     copy_website_dep(build_root)
 
@@ -237,7 +239,7 @@ def build_download_page(build_root: str):
         f.write(download_page)
 
 
-def build_artifacts_list() -> None:
+def build_artifacts_list(commit_info: util.CommitInfo | None = None) -> None:
     # download prev
     if SKIP_PREV_ARTIFACTS is False:
         req_url = f"{GH_PAGES_BASE_URL}files/tree/artifacts/{ARTIFACTS_LIST_FILE}"
@@ -245,24 +247,29 @@ def build_artifacts_list() -> None:
         prev_artifacts_list = requests.get(req_url)
         del req_url
         prev_artifacts_list.raise_for_status()
-        i_prev_list: dict[str, ArtifactList | dict] = prev_artifacts_list.json()
+        i_prev_list: TYPE_HINT_ARTIFACTS_LIST = prev_artifacts_list.json()
         prev_list = {}
         for iprev_key, iprev_value in i_prev_list.items():
-            prev_list[iprev_key] = ArtifactList.model_validate_json(
-                json.dumps(iprev_value)
-            )
+            if iprev_key == "list_version":
+                continue
+            else:
+                prev_list[iprev_key] = ArtifactList.model_validate_json(
+                    json.dumps(iprev_value)
+                )
         print(f"{prev_list=}")
         for release_id, arelease in prev_list.items():
+            if release_id == "list_version":
+                continue
             if arelease.is_released is True:
-                arelease_artifcats = arelease.release_artifacts
-                for ara_filename in arelease_artifcats.values():
-                    file_req_url = (
-                        f"{GH_PAGES_BASE_URL}files/hash/sha256/{ara_filename}/file"
-                    )
+                arelease_artifcats: TYPE_HINT_RELEASE_ARTIFACTS = (
+                    arelease.release_artifacts
+                )
+                for ara_hashes in arelease_artifcats.values():
+                    file_req_url = f"{GH_PAGES_BASE_URL}files/hash/sha256/{ara_hashes['sha256']}/file"
                     print(f"{file_req_url=}")
                     ara_file_resp = requests.get(file_req_url)
                     ara_file_resp.raise_for_status()
-                    fname_req_url = f"{GH_PAGES_BASE_URL}files/hash/sha256/{ara_filename}/filename.txt"
+                    fname_req_url = f"{GH_PAGES_BASE_URL}files/hash/sha256/{ara_hashes['sha256']}/filename.txt"
                     print(f"{fname_req_url=}")
                     ara_fname_resp = requests.get(fname_req_url)
                     ara_fname_resp.raise_for_status()
@@ -272,22 +279,20 @@ def build_artifacts_list() -> None:
                             "history",
                             release_id,
                             "sha256",
-                            ara_filename,  # file hash
+                            ara_hashes["sha256"],
                             ara_fname_resp.content.decode(),  # file name
                         )
                     ) as f:
                         shutil.copyfileobj(ara_file_resp.raw, f)
             for aca_id in arelease.ci_tests.values():
-                for aca_filename in aca_id.values():
-                    req_url = (
-                        f"{GH_PAGES_BASE_URL}files/hash/sha256/{aca_filename}/file"
-                    )
+                for aca_hashes in aca_id.values():
+                    req_url = f"{GH_PAGES_BASE_URL}files/hash/sha256/{aca_hashes['sha256']}/file"
                     print(f"{req_url=}")
                     ara_file_resp = requests.get(req_url)
                     del req_url
                     ara_file_resp.raise_for_status()
                     # file name
-                    req_url = f"{GH_PAGES_BASE_URL}files/hash/sha256/{aca_filename}/filename.txt"
+                    req_url = f"{GH_PAGES_BASE_URL}files/hash/sha256/{aca_hashes['sha256']}/filename.txt"
                     print(f"{req_url=}")
                     ara_fname_resp = requests.get(req_url)
                     del req_url
@@ -299,7 +304,7 @@ def build_artifacts_list() -> None:
                             release_id,
                             "ci_test",
                             "sha256",
-                            ara_filename,  # file hash
+                            aca_hashes["sha256"],
                             ara_fname_resp.content.decode(),  # file name
                         )
                     ) as f:
@@ -329,7 +334,11 @@ def build_artifacts_list() -> None:
         for target in RUST_TARGETS:
             if target in file:
                 with open(file, "rb") as f:
-                    files_list[target] = hashlib.sha256(f.read()).hexdigest()
+                    filedata = f.read()
+                files_list[target] = {
+                    "sha256": hashlib.sha256(filedata).hexdigest(),
+                    "blake3": blake3.blake3(filedata).hexdigest(),
+                }
                 break
         else:
             print(f"unknown target, file: {file}")
@@ -342,7 +351,7 @@ def build_artifacts_list() -> None:
             release_artifacts={},
         )
         lastest_num = str(int(lastest_num) + 1)
-    commit_info = util.CommitInfo.get_from_git()
+    commit_info = util.CommitInfo.get_from_git() if commit_info is None else commit_info
     if commit_info.is_release is False:
         ci_test_id = f"{commit_info.time.replace(' ', '_')}::{commit_info.sha}"
         new_list[lastest_num].ci_tests[ci_test_id] = files_list
@@ -353,6 +362,8 @@ def build_artifacts_list() -> None:
     new_list_json = {}
     for key, value in new_list.items():
         new_list_json[key] = json.loads(value.model_dump_json(indent=4))
+    # list version
+    new_list_json["list_version"] = "2"
     with open(
         util.fix_path("artifacts", ARTIFACTS_LIST_FILE), "w", encoding="utf-8"
     ) as f:
@@ -456,6 +467,11 @@ def build_files_page(dir_path: str):
     os.mkdir(os.path.join(dir_path, "tree"))
     os.mkdir(os.path.join(dir_path, "hash"))
     for include_file in include_files:
+        print(
+            f"{Fore.CYAN}Processing{Fore.RESET} {include_file.abs_path}" + ""
+            if include_file.rename is None
+            else f"{Fore.LIGHTBLACK_EX}->{Fore.RESET} {include_file.rename}"
+        )
         for cfrom, cto in [
             (
                 include_file.abs_path,
@@ -478,7 +494,7 @@ def build_files_page(dir_path: str):
                 ),
             ),
         ]:
-            print(f"Copy: {cfrom=} {cto=}")
+            print(f"  to {Fore.LIGHTBLACK_EX}->{Fore.RESET} {cto}")
             os.makedirs(os.path.dirname(cto), exist_ok=True)
             _ = shutil.copy2(cfrom, cto)
         for filename_path in [
@@ -517,7 +533,11 @@ def build_files_page(dir_path: str):
 
 
 def process_dir(
-    dir_path: str, ignored: list[str], nav_template: str, website_root_path: str
+    dir_path: str,
+    ignored: list[str],
+    nav_template: str,
+    website_root_path: str,
+    commit_info: util.CommitInfo | None = None,
 ):
     for dir in os.listdir(dir_path):
         full_dir_path = os.path.join(dir_path, dir)
@@ -530,31 +550,41 @@ def process_dir(
         else:
             if os.path.isfile(full_dir_path) is True:
                 if dir.endswith(".html") is True:
-                    print(f"Found html file: {full_dir_path}")
+                    print(
+                        f"{Fore.CYAN}Found{Fore.RESET} html file `{full_dir_path}` processing...",
+                        end="",
+                    )
                     with open(full_dir_path, "r", encoding="utf-8") as f:
                         orig_content = f.read()
                     new_content = replace_var(
-                        full_dir_path, nav_template, website_root_path
+                        full_dir_path,
+                        nav_template,
+                        website_root_path,
+                        commit_info=commit_info,
                     )
                     if new_content != orig_content:
                         with open(full_dir_path, "w", encoding="utf-8") as f:
                             _ = f.write(new_content)
-                        print(
-                            f"{Fore.GREEN}Wrote html file:{Fore.RESET} {Back.LIGHTBLACK_EX}{full_dir_path}{Back.RESET}."
-                        )
+                        print(f"{Fore.GREEN}Wrote{Fore.RESET}.")
+                    else:
+                        print("Finished.")
             elif os.path.isdir(full_dir_path) is True:
                 process_dir(
                     dir_path=full_dir_path,
                     ignored=ignored,
                     nav_template=nav_template,
                     website_root_path=website_root_path,
+                    commit_info=commit_info,
                 )
             else:
                 print(f"???: isfile=False, isdir=False, {dir=}")
 
 
 def replace_var(
-    replace_html_path: str, nav_template: str, website_root_path: str
+    replace_html_path: str,
+    nav_template: str,
+    website_root_path: str,
+    commit_info: util.CommitInfo | None = None,
 ) -> str:
     template_vars = VarStore()
     template_vars.set_var(
@@ -606,7 +636,7 @@ def replace_var(
         str(mistune.html(third_party_license)),
     )
     del third_party_license
-    commit_info = util.CommitInfo.get_from_git()
+    commit_info = util.CommitInfo.get_from_git() if commit_info is None else commit_info
     html_vars.set_var("VAR_COMMIT_SHA", commit_info.sha)
     html_vars.set_var("VAR_COMMIT_SHORT_SHA", commit_info.short_sha)
     html_vars.set_var("VAR_COMMIT_TIME", commit_info.time)

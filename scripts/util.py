@@ -24,7 +24,6 @@ import sys
 import time
 import tomllib
 from typing import Literal
-from warnings import deprecated
 lazy import selectors
 lazy import socket
 
@@ -205,51 +204,7 @@ def run_cmd(
             raise subprocess.CalledProcessError(
                 process.returncode, command, output=pstdout, stderr=pstderr
             )
-    return (process.returncode, pstdout.rstrip("\n"), pstderr)
-
-
-@deprecated("replace with CommitInfo.get_from_git()")
-def get_commit_info(show_cmd: bool = True) -> CommitInfo:
-    """return CommitInfo"""
-    (_returncode, sha_stdout, _stderr) = run_cmd(
-        ["git", "rev-parse", "HEAD"], cwd=fix_path(), show_command=show_cmd
-    )
-    commit_sha = sha_stdout.replace("\n", "")
-    (_returncode, ssha_stdout, _stderr) = run_cmd(
-        ["git", "rev-parse", "--short", "HEAD"], cwd=fix_path(), show_command=show_cmd
-    )
-    commit_short_sha = ssha_stdout.replace("\n", "")
-    (_returncode, commit_time, _stderr) = run_cmd(
-        ["git", "log", "-1", "--format=%cd", "--date=iso"],
-        cwd=fix_path(),
-        show_command=show_cmd,
-    )
-    (_returncode, commit_msg, _stderr) = run_cmd(
-        ["git", "log", "-1", "--format=%B"], cwd=fix_path(), show_command=show_cmd
-    )
-    (_, commit_committer_name, _stderr) = run_cmd(
-        ["git", "log", "-1", "--format=%cn"], cwd=fix_path(), show_command=show_cmd
-    )
-    (_, commit_committer_email, _stderr) = run_cmd(
-        ["git", "log", "-1", "--format=%ce"], cwd=fix_path(), show_command=show_cmd
-    )
-    (_, commit_author_name, _stderr) = run_cmd(
-        ["git", "log", "-1", "--format=%an"], cwd=fix_path(), show_command=show_cmd
-    )
-    (_, commit_author_email, _stderr) = run_cmd(
-        ["git", "log", "-1", "--format=%ae"], cwd=fix_path(), show_command=show_cmd
-    )
-    return CommitInfo(
-        commit_sha,
-        commit_short_sha,
-        commit_time,
-        commit_msg,
-        commit_committer_name,
-        commit_committer_email,
-        commit_author_name,
-        commit_author_email,
-        is_release=("release pmj" in commit_msg.lower()),
-    )
+    return (process.returncode, pstdout.removesuffix("\n"), pstderr.removesuffix("\n"))
 
 
 class CommitInfo:
@@ -317,8 +272,7 @@ class CommitInfo:
             (_returncode, stdout, _stderr) = run_cmd(
                 cmd, cwd=fix_path() if cwd is None else cwd, show_command=show_cmd
             )
-            # remove trailling new line (\n)
-            results[key] = stdout[: len(stdout) - 2]
+            results[key] = stdout
         return CommitInfo(**results, is_release=None)
 
 
