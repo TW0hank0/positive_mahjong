@@ -52,7 +52,6 @@ class BuildTargetInfo:
             "--release",
             "--target",
             self.target,
-            "--workspace",
         ]
         if self.packages is None:
             cmd.append("--workspace")
