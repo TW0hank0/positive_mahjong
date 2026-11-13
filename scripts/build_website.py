@@ -402,16 +402,13 @@ class FilesPageIncludeFile:
 
     def raw_name(self) -> str:
         """like: path/to/file.txt -> path-_-to-file.txt"""
-        return (
-            "-_-".join(os.path.dirname(self.path_rel_project).split(os.path.sep))
-            + (
-                "-"
-                if self.path_rel_project != os.path.basename(self.path_rel_project)
-                else ""
-            )
-            + os.path.basename(
-                self.path_rel_project if self.rename is None else self.rename
-            )
+        return "-_-".join(
+            os.path.join(
+                os.path.dirname(self.path_rel_project),
+                self.rename
+                if self.rename is not None
+                else os.path.basename(self.abs_path),
+            ).split(os.path.sep)
         )
 
 
@@ -472,31 +469,42 @@ def build_files_page(dir_path: str):
             if include_file.rename is None
             else f"{Fore.LIGHTBLACK_EX}->{Fore.RESET} {include_file.rename}"
         )
-        for cfrom, cto in [
+        for cto in [
+            (os.path.join(dir_path, "raw", include_file.raw_name())),
+            (os.path.join(dir_path, "tree", include_file.path_rel_project)),
             (
-                include_file.abs_path,
-                os.path.join(dir_path, "raw", include_file.raw_name()),
-            ),
-            (
-                include_file.abs_path,
-                os.path.join(dir_path, "tree", include_file.path_rel_project),
-            ),
-            (
-                include_file.abs_path,
                 os.path.join(
                     dir_path, "hash", "sha256", include_file.hash_name_sha256(), "file"
-                ),
+                )
             ),
             (
-                include_file.abs_path,
                 os.path.join(
                     dir_path, "hash", "blake3", include_file.hash_name_blake3(), "file"
-                ),
+                )
             ),
         ]:
             print(f"  to {Fore.LIGHTBLACK_EX}->{Fore.RESET} {cto}")
             os.makedirs(os.path.dirname(cto), exist_ok=True)
-            _ = shutil.copy2(cfrom, cto)
+            _ = shutil.copy2(include_file.abs_path, cto)
+        # reduce disk usage
+        os.remove(os.path.join(dir_path, "raw", include_file.raw_name()))
+        os.mkdir(os.path.join(dir_path, "raw", include_file.raw_name()))
+        with open(
+            os.path.join(dir_path, "raw", include_file.raw_name(), "index.html"), "w"
+        ) as f:
+            f.write(f"""<!DOCTYPE html>
+    <html>
+        <head>
+            <meta http-equiv="refresh" content="0; url=/files/hash/sha256/{include_file.hash_name_sha256()}/file">
+            <title>重定向中...</title>
+        </head>
+        <body>
+            <p>如果沒有自動跳轉，請<a href="/files/hash/sha256/{include_file.hash_name_sha256()}/file">點擊這裡跳轉到 /files/hash/sha256/{include_file.hash_name_sha256()}/file</a></p>
+            <script>
+                window.location.href = "/files/hash/sha256/{include_file.hash_name_sha256()}/file";
+            </script>
+        </body>
+</html>""")
         for filename_path in [
             os.path.join(
                 dir_path,
