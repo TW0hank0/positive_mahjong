@@ -21,3 +21,9 @@ specifiers = ["0.23.5"]
 version = "0.5.4"
 backend = "cargo:mdbook"
 specifiers = ["0.5.4"]
+
+[[tools."npm:@biomejs/biome"]]
+version = "2.6.7"
+aube = { path = ".mise/locks/npm-biomejs-biome/2.6.7", digest = "sha256:551eae3f67ea0dbb628ebb5c95bb1891a97bf8764a764bc201117c061d502603" }
+backend = "npm:@biomejs/biome"
+specifiers = ["2.6.7"]
