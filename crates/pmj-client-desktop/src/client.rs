@@ -283,12 +283,20 @@ impl Client {
                                 }
                                 Err(e) => {
                                     let msg = match e.kind {
-                                        CCErrKinds::Url(url_err) => { format!("地址解析錯誤：{:?}", url_err)}
-                                        CCErrKinds::Unknown => { String::from("未知錯誤")}
-                                        _ => { format!("錯誤：{}", e) }
+                                        CCErrKinds::Url(url_err) => {
+                                            format!("地址解析錯誤：{:?}", url_err)
+                                        }
+                                        CCErrKinds::Unknown => String::from("未知錯誤"),
+                                        _ => {
+                                            format!("錯誤：{}", e)
+                                        }
                                     };
                                     error!(msg);
-                                    self.toast.add(Toast::new(msg).set_error().set_title(String::from("Failed to connect server!")));
+                                    self.toast.add(
+                                        Toast::new(msg)
+                                            .set_error()
+                                            .set_title(String::from("Failed to connect server!")),
+                                    );
                                 }
                             }
                         }

@@ -34,11 +34,13 @@ pub enum CCErrKinds {
 
 impl CCError {
     #[inline]
-    pub fn new_unknown()->Self{
-        Self { kind: CCErrKinds::Unknown }
+    pub fn new_unknown() -> Self {
+        Self {
+            kind: CCErrKinds::Unknown,
+        }
     }
     #[inline]
-    pub fn new(kind:CCErrKinds)->Self{
+    pub fn new(kind: CCErrKinds) -> Self {
         Self { kind }
     }
 }
