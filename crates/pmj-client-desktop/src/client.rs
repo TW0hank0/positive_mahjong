@@ -203,6 +203,7 @@ impl Client {
                         let gm_state = ccore.game_state();
                         match gm_state.clone() {
                             ccore::GMState::HomePage => {
+                                connecting_state.ccore=Some(ccore);
                                 return Task::done(Message::Connecting(ConnectingMsg::ReadResp));
                             }
                             pmj_client_core::ccore::GMState::V2Better(gms_v2) => {
