@@ -22,7 +22,7 @@ use std::{
 };
 
 use iced::{
-    self, Length, alignment,
+    self, Length, alignment, border,
     widget::{Column, Row, button, container, rule, space, text, text_input},
 };
 use tracing::{info, warn};
@@ -299,13 +299,52 @@ impl ServerGUI {
                             .into(),
                     );
                 }
-                {
+                if matches!(v2_state.game_status, GameStatus::Room) {
                     v2_layout.push(
                         button(text("開始遊戲"))
                             .on_press(GUIMessages::V2Better(V2BetterMsg::StartGame))
                             .into(),
                     );
                 }
+                let player_infos = v2_state.players.iter().fold(
+                    Column::new().push(
+                        button(text("Refresh"))
+                            .on_press(GUIMessages::V2Better(V2BetterMsg::FetchPlayer)),
+                    ),
+                    |layout, player| {
+                        layout.push(
+                            container(
+                                Row::new()
+                                    .spacing(5)
+                                    .push(text(player.player_id).style(|theme: &iced::Theme| {
+                                        let p = theme.extended_palette();
+                                        text::Style {
+                                            color: Some(p.primary.base.color),
+                                        }
+                                    }))
+                                    .push(text(player.player_ip_addr.to_string())),
+                            )
+                            .padding(3)
+                            .style(|t| {
+                                let p = t.extended_palette();
+                                container::Style {
+                                    border: iced::Border {
+                                        color: p.secondary.weak.color,
+                                        width: 0.7,
+                                        radius: border::Radius {
+                                            top_left: 0.2,
+                                            top_right: 0.5,
+                                            bottom_left: 0.2,
+                                            bottom_right: 0.5,
+                                        },
+                                    },
+                                    ..Default::default()
+                                }
+                            }),
+                        )
+                    },
+                );
+                layout.push(player_infos.into());
                 layout.push(Column::from_vec(v2_layout).spacing(5).into());
             }
         }

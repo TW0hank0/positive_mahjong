@@ -15,7 +15,9 @@
 
 use iced::{
     self, Border, Color, Element, Length, Pixels, Task, alignment, task,
-    widget::{self, Column, Row, Stack, button, container, scrollable, space, text, text_input},
+    widget::{
+        self, Column, Row, Stack, button, container, rule, scrollable, space, text, text_input,
+    },
 };
 use tracing::{error, info, warn};
 
@@ -24,7 +26,7 @@ use pmj_desktop::{
     shared::{ButtonStyles, ContainerStyles, Toast, ToastManager},
 };
 
-use pmj_client_core::ccore;
+use pmj_client_core::{ccore, error::CCErrKinds};
 use pmj_shared::shared::{
     self, FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES, PROJECT_NAME, PROJECT_VERSION,
 };
@@ -37,7 +39,7 @@ pub const MATERIAL_SYMBOLS_OUTLINED: iced::font::Font =
 pub struct Client {
     server_url: String,
     scene: ClientScenes,
-    theme: iced::theme::Theme,
+    theme: iced::Theme,
     toast: ToastManager,
 }
 
@@ -63,7 +65,7 @@ pub struct HomeState {
 pub struct PlayState {
     is_start: bool,
     player_id: u8,
-    hand_cards: Vec<pmj_gamemodes::v2_better::shared::PMJCard>,
+    hand_cards: PreferredHandCards,
     game_msgs: Vec<(u64, String)>,
     game_controller: Vec<pmj_client_core::ccore::PlayerCtrl>,
     current_turn: Option<u8>,
@@ -96,12 +98,41 @@ pub enum ConnectingMsg {
 pub enum PlayMsg {
     GetCard,
     ThrowCard(pmj_gamemodes::v2_better::shared::PMJCard),
+    PrefCardMoveBehind(usize),
+    PrefCardMoveForward(usize),
 }
 
 pub const ALPHABET: [char; 26] = [
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
     'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
 ];
+
+#[derive(Debug)]
+struct PreferredHandCards(Vec<pmj_gamemodes::v2_better::shared::PMJCard>);
+
+impl PreferredHandCards {
+    pub fn move_behind(&mut self, index: usize) {
+        let card = self.0.remove(index);
+        self.0.insert(index, card);
+    }
+    pub fn move_forward(&mut self, index: usize) {
+        let card = self.0.remove(index);
+        self.0.insert(index - 1, card);
+    }
+    pub fn update(&mut self, new: Vec<pmj_gamemodes::v2_better::shared::PMJCard>) {
+        let mut refactor_cards = Vec::new();
+        for card in self.0.iter() {
+            if new.contains(card) {
+                refactor_cards.push(card.clone());
+            }
+        }
+        for card in new {
+            if !refactor_cards.contains(&card) {
+                refactor_cards.push(card);
+            }
+        }
+    }
+}
 
 impl Client {
     pub fn new() -> (Self, Task<Message>) {
@@ -146,12 +177,13 @@ impl Client {
                             play_state.current_turn = gms_v2.player_turn;
                             play_state.player_id = gms_v2.player_id;
                             if (!play_state.is_start)
-                                && gms_v2.game_events.iter().any(|(_, event)| matches!(event, ccore::V2BetterEvents::GameStart)
-                                    )
+                                && gms_v2.game_events.iter().any(|(_, event)| {
+                                    matches!(event, ccore::V2BetterEvents::GameStart)
+                                })
                             {
                                 play_state.is_start = true;
                             }
-                            play_state.hand_cards = gms_v2.cards.clone();
+                            play_state.hand_cards.update(gms_v2.cards.clone());
                             play_state.game_msgs.clear();
                             for (msgid, gmsg) in gms_v2.game_events.clone().iter() {
                                 play_state.game_msgs.push((*msgid, format!("{:?}", gmsg)));
@@ -174,12 +206,13 @@ impl Client {
                         let gm_state = ccore.game_state();
                         match gm_state.clone() {
                             ccore::GMState::HomePage => {
+                                connecting_state.ccore = Some(ccore);
                                 return Task::done(Message::Connecting(ConnectingMsg::ReadResp));
                             }
                             pmj_client_core::ccore::GMState::V2Better(gms_v2) => {
                                 self.scene = ClientScenes::Play(PlayState {
                                     is_start: false,
-                                    hand_cards: Vec::new(),
+                                    hand_cards: PreferredHandCards(Vec::with_capacity(20)),
                                     game_msgs: Vec::with_capacity(20),
                                     game_controller: Vec::new(),
                                     current_turn: None,
@@ -249,9 +282,21 @@ impl Client {
                                     ));
                                 }
                                 Err(e) => {
-                                    let msg = format!("update: {}", e);
+                                    let msg = match e.kind {
+                                        CCErrKinds::Url(url_err) => {
+                                            format!("地址解析錯誤：{:?}", url_err)
+                                        }
+                                        CCErrKinds::Unknown => String::from("未知錯誤"),
+                                        _ => {
+                                            format!("錯誤：{}", e)
+                                        }
+                                    };
                                     error!(msg);
-                                    self.toast.add(Toast::new(msg).set_error());
+                                    self.toast.add(
+                                        Toast::new(msg)
+                                            .set_error()
+                                            .set_title(String::from("Failed to connect server!")),
+                                    );
                                 }
                             }
                         }
@@ -274,6 +319,12 @@ impl Client {
                         play_state.ccore.player_game_action(
                             pmj_gamemodes::v2_better::shared::PlayerGameActions::ThrowCard(card),
                         );
+                    }
+                    PlayMsg::PrefCardMoveBehind(index) => {
+                        play_state.hand_cards.move_behind(index);
+                    }
+                    PlayMsg::PrefCardMoveForward(index) => {
+                        play_state.hand_cards.move_forward(index);
                     }
                 },
                 _ => {
@@ -719,7 +770,7 @@ impl Client {
                     // 卡牌
                     {
                         let mut card_bar_elements: Vec<iced::Element<'_, Message>> = Vec::new();
-                        for card in play_state.hand_cards.iter() {
+                        for (card_index, card) in play_state.hand_cards.0.iter().enumerate() {
                             let card_element = Column::new()
                                 .padding(5)
                                 .width(120)
@@ -731,6 +782,30 @@ impl Client {
                                         .align_y(alignment::Vertical::Bottom)
                                         .size(15)
                                         .align_x(alignment::Horizontal::Right),
+                                )
+                                .push(rule::horizontal(1))
+                                .push(
+                                    Row::new()
+                                        .padding(3)
+                                        .push(button(text("<")).on_press_maybe(
+                                            if card_index == 1 {
+                                                None
+                                            } else {
+                                                Some(Message::Play(PlayMsg::PrefCardMoveForward(
+                                                    card_index,
+                                                )))
+                                            },
+                                        ))
+                                        .push(space().width(Length::Fill))
+                                        .push(button(text(">")).on_press_maybe(
+                                            if card_index == (play_state.hand_cards.0.len() - 1) {
+                                                None
+                                            } else {
+                                                Some(Message::Play(PlayMsg::PrefCardMoveBehind(
+                                                    card_index,
+                                                )))
+                                            },
+                                        )),
                                 );
                             if play_state
                                 .game_controller
@@ -773,7 +848,8 @@ impl Client {
                                             color: p.primary.base.color,
                                             width: 1.0,
                                             radius: iced::border::Radius::new(4),
-                                        },..Default::default()
+                                        },
+                                        ..Default::default()
                                     }
                                 })
                                 .height(Length::Shrink),

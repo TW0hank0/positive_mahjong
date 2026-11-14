@@ -108,9 +108,16 @@ impl ClientCore {
                             let (_event_num, event2) =
                                 state.game_events.get(state.game_events.len() - 2).unwrap();
                             match event2 {
-                                V2BetterEvents::PlayerAction(e2p, _e2pga) => {
-                                    if e2p != &state.player_id {
-                                        able_action.push(PlayerCtrl::GetCard);
+                                V2BetterEvents::PlayerAction(e2p, e2pga) => {
+                                    match e2pga {
+                                        pmj_gamemodes::v2_better::shared::PlayerGameActions::ExposedKong { with:_, kong_card:_ }=>{
+                                            able_action.push(PlayerCtrl::GetCard);
+                                        }
+                                        _=>{
+                                            if e2p != &state.player_id {
+                                                able_action.push(PlayerCtrl::GetCard);
+                                            }
+                                        }
                                     }
                                 }
                                 _ => {
@@ -126,10 +133,13 @@ impl ClientCore {
         able_action
     }
     pub fn connect(server_url: String) -> Result<Self, error::CCError> {
-        let uri: url::Url = url::Url::parse(&server_url).unwrap();
-        let host = uri.host_str().unwrap();
-        let port = uri.port().unwrap();
-        let tcp_stream = net::TcpStream::connect((host, port)).unwrap();
+        let uri: url::Url = url::Url::parse(&server_url).map_err(|e| error::CCError {
+            kind: error::CCErrKinds::Url(e),
+        })?;
+        let host = uri.host_str().ok_or(error::CCError::new_unknown())?;
+        let port = uri.port().ok_or(error::CCError::new_unknown())?;
+        let tcp_stream = net::TcpStream::connect((host, port))
+            .map_err(|e| error::CCError::new(error::CCErrKinds::Io(e)))?;
         match tcp_stream.set_nodelay(true) {
             Ok(_) => {}
             Err(e) => {
@@ -190,7 +200,7 @@ impl ClientCore {
                             drop(guard);
                             warn!("error: {}", e);
                             Result::Err(error::CCError {
-                                kind: error::CCErrKinds::Other,
+                                kind: error::CCErrKinds::FirstMsgSendError,
                             })
                         }
                     }
