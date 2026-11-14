@@ -146,8 +146,9 @@ impl Client {
                             play_state.current_turn = gms_v2.player_turn;
                             play_state.player_id = gms_v2.player_id;
                             if (!play_state.is_start)
-                                && gms_v2.game_events.iter().any(|(_, event)| matches!(event, ccore::V2BetterEvents::GameStart)
-                                    )
+                                && gms_v2.game_events.iter().any(|(_, event)| {
+                                    matches!(event, ccore::V2BetterEvents::GameStart)
+                                })
                             {
                                 play_state.is_start = true;
                             }
@@ -773,7 +774,8 @@ impl Client {
                                             color: p.primary.base.color,
                                             width: 1.0,
                                             radius: iced::border::Radius::new(4),
-                                        },..Default::default()
+                                        },
+                                        ..Default::default()
                                     }
                                 })
                                 .height(Length::Shrink),

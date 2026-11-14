@@ -127,16 +127,40 @@ impl PlayerGameActions {
         matches!(self, Self::ThrowCard(_))
     }
     pub fn is_eat(&self) -> bool {
-        matches!(self, Self::Eat { with:_, eat_card:_ })
+        matches!(
+            self,
+            Self::Eat {
+                with: _,
+                eat_card: _
+            }
+        )
     }
     pub fn is_triplet(&self) -> bool {
-        matches!(self, Self::Triplet { with:_, triplet_card:_ })
+        matches!(
+            self,
+            Self::Triplet {
+                with: _,
+                triplet_card: _
+            }
+        )
     }
     pub fn is_exposed_kong(&self) -> bool {
-        matches!(self, Self::ExposedKong { with:_, kong_card:_ })
+        matches!(
+            self,
+            Self::ExposedKong {
+                with: _,
+                kong_card: _
+            }
+        )
     }
     pub fn is_concealed_kong(&self) -> bool {
-        matches!(self, Self::ConcealedKong { with:_, kong_card:_ })
+        matches!(
+            self,
+            Self::ConcealedKong {
+                with: _,
+                kong_card: _
+            }
+        )
     }
     pub fn is_replace_flower(&self) -> bool {
         matches!(self, Self::ReplaceFlower(_))
@@ -186,10 +210,7 @@ pub enum PMJCardType {
 
 impl PMJCardType {
     pub fn is_ten_thousand(&self) -> bool {
-        matches! (self,
-            Self::TenThousand(_)
-            )
-
+        matches!(self, Self::TenThousand(_))
     }
     pub fn is_line(&self) -> bool {
         matches!(self, Self::Line(_))
