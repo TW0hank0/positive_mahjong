@@ -14,7 +14,10 @@
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 use iced::{
-    self, Border, Color, Element, Length, Pixels, Task, alignment, task, widget::{self, Column, Row, Stack, button, container, rule, scrollable, space, text, text_input},
+    self, Border, Color, Element, Length, Pixels, Task, alignment, task,
+    widget::{
+        self, Column, Row, Stack, button, container, rule, scrollable, space, text, text_input,
+    },
 };
 use tracing::{error, info, warn};
 
@@ -107,18 +110,18 @@ pub const ALPHABET: [char; 26] = [
 #[derive(Debug)]
 struct PreferredHandCards(Vec<pmj_gamemodes::v2_better::shared::PMJCard>);
 
-impl PreferredHandCards{
+impl PreferredHandCards {
     pub fn move_behind(&mut self, index: usize) {
-        let card=self.0.remove(index);
-        self.0.insert(index,card );
-    }
-    pub fn move_forward(&mut self, index:usize){
         let card = self.0.remove(index);
-        self.0.insert(index-1, card);
+        self.0.insert(index, card);
     }
-    pub fn update(&mut self, new: Vec<pmj_gamemodes::v2_better::shared::PMJCard>){
-        let mut refactor_cards=Vec::new();
-        for card in self.0.iter(){
+    pub fn move_forward(&mut self, index: usize) {
+        let card = self.0.remove(index);
+        self.0.insert(index - 1, card);
+    }
+    pub fn update(&mut self, new: Vec<pmj_gamemodes::v2_better::shared::PMJCard>) {
+        let mut refactor_cards = Vec::new();
+        for card in self.0.iter() {
             if new.contains(card) {
                 refactor_cards.push(card.clone());
             }
@@ -203,7 +206,7 @@ impl Client {
                         let gm_state = ccore.game_state();
                         match gm_state.clone() {
                             ccore::GMState::HomePage => {
-                                connecting_state.ccore=Some(ccore);
+                                connecting_state.ccore = Some(ccore);
                                 return Task::done(Message::Connecting(ConnectingMsg::ReadResp));
                             }
                             pmj_client_core::ccore::GMState::V2Better(gms_v2) => {
@@ -305,10 +308,10 @@ impl Client {
                             pmj_gamemodes::v2_better::shared::PlayerGameActions::ThrowCard(card),
                         );
                     }
-                    PlayMsg::PrefCardMoveBehind(index)=>{
+                    PlayMsg::PrefCardMoveBehind(index) => {
                         play_state.hand_cards.move_behind(index);
                     }
-                    PlayMsg::PrefCardMoveForward(index)=>{
+                    PlayMsg::PrefCardMoveForward(index) => {
                         play_state.hand_cards.move_forward(index);
                     }
                 },
@@ -767,11 +770,30 @@ impl Client {
                                         .align_y(alignment::Vertical::Bottom)
                                         .size(15)
                                         .align_x(alignment::Horizontal::Right),
-                                ).push(rule::horizontal(1)).push(
-                                    Row::new().padding(3)
-                                        .push(button(text("<")).on_press_maybe(if card_index == 1 {None}else{Some(Message::Play(PlayMsg::PrefCardMoveForward(card_index)))}))
+                                )
+                                .push(rule::horizontal(1))
+                                .push(
+                                    Row::new()
+                                        .padding(3)
+                                        .push(button(text("<")).on_press_maybe(
+                                            if card_index == 1 {
+                                                None
+                                            } else {
+                                                Some(Message::Play(PlayMsg::PrefCardMoveForward(
+                                                    card_index,
+                                                )))
+                                            },
+                                        ))
                                         .push(space().width(Length::Fill))
-                                        .push(button(text(">")).on_press_maybe(if card_index == (play_state.hand_cards.0.len() -1) {None} else {Some(Message::Play(PlayMsg::PrefCardMoveBehind(card_index)))}))
+                                        .push(button(text(">")).on_press_maybe(
+                                            if card_index == (play_state.hand_cards.0.len() - 1) {
+                                                None
+                                            } else {
+                                                Some(Message::Play(PlayMsg::PrefCardMoveBehind(
+                                                    card_index,
+                                                )))
+                                            },
+                                        )),
                                 );
                             if play_state
                                 .game_controller
