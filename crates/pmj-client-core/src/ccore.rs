@@ -108,9 +108,16 @@ impl ClientCore {
                             let (_event_num, event2) =
                                 state.game_events.get(state.game_events.len() - 2).unwrap();
                             match event2 {
-                                V2BetterEvents::PlayerAction(e2p, _e2pga) => {
-                                    if e2p != &state.player_id {
-                                        able_action.push(PlayerCtrl::GetCard);
+                                V2BetterEvents::PlayerAction(e2p, e2pga) => {
+                                    match e2pga {
+                                        pmj_gamemodes::v2_better::shared::PlayerGameActions::ExposedKong { with:_, kong_card:_ }=>{
+                                            able_action.push(PlayerCtrl::GetCard);
+                                        }
+                                        _=>{
+                                            if e2p != &state.player_id {
+                                                able_action.push(PlayerCtrl::GetCard);
+                                            }
+                                        }
                                     }
                                 }
                                 _ => {
