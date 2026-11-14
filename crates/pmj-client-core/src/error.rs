@@ -13,19 +13,34 @@
 // 您應該已經收到一份 GNU Affero 通用公共授權條款副本。
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
-//! pmj_client_core__error
+//! pmj_client_core::error
 
-use std::{error, fmt};
+use std::{error, fmt, io};
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct CCError {
     pub kind: CCErrKinds,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub enum CCErrKinds {
     HandShakeError,
+    FirstMsgSendError,
+    Url(url::ParseError),
+    Io(io::Error),
     Other,
+    Unknown,
+}
+
+impl CCError {
+    #[inline]
+    pub fn new_unknown()->Self{
+        Self { kind: CCErrKinds::Unknown }
+    }
+    #[inline]
+    pub fn new(kind:CCErrKinds)->Self{
+        Self { kind }
+    }
 }
 
 impl fmt::Display for CCError {

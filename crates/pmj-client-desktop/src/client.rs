@@ -26,7 +26,7 @@ use pmj_desktop::{
     shared::{ButtonStyles, ContainerStyles, Toast, ToastManager},
 };
 
-use pmj_client_core::ccore;
+use pmj_client_core::{ccore, error::CCErrKinds};
 use pmj_shared::shared::{
     self, FONT_MATERIAL_SYMBOLS_OUTLINED_BYTES, PROJECT_NAME, PROJECT_VERSION,
 };
@@ -212,7 +212,7 @@ impl Client {
                             pmj_client_core::ccore::GMState::V2Better(gms_v2) => {
                                 self.scene = ClientScenes::Play(PlayState {
                                     is_start: false,
-                                    hand_cards: PreferredHandCards(Vec::new()),
+                                    hand_cards: PreferredHandCards(Vec::with_capacity(20)),
                                     game_msgs: Vec::with_capacity(20),
                                     game_controller: Vec::new(),
                                     current_turn: None,
@@ -282,9 +282,13 @@ impl Client {
                                     ));
                                 }
                                 Err(e) => {
-                                    let msg = format!("update: {}", e);
+                                    let msg = match e.kind {
+                                        CCErrKinds::Url(url_err) => { format!("地址解析錯誤：{:?}", url_err)}
+                                        CCErrKinds::Unknown => { String::from("未知錯誤")}
+                                        _ => { format!("錯誤：{}", e) }
+                                    };
                                     error!(msg);
-                                    self.toast.add(Toast::new(msg).set_error());
+                                    self.toast.add(Toast::new(msg).set_error().set_title(String::from("Failed to connect server!")));
                                 }
                             }
                         }

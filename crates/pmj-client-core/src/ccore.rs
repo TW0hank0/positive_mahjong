@@ -133,10 +133,10 @@ impl ClientCore {
         able_action
     }
     pub fn connect(server_url: String) -> Result<Self, error::CCError> {
-        let uri: url::Url = url::Url::parse(&server_url).unwrap();
-        let host = uri.host_str().unwrap();
-        let port = uri.port().unwrap();
-        let tcp_stream = net::TcpStream::connect((host, port)).unwrap();
+        let uri: url::Url = url::Url::parse(&server_url).map_err(|e| {error::CCError{kind:error::CCErrKinds::Url(e)}})?;
+        let host = uri.host_str().ok_or(error::CCError::new_unknown())?;
+        let port = uri.port().ok_or(error::CCError::new_unknown())?;
+        let tcp_stream = net::TcpStream::connect((host, port)).map_err(|e|{error::CCError::new(error::CCErrKinds::Io(e))})?;
         match tcp_stream.set_nodelay(true) {
             Ok(_) => {}
             Err(e) => {
@@ -197,7 +197,7 @@ impl ClientCore {
                             drop(guard);
                             warn!("error: {}", e);
                             Result::Err(error::CCError {
-                                kind: error::CCErrKinds::Other,
+                                kind: error::CCErrKinds::FirstMsgSendError,
                             })
                         }
                     }

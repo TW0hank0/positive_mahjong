@@ -14,8 +14,7 @@
 // 如果沒有，請參見 <https://www.gnu.org/licenses/>。
 
 use iced::{
-    self, Background, Border, Length, alignment, border,
-    widget::{Column, button, container, progress_bar, scrollable, space, text},
+    self, Background, Border, Length, alignment, border, widget::{Column, Row, button, container, progress_bar, scrollable, space, text},
 };
 use std::time;
 use tracing::info;
@@ -204,12 +203,17 @@ impl ToastManager {
             let layout = reverse_toasts.into_iter().fold(
                 Column::new().padding(5).spacing(10),
                 |layout, (toast, instant)| {
-                    let mut tlayout = Column::new().padding(2).width(Length::Fixed(450.0));
+                    let mut tlayout = Column::new().padding(0).width(Length::Fixed(450.0));
+                    let content ={
+                        let mut layout=Column::new().padding(5);
                     if let Some(title) = toast.title {
-                        tlayout = tlayout.push(text(title).size(28))
+                        layout = layout.push(text(title).size(28))
                     }
-                    tlayout = tlayout.push(text(toast.msg).size(22));
-                    tlayout = tlayout.push(
+                    layout = layout.push(text(toast.msg).size(22));
+                    layout
+                    };
+                    tlayout=tlayout.push(content);
+                    tlayout = tlayout.push(Row::new().push(text(format!("{:?}", toast.level)).size(10)).push(
                         progress_bar(0.0..=10.0, instant.elapsed().as_secs_f32())
                             .girth(Length::Fixed(7.0))
                             .style(|theme: &iced::Theme| {
@@ -219,31 +223,28 @@ impl ToastManager {
                                     bar: Background::Color(p.primary.base.color),
                                     border: iced::Border {
                                         color: p.primary.strong.color,
-                                        width: 1.0,
-                                        radius: iced::border::radius(4),
+                                        width: 0.7,
+                                        radius: border::Radius {
+                                            top_left:0.1,
+                                            top_right:0.1,
+                                            bottom_left:0.5,
+                                            bottom_right:0.5,
+                                        }
                                     },
                                 }
                             }),
-                    );
-                    let tlevel = toast.level;
+                    ));
                     layout.push(container(tlayout).style(move |theme: &iced::Theme| {
                         let p = theme.extended_palette();
                         container::Style {
-                            background: Some(Background::Color(match tlevel {
-                                ToastLevel::Error => p.danger.base.color,
-                                ToastLevel::Info => p.secondary.base.color,
-                                ToastLevel::Sucessful => p.success.base.color,
-                                ToastLevel::Warning => p.warning.base.color,
-                            })),
-                            text_color: Some(match tlevel {
-                                ToastLevel::Error => p.danger.base.text,
-                                ToastLevel::Info => p.secondary.base.text,
-                                ToastLevel::Sucessful => p.success.base.text,
-                                ToastLevel::Warning => p.warning.base.text,
-                            }),
                             border: iced::Border {
-                                color: iced::Color::TRANSPARENT,
-                                width: 0.0,
+                                color: match toast.level {
+                                    ToastLevel::Error => p.danger.base.color,
+                                    ToastLevel::Info => p.secondary.base.color,
+                                    ToastLevel::Sucessful => p.success.base.color,
+                                    ToastLevel::Warning => p.warning.base.color,
+                                },
+                                width: 3.0,
                                 radius: iced::border::radius(2),
                             },
                             ..Default::default()
