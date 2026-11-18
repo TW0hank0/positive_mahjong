@@ -20,7 +20,7 @@ mod client;
 use pmj_shared::shared::{self, FONT_NOTO_SANS_REG_BYTES, ICON_PNG_BYTES, PROJECT_NAME};
 
 pub const FONT_NOTO_SANS_REG: iced::font::Font = iced::font::Font::with_name("Noto Sans TC");
-const MEMBER_NAME:&str="pmj-client-desktop-base";
+const MEMBER_NAME: &str = "pmj-client-desktop-base";
 
 pub fn icon_init() -> Option<iced::window::Icon> {
     let img = image::load_from_memory_with_format(ICON_PNG_BYTES, image::ImageFormat::Png)

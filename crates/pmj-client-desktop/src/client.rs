@@ -808,7 +808,8 @@ impl Client {
                                         .style(ButtonStyles::PrimaryOutlined.style())
                                         .into(),
                                 );
-                            } else */ {
+                            } else */
+                            {
                                 card_bar_elements.push(
                                     container(card_element)
                                         .style(ContainerStyles::BackgroundOutlined.style())

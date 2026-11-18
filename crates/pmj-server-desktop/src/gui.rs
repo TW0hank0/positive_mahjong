@@ -39,9 +39,7 @@ pub fn main() -> iced::Result {
         .title(ServerGUI::title)
         .theme(ServerGUI::theme)
         .subscription(ServerGUI::subscription)
-        .settings(pmj_desktop::shared::iced_app_settings(
-            MEMBER_NAME,
-        ))
+        .settings(pmj_desktop::shared::iced_app_settings(MEMBER_NAME))
         .window(pmj_desktop::shared::iced_window_settings())
         .run()
 }
@@ -344,7 +342,12 @@ impl ServerGUI {
                         )
                     },
                 );
-                layout.push(Column::from_vec(v2_layout).push(player_infos).spacing(5).into());
+                layout.push(
+                    Column::from_vec(v2_layout)
+                        .push(player_infos)
+                        .spacing(5)
+                        .into(),
+                );
             }
         }
         Column::from_vec(layout).padding(5).into()
