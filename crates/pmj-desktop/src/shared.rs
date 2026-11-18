@@ -146,7 +146,7 @@ pub fn iced_window_settings() -> iced::window::Settings {
         ..Default::default()
     }
 }
-pub fn iced_app_settings(member_name: String) -> iced::Settings {
+pub fn iced_app_settings(member_name: &str) -> iced::Settings {
     iced::Settings {
         id: Some(format!("{} - {}", member_name, PROJECT_NAME)),
         default_text_size: iced::Pixels::from(24),
@@ -292,12 +292,19 @@ pub struct Toast {
 impl Default for Toast {
     fn default() -> Self {
         Self {
-            level: ToastLevel::Info,
+            level: ToastLevel::default(),
             msg: String::new(),
             title: None,
         }
     }
 }
+
+impl From<&str> for Toast {
+    fn from(value: &str) -> Self {
+        Self::new(value.into())
+    }
+}
+
 impl Toast {
     pub fn new(msg: String) -> Self {
         Self {
@@ -327,9 +334,10 @@ impl Toast {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub enum ToastLevel {
     Sucessful,
+    #[default]
     Info,
     Warning,
     Error,

@@ -42,10 +42,9 @@ class BuildTargetInfo:
         self.target = target
         self.packages = packages
         commit_info = util.CommitInfo.get_from_git()
-        if commit_info.is_release is False:
-            self.version = util.get_version() + "+" + commit_info.short_sha
-        else:
-            self.version = util.get_version()
+        self.version = util.get_version() + (
+            "+" + commit_info.short_sha if commit_info.is_release is False else ""
+        )
 
     def rustup_target(self):
         util.run_cmd(["rustup", "target", "add", self.target])
@@ -133,7 +132,7 @@ class BuildTargetInfo:
                 f"pmj-desktop-installer-v{self.version}-{self.target}{EXEC_EXT}"
             )
             os.rename(
-                desktop_installer_path,
+                util.fix_path("artifacts", f"pmj-desktop-installer{EXEC_EXT}"),
                 util.fix_path("artifacts", new_desktop_installer_name),
             )
             print(
@@ -173,7 +172,10 @@ class BuildTargetInfo:
         ]
         for file in os.listdir(target_path):
             full_file_path = os.path.join(target_path, file)
-            if os.path.isfile(full_file_path) is True:
+            if (
+                os.path.isfile(full_file_path) is True
+                and file != f"pmj-desktop-installer{EXEC_EXT}"
+            ):
                 if INCLUDE_FILES_MATCH_TYPE == "inclue_all_files":
                     include_files.append(full_file_path)
                 elif INCLUDE_FILES_MATCH_TYPE == "exe_split":
@@ -243,7 +245,7 @@ class BuildTargetInfo:
         if type(other) is BuildTargetInfo:
             return self.target <= other.target
         else:
-            raise NotImplementedError("僅支援int、float及UInt！")
+            raise NotImplementedError()
 
 
 def main():

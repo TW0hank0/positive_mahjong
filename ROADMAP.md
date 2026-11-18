@@ -12,12 +12,11 @@
 
 - [pmj-client-core：客戶端核心](./TODO.md#pmj-client-core)
 - [V2Better 玩法](<./TODO.md#V2Better 玩法>)
-- [客戶端遊戲中退出向玩家確認](./TODO.md#客戶端遊戲中退出向玩家確認)
-- [客戶端遊戲中退出向伺服器傳送訊息](./TODO.md#客戶端遊戲中退出向伺服器傳送訊息)
 
 ### v0.3.0
 
-- github-workflow：cache licenses 用 Cargo.lock 作為 key
+- [客戶端遊戲中退出向玩家確認](./TODO.md#客戶端遊戲中退出向玩家確認)
+- [客戶端遊戲中退出向伺服器傳送訊息](./TODO.md#客戶端遊戲中退出向伺服器傳送訊息)
 - [伺服器GUI顯示遊戲狀態](./TODO.md#伺服器GUI顯示遊戲狀態)
 
 ### v0.4.0
@@ -31,7 +30,7 @@
 
 ### v0.6.0
 
-- （暫定）pmj-server-tui：總端中的客戶端
+- （暫定）[pmj-server-tui：總端中的客戶端](./TODO.md#pmj-server-tui)
 
 ### v0.7.0
 

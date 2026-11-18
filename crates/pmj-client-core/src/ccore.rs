@@ -82,55 +82,9 @@ pub enum V2BetterEvents {
     YouHandCardChange(Vec<pmj_gamemodes::v2_better::shared::PMJCard>),
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub enum PlayerCtrl {
-    GetCard,
-    ThrowCard,
-}
-
 impl ClientCore {
     pub fn game_state(&self) -> GMState {
         self.gamemode_state.clone()
-    }
-    /// TODO
-    pub fn current_ctrl(&self) -> Vec<PlayerCtrl> {
-        let mut able_action = Vec::new();
-        match self.gamemode_state {
-            GMState::HomePage => {}
-            GMState::V2Better(ref state) => {
-                if state.game_events.len() > 1 {
-                    let (_event_num, event) = state.game_events.last().unwrap();
-                    match event {
-                        V2BetterEvents::YouGetCard(_) => able_action.push(PlayerCtrl::ThrowCard),
-                        V2BetterEvents::ChangeTurn(turn_player)
-                            if turn_player == &state.player_id =>
-                        {
-                            let (_event_num, event2) =
-                                state.game_events.get(state.game_events.len() - 2).unwrap();
-                            match event2 {
-                                V2BetterEvents::PlayerAction(e2p, e2pga) => {
-                                    match e2pga {
-                                        pmj_gamemodes::v2_better::shared::PlayerGameActions::ExposedKong { with:_, kong_card:_ }=>{
-                                            able_action.push(PlayerCtrl::GetCard);
-                                        }
-                                        _=>{
-                                            if e2p != &state.player_id {
-                                                able_action.push(PlayerCtrl::GetCard);
-                                            }
-                                        }
-                                    }
-                                }
-                                _ => {
-                                    able_action.push(PlayerCtrl::GetCard);
-                                }
-                            }
-                        }
-                        _ => {}
-                    }
-                }
-            }
-        }
-        able_action
     }
     pub fn connect(server_url: String) -> Result<Self, error::CCError> {
         let uri: url::Url = url::Url::parse(&server_url).map_err(|e| error::CCError {

@@ -67,10 +67,9 @@ pub struct PlayState {
     player_id: u8,
     hand_cards: PreferredHandCards,
     game_msgs: Vec<(u64, String)>,
-    game_controller: Vec<pmj_client_core::ccore::PlayerCtrl>,
     current_turn: Option<u8>,
-    ccore: pmj_client_core::ccore::ClientCore,
-    gm_state: pmj_client_core::ccore::GMState,
+    ccore: ccore::ClientCore,
+    gm_state: ccore::GMState,
 }
 
 #[derive(Debug, Clone)]
@@ -165,7 +164,6 @@ impl Client {
             Message::CCoreProcessTask => match self.scene {
                 ClientScenes::Play(ref mut play_state) => {
                     play_state.ccore.process_task();
-                    play_state.game_controller = play_state.ccore.current_ctrl();
                     play_state.gm_state = play_state.ccore.game_state();
                     match play_state.gm_state {
                         pmj_client_core::ccore::GMState::HomePage => {
@@ -214,7 +212,6 @@ impl Client {
                                     is_start: false,
                                     hand_cards: PreferredHandCards(Vec::with_capacity(20)),
                                     game_msgs: Vec::with_capacity(20),
-                                    game_controller: Vec::new(),
                                     current_turn: None,
                                     ccore,
                                     gm_state,
@@ -755,9 +752,6 @@ impl Client {
                     {
                         // pga
                         let mut pga_bar = Vec::new();
-                        if play_state
-                            .game_controller
-                            .contains(&pmj_client_core::ccore::PlayerCtrl::GetCard)
                         {
                             pga_bar.push(
                                 button(text("GetCard"))
@@ -807,17 +801,15 @@ impl Client {
                                             },
                                         )),
                                 );
-                            if play_state
-                                .game_controller
-                                .contains(&pmj_client_core::ccore::PlayerCtrl::ThrowCard)
-                            {
+                            /* {
                                 card_bar_elements.push(
                                     button(card_element)
                                         .on_press(Message::Play(PlayMsg::ThrowCard(card.clone())))
                                         .style(ButtonStyles::PrimaryOutlined.style())
                                         .into(),
                                 );
-                            } else {
+                            } else */
+                            {
                                 card_bar_elements.push(
                                     container(card_element)
                                         .style(ContainerStyles::BackgroundOutlined.style())

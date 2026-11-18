@@ -15,20 +15,21 @@
 
 use tracing::{debug, error};
 
-mod client;
-
 use pmj_desktop::shared::{FONT_NOTO_SANS_REG, iced_app_settings, iced_window_settings};
 use pmj_shared::shared::init_tracing_fmt;
 
+mod client;
+use client::MEMBER_NAME;
+
 fn main() {
-    let _guard = init_tracing_fmt(String::from("pmj-client-desktop"));
+    let _guard = init_tracing_fmt(MEMBER_NAME);
     let iced_result = iced::application(
         client::Client::new,
         client::Client::update,
         client::Client::view,
     )
     .window(iced_window_settings())
-    .settings(iced_app_settings(String::from(client::MEMBER_NAME)))
+    .settings(iced_app_settings(MEMBER_NAME))
     .default_font(FONT_NOTO_SANS_REG)
     .title(client::Client::title)
     .theme(client::Client::theme)

@@ -30,11 +30,11 @@ const MEMBER_NAME: &str = "pmj-desktop-installer";
 const INST_STORED_BYTES: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/inst-stored.zip"));
 
 fn main() {
-    let _guard = shared::init_tracing_fmt(String::from(MEMBER_NAME));
+    let _guard = shared::init_tracing_fmt(MEMBER_NAME);
     let iced_result =
         iced::application(PmjInstaller::new, PmjInstaller::update, PmjInstaller::view)
             .window(iced_window_settings())
-            .settings(iced_app_settings(String::from("pmj-desktop-installer")))
+            .settings(iced_app_settings(MEMBER_NAME))
             .default_font(FONT_NOTO_SANS_REG)
             .title(PmjInstaller::title)
             .theme(PmjInstaller::theme)
@@ -193,6 +193,7 @@ impl PmjInstaller {
                                     info!("update: matches!(inst_state, InstState::InstallFinish)");
                                     self.scene = Scenes::Installed;
                                     self.installing = false;
+                                    return iced::Task::none();
                                 } else {
                                     self.install_states.push(inst_state);
                                 }
