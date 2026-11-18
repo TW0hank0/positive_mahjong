@@ -20,6 +20,7 @@ mod client;
 use pmj_shared::shared::{self, FONT_NOTO_SANS_REG_BYTES, ICON_PNG_BYTES, PROJECT_NAME};
 
 pub const FONT_NOTO_SANS_REG: iced::font::Font = iced::font::Font::with_name("Noto Sans TC");
+const MEMBER_NAME:&str="pmj-client-desktop-base";
 
 pub fn icon_init() -> Option<iced::window::Icon> {
     let img = image::load_from_memory_with_format(ICON_PNG_BYTES, image::ImageFormat::Png)
@@ -30,7 +31,7 @@ pub fn icon_init() -> Option<iced::window::Icon> {
 }
 
 fn main() {
-    let _guard = shared::init_tracing_fmt(String::from("pmj_client_desktop"));
+    let _guard = shared::init_tracing_fmt(MEMBER_NAME);
     let window_settings = iced::window::Settings {
         maximized: true,
         min_size: Some(iced::Size::new(720.0, 480.0)),
@@ -39,7 +40,7 @@ fn main() {
         ..Default::default()
     };
     let app_settings = iced::Settings {
-        id: Some(format!("{} - pmj_client_desktop_base", PROJECT_NAME)),
+        id: Some(format!("{} - {}", MEMBER_NAME, PROJECT_NAME)),
         default_text_size: iced::Pixels::from(24),
         default_font: FONT_NOTO_SANS_REG,
         vsync: true,

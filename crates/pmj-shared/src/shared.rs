@@ -102,16 +102,16 @@ pub fn read_server_config() -> PMJServerConfig {
     }
 }
 
-pub fn init_tracing_fmt(member_name: String) -> tracing_appender::non_blocking::WorkerGuard {
+pub fn init_tracing_fmt(member_name: &str) -> tracing_appender::non_blocking::WorkerGuard {
     let log_dir_path = dirs::data_local_dir()
         .unwrap_or(env::current_dir().unwrap())
         .join("positive_mahjong")
         .join("logs")
-        .join(member_name.clone());
+        .join(member_name);
     if !fs::exists(&log_dir_path).unwrap_or(false) {
         fs::create_dir_all(&log_dir_path).ok();
     }
-    let guard = positive_tool_rs::pt::init_tracing(log_dir_path, Some(member_name));
+    let guard = positive_tool_rs::pt::init_tracing(log_dir_path, Some(member_name.into()));
     debug!("成功初始化日誌。");
     guard
 }
