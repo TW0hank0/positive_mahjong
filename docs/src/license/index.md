@@ -19,5 +19,5 @@
 
 授權聲明：
 
-- [模組庫授權與聲明](license/ThirdPartyLicense-Rust.md)
-- [其他第三方專案授權聲明](license/other.md)
+- [模組庫授權與聲明](./ThirdPartyLicense-Rust.md)
+- [其他第三方專案授權聲明](./other.md)
