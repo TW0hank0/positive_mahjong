@@ -23,7 +23,7 @@ backend = "cargo:mdbook"
 specifiers = ["0.5.4"]
 
 [[tools."npm:@biomejs/biome"]]
-version = "2.6.7"
-aube = { path = ".mise/locks/npm-biomejs-biome/2.6.7", digest = "sha256:551eae3f67ea0dbb628ebb5c95bb1891a97bf8764a764bc201117c061d502603" }
+version = "2.6.8"
+aube = { path = ".mise/locks/npm-biomejs-biome/2.6.8", digest = "sha256:10ffb2e3dfb58f754834589343a3cc8f91e1ba1d82663c0e71c7bce06eb15b06" }
 backend = "npm:@biomejs/biome"
-specifiers = ["2.6.7"]
+specifiers = ["2.6.8"]
