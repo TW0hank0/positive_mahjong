@@ -412,6 +412,13 @@ class FilesPageIncludeFile:
         )
 
 
+class MappingInfo(pydantic.BaseModel):
+    raw: dict[str, dict[Literal["blake3", "sha256"], str]]
+    tree: dict[str, dict[Literal["blake3", "sha256"], str]]
+    blake3: list[str]
+    sha256: list[str]
+
+
 def build_files_page(dir_path: str):
     include_files: list[FilesPageIncludeFile] = [
         FilesPageIncludeFile(util.fix_path("LICENSE.txt")),
@@ -463,6 +470,7 @@ def build_files_page(dir_path: str):
     os.mkdir(os.path.join(dir_path, "raw"))
     os.mkdir(os.path.join(dir_path, "tree"))
     os.mkdir(os.path.join(dir_path, "hash"))
+    mapping_info = MappingInfo(raw={}, tree={}, sha256=[], blake3=[])
     for include_file in include_files:
         print(
             f"{Fore.CYAN}Processing{Fore.RESET} {include_file.abs_path}" + ""
@@ -525,7 +533,11 @@ def build_files_page(dir_path: str):
                 filename_path,
                 "w",
             ) as f:
-                _ = f.write(os.path.basename(include_file.abs_path))
+                _ = f.write(
+                    os.path.basename(include_file.abs_path)
+                    if include_file.rename is None
+                    else include_file.rename
+                )
         files_summary = (
             files_summary
             + f"""
@@ -533,6 +545,18 @@ def build_files_page(dir_path: str):
           <a href="./tree/{include_file.path_rel_project}" target="_blank" download>{os.path.basename(include_file.abs_path) if include_file.rename is None else include_file.rename}</a>
         </div>"""
         )
+        mapping_info.blake3.append(include_file.hash_name_blake3())
+        mapping_info.sha256.append(include_file.hash_name_sha256())
+        mapping_info.tree[include_file.path_rel_project] = {
+            "blake3": include_file.hash_name_blake3(),
+            "sha256": include_file.hash_name_sha256(),
+        }
+        mapping_info.raw[include_file.raw_name()] = {
+            "blake3": include_file.hash_name_blake3(),
+            "sha256": include_file.hash_name_sha256(),
+        }
+    with open(os.path.join(dir_path, "mapping.json"), "w") as f:
+        _ = f.write(mapping_info.model_dump_json(indent=4))
     replaced_template = FILES_PAGE_TEMPLATE.replace(
         "{{$DY_VAR_FILES_SUMMARY$}}", files_summary
     )
