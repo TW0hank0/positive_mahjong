@@ -666,6 +666,19 @@ def replace_var(
 
 
 def copy_website_dep(build_root: str):
+    if (
+        os.path.exists(
+            util.fix_path("docs", "src", "license", "ThirdPartyLicense-Rust.md")
+        )
+        is True
+    ):
+        os.remove(util.fix_path("docs", "src", "license", "ThirdPartyLicense-Rust.md"))
+        print(
+            f"Removed {util.fix_path('docs', 'src', 'license', 'ThirdPartyLicense-Rust.md')}"
+        )
+    print(
+        f"Copied to {shutil.copy2(util.fix_path('auto_generated', 'ThirdPartyLicense-Rust.md'), util.fix_path('docs', 'src', 'license'))}"
+    )
     _ = util.run_cmd(["mdbook", "build"], cwd=util.fix_path("docs"))
     if os.path.exists(os.path.join(build_root, "docs")) is True:
         shutil.rmtree(os.path.join(build_root, "docs"))
