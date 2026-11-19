@@ -115,6 +115,10 @@ iced-GUI + ratatui-TUI + clap-CLI
 - [ ] 不重複檢查
 - [ ] 在 RequestsReview 時檢查
 
+#### i18n/l10n
+
+try fluent?
+
 ---
 
 ## 已完成
